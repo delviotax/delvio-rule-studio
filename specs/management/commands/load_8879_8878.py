@@ -460,9 +460,10 @@ F79_LINES: list[dict] = [
 ]
 
 F79_DIAGNOSTICS: list[dict] = [
-    {"diagnostic_id": "D_8879_NEED", "title": "Form 8879 required for this e-filed return", "severity": "warning",
+    {"diagnostic_id": "D_8879_NEED", "title": "Form 8879 required for this e-filed return", "severity": "info",
      "condition": "e-filing with the Practitioner PIN method, or the ERO enters/generates any taxpayer PIN",
-     "message": "This return needs a Form 8879: the Practitioner PIN method (the house default) always requires one, and any ERO-entered or ERO-generated taxpayer PIN requires one under either method. Print it, obtain the taxpayer signature(s), and retain it - it is never mailed to the IRS.", "notes": "W1."},
+     "message": "This return needs a Form 8879: the Practitioner PIN method (the house default) always requires one, and any ERO-entered or ERO-generated taxpayer PIN requires one under either method. Print it, obtain the taxpayer signature(s), and retain it - it is never mailed to the IRS.",
+     "notes": "W1. SEVERITY AMENDED warning -> info 2026-07-25 (Ken-directed, tts s109). This states a FACT about the return - an 8879 is required - and NOTHING the preparer does can clear it: it fires whenever the need-gate is on, signed or not, for the life of the return. A warning that cannot be resolved is unactionable, and it actively misled a QA tester into reporting the 8879 record as lost (the surviving finding was in fact proof the record still existed - it cannot fire without a Form8879 row). Enforcement is unchanged and lives where it belongs: D_8879_UNSIGNED (error) blocks transmission until the signature dates are recorded, and the extract refuses on the same condition. Same class as D_8879_SID and D_8879_RETAIN, which were already info. No tax-law element changes - Pub. 1345 and the Form 8879 need-chart are untouched."},
     {"diagnostic_id": "D_8879_UNSIGNED", "title": "8879 not signed - transmission is blocked", "severity": "error",
      "condition": "f8879_needed and a required signed date is missing at extract/transmit",
      "message": "The ERO must RECEIVE the completed, signed Form 8879 before the return is transmitted or released for transmission (Form 8879 caution; Pub 1345). Record the taxpayer (and spouse, if MFJ) signature date(s) before building the e-file submission.", "notes": "W2. Walk seam 3: the extract refuses on this - revisit at S-17g."},
@@ -806,7 +807,13 @@ class Command(BaseCommand):
         for a in FLOW_ASSERTIONS:
             a = dict(a)
             FlowAssertion.objects.update_or_create(assertion_id=a.pop("assertion_id"), defaults=a)
-        self.stdout.write(f"  {len(FLOW_ASSERTIONS)} flow assertions (staged DRAFT - the tts leg activates)")
+        # The status comes from FLOW_ASSERTIONS itself (ACTIVE since the tts build
+        # leg landed, s94). The old hard-coded "staged DRAFT" text outlived the flip
+        # and read, on every reseed, as though this run had just deactivated the
+        # three assertions the tts flow gate depends on. Report the truth instead.
+        _fa_status = sorted({fa.get("status", "draft") for fa in FLOW_ASSERTIONS})
+        self.stdout.write(
+            f"  {len(FLOW_ASSERTIONS)} flow assertions ({'/'.join(_fa_status)})")
 
     def _report(self):
         self.stdout.write("\n" + "=" * 60)

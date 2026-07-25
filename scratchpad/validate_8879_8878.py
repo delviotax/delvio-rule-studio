@@ -40,8 +40,14 @@ def check(cond, ok, bad):
 
 call_command("migrate", run_syncdb=True, verbosity=0)
 
-# -- Gate-1 guard: the sentinel SHIPS False and the loader refuses --
-check(L.READY_TO_SEED is False, "READY_TO_SEED ships False (Gate-1 pending)", "READY_TO_SEED is not False in the shipped file")
+# -- Gate-1 guard: the loader refuses while the sentinel is off --
+# The sentinel itself has SHIPPED True since 2026-07-15 (Ken approved WO-33 Gate-1
+# in-session, tts s94), so the harness no longer asserts it ships False — it forces
+# the flag off to prove the refusal path still works, then restores it. Before this
+# repair the three post-Gate-1 assertions (ships-False, guard-refusal, FAs-DRAFT)
+# failed on every run purely because nobody updated the harness after the flip.
+check(L.READY_TO_SEED is True, "READY_TO_SEED is on (Gate-1 approved 2026-07-15, WO-33)", "READY_TO_SEED is off — the loader will refuse to seed")
+L.READY_TO_SEED = False
 try:
     call_command("load_8879_8878", verbosity=0)
     FAILURES.append("guard FAILED to refuse while READY_TO_SEED=False")
@@ -112,11 +118,11 @@ for form, rules, links, tag in ((form_79, L.F79_RULES, L.F79_RULE_LINKS, "8879")
     linked = {rl[0] for rl in links}
     check(not (linked - defined) and not (defined - linked), f"{tag}: rule_links bidirectionally complete", f"{tag} link drift: {linked ^ defined}")
 
-# -- FAs staged DRAFT --
+# -- FAs: staged DRAFT at authoring, ACTIVATED when the tts leg landed (s94) --
 fas = list(FlowAssertion.objects.filter(assertion_id__in=["FA-8879-NEED", "FA-8879-RESIGN", "FA-8878-EFW"]))
 check(len(fas) == 3, "3 pair assertions", f"FA count {len(fas)}")
-notdraft = [fa.assertion_id for fa in fas if fa.status != "draft"]
-check(not notdraft, "all pair FAs staged DRAFT (the new-FAs-default-ACTIVE trap)", f"NOT draft: {notdraft}")
+notactive = [fa.assertion_id for fa in fas if fa.status != "active"]
+check(not notactive, "all 3 pair FAs ACTIVE (flipped when the tts build leg landed, s94)", f"NOT active: {notactive}")
 
 # ============================================================
 # Logic oracles
@@ -221,6 +227,13 @@ r_timing = FormRule.objects.get(tax_form=form_79, rule_id="R-8879-TIMING")
 check("stockpiling" in r_timing.formula and "9325" in r_timing.formula, "sign-before-transmit + SID/9325 + stockpiling in R-8879-TIMING", "timing rule text missing")
 d_unsigned = FormDiagnostic.objects.get(tax_form=form_79, diagnostic_id="D_8879_UNSIGNED")
 check(d_unsigned.severity == "error", "D_8879_UNSIGNED is a BLOCKER (walk seam 3 extract-refusal)", "D_8879_UNSIGNED not error")
+# -- the 2026-07-25 severity amendment, pinned so it cannot be silently reverted --
+# D_8879_NEED states a FACT (this return requires an 8879) that NOTHING the preparer
+# does can clear, so it is INFO. Enforcement stays on D_8879_UNSIGNED (error, asserted
+# above): the pair must never both be non-blocking, or an unsigned return could transmit.
+d_need = FormDiagnostic.objects.get(tax_form=form_79, diagnostic_id="D_8879_NEED")
+check(d_need.severity == "info", "D_8879_NEED is INFO (unclearable standing fact; amended 2026-07-25)", f"D_8879_NEED severity is {d_need.severity}, expected info")
+check(d_unsigned.severity == "error", "the NEED/UNSIGNED pair still carries exactly one blocker", "the 8879 need-chart has no blocking diagnostic left")
 d_yw = FormDiagnostic.objects.get(tax_form=form_78, diagnostic_id="D_8878_YEARWATCH")
 check("YEAR-DATED" in d_yw.message, "the 8878 year-watch diagnostic present", "year-watch missing")
 

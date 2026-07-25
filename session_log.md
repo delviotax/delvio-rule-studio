@@ -1,3 +1,35 @@
+## 2026-07-25 - D_8879_NEED severity amendment (warning -> info; Ken-directed, tts s109) - SEEDED + tts leg SHIPPED
+- Amended IN THE OWNING LOADER (load_8879_8878.py, in-place re-run safe). **No tax-law element
+  changes** - Pub. 1345 and the Form 8879 need-chart are untouched; this is a SEVERITY/workflow
+  amendment only, so it did NOT enter via CHANGE_REGISTER (that funnel is for law changes).
+- WHY: D_8879_NEED states a FACT about the return - an 8879 is required - and NOTHING the preparer
+  can do will clear it. It fires whenever the need-gate is on, signed or not, for the life of the
+  return. An unclearable warning is unactionable, and this one did measurable harm: a QA tester
+  (Batch-001) read the surviving finding as evidence that the completed Form 8879 record had been
+  lost, and filed a P0 on that basis. The finding was in fact PROOF THE RECORD STILL EXISTED - the
+  rule short-circuits to [] when there is no Form8879 row. Same class as D_8879_SID and
+  D_8879_RETAIN, which were already info.
+- ENFORCEMENT UNCHANGED: D_8879_UNSIGNED stays an ERROR and blocks transmission until the signature
+  dates are recorded; the extract still refuses on the same condition. The harness now pins BOTH
+  halves, so the pair can never go all-non-blocking (an unsigned return reaching transmit).
+- Harness `scratchpad/validate_8879_8878.py` **79/0** - and REPAIRED while here: three assertions
+  had been failing on every run since 2026-07-15 purely because nobody updated them after Ken
+  approved Gate-1 (they still asserted READY_TO_SEED ships False and the FAs are staged DRAFT).
+  Now it forces the sentinel off to prove the refusal path, then restores it, and asserts the FAs
+  are ACTIVE. A permanently-red harness is a harness nobody reads.
+- ALSO FIXED: the loader printed a hard-coded "3 flow assertions (staged DRAFT - the tts leg
+  activates)" on every reseed. The status has been ACTIVE since s94; the stale text read as though
+  the run had just deactivated the three assertions the tts flow gate depends on. It now reports
+  the actual status from FLOW_ASSERTIONS. **Verified against prod after seeding: all 3 still
+  `active` (484 active FAs total)** - the message was lying, the behaviour was correct.
+- Seeded to prod; deployed export verified carrying `D_8879_NEED -> info`; tts mirror
+  `server/specs/8879_spec.json` refreshed from the deployed export (the ONLY diff vs the previous
+  mirror was that one severity - rules/line_map/facts/tests/metadata byte-identical).
+- tts leg landed same-session (`s109`): rules_8879 severity moved in BOTH places it lives (the
+  `_finding()` the rule emits AND the RULES_8879 registration that seeds the DB rule row - they
+  must never disagree), seed_rules re-run on BOTH DBs and verified, 3 new pins incl. one that
+  reads the cached spec mirror so app-vs-spec drift fails a test instead of reaching preparers.
+
 ## 2026-07-19 - 1065_B Q4 auto-answer amendment (S-21c spec leg; tts s99) - SEEDED + tts leg SHIPPED
 - Amended IN THE OWNING LOADER (load_1065_l_b.py, single-entity 1065_B - in-place re-run safe;
   `7a55f57`): NEW R-B4-AUTO - the app derives Q4 as derived-YELLOW/overridable: 4a = receipts
