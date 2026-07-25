@@ -1,4 +1,44 @@
-"""Load the FORM_5695 spec — Residential Energy Credits (§25D + §25C), minimal v1.
+"""Load the FORM_5695 spec — Residential Energy Credits (§25D + §25C).
+
+VERSION 2 (2026-07-25, s110) — THE "LIGHT 2025 FACE" AMENDMENT.
+Ken's scope call this session, verbatim: "I think this form goes away for 2026 so
+you can do a light version. something good enough to complete the tax return."
+v1 modelled 17 cost boxes and nothing else; the 2025 face additionally REQUIRES
+eligibility answers, home addresses and Qualified Manufacturer ID numbers, and
+its doors arithmetic is not the one v1 used. v2 adds exactly what is needed to
+produce a FILABLE 2025 Form 5695, and no more:
+  (a) THE ELIGIBILITY GATES that can deny a credit — 5a (battery ≥3 kWh),
+      7a (fuel cell in the main home), 17a/b/c (main home in the US / original
+      user / 5-year use), 21a/b (US residence / originally placed in service by
+      you), 25a (enabling property installed in 2025), 26a (qualifying audit).
+      An explicit NO denies its branch exactly as the face directs. An
+      UNANSWERED gate does NOT deny — it fires D_5695_GATE_OPEN. See the note on
+      E_RULES R-5695-GATE for why that deviation from the face is deliberate.
+  (b) THE QM PIN (§25C(h)) — first required for property placed in service after
+      Dec 31, 2024, i.e. TY2025 is the FIRST year it bites. Without it the IRS
+      disallows the §25C credit, so a 5695 that omits it is not a filable form.
+      One PIN per §25C category (the face's per-item PIN slots are the deferred
+      part of "light"): doors/windows/AC/water heater/furnace/enabling/heat pump.
+  (c) THE HOME ADDRESS — one main-home address, rendered into all four address
+      blocks the face carries (Part I, 7b, 17d, 21c). "You can only have one main
+      home at a time" (face caution), so one address is the honest model.
+  (d) THE DOORS ARITHMETIC CORRECTED — the face caps the MOST EXPENSIVE door at
+      $250 on its own (19c) before the $500 aggregate (19h). v1's
+      min(30%×all_doors, 500) OVERSTATES: $2,000 of doors gave $500 where the
+      face gives $250. One new fact (the most expensive door's cost) fixes it.
+
+DELIBERATELY STILL DEFERRED IN v2 (the "light" boundary, all preparer-visible):
+  - The per-item PIN slots (19d two next doors, 20a four windows, 23a two water
+    heaters, 25d(i)(ii), 29a/c/e each). The ARITHMETIC is unaffected — 19f =
+    19d + 19e and 20c = 20a + 20b, so folding the sibling costs into the "all
+    other" box produces the identical credit; only the extra PIN boxes go blank.
+  - The joint-occupancy allocation (7c / 32a) — still D_5695_JOINT.
+  - The construction-related split (17e) — Yes fires a warning, no auto-split.
+  - The precise Credit Limit Worksheet credit-ordering (v1's simplified limit).
+
+v1 header follows.
+--------------------------------------------------------------------------
+Load the FORM_5695 spec — Residential Energy Credits (§25D + §25C), minimal v1.
 
 Phase 2, third common form. Ken: "do the very least we can do on 5695 for 2025"
 (2026-06-15). Form 5695 carries two nonrefundable credits:
@@ -51,7 +91,7 @@ READY_TO_SEED = True  # FLIPPED 2026-06-15 — Ken approved the review walk ("Ap
 
 FORM_JURISDICTION = "FED"
 FORM_TAX_YEAR = 2025
-FORM_VERSION = 1
+FORM_VERSION = 2  # v2 2026-07-25 — the light 2025 face (gates + QM PINs + address + doors split).
 FORM_ENTITY_TYPES = ["1040"]
 FORM_STATUS = "draft"
 
@@ -62,12 +102,18 @@ FORM_STATUS = "draft"
 
 RATE = 0.30
 FUEL_CELL_PER_KW = 1000      # $500 per ½ kW
-DOORS_CAP = 500
+DOOR_TOP_CAP = 250           # line 19c — the MOST EXPENSIVE door, on its own
+DOORS_CAP = 500              # line 19h — all doors, aggregate
 WINDOWS_CAP = 600
 ITEM_CAP = 600               # each Section-B energy-property item
 AUDIT_CAP = 150
 AGG_25C = 1200               # the Section A+B aggregate
 HEATPUMP_CAP = 2000          # heat pumps / HP water heaters / biomass (separate)
+
+# The gates are TRI-STATE. False denies; None (unanswered) does not — see R-5695-GATE.
+def _denied(gate) -> bool:
+    """True only when the preparer explicitly answered No."""
+    return gate is False
 
 
 def _r0(x) -> int:
@@ -75,29 +121,57 @@ def _r0(x) -> int:
 
 
 def credit_25d(solar_elec, solar_water, small_wind, geothermal, battery,
-               fuel_cell_cost, fuel_cell_kw, carryforward_prior, tax_limit) -> tuple[int, int]:
-    """Part I (§25D). Returns (line15 credit → Sch 3 5a, line16 carryforward-out)."""
-    l6b = RATE * (solar_elec + solar_water + small_wind + geothermal + battery)
-    fuel = min(RATE * fuel_cell_cost, FUEL_CELL_PER_KW * fuel_cell_kw)
+               fuel_cell_cost, fuel_cell_kw, carryforward_prior, tax_limit,
+               battery_ge_3kwh=None, fuel_cell_main_home=None) -> tuple[int, int]:
+    """Part I (§25D). Returns (line15 credit → Sch 3 5a, line16 carryforward-out).
+
+    Line 5a No  → the battery cost cannot be claimed (face: "you cannot claim a
+                  credit for qualified battery storage technology").
+    Line 7a No  → skip lines 7b through 11, i.e. no fuel cell credit.
+    """
+    claimed_battery = 0 if _denied(battery_ge_3kwh) else battery
+    l6b = RATE * (solar_elec + solar_water + small_wind + geothermal + claimed_battery)
+    fuel = 0 if _denied(fuel_cell_main_home) else min(RATE * fuel_cell_cost,
+                                                      FUEL_CELL_PER_KW * fuel_cell_kw)
     l13 = _r0(l6b + fuel + carryforward_prior)
     l15 = min(l13, _r0(tax_limit))
     return (l15, l13 - l15)
 
 
-def credit_25c(insulation, doors, windows, central_ac, water_heater, furnace,
-               panelboard, audit, heat_pump_biomass, tax_limit) -> int:
-    """Part II (§25C). Returns line32 credit → Sch 3 5b (no carryforward)."""
-    envelope = (RATE * insulation
-                + min(RATE * doors, DOORS_CAP)
-                + min(RATE * windows, WINDOWS_CAP))
-    prop = (min(RATE * central_ac, ITEM_CAP)
-            + min(RATE * water_heater, ITEM_CAP)
-            + min(RATE * furnace, ITEM_CAP)
-            + min(RATE * panelboard, ITEM_CAP)
-            + min(RATE * audit, AUDIT_CAP))
-    group_1200 = min(envelope + prop, AGG_25C)
-    group_2000 = min(RATE * heat_pump_biomass, HEATPUMP_CAP)
-    l30 = _r0(group_1200 + group_2000)
+def credit_25c(insulation, doors_top, doors_other, windows, central_ac, water_heater,
+               furnace, panelboard, audit, heat_pump_biomass, tax_limit,
+               section_a=None, section_b=None, enabling=None, audit_ok=None) -> int:
+    """Part II (§25C). Returns line32 credit → Sch 3 5b (no carryforward).
+
+    `section_a` is the AND of lines 17a/17b/17c, `section_b` the AND of 21a/21b —
+    each is False only when the preparer answered No to at least one of them.
+    A denied Section A zeroes lines 18b/19h/20d; a denied Section B zeroes
+    22d/23d/24d/25e AND line 29 (the face: "Skip lines 22 through 25 and line 29");
+    `enabling` (25a) gates line 25e alone and `audit_ok` (26a) line 26c alone.
+
+    DOORS (the v1 correction): line 19c caps the most expensive door at $250 by
+    itself, line 19g is 30% of every other door uncapped per item, and line 19h
+    caps their sum at $500.
+    """
+    a_ok = not _denied(section_a)
+    b_ok = not _denied(section_b)
+
+    l18b = min(RATE * insulation, AGG_25C) if a_ok else 0
+    l19c = min(RATE * doors_top, DOOR_TOP_CAP)
+    l19g = RATE * doors_other
+    l19h = min(l19c + l19g, DOORS_CAP) if a_ok else 0
+    l20d = min(RATE * windows, WINDOWS_CAP) if a_ok else 0
+
+    l22d = min(RATE * central_ac, ITEM_CAP) if b_ok else 0
+    l23d = min(RATE * water_heater, ITEM_CAP) if b_ok else 0
+    l24d = min(RATE * furnace, ITEM_CAP) if b_ok else 0
+    l25e = min(RATE * panelboard, ITEM_CAP) if (b_ok and not _denied(enabling)) else 0
+    l26c = min(RATE * audit, AUDIT_CAP) if not _denied(audit_ok) else 0
+
+    l27 = l18b + l19h + l20d + l22d + l23d + l24d + l25e + l26c
+    l28 = min(l27, AGG_25C)
+    l29h = min(RATE * heat_pump_biomass, HEATPUMP_CAP) if b_ok else 0
+    l30 = _r0(l28 + l29h)
     return min(l30, _r0(tax_limit))
 
 
@@ -268,8 +342,17 @@ E_IDENTITY = {
         "$150 audit sub-caps + a separate $2,000 heat-pump/biomass group; no "
         "carryforward) → line 32 → Schedule 3 line 5b. The Credit Limit Worksheet "
         "caps each at available tax. OBBBA TERMINATES both after 2025 — a TY2026 "
-        "return fires D_5695_2026. Joint occupancy / QM-PIN / CEE-tier are "
-        "preparer-asserted (deferred)."
+        "return fires D_5695_2026. "
+        "V2 (2026-07-25, Ken: 'a light version, good enough to complete the tax "
+        "return'): the 2025 face's ELIGIBILITY GATES (5a/7a/17a-c/21a-b/25a/26a — "
+        "an explicit No denies exactly the branch the form skips; unanswered does "
+        "NOT deny), the §25C(h) QM ID NUMBERS (one per category — required for "
+        "property placed in service after 12/31/2024, so TY2025 is the first and "
+        "only year), ONE MAIN HOME ADDRESS rendered into all four face blocks, and "
+        "the DOORS ARITHMETIC CORRECTED to the face (19c caps the most expensive "
+        "door at $250 before the $500 aggregate; v1 overstated). Still deferred: "
+        "the per-item PIN slots (arithmetic-neutral), joint occupancy / fractional "
+        "share allocation, the 17e construction split, CEE-tier qualification."
     ),
 }
 
@@ -294,25 +377,108 @@ E_FACTS: list[dict] = [
     # ── Part II §25C inputs ──
     {"fact_key": "e5695_insulation", "label": "Insulation / air-sealing cost",
      "data_type": "decimal", "default_value": "0", "sort_order": 9, "notes": "Line 18 (30%, no item sub-cap)."},
-    {"fact_key": "e5695_doors", "label": "Exterior doors cost",
-     "data_type": "decimal", "default_value": "0", "sort_order": 10, "notes": "Line 19 (30%, $500 all doors)."},
+    {"fact_key": "e5695_doors_top", "label": "Most expensive exterior door — cost",
+     "data_type": "decimal", "default_value": "0", "sort_order": 10,
+     "notes": "Line 19a. Line 19c caps 30% of THIS door alone at $250 (v2 — v1 had no per-door cap)."},
+    {"fact_key": "e5695_doors", "label": "All other exterior doors — cost",
+     "data_type": "decimal", "default_value": "0", "sort_order": 11,
+     "notes": ("Lines 19d + 19e (the face splits the two next most expensive out for their PINs; the "
+               "arithmetic is identical because 19f = 19d + 19e). 30% uncapped per item, then line 19h "
+               "caps 19c + 19g at $500 for all doors."),
+     },
     {"fact_key": "e5695_windows", "label": "Exterior windows / skylights cost",
-     "data_type": "decimal", "default_value": "0", "sort_order": 11, "notes": "Line 20 (30%, $600)."},
+     "data_type": "decimal", "default_value": "0", "sort_order": 12, "notes": "Line 20 (30%, $600)."},
     {"fact_key": "e5695_central_ac", "label": "Central air conditioner cost",
-     "data_type": "decimal", "default_value": "0", "sort_order": 12, "notes": "Line 22 (30%, $600)."},
+     "data_type": "decimal", "default_value": "0", "sort_order": 13, "notes": "Line 22 (30%, $600)."},
     {"fact_key": "e5695_water_heater", "label": "Gas/propane/oil water heater cost",
-     "data_type": "decimal", "default_value": "0", "sort_order": 13, "notes": "Line 23 (30%, $600)."},
+     "data_type": "decimal", "default_value": "0", "sort_order": 14, "notes": "Line 23 (30%, $600)."},
     {"fact_key": "e5695_furnace", "label": "Furnace / hot water boiler cost",
-     "data_type": "decimal", "default_value": "0", "sort_order": 14, "notes": "Line 24 (30%, $600)."},
+     "data_type": "decimal", "default_value": "0", "sort_order": 15, "notes": "Line 24 (30%, $600)."},
     {"fact_key": "e5695_panelboard", "label": "Electrical panelboard / circuit upgrade cost",
-     "data_type": "decimal", "default_value": "0", "sort_order": 15, "notes": "Line 25 (30%, $600)."},
+     "data_type": "decimal", "default_value": "0", "sort_order": 16, "notes": "Line 25c (30%, $600). Gated by line 25a."},
     {"fact_key": "e5695_home_audit", "label": "Home energy audit cost",
-     "data_type": "decimal", "default_value": "0", "sort_order": 16, "notes": "Line 26 (30%, $150)."},
+     "data_type": "decimal", "default_value": "0", "sort_order": 17, "notes": "Line 26b (30%, $150). Gated by line 26a."},
     {"fact_key": "e5695_heat_pump_biomass", "label": "Heat pump / HP water heater / biomass cost",
-     "data_type": "decimal", "default_value": "0", "sort_order": 17, "notes": "Line 29 (30%, separate $2,000)."},
-    # ── Edge flag ──
+     "data_type": "decimal", "default_value": "0", "sort_order": 18, "notes": "Line 29 (30%, separate $2,000)."},
+
+    # ── v2: THE ELIGIBILITY GATES (tri-state — unanswered is NOT a No) ──
+    # Every one of these is a question the 2025 face asks and then uses to DENY a
+    # credit. They carry no default_value on purpose: "unanswered" is a real,
+    # distinct state that fires D_5695_GATE_OPEN rather than silently zeroing.
+    {"fact_key": "e5695_battery_ge_3kwh", "label": "Line 5a — battery storage capacity is at least 3 kWh?",
+     "data_type": "boolean", "sort_order": 40,
+     "notes": "Line 5a. No → the battery cost cannot be claimed (excluded from line 6a)."},
+    {"fact_key": "e5695_fuel_cell_main_home", "label": "Line 7a — fuel cell installed on your main home in the US?",
+     "data_type": "boolean", "sort_order": 41,
+     "notes": "Line 7a. No → skip lines 7b-11; no fuel cell credit."},
+    {"fact_key": "e5695_25c_main_home", "label": "Line 17a — improvements installed in/on your main home in the US?",
+     "data_type": "boolean", "sort_order": 42,
+     "notes": "Line 17a. No (or 17b/17c No) → no Section A credit at all."},
+    {"fact_key": "e5695_25c_original_user", "label": "Line 17b — are you the original user of the improvements?",
+     "data_type": "boolean", "sort_order": 43, "notes": "Line 17b. Part of the Section A gate."},
+    {"fact_key": "e5695_25c_five_years", "label": "Line 17c — components expected to remain in use at least 5 years?",
+     "data_type": "boolean", "sort_order": 44, "notes": "Line 17c. Part of the Section A gate."},
+    {"fact_key": "e5695_25c_construction", "label": "Line 17e — were any improvements related to constructing this home?",
+     "data_type": "boolean", "sort_order": 45,
+     "notes": ("Line 17e. Yes does NOT deny — construction-related costs are simply not eligible, and v2 "
+               "does not split them out. Fires D_5695_CONSTRUCT so the preparer excludes them by hand.")},
+    {"fact_key": "e5695_energy_prop_residence", "label": "Line 21a — energy property at a US home you use as a residence?",
+     "data_type": "boolean", "sort_order": 46,
+     "notes": "Line 21a. No (or 21b No) → skip lines 22-25 AND line 29 (heat pumps too)."},
+    {"fact_key": "e5695_energy_prop_original_use", "label": "Line 21b — was the energy property originally placed in service by you?",
+     "data_type": "boolean", "sort_order": 47, "notes": "Line 21b. Part of the Section B gate."},
+    {"fact_key": "e5695_enabling_2025", "label": "Line 25a — enabling and enabled property both installed in 2025?",
+     "data_type": "boolean", "sort_order": 48,
+     "notes": "Line 25a. No → skip lines 25b-25e; no panelboard/enabling-property credit."},
+    {"fact_key": "e5695_enabling_code", "label": "Line 25b — code for the type of enabled property",
+     "data_type": "string", "sort_order": 49,
+     "notes": "Line 25b. Preparer-supplied per the instructions' code list; not validated."},
+    {"fact_key": "e5695_audit_qualified", "label": "Line 26a — audit of your main home with a written report by a certified auditor?",
+     "data_type": "boolean", "sort_order": 50,
+     "notes": "Line 26a. No → no home energy audit credit."},
+
+    # ── v2: THE QUALIFIED MANUFACTURER ID NUMBERS (§25C(h)) ──
+    # Required for property placed in service AFTER Dec 31, 2024 — TY2025 is the
+    # first year. Omitting one does not change the arithmetic; it gets the credit
+    # DISALLOWED, so D_5695_QM_PIN flags it. One PIN per category is the "light"
+    # boundary (the face has a slot per item).
+    {"fact_key": "e5695_pin_doors", "label": "QM ID number — most expensive exterior door",
+     "data_type": "string", "sort_order": 60, "notes": "Line 19b. §25C(h)."},
+    {"fact_key": "e5695_pin_windows", "label": "QM ID number — windows / skylights",
+     "data_type": "string", "sort_order": 61, "notes": "Line 20a. §25C(h)."},
+    {"fact_key": "e5695_pin_central_ac", "label": "QM ID number — central air conditioner",
+     "data_type": "string", "sort_order": 62, "notes": "Line 22a. §25C(h)."},
+    {"fact_key": "e5695_pin_water_heater", "label": "QM ID number — gas/propane/oil water heater",
+     "data_type": "string", "sort_order": 63, "notes": "Line 23a. §25C(h)."},
+    {"fact_key": "e5695_pin_furnace", "label": "QM ID number — furnace / hot water boiler",
+     "data_type": "string", "sort_order": 64, "notes": "Line 24a. §25C(h)."},
+    {"fact_key": "e5695_pin_panelboard", "label": "QM ID number — enabling property (panelboard)",
+     "data_type": "string", "sort_order": 65, "notes": "Line 25d(i). §25C(h)."},
+    {"fact_key": "e5695_pin_heat_pump_biomass", "label": "QM ID number — heat pump / HP water heater / biomass",
+     "data_type": "string", "sort_order": 66, "notes": "Lines 29a/29c/29e. §25C(h)."},
+
+    # ── v2: THE MAIN HOME ADDRESS ──
+    # ONE address. The face carries four address blocks (Part I, 7b, 17d, 21c) but
+    # cautions "You can only have one main home at a time", so v2 keys it once and
+    # renders it into every block. A second home is the deferred multi-home case.
+    {"fact_key": "e5695_home_street", "label": "Main home — number and street",
+     "data_type": "string", "sort_order": 70, "notes": "Renders into the Part I, 7b, 17d and 21c address blocks."},
+    {"fact_key": "e5695_home_unit", "label": "Main home — unit no.",
+     "data_type": "string", "sort_order": 71, "notes": "Same four blocks."},
+    {"fact_key": "e5695_home_city", "label": "Main home — city or town",
+     "data_type": "string", "sort_order": 72, "notes": "Same four blocks."},
+    {"fact_key": "e5695_home_state", "label": "Main home — state",
+     "data_type": "string", "sort_order": 73, "notes": "Same four blocks."},
+    {"fact_key": "e5695_home_zip", "label": "Main home — ZIP code",
+     "data_type": "string", "sort_order": 74, "notes": "Same four blocks."},
+
+    # ── Edge flags ──
     {"fact_key": "e5695_joint_occupancy", "label": "Joint occupancy (allocation needed)?",
-     "data_type": "boolean", "default_value": "false", "sort_order": 18, "notes": "D_5695_JOINT — not modeled."},
+     "data_type": "boolean", "default_value": "false", "sort_order": 80,
+     "notes": "Lines 7c AND 32a — one fact drives both checkboxes. D_5695_JOINT — allocation not modeled."},
+    {"fact_key": "e5695_condo_fractional", "label": "Condominium / cooperative fractional share?",
+     "data_type": "boolean", "default_value": "false", "sort_order": 81,
+     "notes": "Line 32b checkbox. The fractional-share computation is not modeled — D_5695_FRACTIONAL."},
     # ── Outputs ──
     {"fact_key": "e5695_line15", "label": "§25D credit → Schedule 3 line 5a",
      "data_type": "decimal", "sort_order": 30, "notes": "OUTPUT. Part I credit."},
@@ -334,15 +500,51 @@ E_RULES: list[dict] = [
      "description": "§25D the residential clean energy credit, tax-limited, with carryforward."},
     {"rule_id": "R-5695-25C", "title": "Part II §25C — 30% with the $1,200 + $2,000 caps", "rule_type": "calculation",
      "precedence": 2, "sort_order": 2,
-     "formula": ("envelope = 30%×insulation + min(30%×doors,500) + min(30%×windows,600); property = "
-                 "Σ min(30%×item,600) [AC/WH/furnace/panel] + min(30%×audit,150); group_1200 = "
-                 "min(envelope+property, 1200); group_2000 = min(30%×heat_pump_biomass, 2000); l32 = "
-                 "min(group_1200 + group_2000, tax_limit) → Sch 3 line 5b. No carryforward."),
-     "inputs": ["e5695_insulation", "e5695_doors", "e5695_windows", "e5695_central_ac",
+     "formula": ("l18b = min(30%×insulation, 1200); DOORS l19c = min(30%×most_expensive_door, 250), "
+                 "l19g = 30%×other_doors, l19h = min(l19c+l19g, 500); l20d = min(30%×windows, 600); "
+                 "l22d/l23d/l24d/l25e = min(30%×item, 600) each; l26c = min(30%×audit, 150); "
+                 "l27 = Σ(18b,19h,20d,22d,23d,24d,25e,26c); l28 = min(l27, 1200); "
+                 "l29h = min(30%×heat_pump_biomass, 2000); l30 = l28 + l29h; "
+                 "l32 = min(l30, tax_limit) → Sch 3 line 5b. No carryforward."),
+     "inputs": ["e5695_insulation", "e5695_doors_top", "e5695_doors", "e5695_windows", "e5695_central_ac",
                 "e5695_water_heater", "e5695_furnace", "e5695_panelboard", "e5695_home_audit",
                 "e5695_heat_pump_biomass"],
      "outputs": ["e5695_line32"],
-     "description": "§25C the energy efficient home improvement credit, capped, no carryforward."},
+     "description": ("§25C the energy efficient home improvement credit, capped, no carryforward. v2 "
+                     "corrects the doors arithmetic: the face caps the MOST EXPENSIVE door at $250 on "
+                     "its own (line 19c) before the $500 all-doors aggregate (line 19h), so v1's "
+                     "min(30%×all_doors, 500) overstated — $2,000 on one door gave $500, not $250.")},
+    {"rule_id": "R-5695-GATE", "title": "The eligibility gates — an explicit No denies the branch", "rule_type": "conditional",
+     "precedence": 5, "sort_order": 5,
+     "formula": ("5a No → battery excluded from line 6a. 7a No → skip 7b-11 (no fuel cell). "
+                 "17a/17b/17c any No → no Section A (lines 18b/19h/20d = 0). "
+                 "21a/21b either No → skip lines 22-25 AND line 29 (no energy property, no heat pump). "
+                 "25a No → skip 25b-25e (no enabling property). 26a No → no audit credit. "
+                 "UNANSWERED (null) does NOT deny — it fires D_5695_GATE_OPEN."),
+     "inputs": ["e5695_battery_ge_3kwh", "e5695_fuel_cell_main_home", "e5695_25c_main_home",
+                "e5695_25c_original_user", "e5695_25c_five_years", "e5695_energy_prop_residence",
+                "e5695_energy_prop_original_use", "e5695_enabling_2025", "e5695_audit_qualified"],
+     "outputs": ["e5695_line15", "e5695_line32"],
+     "description": ("The face's own denial logic, modelled TRI-STATE. Answering No zeroes exactly the "
+                     "branch the form says to skip. Leaving a question UNANSWERED deliberately does NOT "
+                     "zero it: the app back-enters returns already prepared elsewhere, where the "
+                     "eligibility was established off-system, and silently deleting a credit the "
+                     "preparer computed is a worse failure than flagging the blank. The unanswered "
+                     "state is therefore surfaced as a warning, never resolved by assumption.")},
+    {"rule_id": "R-5695-QMPIN", "title": "§25C(h) — the Qualified Manufacturer ID number", "rule_type": "validation",
+     "precedence": 6, "sort_order": 6,
+     "formula": ("For each §25C category with a PIN box on the face (doors 19b, windows 20a, A/C 22a, "
+                 "water heater 23a, furnace 24a, enabling property 25d, heat pump/biomass 29a/c/e): "
+                 "cost > 0 AND the PIN is blank → D_5695_QM_PIN. The arithmetic is unaffected."),
+     "inputs": ["e5695_pin_doors", "e5695_pin_windows", "e5695_pin_central_ac", "e5695_pin_water_heater",
+                "e5695_pin_furnace", "e5695_pin_panelboard", "e5695_pin_heat_pump_biomass"],
+     "outputs": [],
+     "description": ("§25C(h), added by the Inflation Reduction Act, denies the credit for any item "
+                     "whose qualified product identification number is not reported on the return. It "
+                     "applies to property placed in service after December 31, 2024, so TY2025 is the "
+                     "FIRST year it bites — and the last, since OBBBA terminates §25C after 2025. "
+                     "Insulation (line 18) and the home energy audit (line 26) have no PIN box and are "
+                     "correctly exempt.")},
     {"rule_id": "R-5695-LIMIT", "title": "Credit Limit Worksheet — tax-liability limit", "rule_type": "calculation",
      "precedence": 3, "sort_order": 3,
      "formula": ("Each credit is limited to the tax available after the credits that precede it (Form 5695 "
@@ -365,8 +567,20 @@ E_LINES: list[dict] = [
     {"line_number": "l14", "description": "Line 14: tax-liability limit (Credit Limit Worksheet)", "line_type": "input"},
     {"line_number": "l15", "description": "Line 15: §25D credit (smaller of 13 or 14) → Sch 3 5a", "line_type": "total"},
     {"line_number": "l16", "description": "Line 16: §25D carryforward to 2026 (13 − 15)", "line_type": "calculated"},
+    {"line_number": "l5a", "description": "Line 5a: battery storage capacity ≥ 3 kWh? No → no battery credit", "line_type": "input"},
+    {"line_number": "l7a", "description": "Line 7a: fuel cell on your main home in the US? No → skip lines 7b-11", "line_type": "input"},
+    {"line_number": "l7b", "description": "Line 7b: address of the main home where the fuel cell was installed", "line_type": "input"},
+    {"line_number": "l17a_c", "description": "Lines 17a/17b/17c: the Section A gate (main home in US / original user / 5 years)", "line_type": "input"},
+    {"line_number": "l17d", "description": "Line 17d: address of the main home where the improvements were made", "line_type": "input"},
+    {"line_number": "l17e", "description": "Line 17e: were improvements related to constructing this home?", "line_type": "input"},
     {"line_number": "l18_26", "description": "Part II §25C costs (insulation/doors/windows/AC/WH/furnace/panel/audit)", "line_type": "input"},
-    {"line_number": "l1200", "description": "§25C Section A+B credit capped at $1,200 aggregate", "line_type": "calculated"},
+    {"line_number": "l19c", "description": "Line 19c: most expensive door = min(30% × line 19a, $250)", "line_type": "calculated"},
+    {"line_number": "l19h", "description": "Line 19h: all doors = min(19c + 30% × other doors, $500)", "line_type": "calculated"},
+    {"line_number": "l21a_b", "description": "Lines 21a/21b: the Section B gate. Either No → skip lines 22-25 AND line 29", "line_type": "input"},
+    {"line_number": "l21c", "description": "Line 21c: address of each home where energy property was installed", "line_type": "input"},
+    {"line_number": "l25a", "description": "Line 25a: enabling AND enabled property both installed in 2025? No → skip 25b-25e", "line_type": "input"},
+    {"line_number": "l26a", "description": "Line 26a: qualifying home energy audit with a written report? No → no audit credit", "line_type": "input"},
+    {"line_number": "l1200", "description": "§25C Section A+B credit capped at $1,200 aggregate (line 28)", "line_type": "calculated"},
     {"line_number": "l29", "description": "Line 29: heat-pump/biomass credit = min(30%×cost, $2,000)", "line_type": "calculated"},
     {"line_number": "l30", "description": "Line 30: §25C total before the tax limit ($1,200 + $2,000 groups)", "line_type": "calculated"},
     {"line_number": "l31", "description": "Line 31: tax-liability limit (Credit Limit Worksheet)", "line_type": "input"},
@@ -411,6 +625,47 @@ E_DIAGNOSTICS: list[dict] = [
      "message": ("Joint occupancy is indicated. The per-occupant allocation of the residential energy credits "
                  "(Form 5695 lines 7c / 32a) is not modeled — verify each occupant's share manually."),
      "notes": "Deferred edge case."},
+    # ── v2 ──
+    {"diagnostic_id": "D_5695_QM_PIN", "title": "Qualified Manufacturer ID number missing (§25C(h))", "severity": "warning",
+     "condition": "a §25C category with a PIN box on the face has a cost but no QM ID number",
+     "message": ("A §25C cost was entered without its Qualified Manufacturer Identification Number. For "
+                 "property placed in service after December 31, 2024, §25C(h) DENIES the credit for any "
+                 "item whose QM ID number is not reported on the return — 2025 is the first year this "
+                 "applies. Enter the number shown on the manufacturer's certification, or remove the cost."),
+     "notes": ("§25C(h). A warning rather than an error: the app cannot verify a PIN, and blocking "
+               "transmission on an unverifiable field would stop a return the preparer may have the "
+               "number for. Insulation (line 18) and the audit (line 26) have no PIN box and never fire.")},
+    {"diagnostic_id": "D_5695_GATE_OPEN", "title": "Eligibility question unanswered", "severity": "warning",
+     "condition": "a cost is entered for a branch whose Yes/No eligibility question is still blank",
+     "message": ("Form 5695 asks an eligibility question for this credit (lines 5a, 7a, 17a-17c, 21a-21b, "
+                 "25a or 26a) and it has not been answered. The credit has been computed as though the "
+                 "property qualifies — answer the question to confirm, because a No means the credit "
+                 "cannot be claimed at all."),
+     "notes": "Tri-state gate: unanswered is a distinct state from No and never silently zeroes a credit."},
+    {"diagnostic_id": "D_5695_GATE_NO", "title": "A credit was denied by an eligibility answer", "severity": "info",
+     "condition": "an eligibility question was answered No and zeroed its branch",
+     "message": ("A 'No' answer on Form 5695 removed part of the credit, exactly as the form directs. "
+                 "Line 5a No drops the battery cost; 7a No drops the fuel cell; 17a/b/c No removes the "
+                 "whole of Section A; 21a/b No removes the energy property AND the heat pump credit; "
+                 "25a No removes the enabling property; 26a No removes the home energy audit."),
+     "notes": "INFO, not a warning — the preparer caused it on purpose; this only explains the number."},
+    {"diagnostic_id": "D_5695_ADDRESS", "title": "Main home address missing", "severity": "warning",
+     "condition": "Form 5695 is engaged and the main home street or city is blank",
+     "message": ("Form 5695 requires the complete address of the home where the property was installed "
+                 "(the Part I block and lines 7b, 17d and 21c). Enter the main home address."),
+     "notes": "The face asks for it in four places; the app keys it once."},
+    {"diagnostic_id": "D_5695_CONSTRUCT", "title": "Improvements related to constructing the home", "severity": "warning",
+     "condition": "e5695_25c_construction is True",
+     "message": ("Line 17e is Yes: some improvements related to constructing this home. Costs related to "
+                 "the construction of your main home do NOT qualify, even if the work was done after you "
+                 "moved in. Remove those costs — the split is not computed automatically."),
+     "notes": "Deliberately not auto-split in v2 (the light boundary)."},
+    {"diagnostic_id": "D_5695_FRACTION", "title": "Condominium / cooperative fractional share", "severity": "warning",
+     "condition": "e5695_condo_fractional is True",
+     "message": ("Line 32b is checked: a fractional share of the improvements in a condominium or "
+                 "cooperative. Only your share of the cost qualifies — the allocation is not computed "
+                 "automatically, so verify the amounts entered are already your share."),
+     "notes": "Deferred edge case, same family as D_5695_JOINT."},
 ]
 
 E_SCENARIOS: list[dict] = [
@@ -422,10 +677,13 @@ E_SCENARIOS: list[dict] = [
      "inputs": {"tax_year": 2025, "kind": "25c", "windows": 3000, "tax_limit": 100000},
      "expected_outputs": {"e5695_line32": 600},
      "notes": "30% × 3,000 = 900, capped at $600 (windows)."},
-    {"scenario_name": "E-T3 — §25C doors capped $500", "scenario_type": "edge_case", "sort_order": 3,
-     "inputs": {"tax_year": 2025, "kind": "25c", "doors": 2000, "tax_limit": 100000},
-     "expected_outputs": {"e5695_line32": 500},
-     "notes": "30% × 2,000 = 600, capped at $500 (all doors)."},
+    {"scenario_name": "E-T3 — §25C doors: ONE $2,000 door caps at $250, not $500", "scenario_type": "edge_case", "sort_order": 3,
+     "inputs": {"tax_year": 2025, "kind": "25c", "doors_top": 2000, "tax_limit": 100000},
+     "expected_outputs": {"e5695_line32": 250},
+     "notes": ("THE v2 CORRECTION. Line 19c caps 30% × 2,000 = 600 at $250 for the most expensive door; "
+               "19h = min(250 + 0, 500) = 250. v1's min(30%×doors, 500) answered 500 — a $250 overstatement "
+               "on the commonest doors fact pattern there is (one replaced front door)."),
+     },
     {"scenario_name": "E-T4 — §25C $1,200 aggregate cap", "scenario_type": "edge_case", "sort_order": 4,
      "inputs": {"tax_year": 2025, "kind": "25c", "insulation": 5000, "windows": 3000, "tax_limit": 100000},
      "expected_outputs": {"e5695_line32": 1200},
@@ -450,6 +708,53 @@ E_SCENARIOS: list[dict] = [
      "inputs": {"tax_year": 2026, "kind": "25c", "windows": 3000},
      "expected_outputs": {"D_5695_2026": True},
      "notes": "OBBBA termination → D_5695_2026 (credit not computed for 2026)."},
+
+    # ── v2 scenarios ──
+    {"scenario_name": "E-T9 — §25C doors: the $250 door plus others, aggregate $500", "scenario_type": "edge_case", "sort_order": 10,
+     "inputs": {"tax_year": 2025, "kind": "25c", "doors_top": 1200, "doors": 1500, "tax_limit": 100000},
+     "expected_outputs": {"e5695_line32": 500},
+     "notes": "19c = min(360,250) = 250; 19g = 30%×1,500 = 450; 19h = min(700,500) = 500 (the aggregate bites)."},
+    {"scenario_name": "E-T10 — §25C doors: both boxes under every cap", "scenario_type": "normal", "sort_order": 11,
+     "inputs": {"tax_year": 2025, "kind": "25c", "doors_top": 700, "doors": 300, "tax_limit": 100000},
+     "expected_outputs": {"e5695_line32": 300},
+     "notes": "19c = min(210,250) = 210; 19g = 90; 19h = min(300,500) = 300 — no cap applies."},
+    {"scenario_name": "E-G2 — line 17a No → the whole of Section A is denied", "scenario_type": "diagnostic", "sort_order": 12,
+     "inputs": {"tax_year": 2025, "kind": "25c", "insulation": 5000, "windows": 3000, "doors_top": 1000,
+                "section_a": False, "tax_limit": 100000},
+     "expected_outputs": {"e5695_line32": 0, "D_5695_GATE_NO": True},
+     "notes": "Face: 'If you checked the No box for line 17a, 17b, or 17c... Do not complete Part II, Section A.'"},
+    {"scenario_name": "E-G3 — line 21a No → energy property AND the heat pump are denied, the audit survives",
+     "scenario_type": "diagnostic", "sort_order": 13,
+     "inputs": {"tax_year": 2025, "kind": "25c", "central_ac": 4000, "heat_pump_biomass": 10000,
+                "home_audit": 500, "section_b": False, "tax_limit": 100000},
+     "expected_outputs": {"e5695_line32": 150, "D_5695_GATE_NO": True},
+     "notes": ("Face: 'Skip lines 22 through 25 and line 29. Go to line 26.' — line 29 (the $2,000 heat "
+               "pump group) is inside the skip, which is the easy one to miss; only the audit's "
+               "min(30%×500,150) = 150 remains."),
+     },
+    {"scenario_name": "E-G4 — line 5a No → the battery cost is dropped from §25D", "scenario_type": "diagnostic", "sort_order": 14,
+     "inputs": {"tax_year": 2025, "kind": "25d", "solar_electric": 20000, "battery": 10000,
+                "battery_ge_3kwh": False, "tax_limit": 100000},
+     "expected_outputs": {"e5695_line15": 6000, "e5695_line16": 0, "D_5695_GATE_NO": True},
+     "notes": "30% × 20,000 solar only = 6,000; the 10,000 battery is excluded from line 6a."},
+    {"scenario_name": "E-G5 — line 26a No → no home energy audit credit", "scenario_type": "diagnostic", "sort_order": 15,
+     "inputs": {"tax_year": 2025, "kind": "25c", "home_audit": 500, "audit_ok": False, "tax_limit": 100000},
+     "expected_outputs": {"e5695_line32": 0, "D_5695_GATE_NO": True},
+     "notes": "Face: 'If you checked the No box, you cannot claim the home energy audit credit.'"},
+    {"scenario_name": "E-G6 — line 25a No → no enabling-property (panelboard) credit", "scenario_type": "diagnostic", "sort_order": 16,
+     "inputs": {"tax_year": 2025, "kind": "25c", "panelboard": 4000, "enabling": False, "tax_limit": 100000},
+     "expected_outputs": {"e5695_line32": 0, "D_5695_GATE_NO": True},
+     "notes": "Face: 'Skip lines 25b through 25e.' The $600 panelboard credit is denied."},
+    {"scenario_name": "E-G7 — a §25C cost with no QM ID number", "scenario_type": "diagnostic", "sort_order": 17,
+     "inputs": {"tax_year": 2025, "kind": "25c", "windows": 3000, "pin_windows": "", "tax_limit": 100000},
+     "expected_outputs": {"e5695_line32": 600, "D_5695_QM_PIN": True},
+     "notes": ("§25C(h): the credit is computed but flagged — the IRS disallows an item whose QM ID "
+               "number is not on the return for property placed in service after 12/31/2024."),
+     },
+    {"scenario_name": "E-G8 — costs entered, eligibility question still blank", "scenario_type": "diagnostic", "sort_order": 18,
+     "inputs": {"tax_year": 2025, "kind": "25c", "windows": 3000, "section_a": None, "tax_limit": 100000},
+     "expected_outputs": {"e5695_line32": 600, "D_5695_GATE_OPEN": True},
+     "notes": "Unanswered is NOT a No — the credit stands and the blank is surfaced (R-5695-GATE)."},
 ]
 
 E_RULE_LINKS: list[tuple[str, str, str, str]] = [
@@ -460,6 +765,9 @@ E_RULE_LINKS: list[tuple[str, str, str, str]] = [
     ("R-5695-LIMIT", "IRS_2025_F5695_INSTR", "primary", "The Credit Limit Worksheet"),
     ("R-5695-TERM", "IRC_25D", "primary", "OBBBA §70506 termination"),
     ("R-5695-TERM", "IRC_25C", "secondary", "OBBBA §70505 termination"),
+    ("R-5695-GATE", "IRS_2025_F5695_INSTR", "primary", "The face's own skip/deny directions (5a, 7a, 17a-c, 21a-b, 25a, 26a)"),
+    ("R-5695-QMPIN", "IRC_25C", "primary", "§25C(h) qualified product identification number"),
+    ("R-5695-QMPIN", "IRS_2025_F5695_INSTR", "secondary", "The PIN boxes on lines 19b/20a/22a/23a/24a/25d/29a-e"),
 ]
 
 
@@ -505,6 +813,23 @@ FLOW_ASSERTIONS: list[dict] = [
      "definition": {"kind": "gating_check", "form": "FORM_5695", "expect": {"red_fires": True},
                     "blockers": ["obbba_terminated_2026"]},
      "sort_order": 6},
+    {"assertion_id": "FA-1040-5695-07", "assertion_type": "flow_assertion", "entity_types": ["1040"],
+     "title": "Doors — the most expensive door caps at $250 before the $500 aggregate",
+     "description": ("Validates R-5695-25C's doors arithmetic. Bug it catches: the pre-v2 shape "
+                     "min(30%×all_doors, 500), which overstates a single expensive door by up to $250."),
+     "definition": {"kind": "formula_check", "form": "FORM_5695",
+                    "formula": "l19c = min(0.30×doors_top, 250); l19h = min(l19c + 0.30×doors_other, 500)"},
+     "sort_order": 7},
+    {"assertion_id": "FA-1040-5695-08", "assertion_type": "flow_assertion", "entity_types": ["1040"],
+     "title": "The eligibility gates deny exactly the branch the face skips",
+     "description": ("Validates R-5695-GATE. Bugs it catches: a 21a/21b No that fails to skip LINE 29 "
+                     "(the $2,000 heat-pump group sits outside lines 22-25 and is easy to miss), a 17a-c "
+                     "No that leaves Section A standing, and — the other direction — an UNANSWERED gate "
+                     "being treated as a No and silently deleting a credit."),
+     "definition": {"kind": "gating_check", "form": "FORM_5695",
+                    "expect": {"denies_only_named_branch": True, "null_never_denies": True},
+                    "blockers": ["l5a_no", "l7a_no", "l17a_c_no", "l21a_b_no", "l25a_no", "l26a_no"]},
+     "sort_order": 8},
 ]
 
 

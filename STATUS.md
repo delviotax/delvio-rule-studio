@@ -1,7 +1,7 @@
 ---
 type: project-status
 project: sherpa-tax-rule-studio
-last_updated: 2026-07-12
+last_updated: 2026-07-25
 ---
 
 # STATUS — sherpa-tax-rule-studio
@@ -12,7 +12,38 @@ last_updated: 2026-07-12
 
 ## Current state
 
-**NEW 2026-07-12 (latest) — GATE-1 ×2 APPROVED + SEEDED: 2553 (WO-26) + 2848 (WO-27) — S-20b/c RS lane CLEAR.**
+**NEW 2026-07-25 (latest) — FORM_5695 AMENDED TO **v2**, THE "LIGHT 2025 FACE" (tts s110).**
+Ken's scope call, live, verbatim: *"I think this form goes away for 2026 so you can do a light version.
+something good enough to complete the tax return."* — OBBBA terminates both credits after 2025, so this
+form has exactly one filing season left and v2 buys only what makes it FILABLE. **v1 modelled 17 cost
+boxes and nothing else**, and the audit against our own 2025 IRS template found three things missing and
+one thing wrong: **(a) the ELIGIBILITY GATES** the face uses to deny a credit (5a battery ≥3 kWh · 7a fuel
+cell main home · 17a-c Section A · 21a-b Section B · 25a enabling · 26a audit) — modelled TRI-STATE, an
+explicit No denies exactly the branch the form skips, **an UNANSWERED gate deliberately does NOT deny**
+(the app back-enters returns already prepared elsewhere; silently deleting a credit is worse than
+flagging a blank) → `D_5695_GATE_OPEN` / `D_5695_GATE_NO`; **(b) the §25C(h) QM ID NUMBERS** — first
+required for property placed in service after 12/31/2024, so **TY2025 is the first year it bites and the
+last**, and without them the IRS DISALLOWS the credit → 7 PIN facts + `D_5695_QM_PIN`; **(c) the main
+home address** (the face carries four address blocks but cautions "you can only have one main home", so
+it is keyed once and rendered into all four); **(d) THE DOORS ARITHMETIC WAS WRONG** — the face caps the
+MOST EXPENSIVE door at $250 on its own (19c) before the $500 aggregate (19h), so v1's
+`min(30%×all_doors, 500)` **overstated by up to $250 on the commonest doors pattern there is (one
+replaced front door: $2,000 → v1 said $500, the face says $250)**. One new fact fixes it.
+**Deliberately still deferred (the light boundary):** the per-item PIN slots — ARITHMETIC-NEUTRAL, since
+19f = 19d + 19e and 20c = 20a + 20b, so folding the sibling costs into the "all other" box yields the
+identical credit and only the extra PIN boxes go blank — plus joint-occupancy / fractional-share
+allocation and the 17e construction split (both now warn). **Spec: 21→46 facts · 4→6 rules
+(+R-5695-GATE, +R-5695-QMPIN) · 15→27 lines · 6→12 diagnostics · 9→18 scenarios · 6→8 FAs.** Integrity
+gate `check_5695_integrity.py` re-typed for the gates + doors split and **PASSES**; seeded to RS prod;
+**deployed export verified serving v2**; the tts mirror `server/specs/5695_spec.json` refreshed from that
+deployed export. ⚠ **FORM_5695 is the FIRST form in this DB to carry two version rows** — the lookup
+endpoint is `order_by("-version").first()` so v2 wins deterministically, and **v1 was set `archived`** so
+the working list shows one. ⚠ **Also repaired: `test_seed_creates_20_assertions` (×2 files) had been RED
+on every run since `05cbe72` added `FA-K1-ROUND`** — a 21st assertion against a hardcoded 20. Same class
+as the 8879 harness rot found in tts s109b: *a permanently-red test is one nobody reads.* The count now
+reads the authored list; the type mix stays literal as the real tripwire. **Suite 70p/2f → 72 passed.**
+
+**2026-07-12 — GATE-1 ×2 APPROVED + SEEDED: 2553 (WO-26) + 2848 (WO-27) — S-20b/c RS lane CLEAR.**
 Ken approved both walks live (plain-English re-present → AskUserQuestion "Approve" ×2). Sentinels flipped +
 recorded; harnesses re-run post-flip (82/0 · 73/0); both prod-seeded (2553 bound 18 authority links incl.
 IRC_1361/1362; 2848 16); deployed exports verified 200; tts mirrors cached from the deployed endpoint; FA export

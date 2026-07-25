@@ -124,11 +124,14 @@ class TestImportFlexibleKeys:
 
 @pytest.mark.django_db
 class TestFlowAssertionsCount:
-    def test_seed_creates_20_assertions(self):
+    def test_seed_creates_every_starter_assertion(self):
+        """Duplicate of the same check in test_flow_assertions.py — see the note there."""
         from django.core.management import call_command
 
+        from specs.management.commands.seed_flow_assertions import ASSERTIONS
+
         call_command("seed_flow_assertions")
-        assert FlowAssertion.objects.count() == 20
+        assert FlowAssertion.objects.count() == len(ASSERTIONS)
         assert FlowAssertion.objects.filter(assertion_type="table_invariant").count() == 4
         assert FlowAssertion.objects.filter(assertion_type="flow_assertion").count() == 9
-        assert FlowAssertion.objects.filter(assertion_type="reconciliation").count() == 7
+        assert FlowAssertion.objects.filter(assertion_type="reconciliation").count() == 8
