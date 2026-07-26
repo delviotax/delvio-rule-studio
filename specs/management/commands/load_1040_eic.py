@@ -371,37 +371,80 @@ AUTHORITY_SOURCES: list[dict] = [
         "trust_score": 9.50,
         "requires_human_review": False,
         "notes": (
-            "Checklist questions transcribed 2026-06-11 (server/.scratch/f8867_text.txt). "
-            "Data-map render — preparer-answer facts, NO compute. v1 covers EIC + "
-            "CTC/ACTC/ODC + HOH; the AOTC (Part IV) section renders but flags RED "
-            "until Form 8863 exists."
+            "Per-question face re-verified 2026-07-26 against the live template "
+            "(resources/irs_forms/2025/f8867.pdf text + AcroForm widget dump; Rev. "
+            "11-2024 still current per irs.gov): 20 answerable lines 1/2/3/4/4a/4b/"
+            "5/6/7/7a/8/9a/9b/9c/10/11/12/13/14/15 + the line-5 documents list. "
+            "N/A checkbox exists ONLY on lines 2, 7, 7a, 8, 9c, 11, 12 (widget "
+            "truth, confirmed by the MeF IRS8867.xsd YES/NO/N-A code elements — "
+            "the two sources agree line-for-line). Data-map render — preparer-"
+            "answer facts, NO compute. Parts I-VI all supported (Form 8863 is "
+            "built; the old v1 AOTC-RED note is obsolete)."
         ),
         "topics": ["preparer_due_diligence"],
         "excerpts": [
             {
                 "excerpt_label": "Header credit checkboxes + Part I general due diligence (Q1-8, verbatim)",
-                "location_reference": "Form 8867 (Rev. Nov 2024), header + Part I",
+                "location_reference": "Form 8867 (Rev. Nov 2024), header + Part I (page 1)",
                 "excerpt_text": (
-                    "Check here if any applicable credits are claimed on the return: "
-                    "Earned Income Credit (EIC); Child Tax Credit/Additional Child Tax "
-                    "Credit/Credit for Other Dependents (CTC/ACTC/ODC); American "
-                    "Opportunity Tax Credit (AOTC); Head of Household (HOH). Part I — Due "
-                    "Diligence Requirements. 1 Did you complete the return based on "
-                    "information provided by the taxpayer or reasonably obtained? 2 Did you "
-                    "complete the applicable worksheet(s) or your own equivalent? 3 Did you "
-                    "satisfy the knowledge requirement? 4 Did any information seem "
-                    "incorrect, incomplete, or inconsistent? (4a make inquiries / 4b "
-                    "document) 5 Did you satisfy the record retention requirement? 6 Did "
-                    "you ask the taxpayer questions to substantiate eligibility/amounts? 7 "
-                    "Did you ask whether the credit(s) were disallowed in a prior year? 8 "
-                    "If credits were disallowed, did you complete the required "
-                    "recertification (Form 8862)?"
+                    "Please check the appropriate box for the credit(s) and/or HOH filing "
+                    "status claimed on the return and complete the related Parts I-V for "
+                    "the benefit(s) claimed (check all that apply): EIC; CTC/ACTC/ODC; "
+                    "AOTC; HOH. Part I — Due Diligence Requirements. "
+                    "1 Did you complete the return based on information for the applicable "
+                    "tax year provided by the taxpayer or reasonably obtained by you? [Yes/No] "
+                    "2 If credits are claimed on the return, did you complete the applicable "
+                    "EIC and/or CTC/ACTC/ODC worksheets found in the Form 1040, 1040-SR, "
+                    "1040-NR, 1040-SS, or Schedule 8812 (Form 1040) instructions, and/or the "
+                    "AOTC worksheet found in the Form 8863 instructions, or your own "
+                    "worksheet(s) that provides the same information, and all related forms "
+                    "and schedules for each credit claimed? [Yes/No/N/A] "
+                    "3 Did you satisfy the knowledge requirement? To meet the knowledge "
+                    "requirement, you must do both of the following: interview the taxpayer, "
+                    "ask questions, and contemporaneously document the taxpayer's responses "
+                    "to determine that the taxpayer is eligible to claim the credit(s) "
+                    "and/or HOH filing status; review information to determine that the "
+                    "taxpayer is eligible to claim the credit(s) and/or HOH filing status "
+                    "and to figure the amount(s) of any credit(s). [Yes/No] "
+                    "4 Did any information provided by the taxpayer or a third party for "
+                    "use in preparing the return, or information reasonably known to you, "
+                    "appear to be incorrect, incomplete, or inconsistent? (If 'Yes,' answer "
+                    "questions 4a and 4b. If 'No,' go to question 5.) [Yes/No] "
+                    "4a Did you make reasonable inquiries to determine the correct, "
+                    "complete, and consistent information? [Yes/No] "
+                    "4b Did you contemporaneously document your inquiries? (Documentation "
+                    "should include the questions you asked, whom you asked, when you asked, "
+                    "the information that was provided, and the impact the information had "
+                    "on your preparation of the return.) [Yes/No] "
+                    "5 Did you satisfy the record retention requirement? To meet the record "
+                    "retention requirement, you must keep a copy of your documentation "
+                    "referenced in question 4b, a copy of this Form 8867, a copy of any "
+                    "applicable worksheet(s), a record of how, when, and from whom the "
+                    "information used to prepare Form 8867 and any applicable worksheet(s) "
+                    "was obtained, and a copy of any document(s) provided by the taxpayer "
+                    "that you relied on to determine eligibility for the credit(s) and/or "
+                    "HOH filing status or to figure the amount(s) of the credit(s). [Yes/No] "
+                    "List those documents provided by the taxpayer, if any, that you relied "
+                    "on: [text entry] "
+                    "6 Did you ask the taxpayer whether he/she could provide documentation "
+                    "to substantiate eligibility for the credit(s) and/or HOH filing status "
+                    "and the amount(s) of any credit(s) claimed on the return if his/her "
+                    "return is selected for audit? [Yes/No] "
+                    "7 Did you ask the taxpayer if any of these credits were disallowed or "
+                    "reduced in a previous year? (If credits were disallowed or reduced, go "
+                    "to question 7a; if not, go to question 8.) [Yes/No/N/A] "
+                    "7a Did you complete the required recertification Form 8862? [Yes/No/N/A] "
+                    "8 If the taxpayer is reporting self-employment income, did you ask "
+                    "questions to prepare a complete and correct Schedule C (Form 1040)? "
+                    "[Yes/No/N/A]"
                 ),
                 "summary_text": (
-                    "Header: which of EIC / CTC-ACTC-ODC / AOTC / HOH are claimed "
-                    "(drive from computed credits + filing status). Part I Q1-8 = general "
-                    "due-diligence Y/N (4a/4b inquiry+documentation; 7/8 prior-year "
-                    "disallowance + 8862)."
+                    "Header: which of EIC / CTC-ACTC-ODC / AOTC / HOH are claimed (driven "
+                    "from computed credits + filing status). Part I = 11 answerable lines: "
+                    "1 [Y/N], 2 [Y/N/N-A], 3 [Y/N], 4 [Y/N] (Yes routes to 4a/4b, No skips "
+                    "to 5), 4a [Y/N], 4b [Y/N], 5 [Y/N] + free-text documents list, 6 "
+                    "[Y/N], 7 [Y/N/N-A] (disallowance routes to 7a, else skip to 8), 7a "
+                    "[Y/N/N-A], 8 = the Schedule C question [Y/N/N-A]."
                 ),
                 "is_key_excerpt": True,
             },
@@ -409,19 +452,52 @@ AUTHORITY_SOURCES: list[dict] = [
                 "excerpt_label": "Parts II-V credit-specific (Q9-13 + HOH, verbatim)",
                 "location_reference": "Form 8867 (Rev. Nov 2024), Parts II-V",
                 "excerpt_text": (
-                    "Part II — Due Diligence Questions for Returns Claiming EIC (9a/9b/9c: "
-                    "residency, relationship, and income inquiries for a qualifying child; "
-                    "if no qualifying child, the taxpayer-eligibility questions). Part III "
-                    "— Due Diligence Questions for Returns Claiming CTC/ACTC/ODC (10-12). "
-                    "Part IV — Due Diligence Questions for Returns Claiming AOTC (13). Part "
-                    "V — Eligibility Certification: you will comply with all due-diligence "
-                    "requirements for each credit; Head of Household filing status "
-                    "determination questions."
+                    "Part II — Due Diligence Questions for Returns Claiming EIC (If the "
+                    "return does not claim EIC, go to Part III.) "
+                    "9a Have you determined that the taxpayer is eligible to claim the EIC "
+                    "for the number of qualifying children claimed, or is eligible to claim "
+                    "the EIC without a qualifying child? (If the taxpayer is claiming the "
+                    "EIC and does not have a qualifying child, go to question 10.) [Yes/No] "
+                    "9b Did you ask the taxpayer if the child lived with the taxpayer for "
+                    "over half of the year, even if the taxpayer has supported the child "
+                    "the entire year? [Yes/No] "
+                    "9c Did you explain to the taxpayer the rules about claiming the EIC "
+                    "when a child is the qualifying child of more than one person "
+                    "(tiebreaker rules)? [Yes/No/N/A] "
+                    "Part III — Due Diligence Questions for Returns Claiming CTC/ACTC/ODC "
+                    "(If the return does not claim CTC, ACTC, or ODC, go to Part IV.) "
+                    "10 Have you determined that each qualifying person for the "
+                    "CTC/ACTC/ODC is the taxpayer's dependent who is a citizen, national, "
+                    "or resident of the United States? [Yes/No] "
+                    "11 Did you explain to the taxpayer that he/she may not claim the "
+                    "CTC/ACTC if the child has not lived with the taxpayer for over half of "
+                    "the year, even if the taxpayer has supported the child, unless the "
+                    "child's custodial parent has released a claim to exemption for the "
+                    "child? [Yes/No/N/A] "
+                    "12 Did you explain to the taxpayer the rules about claiming the "
+                    "CTC/ACTC/ODC for a child of divorced or separated parents (or parents "
+                    "who live apart), including any requirement to attach a Form 8332 or "
+                    "similar statement to the return? [Yes/No/N/A] "
+                    "Part IV — Due Diligence Questions for Returns Claiming AOTC (If the "
+                    "return does not claim AOTC, go to Part V.) "
+                    "13 Did the taxpayer provide substantiation for the credit, such as a "
+                    "Form 1098-T and/or receipts for the qualified tuition and related "
+                    "expenses for the claimed AOTC? [Yes/No] "
+                    "Part V — Due Diligence Questions for Claiming HOH (If the return does "
+                    "not claim HOH filing status, go to Part VI.) "
+                    "14 Have you determined that the taxpayer was unmarried or considered "
+                    "unmarried on the last day of the tax year and provided more than half "
+                    "of the cost of keeping up a home for the year for a qualifying person? "
+                    "[Yes/No] "
+                    "Part VI — Eligibility Certification. "
+                    "15 Do you certify that all of the answers on this Form 8867 are, to "
+                    "the best of your knowledge, true, correct, and complete? [Yes/No]"
                 ),
                 "summary_text": (
-                    "Part II EIC (Q9), Part III CTC/ACTC/ODC (Q10-12), Part IV AOTC (Q13 — "
-                    "RED until 8863), Part V HOH determination + certification. All "
-                    "preparer-answered inputs."
+                    "Part II EIC: 9a [Y/N] (childless EIC skips 9b/9c to question 10), 9b "
+                    "[Y/N], 9c [Y/N/N-A]. Part III CTC/ACTC/ODC: 10 [Y/N], 11 [Y/N/N-A], "
+                    "12 [Y/N/N-A]. Part IV AOTC: 13 [Y/N]. Part V HOH: 14 [Y/N]. Part VI "
+                    "certification: 15 [Y/N]. All preparer-answered inputs."
                 ),
                 "is_key_excerpt": True,
             },
@@ -1250,114 +1326,215 @@ F8867_IDENTITY = {
     "form_number": "8867",
     "form_title": "Form 8867 — Paid Preparer's Due Diligence Checklist (Rev. Nov 2024)",
     "notes": (
-        "Sprint Topic 7. REAL IRS FACE (Attachment Seq 70). DATA-MAP render — all "
-        "preparer-answered Y/N/N-A facts, NO compute. Required on every return "
-        "claiming EIC / CTC-ACTC-ODC / AOTC / HOH. v1 covers EIC + CTC/ODC + HOH; "
-        "the AOTC section (Part IV, Q13) renders but flags RED until Form 8863 "
-        "exists (DoD). Header credit checkboxes are driven from the computed credits "
-        "+ filing status; everything else is the preparer's answers."
+        "Sprint Topic 7; PER-QUESTION REBUILD 2026-07-26 (QA Batch-001 item 11, "
+        "Ken GO). REAL IRS FACE (Attachment Seq 70), one line per answerable "
+        "question — 1/2/3/4/4a/4b/5(+documents list)/6/7/7a/8/9a/9b/9c/10/11/12/"
+        "13/14/15. The N/A choice exists ONLY where the printed face has an N/A "
+        "checkbox: lines 2, 7, 7a, 8, 9c, 11, 12 (PDF widget dump; confirmed by "
+        "the MeF IRS8867.xsd code elements). DATA-MAP render — all preparer-"
+        "answered facts, NO compute. Required on every return claiming EIC / "
+        "CTC-ACTC-ODC / AOTC / HOH (§6695(g), ~$600 per credit per return). A "
+        "filed BLANK reads as 'the question was never asked' — the per-question "
+        "model exists so no filed answer is ever blank merely because the "
+        "storage model couldn't hold it. Header credit checkboxes are driven "
+        "from the computed credits + filing status; Parts I-VI all supported "
+        "(Form 8863 is built — the old v1 AOTC-RED boundary is retired)."
     ),
 }
 
+# Answer vocabulary: "yes" / "no" (+ "na" ONLY on the seven lines whose printed
+# face has an N/A checkbox — widget truth, matching the XSD code elements).
+_YN = ["yes", "no"]
+_YNA = ["yes", "no", "na"]
+
 F8867_FACTS: list[dict] = [
     {"fact_key": "f8867_claims_eic", "label": "Header: EIC claimed on the return", "data_type": "boolean", "sort_order": 1,
-     "notes": "DERIVED from 1040 line 27a > 0 (or the EIC worksheet active). Drives Part II applicability."},
+     "notes": "DERIVED from 1040 line 27a > 0. Drives Part II applicability."},
     {"fact_key": "f8867_claims_ctc_actc_odc", "label": "Header: CTC/ACTC/ODC claimed", "data_type": "boolean", "sort_order": 2,
      "notes": "DERIVED from Schedule 8812 (1040 line 19/28). Drives Part III."},
     {"fact_key": "f8867_claims_aotc", "label": "Header: AOTC claimed", "data_type": "boolean", "sort_order": 3,
-     "notes": "v1: Form 8863 not built -> Part IV renders but flags RED (DoD)."},
+     "notes": "DERIVED from Form 8863 line 7 > 0 (compute_8863.aotc_claimed — the single shared covered-credit signal). Drives Part IV."},
     {"fact_key": "f8867_claims_hoh", "label": "Header: Head of Household filing status claimed", "data_type": "boolean", "sort_order": 4,
      "notes": "DERIVED from filing_status == HOH. Drives Part V."},
-    {"fact_key": "f8867_q1_based_on_info", "label": "Q1: return based on info provided by / reasonably obtained from the taxpayer",
-     "data_type": "boolean", "sort_order": 10, "notes": "Preparer answer (Part I general due diligence)."},
-    {"fact_key": "f8867_q2_worksheets", "label": "Q2: completed the applicable worksheet(s) or equivalent",
-     "data_type": "boolean", "sort_order": 11, "notes": "Preparer answer."},
-    {"fact_key": "f8867_q3_knowledge", "label": "Q3: satisfied the knowledge requirement", "data_type": "boolean", "sort_order": 12,
-     "notes": "Preparer answer."},
-    {"fact_key": "f8867_q4_inconsistent", "label": "Q4: any information incorrect/incomplete/inconsistent (4a inquire / 4b document)",
-     "data_type": "boolean", "sort_order": 13, "notes": "Preparer answer (Y triggers 4a/4b sub-answers)."},
-    {"fact_key": "f8867_q5_record_retention", "label": "Q5: satisfied the record retention requirement", "data_type": "boolean",
-     "sort_order": 14, "notes": "Preparer answer."},
-    {"fact_key": "f8867_q6_substantiation", "label": "Q6: asked questions to substantiate eligibility/amounts", "data_type": "boolean",
-     "sort_order": 15, "notes": "Preparer answer."},
-    {"fact_key": "f8867_q7_prior_disallowance", "label": "Q7: asked whether the credit(s) were disallowed in a prior year",
-     "data_type": "boolean", "sort_order": 16, "notes": "Preparer answer."},
-    {"fact_key": "f8867_q8_recertification", "label": "Q8: completed the required recertification (Form 8862) if applicable",
-     "data_type": "boolean", "sort_order": 17, "notes": "Preparer answer (links to the 8862 render)."},
-    {"fact_key": "f8867_q9_eic", "label": "Part II Q9 (a/b/c): EIC residency/relationship/income inquiries", "data_type": "boolean",
-     "sort_order": 20, "notes": "Preparer answer (EIC-specific)."},
-    {"fact_key": "f8867_q10_12_ctc", "label": "Part III Q10-12: CTC/ACTC/ODC due-diligence answers", "data_type": "boolean",
-     "sort_order": 21, "notes": "Preparer answer (CTC-specific)."},
-    {"fact_key": "f8867_q13_aotc", "label": "Part IV Q13: AOTC due-diligence answer", "data_type": "boolean", "sort_order": 22,
-     "notes": "v1: renders but RED until 8863 exists."},
-    {"fact_key": "f8867_part_v_hoh", "label": "Part V: HOH determination questions answered", "data_type": "boolean", "sort_order": 23,
-     "notes": "Preparer answer (HOH-specific)."},
+    # ── Part I (Q1-8 + sub-questions; always applicable when the form is required) ──
+    {"fact_key": "f8867_q1_based_on_info", "label": "Q1: return based on info for the applicable tax year provided by / reasonably obtained from the taxpayer",
+     "data_type": "choice", "choices": _YN, "sort_order": 10, "notes": "Preparer answer (Part I general due diligence)."},
+    {"fact_key": "f8867_q2_worksheets", "label": "Q2: completed the applicable EIC/CTC-ACTC-ODC/AOTC worksheet(s) or your own equivalent",
+     "data_type": "choice", "choices": _YNA, "sort_order": 11, "notes": "Preparer answer. N/A box on the face."},
+    {"fact_key": "f8867_q3_knowledge", "label": "Q3: satisfied the knowledge requirement (interview + contemporaneous documentation + review)",
+     "data_type": "choice", "choices": _YN, "sort_order": 12, "notes": "Preparer answer."},
+    {"fact_key": "f8867_q4_inconsistent", "label": "Q4: did any information appear incorrect, incomplete, or inconsistent",
+     "data_type": "choice", "choices": _YN, "sort_order": 13,
+     "notes": "Preparer answer. Face routing: Yes -> answer 4a and 4b; No -> go to question 5 (4a/4b legitimately blank)."},
+    {"fact_key": "f8867_q4a_inquiries", "label": "Q4a: made reasonable inquiries to determine correct/complete/consistent information",
+     "data_type": "choice", "choices": _YN, "sort_order": 14, "notes": "Applicable only when Q4 = yes."},
+    {"fact_key": "f8867_q4b_documented", "label": "Q4b: contemporaneously documented the inquiries",
+     "data_type": "choice", "choices": _YN, "sort_order": 15, "notes": "Applicable only when Q4 = yes."},
+    {"fact_key": "f8867_q5_record_retention", "label": "Q5: satisfied the record retention requirement",
+     "data_type": "choice", "choices": _YN, "sort_order": 16, "notes": "Preparer answer."},
+    {"fact_key": "f8867_q5_documents_list", "label": "Q5: list of documents provided by the taxpayer that you relied on",
+     "data_type": "string", "sort_order": 17,
+     "notes": "Free-text; the face says 'if any' — OPTIONAL, never required by D_8867_001. MeF WorkPaperDocumentNm."},
+    {"fact_key": "f8867_q6_substantiation", "label": "Q6: asked whether the taxpayer could provide documentation to substantiate eligibility/amounts if audited",
+     "data_type": "choice", "choices": _YN, "sort_order": 18, "notes": "Preparer answer."},
+    {"fact_key": "f8867_q7_prior_disallowance", "label": "Q7: asked whether any of these credits were disallowed or reduced in a previous year",
+     "data_type": "choice", "choices": _YNA, "sort_order": 19,
+     "notes": "N/A box on the face. Face routing: if credits were disallowed/reduced -> 7a; if not -> question 8."},
+    {"fact_key": "f8867_q7a_recertification", "label": "Q7a: completed the required recertification Form 8862",
+     "data_type": "choice", "choices": _YNA, "sort_order": 20,
+     "notes": "N/A box on the face. Required-answer only when a prior-year disallowance is on record (the cascade's signal — gate/cascade lock-step)."},
+    {"fact_key": "f8867_q8_sch_c_questions", "label": "Q8: if self-employment income is reported, asked questions to prepare a complete and correct Schedule C",
+     "data_type": "choice", "choices": _YNA, "sort_order": 21,
+     "notes": "N/A box on the face — a no-Schedule-C return answers N/A, never blank. NEW in the per-question rebuild (the old model had no face-8 line)."},
+    # ── Part II (EIC) ──
+    {"fact_key": "f8867_q9a_eic_eligibility", "label": "Q9a: determined the taxpayer is eligible for the EIC claimed (with or without a qualifying child)",
+     "data_type": "choice", "choices": _YN, "sort_order": 30,
+     "notes": "Face routing: claiming EIC without a qualifying child -> go to question 10 (9b/9c legitimately blank)."},
+    {"fact_key": "f8867_q9b_residency_inquiry", "label": "Q9b: asked whether the child lived with the taxpayer for over half the year",
+     "data_type": "choice", "choices": _YN, "sort_order": 31, "notes": "Applicable when EIC is claimed WITH a qualifying child."},
+    {"fact_key": "f8867_q9c_tiebreaker_explained", "label": "Q9c: explained the tiebreaker rules for a child who is the qualifying child of more than one person",
+     "data_type": "choice", "choices": _YNA, "sort_order": 32,
+     "notes": "N/A box on the face. Applicable when EIC is claimed WITH a qualifying child."},
+    # ── Part III (CTC/ACTC/ODC) ──
+    {"fact_key": "f8867_q10_ctc_dependent_citizen", "label": "Q10: determined each CTC/ACTC/ODC qualifying person is the taxpayer's dependent and a citizen/national/resident of the US",
+     "data_type": "choice", "choices": _YN, "sort_order": 40, "notes": "Preparer answer (CTC-specific)."},
+    {"fact_key": "f8867_q11_ctc_residency_explained", "label": "Q11: explained that CTC/ACTC cannot be claimed for a child who did not live with the taxpayer over half the year absent a custodial release",
+     "data_type": "choice", "choices": _YNA, "sort_order": 41, "notes": "N/A box on the face."},
+    {"fact_key": "f8867_q12_ctc_divorced_rules", "label": "Q12: explained the divorced/separated-parents rules including any Form 8332 attachment requirement",
+     "data_type": "choice", "choices": _YNA, "sort_order": 42, "notes": "N/A box on the face."},
+    # ── Part IV (AOTC) / Part V (HOH) / Part VI (certification) ──
+    {"fact_key": "f8867_q13_aotc", "label": "Q13: taxpayer provided substantiation for the AOTC (Form 1098-T and/or receipts)",
+     "data_type": "choice", "choices": _YN, "sort_order": 50, "notes": "Preparer answer (AOTC-specific; Form 8863 is built)."},
+    {"fact_key": "f8867_q14_hoh_determination", "label": "Q14: determined the taxpayer was unmarried/considered unmarried and paid over half the cost of keeping up a home for a qualifying person",
+     "data_type": "choice", "choices": _YN, "sort_order": 60, "notes": "Preparer answer (HOH-specific). The old model's 'hoh' line = this face line 14."},
+    {"fact_key": "f8867_q15_certification", "label": "Q15: certify that all answers on this Form 8867 are true, correct, and complete",
+     "data_type": "choice", "choices": _YN, "sort_order": 70,
+     "notes": "Part VI eligibility certification. The attestation cascade answers yes; a manual No is preserved faithfully (it is the preparer's own filed statement)."},
 ]
 
 F8867_RULES: list[dict] = [
-    {"rule_id": "R-8867-RENDER", "title": "Form 8867 render gate + section applicability",
+    {"rule_id": "R-8867-RENDER", "title": "Form 8867 render gate + per-question section applicability",
      "rule_type": "routing", "precedence": 0, "sort_order": 1,
      "formula": ("RENDER Form 8867 when ANY of EIC / CTC-ACTC-ODC / AOTC / HOH is claimed. Header checkboxes "
-                 "DERIVED: EIC (1040 27a > 0), CTC/ACTC/ODC (Schedule 8812), AOTC (Form 8863 — not built, RED), "
-                 "HOH (filing_status). Part I (Q1-8) always; Part II if EIC; Part III if CTC; Part IV if AOTC "
-                 "(RED v1); Part V if HOH. All answers are preparer inputs — NO compute."),
+                 "DERIVED: EIC (1040 27a > 0), CTC/ACTC/ODC (1040 line 19/28 via Schedule 8812), AOTC (Form "
+                 "8863 line 7 > 0), HOH (filing_status). APPLICABILITY per the face's own routing: Part I "
+                 "lines 1-8 always (4a/4b only when 4 = yes — 'If No, go to question 5'; 7a only when a "
+                 "prior-year disallowance is on record — 'If credits were disallowed or reduced, go to 7a'; "
+                 "8 answers N/A when no self-employment income); Part II 9a when EIC (9b/9c additionally "
+                 "require a qualifying child — childless EIC 'go to question 10'); Part III 10-12 when CTC; "
+                 "Part IV 13 when AOTC; Part V 14 when HOH; Part VI 15 always. The line-5 documents list is "
+                 "optional ('if any'). All answers are preparer inputs — NO compute. An INAPPLICABLE line "
+                 "prints blank (the face's own skip), an APPLICABLE line must carry yes/no/na — a filed "
+                 "blank on an applicable line reads as 'the question was never asked' (§6695(g))."),
      "inputs": ["f8867_claims_eic", "f8867_claims_ctc_actc_odc", "f8867_claims_aotc", "f8867_claims_hoh"], "outputs": [],
-     "description": ("ONCE PER RETURN (render). DATA-MAP face (the 8812/Sch-B sibling precedent). Required on "
-                     "every return claiming a covered credit/status; the §6695(g) penalty makes it mandatory. "
-                     "v1 covers EIC + CTC/ODC + HOH; AOTC section RED until 8863.")},
+     "description": ("ONCE PER RETURN (render). DATA-MAP face (the 8812/Sch-B sibling precedent), one line "
+                     "per answerable question. Required on every return claiming a covered credit/status; "
+                     "the §6695(g) penalty makes it mandatory. Parts I-VI all supported (Form 8863 built). "
+                     "N/A is a real answer ONLY on lines 2/7/7a/8/9c/11/12 (the face's N/A checkboxes).")},
 ]
 
+# One line per answerable face item, keyed by the FACE numbers (Rev. 11-2024).
+# [Y/N/N-A] marks the seven lines with a printed N/A checkbox; all others [Y/N].
 F8867_LINES: list[dict] = [
-    {"line_number": "1", "description": "Q1: based on taxpayer-provided / reasonably-obtained information", "line_type": "input",
-     "source_rules": ["R-8867-RENDER"], "sort_order": 1},
-    {"line_number": "2", "description": "Q2: completed applicable worksheet(s)", "line_type": "input", "source_rules": ["R-8867-RENDER"], "sort_order": 2},
-    {"line_number": "3", "description": "Q3: knowledge requirement satisfied", "line_type": "input", "source_rules": ["R-8867-RENDER"], "sort_order": 3},
-    {"line_number": "4", "description": "Q4: information inconsistent (4a inquire / 4b document)", "line_type": "input",
-     "source_rules": ["R-8867-RENDER"], "sort_order": 4},
-    {"line_number": "5", "description": "Q5: record retention requirement", "line_type": "input", "source_rules": ["R-8867-RENDER"], "sort_order": 5},
-    {"line_number": "6", "description": "Q6: substantiation inquiries", "line_type": "input", "source_rules": ["R-8867-RENDER"], "sort_order": 6},
-    {"line_number": "7", "description": "Q7: prior-year disallowance asked", "line_type": "input", "source_rules": ["R-8867-RENDER"], "sort_order": 7},
-    {"line_number": "8", "description": "Q8: recertification (Form 8862) completed", "line_type": "input", "source_rules": ["R-8867-RENDER"], "sort_order": 8},
-    {"line_number": "9", "description": "Part II (Q9 a/b/c): EIC due-diligence questions", "line_type": "input",
-     "source_rules": ["R-8867-RENDER"], "sort_order": 9},
-    {"line_number": "10", "description": "Part III (Q10-12): CTC/ACTC/ODC due-diligence questions", "line_type": "input",
-     "source_rules": ["R-8867-RENDER"], "sort_order": 10},
-    {"line_number": "13", "description": "Part IV (Q13): AOTC due-diligence question (RED until 8863)", "line_type": "input",
-     "source_rules": ["R-8867-RENDER"], "sort_order": 11},
-    {"line_number": "hoh", "description": "Part V: HOH determination questions", "line_type": "input", "source_rules": ["R-8867-RENDER"], "sort_order": 12},
+    {"line_number": "1", "description": "Q1 [Y/N]: based on taxpayer-provided / reasonably-obtained information",
+     "line_type": "input", "source_facts": ["f8867_q1_based_on_info"], "source_rules": ["R-8867-RENDER"], "sort_order": 1},
+    {"line_number": "2", "description": "Q2 [Y/N/N-A]: completed applicable worksheet(s) or own equivalent",
+     "line_type": "input", "source_facts": ["f8867_q2_worksheets"], "source_rules": ["R-8867-RENDER"], "sort_order": 2},
+    {"line_number": "3", "description": "Q3 [Y/N]: knowledge requirement satisfied",
+     "line_type": "input", "source_facts": ["f8867_q3_knowledge"], "source_rules": ["R-8867-RENDER"], "sort_order": 3},
+    {"line_number": "4", "description": "Q4 [Y/N]: information appeared incorrect/incomplete/inconsistent (Yes -> 4a/4b; No -> skip to 5)",
+     "line_type": "input", "source_facts": ["f8867_q4_inconsistent"], "source_rules": ["R-8867-RENDER"], "sort_order": 4},
+    {"line_number": "4a", "description": "Q4a [Y/N]: made reasonable inquiries (applicable when 4 = yes)",
+     "line_type": "input", "source_facts": ["f8867_q4a_inquiries"], "source_rules": ["R-8867-RENDER"], "sort_order": 5},
+    {"line_number": "4b", "description": "Q4b [Y/N]: contemporaneously documented the inquiries (applicable when 4 = yes)",
+     "line_type": "input", "source_facts": ["f8867_q4b_documented"], "source_rules": ["R-8867-RENDER"], "sort_order": 6},
+    {"line_number": "5", "description": "Q5 [Y/N]: record retention requirement satisfied",
+     "line_type": "input", "source_facts": ["f8867_q5_record_retention"], "source_rules": ["R-8867-RENDER"], "sort_order": 7},
+    {"line_number": "5_docs", "description": "Q5 documents list [text]: documents provided by the taxpayer that you relied on (optional — 'if any')",
+     "line_type": "input", "source_facts": ["f8867_q5_documents_list"], "source_rules": ["R-8867-RENDER"], "sort_order": 8},
+    {"line_number": "6", "description": "Q6 [Y/N]: asked about substantiating documentation if audited",
+     "line_type": "input", "source_facts": ["f8867_q6_substantiation"], "source_rules": ["R-8867-RENDER"], "sort_order": 9},
+    {"line_number": "7", "description": "Q7 [Y/N/N-A]: asked whether credits were disallowed/reduced in a previous year (disallowed -> 7a; else -> 8)",
+     "line_type": "input", "source_facts": ["f8867_q7_prior_disallowance"], "source_rules": ["R-8867-RENDER"], "sort_order": 10},
+    {"line_number": "7a", "description": "Q7a [Y/N/N-A]: completed the required recertification Form 8862 (the OLD model stored this under line key '8')",
+     "line_type": "input", "source_facts": ["f8867_q7a_recertification"], "source_rules": ["R-8867-RENDER"], "sort_order": 11},
+    {"line_number": "8", "description": "Q8 [Y/N/N-A]: if self-employment income, asked questions for a complete/correct Schedule C (NEW — no old-model counterpart)",
+     "line_type": "input", "source_facts": ["f8867_q8_sch_c_questions"], "source_rules": ["R-8867-RENDER"], "sort_order": 12},
+    {"line_number": "9a", "description": "Q9a [Y/N]: determined EIC eligibility for the qualifying children claimed (childless EIC -> skip 9b/9c)",
+     "line_type": "input", "source_facts": ["f8867_q9a_eic_eligibility"], "source_rules": ["R-8867-RENDER"], "sort_order": 13},
+    {"line_number": "9b", "description": "Q9b [Y/N]: asked whether the child lived with the taxpayer over half the year",
+     "line_type": "input", "source_facts": ["f8867_q9b_residency_inquiry"], "source_rules": ["R-8867-RENDER"], "sort_order": 14},
+    {"line_number": "9c", "description": "Q9c [Y/N/N-A]: explained the qualifying-child-of-more-than-one-person tiebreaker rules",
+     "line_type": "input", "source_facts": ["f8867_q9c_tiebreaker_explained"], "source_rules": ["R-8867-RENDER"], "sort_order": 15},
+    {"line_number": "10", "description": "Q10 [Y/N]: each CTC/ACTC/ODC qualifying person is a dependent and US citizen/national/resident (the OLD model's merged '10' row covered 10-12)",
+     "line_type": "input", "source_facts": ["f8867_q10_ctc_dependent_citizen"], "source_rules": ["R-8867-RENDER"], "sort_order": 16},
+    {"line_number": "11", "description": "Q11 [Y/N/N-A]: explained the residency requirement / custodial-release exception",
+     "line_type": "input", "source_facts": ["f8867_q11_ctc_residency_explained"], "source_rules": ["R-8867-RENDER"], "sort_order": 17},
+    {"line_number": "12", "description": "Q12 [Y/N/N-A]: explained the divorced/separated-parents rules incl. Form 8332",
+     "line_type": "input", "source_facts": ["f8867_q12_ctc_divorced_rules"], "source_rules": ["R-8867-RENDER"], "sort_order": 18},
+    {"line_number": "13", "description": "Q13 [Y/N]: taxpayer provided AOTC substantiation (1098-T / receipts)",
+     "line_type": "input", "source_facts": ["f8867_q13_aotc"], "source_rules": ["R-8867-RENDER"], "sort_order": 19},
+    {"line_number": "14", "description": "Q14 [Y/N]: HOH determination — unmarried/considered unmarried + over half the cost of keeping up the home (the OLD model's 'hoh' row)",
+     "line_type": "input", "source_facts": ["f8867_q14_hoh_determination"], "source_rules": ["R-8867-RENDER"], "sort_order": 20},
+    {"line_number": "15", "description": "Q15 [Y/N]: Part VI certification — all answers true, correct, and complete",
+     "line_type": "input", "source_facts": ["f8867_q15_certification"], "source_rules": ["R-8867-RENDER"], "sort_order": 21},
 ]
 
 F8867_DIAGNOSTICS: list[dict] = [
     {"diagnostic_id": "D_8867_001", "title": "Form 8867 required but a due-diligence answer is blank", "severity": "error",
-     "condition": "8867 renders (a covered credit/status claimed) AND any applicable Part I-V question is unanswered",
+     "condition": ("8867 is required (a covered credit/status is claimed) AND any APPLICABLE question is "
+                   "unanswered. Applicability follows the face's own routing: 1/2/3/4/5/6/7/8/15 always; "
+                   "4a+4b when 4 = yes; 7a when a prior-year disallowance is on record; 9a when EIC; 9b+9c "
+                   "when EIC with a qualifying child; 10/11/12 when CTC/ACTC/ODC; 13 when AOTC; 14 when HOH. "
+                   "The line-5 documents list is optional and never required. A missing row counts as "
+                   "unanswered; N/A counts as answered only on 2/7/7a/8/9c/11/12."),
      "message": ("Form 8867 is required for this return (a covered credit or HOH is claimed), and a due-diligence "
                  "question is unanswered. Complete every applicable question — the §6695(g) penalty applies per "
                  "credit for an incomplete checklist."),
-     "notes": "Data-map completeness gate. Required-answer enforcement (no compute)."},
-    {"diagnostic_id": "D_8867_002", "title": "AOTC claimed on 8867 but Form 8863 is not supported", "severity": "error",
-     "condition": "f8867_claims_aotc is True (Form 8863 not built this sprint)",
-     "message": ("The AOTC due-diligence section (Part IV) is shown but Form 8863 (education credits) is not "
-                 "built this version. Prepare the AOTC and its due diligence manually; the EIC/CTC/HOH sections "
-                 "are supported."),
-     "notes": "DoD: AOTC section renders but flags RED until 8863 exists."},
+     "notes": ("Data-map completeness gate over the per-question face (no compute). D_8867_002 (AOTC "
+               "unsupported) RETIRED — Form 8863 is built (app retired it 2026-06-19; removed from the "
+               "catalogue in the 2026-07-26 per-question rebuild).")},
 ]
 
 F8867_SCENARIOS: list[dict] = [
-    {"scenario_name": "F8867-T1 — EIC + HOH return renders Parts I/II/V",
+    {"scenario_name": "F8867-T1 — EIC + HOH return renders Parts I/II/V/VI",
      "scenario_type": "normal", "sort_order": 1,
-     "inputs": {"claims_eic": True, "claims_hoh": True, "all_questions_answered": True},
-     "expected_outputs": {"renders": True, "part_ii_active": True, "part_v_active": True},
-     "notes": "EIC + HOH -> header boxes checked; Parts I (general), II (EIC), V (HOH) apply."},
-    {"scenario_name": "F8867-T2 — AOTC claimed -> Part IV RED (D_8867_002)",
+     "inputs": {"claims_eic": True, "claims_hoh": True, "qualifying_children": 2, "all_applicable_answered": True},
+     "expected_outputs": {"renders": True, "part_ii_active": True, "part_v_active": True,
+                          "applicable_lines": ["1", "2", "3", "4", "5", "6", "7", "8", "9a", "9b", "9c", "14", "15"]},
+     "notes": "EIC (with QCs) + HOH -> header boxes checked; Parts I, II, V, VI apply; Parts III/IV print blank."},
+    {"scenario_name": "F8867-T2 — Q4 yes makes 4a/4b applicable; blank 4a fires D_8867_001",
      "scenario_type": "failure", "sort_order": 2,
-     "inputs": {"claims_aotc": True},
-     "expected_outputs": {"D_8867_002_fires": True},
-     "notes": "AOTC due diligence not supported (8863 not built)."},
+     "inputs": {"claims_eic": True, "q4": "yes", "q4a": None, "q4b": "yes"},
+     "expected_outputs": {"D_8867_001_fires": True, "unanswered_includes": ["4a"]},
+     "notes": "Face routing: 'If Yes, answer questions 4a and 4b.' A yes on 4 with a blank 4a is an incomplete checklist."},
     {"scenario_name": "F8867-T3 — required but a question blank -> D_8867_001",
      "scenario_type": "failure", "sort_order": 3,
      "inputs": {"claims_eic": True, "q3_knowledge": None},
      "expected_outputs": {"D_8867_001_fires": True},
      "notes": "Incomplete checklist on a required return."},
+    {"scenario_name": "F8867-T4 — childless EIC: 9b/9c legitimately blank, no diagnostic",
+     "scenario_type": "normal", "sort_order": 4,
+     "inputs": {"claims_eic": True, "qualifying_children": 0, "q9a": "yes", "q9b": None, "q9c": None,
+                "all_other_applicable_answered": True},
+     "expected_outputs": {"D_8867_001_fires": False},
+     "notes": "Face: 'If the taxpayer is claiming the EIC and does not have a qualifying child, go to question 10.'"},
+    {"scenario_name": "F8867-T5 — no self-employment income: line 8 answers N/A (blank fires D_8867_001)",
+     "scenario_type": "normal", "sort_order": 5,
+     "inputs": {"claims_ctc": True, "has_schedule_c": False, "q8": "na", "all_other_applicable_answered": True},
+     "expected_outputs": {"D_8867_001_fires": False},
+     "notes": "Line 8 has an N/A checkbox — a no-Schedule-C return answers N/A. Blank is NOT a valid substitute (8 is always applicable)."},
+    {"scenario_name": "F8867-T6 — attestation cascade fills every applicable line incl. 15 = yes",
+     "scenario_type": "normal", "sort_order": 6,
+     "inputs": {"claims_eic": True, "claims_ctc": True, "qualifying_children": 1, "has_schedule_c": True,
+                "prior_disallowance": False, "preparer_attested": True},
+     "expected_outputs": {"q1": "yes", "q2": "yes", "q3": "yes", "q4": "no", "q4a": None, "q4b": None,
+                          "q5": "yes", "q6": "yes", "q7": "yes", "q7a": "na", "q8": "yes",
+                          "q9a": "yes", "q9b": "yes", "q9c": "yes", "q10": "yes", "q11": "yes", "q12": "yes",
+                          "q13": None, "q14": None, "q15": "yes", "D_8867_001_fires": False},
+     "notes": ("The single attestation cascades a DD-compliant answer to every applicable line: 4 = no (so "
+               "4a/4b skip), 7a = na (no disallowance on record), 8 = yes (Schedule C present; na when absent), "
+               "unclaimed parts stay blank, 15 = yes. Un-attesting reverts cascade-written rows to blank.")},
 ]
 
 F8867_RULE_LINKS: list[tuple[str, str, str, str]] = [
@@ -1616,6 +1793,7 @@ class Command(BaseCommand):
             self._upsert_lines(form, spec["lines"])
             self._upsert_diagnostics(form, spec["diagnostics"])
             self._upsert_tests(form, spec["scenarios"])
+        self._prune_stale_8867()
         self._upsert_form_links(sources)
         self._load_flow_assertions()
         self._report_totals()
@@ -1789,6 +1967,43 @@ class Command(BaseCommand):
                 tax_form=form, scenario_name=t.pop("scenario_name"), defaults=t,
             )
         self.stdout.write(f"  {len(scenarios)} test scenarios")
+
+    def _prune_stale_8867(self):
+        """Retire the compressed-model 8867 artifacts the per-question rebuild
+        (2026-07-26) replaced: merged lines '9' / 'hoh' (now 9a-9c / 14), the
+        old fact keys (f8867_q8_recertification -> f8867_q7a_recertification,
+        f8867_q9_eic -> 9a/9b/9c, f8867_q10_12_ctc -> 10/11/12,
+        f8867_part_v_hoh -> f8867_q14_hoh_determination), the retired
+        D_8867_002 (Form 8863 is built), and the superseded scenario names.
+        Scoped to the 8867 TaxForm ONLY; exclude-based keep-sets from the
+        authored lists, so a re-run is a no-op (idempotent)."""
+        form = TaxForm.objects.filter(
+            form_number="8867", jurisdiction=FORM_JURISDICTION,
+            tax_year=FORM_TAX_YEAR, version=FORM_VERSION,
+        ).first()
+        if not form:
+            return
+
+        keep_facts = {f["fact_key"] for f in F8867_FACTS}
+        keep_rules = {r["rule_id"] for r in F8867_RULES}
+        keep_lines = {ln["line_number"] for ln in F8867_LINES}
+        keep_diags = {d["diagnostic_id"] for d in F8867_DIAGNOSTICS}
+        keep_tests = {t["scenario_name"] for t in F8867_SCENARIOS}
+
+        removed = {}
+        removed["facts"] = FormFact.objects.filter(tax_form=form).exclude(fact_key__in=keep_facts).delete()[0]
+        removed["rules"] = FormRule.objects.filter(tax_form=form).exclude(rule_id__in=keep_rules).delete()[0]
+        removed["lines"] = FormLine.objects.filter(tax_form=form).exclude(line_number__in=keep_lines).delete()[0]
+        removed["diagnostics"] = FormDiagnostic.objects.filter(tax_form=form).exclude(diagnostic_id__in=keep_diags).delete()[0]
+        removed["tests"] = TestScenario.objects.filter(tax_form=form).exclude(scenario_name__in=keep_tests).delete()[0]
+
+        total = sum(removed.values())
+        if total:
+            self.stdout.write(self.style.WARNING(
+                f"  8867 compressed model retired: {removed} ({total} stale rows deleted)"
+            ))
+        else:
+            self.stdout.write("  8867: nothing stale to retire (clean re-run)")
 
     def _upsert_form_links(self, sources):
         for source_code, form_code, link_type in AUTHORITY_FORM_LINKS:
