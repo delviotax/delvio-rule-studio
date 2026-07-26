@@ -174,14 +174,20 @@ DIAGNOSTICS: list[dict] = [
      "severity": "error",
      "condition": ("flow_destination is foreign to the return's form (entity arm on a 1040 / "
                    "1040 arm on an entity) OR an activity-linked destination (schedule_c / "
-                   "schedule_f / 8825-rental) has no linked activity_reference"),
+                   "schedule_f / 8825-rental) has no linked activity_reference. SEVERITY IS "
+                   "EFFECT-SCALED: error when the asset carries any nonzero current-year "
+                   "amount (money is being lost from the return); warning when every "
+                   "current-year amount is zero (fully-depreciated legacy inventory — the "
+                   "routing metadata is incomplete but no line is wrong)."),
      "message": ("Asset '{description}' does not feed any line of this return — its "
                  "depreciation is currently lost. Pick the business, farm, or rental property "
                  "it belongs to on the asset card."),
      "notes": ("The Benkoski class: the entity sched_f arm on a 1040 wrote nonexistent 'F14' "
                "and the miss was silent. Expands the S-Corp-era D013 to the unroutable/"
-               "unlinked cases; blocking because the return's income is otherwise overstated "
-               "with no visible sign.")},
+               "unlinked cases; blocking (when dollars move) because the return's income is "
+               "otherwise overstated with no visible sign. The zero-amount warning arm keeps "
+               "a 39-asset fully-depreciated legacy inventory from bricking a return over "
+               "metadata with no tax effect.")},
     {"diagnostic_id": "D_4562_RECON", "title": "Depreciation module does not reconcile to destination lines",
      "severity": "error",
      "condition": ("for any destination: sum(rounded per-asset amounts routed there) != the "
