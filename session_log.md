@@ -1,3 +1,23 @@
+## 2026-07-26 - FORM_8962 Part IV shared-policy allocation modeled per-row (QA Batch-001 item 9, delvio s115) - SEEDED + export-verified
+- Amended IN THE OWNING LOADER (load_1040_form_8962.py, RS 16a5bc4). R-8962-PART4 rewritten from a
+  one-line placeholder to the 2025 face's own line-34 mechanic, quoted VERBATIM under NEW source
+  IRS_2025_F8962_FORM (the 8867/2210 faithful-text lesson applied from the start): the 1095-A is
+  entered AS RECEIVED; allocation rows (per policy: SSN / start-stop months / e-f-g percentages as
+  2-decimal ratios) multiply each covered policy-month, whole-dollar rounded; BLANK pct = retain
+  100% (IRS8962.xsd makes each pct optional — blank is schema-valid; 0.00 = keep none); line 9 /
+  line 34 / the MeF SharedPolicyAllocationGrp derive from the ROW SET (the flag is only the UI
+  reveal). V1 boundaries: one row per policy-month (Pub 974 3+-family RED-defers), max 4 rows.
+- Lines 31/32/33/34 added; 4 new Part IV diagnostics (EMPTY/OVERLAP/TOO_MANY errors + BLANK_PCT
+  warning) + the s106e APP-ONLY annual trio (ANNUAL_INCOMPLETE/CONFLICT/UNSUPPORTED) spec-homed
+  (the s113 divergence class); scenario 8962-T7 (1%-retained -> 13/11/11 -> repay 132 -> Sch 2 1a,
+  the QA acceptance with synthetic identifiers); FA-1040-8962-07.
+- specs.0003: FormDiagnostic.diagnostic_id WIDENED 20 -> 40 and migrated onto RS prod — the app's
+  canonical diagnostic codes run past 20 chars (D_8962_ANNUAL_INCOMPLETE = 24) and the spec must
+  carry them VERBATIM, never truncated aliases. check_8962_integrity extended with an independent
+  monthly+allocation recompute; ALL CHECKS PASS (7 scenarios). Seeded to RS prod; deployed export
+  verified (13 diagnostics / 42 lines / 7 scenarios); tts mirror form_8962_spec.json refreshed
+  verbatim. App leg: delvio 9e13f89 (mig 0215+0216 BOTH DBs; deploy verified live).
+
 ## 2026-07-26 - 8867 PER-QUESTION REBUILD to the Rev. 11-2024 face (QA Batch-001 item 11, tts s114) - SEEDED + export-verified
 - Amended IN THE OWNING LOADER (load_1040_eic.py, RS a0708a5). The compressed 12-line boolean model
   (merged 4/9/10 rows, face 7a stored under line key "8", no face-8 Schedule-C question, no line 15)
