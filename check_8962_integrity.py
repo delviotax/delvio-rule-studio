@@ -104,6 +104,40 @@ def recompute(inp):
             limit = ind_repay_limit(p, fs)
             out["f8962_excess_aptc"] = excess
             out["f8962_repayment"] = excess if limit is None else min(excess, limit)
+    elif "policy" in inp:
+        # Monthly method with a Part IV allocation (s115) — independent
+        # transcription of the line-34 face mechanic: taxpayer's share per
+        # month = 1095-A amount × the entered percentage for months inside
+        # [start, stop]; a BLANK (absent) percentage retains 100%; months
+        # outside every allocation range stay at the full policy amounts.
+        pol = inp["policy"]
+        alloc = inp.get("allocation") or {}
+        start = alloc.get("start_month", 13)
+        stop = alloc.get("stop_month", 0)
+        month8b = round(contrib / 12)           # line 8b
+        total_ptc = total_aptc = 0
+        for mth in range(1, 13):
+            factors = {}
+            for col, pct_key in (("premium", "premium_pct"), ("slcsp", "slcsp_pct"), ("aptc", "aptc_pct")):
+                if start <= mth <= stop and alloc.get(pct_key) is not None:
+                    factors[col] = float(alloc[pct_key])
+                else:
+                    factors[col] = 1.0
+            prem = round(pol["monthly_premium"] * factors["premium"])
+            slcsp = round(pol["monthly_slcsp"] * factors["slcsp"])
+            aptc = round(pol["monthly_aptc"] * factors["aptc"])
+            total_aptc += aptc
+            if prem > 0:
+                total_ptc += min(prem, max(0, slcsp - month8b))
+        out["f8962_total_ptc"] = total_ptc
+        out["f8962_aptc"] = total_aptc
+        if total_ptc >= total_aptc:
+            out["f8962_net_ptc"] = total_ptc - total_aptc
+        else:
+            excess = total_aptc - total_ptc
+            limit = ind_repay_limit(p, fs)
+            out["f8962_excess_aptc"] = excess
+            out["f8962_repayment"] = excess if limit is None else min(excess, limit)
     return out
 
 
@@ -177,8 +211,9 @@ print("FORM_8962 (facts/rules/lines/diagnostics/scenarios/links):",
        len(spec["diagnostics"]), len(spec["scenarios"]), len(spec["rule_links"])))
 print(f"Flow assertions: {len(m.FLOW_ASSERTIONS)}; authority sources: {len(m.AUTHORITY_SOURCES)}")
 print("Independently recomputed — T1 250%/AF .04 net 2,294 / T2 332% excess 1,900 cap 1,625 / "
-      "T3 >400% AF .085 / T4 175% AF .0100 / T5 185% cap 375; the 2024 FPL + Table 5 + the "
-      "Table-2 interpolation + line-5 truncation cross-checked.")
+      "T3 >400% AF .085 / T4 175% AF .0100 / T5 185% cap 375 / T7 Part IV 1%-retained "
+      "13/11/11 -> repay 132; the 2024 FPL + Table 5 + the Table-2 interpolation + "
+      "line-5 truncation + the allocation mechanic cross-checked.")
 
 if errors:
     print("\nFAILURES:")

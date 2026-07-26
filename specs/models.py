@@ -143,7 +143,10 @@ class FormDiagnostic(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     tax_form = models.ForeignKey(TaxForm, on_delete=models.CASCADE, related_name="diagnostics")
-    diagnostic_id = models.CharField(max_length=20)
+    # Widened 20 -> 40 (2026-07-26 s115): the tax-app's canonical diagnostic
+    # codes run past 20 chars (e.g. D_8962_ANNUAL_INCOMPLETE = 24) and the
+    # spec must carry the APP's ids verbatim, not truncated variants.
+    diagnostic_id = models.CharField(max_length=40)
     title = models.CharField(max_length=255)
     severity = models.CharField(max_length=20, choices=Severity.choices)
     condition = models.TextField(blank=True, default="")

@@ -34,6 +34,17 @@ Single form, the load_1040_form_2441 precedent.
 
 SAFETY GUARD: READY_TO_SEED stays False until Ken's review walk (Table 2 + the
 2024 FPL + Table 5 + the monthly method + the SEHI iterative + Parts 4/5).
+
+AMENDED 2026-07-26 (s115, QA Batch-001 item 9): Part IV (shared policy
+allocation) modeled per-row. R-8962-PART4 rewritten to the 2025 face's own
+line-34 mechanic (verbatim excerpt under IRS_2025_F8962_FORM): the 1095-A is
+entered AS RECEIVED (full policy amounts) and the app multiplies by the
+allocation percentages per policy per month. Allocation rows ride a new app
+model (Form8962Allocation, FK to Form1095A) — the row set is not a FormFact,
+mirroring the 1095-A monthly model. Lines 30-34 added; the s106e app-only
+annual-mode diagnostics (ANNUAL_INCOMPLETE / ANNUAL_CONFLICT /
+ANNUAL_UNSUPPORTED) are spec-homed here (the s113 divergence lesson); four
+new Part IV diagnostics; scenario 8962-T7; FA-1040-8962-07.
 """
 
 from django.core.management.base import BaseCommand, CommandError
@@ -207,6 +218,63 @@ AUTHORITY_SOURCES: list[dict] = [
         ],
     },
     {
+        "source_code": "IRS_2025_F8962_FORM",
+        "source_type": "official_form",
+        "source_rank": "primary_official",
+        "jurisdiction_code": "FED",
+        "entity_type_code": "1040",
+        "tax_year_start": 2025,
+        "tax_year_end": 2025,
+        "title": "Form 8962 (2025) — Premium Tax Credit (the form face)",
+        "citation": "Form 8962 (2025), Part IV lines 30-34; Attachment Sequence No. 73",
+        "issuer": "IRS",
+        "official_url": "https://www.irs.gov/pub/irs-pdf/f8962.pdf",
+        "current_status": "active",
+        "is_substantive_authority": False,
+        "is_filing_authority": True,
+        "trust_score": 9.50,
+        "requires_human_review": False,
+        "notes": "The 2025 face itself (SHA-pinned in the tax-app forms_manifest). Part IV structure "
+                 "verified from the template's own AcroForm widget dump (s115): four allocation rows "
+                 "30-33 (f2_1..f2_28), each (a) policy number / (b) SSN of other taxpayer / (c) start "
+                 "month / (d) stop month / (e) premium % / (f) SLCSP % / (g) APTC %; line 34 = the "
+                 "c2_1 Yes(1)/No(2) checkbox. MeF IRS8962.xsd (2025v5.3) agrees: SharedPolicyAllocationGrp "
+                 "maxOccurs=99, PolicyNum 1-15 chars, months required, the three Decimal2RatioType "
+                 "percentages each OPTIONAL (blank is schema-valid); SharedPolicyAllocationInfoInd = line 34.",
+        "topics": ["premium_tax_credit"],
+        "excerpts": [
+            {
+                "excerpt_label": "Part IV line 34 — the allocation mechanic (face text, verbatim)",
+                "location_reference": "Form 8962 (2025), page 2, Part IV line 34",
+                "excerpt_text": (
+                    "34 Have you completed all policy amount allocations? Yes. Multiply the amounts on "
+                    "Form 1095-A by the allocation percentages entered by policy. Add all allocated policy "
+                    "amounts and non-allocated policy amounts from Forms 1095-A, if any, to compute a "
+                    "combined total for each month. Enter the combined total for each month on lines "
+                    "12-23, columns (a), (b), and (f). Compute the amounts for lines 12-23, columns "
+                    "(c)-(e), and continue to line 24. No. See the instructions to report additional "
+                    "policy amount allocations."
+                ),
+                "summary_text": "Line 34 face text: multiply the 1095-A amounts by the entered percentages per policy; combine allocated + non-allocated per month into lines 12-23 (a)/(b)/(f).",
+                "is_key_excerpt": True,
+            },
+            {
+                "excerpt_label": "Part IV header + columns (face text)",
+                "location_reference": "Form 8962 (2025), page 2, Part IV lines 30-33",
+                "excerpt_text": (
+                    "Part IV Allocation of Policy Amounts. Complete the following information for up to "
+                    "four policy amount allocations. See instructions for allocation details. Allocation "
+                    "1 [30]: (a) Policy Number (Form 1095-A, line 2); (b) SSN of other taxpayer; (c) "
+                    "Allocation start month; (d) Allocation stop month; Allocation percentage applied to "
+                    "monthly amounts: (e) Premium Percentage; (f) SLCSP Percentage; (g) Advance Payment "
+                    "of the PTC Percentage. [Allocations 2-4 = lines 31-33, identical columns.]"
+                ),
+                "summary_text": "Part IV: up to four allocations (30-33), columns a-g; the policy number is the 1095-A line 2 number.",
+                "is_key_excerpt": True,
+            },
+        ],
+    },
+    {
         "source_code": "IRC_36B",
         "source_type": "statute",
         "source_rank": "primary_official",
@@ -319,7 +387,10 @@ F8962_FACTS: list[dict] = [
      "notes": "Line 10 routing: Yes -> the annual line 11; No -> the monthly lines 12-23."},
     {"fact_key": "f8962_shared_allocation", "label": "Allocating policy amounts (Part 4)?",
      "data_type": "boolean", "default_value": "false", "sort_order": 4,
-     "notes": "Decision 4. Part 4 shared policy allocation (divorced/shared 1095-A)."},
+     "notes": ("Decision 4. s115: the UI reveal for the per-policy allocation grid (rows ride the app "
+               "Form8962Allocation model — not FormFacts, the 1095-A-monthly precedent). Line 9, line 34, "
+               "the compute, and the MeF group all derive from the ROW SET; this flag alone never "
+               "allocates (flag-without-rows = D_8962_PART4_EMPTY).")},
     {"fact_key": "f8962_marriage_alt", "label": "Alternative calc for the year of marriage (Part 5)?",
      "data_type": "boolean", "default_value": "false", "sort_order": 5,
      "notes": "Decision 4. Part 5."},
@@ -413,12 +484,31 @@ F8962_RULES: list[dict] = [
                  "compute_schedule_c.py:374 RED."),
      "inputs": ["f8962_se_sehi"], "outputs": [],
      "description": "Decision 2. Pub 974 iterative."},
-    {"rule_id": "R-8962-PART4", "title": "Part 4 — shared policy allocation", "rule_type": "calculation",
+    {"rule_id": "R-8962-PART4", "title": "Part 4 — shared policy allocation (lines 30-34)", "rule_type": "calculation",
      "precedence": 11, "sort_order": 11,
-     "formula": ("If f8962_shared_allocation: allocate the 1095-A premium / SLCSP / APTC across tax families "
-                 "by the agreed percentages (lines 30-33), per allocation period, before lines 11/12-23."),
+     "formula": ("The 1095-A is entered AS RECEIVED (full policy amounts); allocation rows (per policy: "
+                 "other-taxpayer SSN, start month c, stop month d, percentages e/f/g as 2-decimal ratios "
+                 "0.00-1.00) drive the line-34 face mechanic: for each month m in [c, d], the taxpayer's "
+                 "share = ROUND(1095-A col A × e), ROUND(col B × f), ROUND(col C × g) — whole-dollar "
+                 "rounded per policy-month, the value a preparer would enter as the face's combined "
+                 "total; a BLANK percentage column allocates "
+                 "nothing (the taxpayer retains 100% of that column — blank is schema-valid per "
+                 "IRS8962.xsd, and 0.00 means the taxpayer keeps 0%). Months outside every allocation "
+                 "range stay at the full policy amounts (the face: 'add all allocated policy amounts and "
+                 "non-allocated policy amounts'). The combined per-month totals feed lines 12-23 columns "
+                 "(a)/(b)/(f) — one aggregation shared by compute, print, and e-file. Line 9 = Yes when "
+                 "any allocation row exists; line 34 = Yes when the entered rows are the complete set "
+                 "(v1 always Yes — >4 rows RED-defers, the face holds four). V1 BOUNDARY: at most ONE "
+                 "allocation row may cover a given policy-month — three-or-more-family sharing on one "
+                 "policy (Pub 974 'Allocation of Policy Amounts Among Three or More Taxpayers') is NOT "
+                 "modeled and RED-defers (D_8962_PART4_OVERLAP). Allocations apply in MONTHLY mode only; "
+                 "the annual method routes around Part IV (line 9 → monthly, D_8962_ANNUAL_UNSUPPORTED)."),
      "inputs": ["f8962_shared_allocation"], "outputs": [],
-     "description": "Decision 4. Part 4."},
+     "description": ("Decision 4 + the s115 per-row rebuild (QA Batch-001 item 9). The percentage "
+                     "CHOICE (Table 3 situations 1-4: divorce, MFS 50/50, no-APTC, other) stays preparer "
+                     "judgment — the app applies what is entered and never enforces the situation rules. "
+                     "The f8962_shared_allocation flag is the UI reveal for the grid; the COMPUTE (and "
+                     "line 9 / line 34 / the MeF SharedPolicyAllocationGrp) derive from the row set.")},
     {"rule_id": "R-8962-PART5", "title": "Part 5 — alternative calculation for the year of marriage", "rule_type": "calculation",
      "precedence": 12, "sort_order": 12,
      "formula": ("If f8962_marriage_alt: compute each spouse's alternative family size + monthly contribution "
@@ -470,7 +560,11 @@ F8962_LINES: list[dict] = [
     {"line_number": "27", "description": "27 Excess advance PTC (25 − 24)", "line_type": "calculated"},
     {"line_number": "28", "description": "28 Repayment limitation (Table 5)", "line_type": "calculated"},
     {"line_number": "29", "description": "29 Excess APTC repayment (min 27, 28) → Schedule 2 line 1a", "line_type": "total"},
-    {"line_number": "30", "description": "30 Part IV — allocation 1 (policy / SSN / months / premium% / SLCSP% / APTC%)", "line_type": "input"},
+    {"line_number": "30", "description": "30 Part IV — allocation 1: (a) policy number (1095-A line 2) / (b) SSN of other taxpayer / (c) start month / (d) stop month / (e) premium % / (f) SLCSP % / (g) APTC %", "line_type": "input"},
+    {"line_number": "31", "description": "31 Part IV — allocation 2 (a-g, identical columns)", "line_type": "input"},
+    {"line_number": "32", "description": "32 Part IV — allocation 3 (a-g, identical columns)", "line_type": "input"},
+    {"line_number": "33", "description": "33 Part IV — allocation 4 (a-g, identical columns)", "line_type": "input"},
+    {"line_number": "34", "description": "34 Have you completed all policy amount allocations? (Yes = multiply + combine per the face; v1 always Yes when rows exist)", "line_type": "calculated"},
     {"line_number": "35", "description": "35 Part V — alternative entries for your SSN (marriage)", "line_type": "input"},
     {"line_number": "36", "description": "36 Part V — alternative entries for spouse's SSN (marriage)", "line_type": "input"},
 ]
@@ -509,6 +603,57 @@ F8962_DIAGNOSTICS: list[dict] = [
      "message": ("Advance premium tax credit was paid but no Form 1095-A is entered. Enter the Marketplace "
                  "statement (Form 1095-A) — the PTC cannot be reconciled without it."),
      "notes": "Due diligence."},
+    # ── s106e annual-mode diagnostics, spec-homed s115 (were app-only — the s113 divergence class) ──
+    {"diagnostic_id": "D_8962_ANNUAL_INCOMPLETE", "title": "Annual method — line 11 entry incomplete", "severity": "warning",
+     "condition": "f8962_all_year_same AND (f8962_line11_premium is NULL OR f8962_line11_slcsp is NULL)",
+     "message": ("The annual method is selected (line 10 Yes) but the line 11 annual entry is incomplete — "
+                 "missing: [11(a) annual enrollment premiums / 11(b) annual SLCSP premium, as applicable]. "
+                 "Enter the year totals from the Form 1095-A (line 33) or switch line 10 to the monthly "
+                 "method."),
+     "notes": "s106e. A (premiums) + B (SLCSP) required; F (APTC) may be blank. Blank ≠ zero — an entered 0 counts."},
+    {"diagnostic_id": "D_8962_ANNUAL_CONFLICT", "title": "Annual method active while monthly 1095-A data exists", "severity": "warning",
+     "condition": "f8962_all_year_same AND line-11 entered AND any nonzero Form1095A monthly amount",
+     "message": ("Both annual line 11 amounts and monthly Form 1095-A amounts are entered. The annual "
+                 "method is active (line 10 Yes), so the monthly 1095-A amounts are IGNORED by the "
+                 "calculation. Confirm the annual entries are correct, or uncheck line 10 to use the "
+                 "monthly data."),
+     "notes": "s106e. The modes never mix; existence alone is fine — warns only when BOTH hold data."},
+    {"diagnostic_id": "D_8962_ANNUAL_UNSUPPORTED", "title": "Annual method + Part IV/V — line 9 routes to monthly", "severity": "warning",
+     "condition": "f8962_all_year_same AND (any allocation row OR f8962_shared_allocation OR f8962_marriage_alt)",
+     "message": ("The annual method (line 10 Yes) cannot be combined with a shared-policy allocation "
+                 "(Part 4) or the alternative calculation for the year of marriage (Part 5) — Form 8962 "
+                 "line 9 routes those situations to the monthly calculation. Uncheck line 10 and enter "
+                 "the monthly amounts."),
+     "notes": "s106e; s115 extends the condition to the allocation ROW SET (not just the flag)."},
+    # ── Part IV shared-policy allocation (s115, QA Batch-001 item 9) ──
+    {"diagnostic_id": "D_8962_PART4_EMPTY", "title": "Part IV checked but no allocation entered", "severity": "error",
+     "condition": "f8962_shared_allocation AND no Form8962Allocation row",
+     "message": ("Shared policy allocation (line 9) is checked but no Part IV allocation is entered. Add "
+                 "the allocation on the shared 1095-A policy — policy number, the other taxpayer's SSN, "
+                 "the start/stop months, and the allocation percentages — or uncheck the box. Enter the "
+                 "Form 1095-A exactly as received (full policy amounts); the allocation percentages are "
+                 "applied automatically."),
+     "notes": "The QA item-9 class: the old build stored only the flag, so Part IV filed blank."},
+    {"diagnostic_id": "D_8962_PART4_OVERLAP", "title": "Overlapping allocations on one policy — not modeled", "severity": "error",
+     "condition": "two allocation rows on the SAME policy cover the same month",
+     "message": ("Two Part IV allocation rows on the same 1095-A policy cover the same month. Allocating "
+                 "one policy among three or more tax families follows special rules (Pub. 974, 'Allocation "
+                 "of Policy Amounts Among Three or More Taxpayers') that are not modeled — restructure the "
+                 "rows so each month is covered by at most one allocation, or prepare Form 8962 manually."),
+     "notes": "V1 boundary (RED-defer). Two-family sharing (one row per period) is the modeled case."},
+    {"diagnostic_id": "D_8962_PART4_BLANK_PCT", "title": "Allocation with a blank APTC percentage while APTC exists", "severity": "warning",
+     "condition": "an allocation row's aptc_pct is BLANK while the policy has APTC in the allocated months",
+     "message": ("A Part IV allocation leaves the APTC percentage (column g) blank while the policy shows "
+                 "advance PTC in the allocated months — blank means the full APTC stays with this return. "
+                 "Enter 0.00 to allocate all of it away, or the agreed percentage; leave blank only if "
+                 "this return keeps 100% of the advance payments."),
+     "notes": "Blank is schema-valid (IRS8962.xsd optional) and means 'not allocated' = retain 100%."},
+    {"diagnostic_id": "D_8962_PART4_TOO_MANY", "title": "More than four allocations — the face holds four", "severity": "error",
+     "condition": "more than 4 allocation rows across the return",
+     "message": ("More than four Part IV allocations are entered. The 2025 Form 8962 face holds four "
+                 "(lines 30-33); reporting additional allocations (line 34 No) is not modeled — prepare "
+                 "the form manually."),
+     "notes": "V1 boundary. MeF would accept up to 99 (SharedPolicyAllocationGrp) — print/e-file parity kept at 4."},
 ]
 
 F8962_SCENARIOS: list[dict] = [
@@ -540,6 +685,21 @@ F8962_SCENARIOS: list[dict] = [
      "expected_outputs": {"f8962_fpl_pct": 185, "f8962_applicable_figure": 0.014, "f8962_excess_aptc": 392,
                           "f8962_repayment": 375},
      "notes": "28,000/15,060=1.85 -> 185 (<200 -> single cap 375); AF 0.0140; contrib 8a=392; PTC = min(5,000, max(0, 1,000−392)=608)=608; APTC 1,000 → excess 392; cap 375 binds -> repay 375."},
+    {"scenario_name": "8962-T7 — Part IV shared-policy allocation (1% retained)", "scenario_type": "normal", "sort_order": 7,
+     "inputs": {"tax_year": 2025, "filing_status": "single", "state": "contiguous", "family_size": 1,
+                "household_income": 28000,
+                "policy": {"policy_number": "1924161", "monthly_premium": 1300, "monthly_slcsp": 1100,
+                           "monthly_aptc": 1100},
+                "allocation": {"other_taxpayer_ssn": "400-00-9860", "start_month": 1, "stop_month": 12,
+                               "premium_pct": "0.01", "slcsp_pct": "0.01", "aptc_pct": "0.01"}},
+     "expected_outputs": {"f8962_fpl_pct": 185, "f8962_total_ptc": 0, "f8962_aptc": 132,
+                          "f8962_excess_aptc": 132, "f8962_repayment": 132},
+     "notes": ("The QA Batch-001 item-9 acceptance class (synthetic identifiers). Full 1095-A "
+               "1,300/1,100/1,100 per month; the taxpayer retains 1% (0.01/0.01/0.01) all 12 months -> "
+               "allocated 13/11/11 per month on lines 12-23. 28,000/15,060=1.85 -> 185; 8a=round(28,000"
+               "×0.0140)=392, 8b=33; PTC/month = min(13, max(0, 11−33))=0 -> line 24 = 0; line 25 = "
+               "11×12 = 132; excess 132 under the <200% single cap 375 -> repay 132 -> Sch 2 line 1a. "
+               "Line 9 Yes; line 34 Yes; MeF SharedPolicyAllocationGrp emits the row.")},
     {"scenario_name": "8962-G1 — 2026 out of scope -> RED", "scenario_type": "diagnostic", "sort_order": 6,
      "inputs": {"tax_year": 2026, "filing_status": "single", "state": "contiguous", "family_size": 1,
                 "household_income": 30000, "premium_annual": 6000, "slcsp_annual": 6500, "aptc_annual": 3000},
@@ -560,7 +720,8 @@ F8962_RULE_LINKS: list[tuple[str, str, str, str]] = [
     ("R-8962-REPAYMENT", "IRS_2025_F8962_INSTR", "primary", "Table 5 → line 29 → Sch 2 line 1a"),
     ("R-8962-REPAYMENT", "IRC_36B", "secondary", "§36B(f)(2)(B) the repayment limitation"),
     ("R-8962-SEHI", "IRS_PUB_974", "primary", "The SEHI ↔ PTC iterative"),
-    ("R-8962-PART4", "IRS_2025_F8962_INSTR", "primary", "Part IV shared policy allocation"),
+    ("R-8962-PART4", "IRS_2025_F8962_FORM", "primary", "Part IV lines 30-34 — the line-34 face mechanic (verbatim excerpt)"),
+    ("R-8962-PART4", "IRS_2025_F8962_INSTR", "secondary", "Part IV allocation situations (Table 3) — preparer judgment, not enforced"),
     ("R-8962-PART5", "IRS_2025_F8962_INSTR", "primary", "Part V year-of-marriage alternative"),
     ("R-8962-2026-DEFER", "IRC_36B", "secondary", "§36B(b)(3)(A) the enhancement through 2025"),
 ]
@@ -605,6 +766,17 @@ FLOW_ASSERTIONS: list[dict] = [
      "definition": {"kind": "reconciliation", "form": "FORM_8962",
                     "formula": "line29 == min(line27, Table5(line5, status)); no cap when line5 >= 400"},
      "sort_order": 5},
+    {"assertion_id": "FA-1040-8962-07", "assertion_type": "flow_assertion", "entity_types": ["1040"],
+     "title": "Part IV allocation: allocated months multiply; non-allocated months stay full",
+     "description": ("Validates R-8962-PART4 (s115). For a policy with an allocation row, each month in "
+                     "[start, stop] contributes 1095-A col A × e / col B × f / col C × g to lines 12-23 "
+                     "(blank pct = retain 100%); months outside every range contribute the full amounts. "
+                     "Bug it catches: the percentages applied to the wrong months/columns, blank treated "
+                     "as 0, or allocations leaking into the annual method."),
+     "definition": {"kind": "formula_check", "form": "FORM_8962",
+                    "formula": ("monthly[m] == 1095A[m] * (pct or 1) for m in [start, stop] per column; "
+                                "monthly[m] == 1095A[m] outside every allocation range; annual mode ignores rows")},
+     "sort_order": 7},
     {"assertion_id": "FA-1040-8962-06", "assertion_type": "flow_assertion", "entity_types": ["1040"],
      "title": "Gates: 2026 RED; SEHI iterative; no-1095-A",
      "description": "A 2026 return fires D_8962_2026 (out of scope); the SE-SEHI flag triggers the Pub 974 iterative (D_8962_SEHI).",
