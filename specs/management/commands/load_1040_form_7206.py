@@ -351,14 +351,22 @@ N_RULES: list[dict] = [
      "formula": "line 3 = line 1 (health premiums) + line 2 (qualified LTC, age-capped). v1 folds LTC into line 1.",
      "inputs": ["f7206_premiums"], "outputs": [],
      "description": "The premiums available to deduct, before the earned-income limit."},
-    {"rule_id": "R-7206-SCHEDC", "title": "Lines 4-10 — Schedule C earned-income limit", "rule_type": "calculation",
+    {"rule_id": "R-7206-SCHEDC", "title": "Lines 4-10 — earned-income limit (Sch C / Sch F / partner K-1 box 14A)", "rule_type": "calculation",
      "precedence": 2, "sort_order": 2,
-     "formula": ("Sch C path: line 6 = line 4 (this net profit) / line 5 (Σ all net profits); line 7 = "
-                 "(Sch 1 L15 ½-SE-tax) × line 6; line 8 = line 4 − line 7; line 10 = line 8 − line 9 "
-                 "(SEP/SIMPLE). THE FIX: the limit subtracts the apportioned ½-SE-tax + SEP, not just net profit."),
+     "formula": ("SE path (any non-S-corp activity): line 4 = the plan-establishing activity's net profit / "
+                 "other earned income — Sch C line 31, Sch F line 34, or the partner's Sch K-1 (Form 1065) "
+                 "box 14 code A (2025 face, line 5 text verbatim names all three). line 5 = Σ ALL net profits "
+                 "across those sources — 'Don't include any net losses shown on these schedules.' line 6 = "
+                 "line 4 / line 5; line 7 = (Sch 1 L15 ½-SE-tax) × line 6; line 8 = line 4 − line 7; line 10 "
+                 "= line 8 − line 9 (SEP/SIMPLE attributable). THE FIX: the limit subtracts the apportioned "
+                 "½-SE-tax + SEP, not just net profit."),
      "inputs": ["f7206_net_profit", "f7206_all_net_profits", "f7206_half_se_tax", "f7206_sep_attributable"],
      "outputs": ["f7206_line10"],
-     "description": "§162(l)(2)(A) earned income for a sole proprietor = net SE earnings (net profit − ½-SE-tax − SE-retirement)."},
+     "description": ("§162(l)(2)(A) earned income for a sole proprietor = net SE earnings (net profit − "
+                     "½-SE-tax − SE-retirement); for a general partner the same lines run on K-1 box 14 "
+                     "code A (i7206: 'a partner with net earnings from self-employment … reported on "
+                     "Schedule K-1 (Form 1065), box 14, code A'). AMENDED 2026-07-26 (QA Batch-001 item 8, "
+                     "tts s113): the partner source named; line 5 excludes net losses per the face.")},
     {"rule_id": "R-7206-SCORP", "title": "Line 11 — S-corp 2% shareholder limit = Box 5 Medicare wages", "rule_type": "calculation",
      "precedence": 3, "sort_order": 3,
      "formula": "S-corp path (skip lines 4-10): line 11 = W-2 Box 5 Medicare wages from the S corporation. line 13 = line 11 − line 12 (2555).",
@@ -465,6 +473,14 @@ N_SCENARIOS: list[dict] = [
      "inputs": {"tax_year": 2025, "premiums": 9500, "net_profit": 10000, "all_net_profits": 50000, "half_se_tax": 5000, "sep_attributable": 0},
      "expected_outputs": {"f7206_line6": "0.2", "f7206_line7": 1000, "f7206_line10": 9000, "f7206_line14": 9000, "D_7206_SC_LIM": True},
      "notes": "line 6 = 10,000/50,000 = 0.2; line 7 = 5,000 × 0.2 = 1,000; limit = 10,000 − 1,000 = 9,000; min(9,500, 9,000) = 9,000."},
+    {"scenario_name": "SC-T9 — partner K-1 box 14A activity; Sch C loss excluded from line 5 (QA Batch-001 item 8)", "scenario_type": "normal", "sort_order": 9,
+     "inputs": {"tax_year": 2025, "premiums": 764, "net_profit": 2602, "all_net_profits": 2602, "half_se_tax": 54, "sep_attributable": 0},
+     "expected_outputs": {"f7206_line7": 54, "f7206_line10": 2548, "f7206_line14": 764},
+     "notes": ("The plan is established under the partnership: line 4 = K-1 box 14A 2,602. The taxpayer's "
+               "other activity is a Schedule C LOSS (−1,838) — a net loss never enters line 5 (face verbatim), "
+               "so line 5 = 2,602 and the ratio is 1.0. line 7 = 54; limit = 2,548; min(764, 2,548) = 764. "
+               "(The QA answer key's return-level figures — AGI 139,619, tax 8,782, refund 1,959 — ride the "
+               "SE tax on the combined 764 of SE earnings; the 7206-level pins are what this scenario owns.)")},
 ]
 
 N_RULE_LINKS: list[tuple[str, str, str, str]] = [

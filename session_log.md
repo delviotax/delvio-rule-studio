@@ -1,3 +1,15 @@
+## 2026-07-26 - FORM_7206 partner-arm amendment (QA Batch-001 item 8, tts s113) - SEEDED + export-verified
+- R-7206-SCHEDC amended IN THE OWNING LOADER (load_1040_form_7206.py): title/formula/description now
+  name the partner source VERBATIM from the 2025 face - line 5 lists "Schedule K-1 (Form 1065), box 14,
+  code A" alongside Sch C 31 / Sch F 34, and "Don't include any net losses shown on these schedules";
+  i7206 eligibility bullet quoted in the description. The partner path runs the SAME lines 4-10 - no
+  new rule, no fact changes, no formula-semantics change for existing scenarios (T1-T8 unchanged).
+- NEW scenario SC-T9 (QA Batch-001 item 8 acceptance): K-1 box 14A 2,602 activity w/ premiums 764,
+  sibling Sch C LOSS excluded from line 5 -> line 7 = 54, line 10 = 2,548, line 14 = 764.
+- Harness check_form_7206_integrity ALL PASS (9 scenarios, dynamic re-derivation); seeded to RS prod;
+  deployed export verified carrying the amendment; tts mirror 7206_spec.json refreshed verbatim
+  (also picked up an earlier authority-excerpt-only drift the cache had missed).
+
 ## 2026-07-26 - GA500 D_GA500_016/017 additions (QA Batch-001 item 7, tts s113) - SEEDED + export-verified
 - Amended IN THE OWNING LOADER (load_ga500_form_500.py, update_or_create-safe). Mechanism additions
   only - no tax-law element changes; not a CHANGE_REGISTER item.
