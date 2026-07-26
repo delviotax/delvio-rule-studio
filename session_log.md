@@ -1,3 +1,19 @@
+## 2026-07-26 - GA500 D_GA500_016/017 additions (QA Batch-001 item 7, tts s113) - SEEDED + export-verified
+- Amended IN THE OWNING LOADER (load_ga500_form_500.py, update_or_create-safe). Mechanism additions
+  only - no tax-law element changes; not a CHANGE_REGISTER item.
+- WHY: (a) the app's D_GA500_002 had DIVERGED from this spec - the spec defines 002 as the
+  DOB-required ERROR; the app shipped "elected but $0 excluded" (warning) under that ID. The
+  app realigns to the spec in tts s113; the elected-but-$0 semantics get a legitimate home as
+  NEW D_GA500_016. (b) NEW D_GA500_017 is the no-silent-gap companion to the tts s108
+  federal->RIE pull: alimony / capital gains / other income / Sch E page-1 rental have no
+  per-owner source in the tts data model, so they are never auto-pulled into the RIE base -
+  017 warns when a RIE-qualified person exists, those federal amounts exist, and worksheet
+  lines 8/9/10/13 are blank for both spouses (the views.py comment promised a D_GA500_RIE_SRC
+  diagnostic that was never built; 017 is it).
+- Harness check_ga500_integrity ALL PASS (18 scenarios); loader re-run against RS prod
+  (17 diagnostics); deployed export verified carrying 016+017; tts mirror 500_spec.json
+  refreshed verbatim.
+
 ## 2026-07-25 - R-S1-10 / R-S2-09 / R-S3-07 manifest-aware amendment (QA backlog #12, tts s112) - SEEDED + tts leg SHIPPED
 - Amended IN THE OWNING LOADER (load_1040_sch123.py, in-place re-run safe). **No tax-law element
   changes** - the line lists and severities are untouched; this is a MECHANISM amendment (the

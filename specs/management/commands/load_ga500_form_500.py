@@ -1041,6 +1041,14 @@ GA500_DIAGNOSTICS: list[dict] = [
      "condition": "tax year NOT in 2026-2028 AND any of g_sub_tips_* / g_sub_ot_* > 0",
      "message": "The HB 463 cash-tips and qualified-overtime exclusions apply to taxable years 2026 through 2028 only (both paragraphs self-repeal December 31, 2028). The entered amounts were NOT subtracted — remove them or verify the tax year.",
      "notes": "Error — contradictory input outside the statutory window; the compute correctly zeroes the lines, the preparer must clear the entry."},
+    {"diagnostic_id": "D_GA500_016", "title": "Retirement exclusion elected but nothing excluded", "severity": "warning",
+     "condition": "g_tp_rie_applies or g_sp_rie_applies is True AND that person's RIE worksheet line 17 = 0",
+     "message": "The retirement income exclusion applies (age/disability gate set) but the computed exclusion is $0 — no income reached that person's worksheet base. Verify the age basis and that the person's retirement income is entered and attributed to the correct spouse.",
+     "notes": "Warning — re-homed from the app's pre-pull D_GA500_002 (which this spec defines as the DOB-required error; the app diverged and is realigned tts s113). Post-pull this fires mainly for a qualified person with no attributed income at all."},
+    {"diagnostic_id": "D_GA500_017", "title": "RIE base may be incomplete — categories not auto-pulled", "severity": "warning",
+     "condition": "g_tp_rie_applies or g_sp_rie_applies is True AND the federal return carries alimony received (Sch 1 line 2a), capital gain/(loss) (1040 line 7), Schedule 1 other income (line 9), or Schedule E page-1 rental/royalty activity AND the corresponding RIE worksheet lines (8/9/10/13) are blank for both spouses",
+     "message": "This return has federal income in categories the software cannot attribute per spouse (alimony, capital gains, other income, and/or Schedule E rental/royalty). If any of it is income of a retirement-exclusion-qualified person, enter the per-spouse amounts on RIE worksheet lines 8/9/10/13 — these categories are not pulled automatically.",
+     "notes": "Warning — the federal→GA RIE pull (tts s108) attributes W-2 wages, interest, dividends, IRA/pension 1099-Rs, and owner-tagged K-1s; these four categories have no per-owner source in the data model and stay preparer-entered (never zeroed by a refresh). No-silent-gap companion to R-GA500-RIE."},
 ]
 
 
@@ -1247,7 +1255,12 @@ FORMS: list[dict] = [
                 "OT gated on the full-time-hourly preparer assertion) — rules R-GA500-TIPS/R-GA500-OT, "
                 "lines S1-12a/S1-12b, diagnostics D_GA500_013-015, scenarios T15-T18, FA-GA500-13/14; "
                 "the HB 463 authority excerpts replaced with VERBATIM enacted /AP text (the prior "
-                "summary excerpt wrongly dated the std-deduction increase 2027)."
+                "summary excerpt wrongly dated the std-deduction increase 2027). AMENDED 2026-07-26 "
+                "(QA Batch-001 item 7, tts s113): diagnostics D_GA500_016 (elected-but-$0, re-homed "
+                "from the app's divergent D_GA500_002 semantics) + D_GA500_017 (RIE base categories "
+                "not auto-pulled — alimony/cap-gains/other/Sch-E rental; the no-silent-gap companion "
+                "to the tts s108 federal→RIE pull). Mechanism additions only — no tax-law element "
+                "changes; not a CHANGE_REGISTER item."
             ),
         },
         "facts": GA500_FACTS,
