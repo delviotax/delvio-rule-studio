@@ -1,3 +1,25 @@
+## 2026-07-26 - FORM_4562 basis fidelity + 280F parallel-arm caps (QA Batch-001 item 6 Leg 3, delvio s118) - SEEDED + export-verified
+- NEW standalone amendment loader load_4562_basis_fidelity.py (the load_4562_destination_rounding
+  precedent). RS 51371ec.
+- R018 "Basis fidelity" - facts original_cost + prior_bonus_depreciation split the basis history
+  (depreciable_basis stays the engine input UNCHANGED - Ken's "add-fields-only" pick on record);
+  accumulated depreciation / adjusted basis are DERIVED; disposal + 1250-additional math start
+  from original cost (i4797 26a "do not reduce the basis" now computable on converted assets).
+- R019 "280F caps bind the AMT and state parallel computations" - closes delvio s46 boundary #3.
+  TWO FLAGGED JUDGMENT CALLS staged for Ken (delvio REVIEW_QUEUE): (1) AMT arm capped at the SAME
+  table per 280F(a)(1)(A) verbatim ("the amount of the depreciation deduction... shall not
+  exceed" - no method carve-out); the 2025 i6251 line 2l checked and SILENT on 280F - recorded
+  honestly as statutory derivation, NOT quoted instruction text (the R017 honesty precedent).
+  (2) GA arm capped at the NO-bonus table: the $8,000 first-year bump IS 168(k)(2)(F)(i), which
+  GA never conforms to. New verbatim 280F(a)(1)(A) excerpt on the existing IRC_280F source.
+- D_4562_BASIS effect-scaled (error: depreciable > original, impossible; warning: split doesn't
+  account for the gap - ackable, legit causes exist). 3 scenarios (Barn 9,010/4,505/4,505 ->
+  current 266 unchanged, accum 5,971, adjusted 3,039; AMT-refigure cap 15,000 -> 12,200; GA
+  no-bump cap 20,000 -> 12,200); FA-4562-280F-01 staged (surgical-refresh rule).
+- Seeded to RS prod; deployed export verified (19 rules / 17 diagnostics / 29 facts / 35
+  scenarios); delvio mirror form_4562_spec.json refreshed verbatim. App leg: delvio bb2935e
+  (mig 0218 BOTH DBs; new leg tests 12; live demo probe green).
+
 ## 2026-07-26 - FORM_4562 destination routing + per-asset rounding + reconciliation (QA Batch-001 item 6 Leg 1, delvio s116) - SEEDED + export-verified
 - NEW standalone amendment loader load_4562_destination_rounding.py (the load_4562_section179_carryover
   precedent - the owning loader is the sprawling multi-form load_remaining_1120s). RS 5e6ffa3 + 37f565d.
