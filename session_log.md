@@ -1,3 +1,22 @@
+## 2026-07-26 - 8867 PER-QUESTION REBUILD to the Rev. 11-2024 face (QA Batch-001 item 11, tts s114) - SEEDED + export-verified
+- Amended IN THE OWNING LOADER (load_1040_eic.py, RS a0708a5). The compressed 12-line boolean model
+  (merged 4/9/10 rows, face 7a stored under line key "8", no face-8 Schedule-C question, no line 15)
+  is replaced with ONE LINE PER PRINTED QUESTION: 1/2/3/4/4a/4b/5/5_docs/6/7/7a/8/9a/9b/9c/10/11/12/
+  13/14/15 (21 entries). Facts re-modeled as per-question CHOICE yes/no, with "na" ONLY on the seven
+  lines whose printed face has an N/A checkbox (2/7/7a/8/9c/11/12) - verified against BOTH the
+  template's AcroForm widget dump AND the MeF IRS8867.xsd code elements, which agree line-for-line.
+- R-8867-RENDER rewritten to the face's own routing (4->4a/4b; 7->7a; childless EIC skips 9b/9c;
+  Part VI 15 always; the 5_docs list optional). D_8867_001 condition re-stated per-question;
+  D_8867_002 PRUNED from the catalogue (Form 8863 built; app retired it 2026-06-19). The authority
+  excerpts that had been compressed paraphrases replaced with faithful face text (the 2210 lesson).
+- NEW _prune_stale_8867 (exclude-based keep-sets from the authored lists, idempotent) retired the 9
+  stale prod rows (4 facts / 2 lines / 1 diagnostic / 2 scenarios). 6 scenarios incl. the T6 full-
+  cascade oracle. NEW harness scratchpad/validate_8867_rebuild.py ALL GREEN (face parity, N/A
+  vocabulary, orphan facts, caps, prune idempotency vs pre-planted stale rows, T6 consistency).
+- Seeded to RS prod; deployed export verified (21 lines / 25 facts / D_8867_001 only / 6 scenarios);
+  tts mirror 8867_spec.json refreshed verbatim. App leg: tts 0f397da + de31033 (mig 0214 re-keyed
+  stored answers BOTH DBs - merged-true->components, merged-false/na->BLANK, never invent).
+
 ## 2026-07-26 - FORM_2210 rate correction: FLAT 7% to 4/15/2026 (QA Batch-001 item 10, tts s113) - SEEDED + export-verified
 - TAX-LAW CORRECTION, verified against the OFFICIAL 2025 Instructions for Form 2210 Penalty
   Worksheet (fetched live from irs.gov): x 0.07 in ALL FOUR rate periods - Rate Period 4 is
