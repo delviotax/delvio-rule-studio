@@ -1,3 +1,24 @@
+## 2026-07-26 - FORM_4562 destination routing + per-asset rounding + reconciliation (QA Batch-001 item 6 Leg 1, delvio s116) - SEEDED + export-verified
+- NEW standalone amendment loader load_4562_destination_rounding.py (the load_4562_section179_carryover
+  precedent - the owning loader is the sprawling multi-form load_remaining_1120s). RS 5e6ffa3 + 37f565d.
+- R016 "Depreciation by destination (1040)" - companion to the S-Corp R013: every 1040 asset requires a
+  SPECIFIC activity link (Sch C L13 / Sch E L18 / Sch F L14); a destination foreign to the return's form
+  is UNROUTABLE (the delvio Benkoski defect: the entity sched_f arm on a 1040 wrote nonexistent "F14",
+  swallowed silently). Authority: the Part IV line 22 face text quoted VERBATIM from the local
+  SHA-tracked f4562.pdf template ("Enter here and on the appropriate lines of your return").
+- R017 per-asset whole-dollar rounding - recorded HONESTLY as a Ken-ratified HOUSE CONVENTION
+  (2026-07-26, in-session), NOT as quoted IRS text: the IRS publishes no per-asset directive (the i1040
+  sum-then-round note flagged as the genuine ambiguity per the Authoritative-Source Rule); the face's
+  col-(g)/destination lines are whole-dollar and TaxWise rounds per asset (Benkoski 4,068 vs 4,069.03).
+- Diagnostics D_4562_DEST + D_4562_RECON under the app's CANONICAL codes (specs.0003 40-char rule);
+  D_4562_DEST severity EFFECT-SCALED (error when dollars move / warning for $0 legacy inventory - the
+  refinement reseeded same-session so a 39-asset fully-depreciated import can't brick a return).
+- Facts flow_destination + activity_reference; 4 scenarios incl. the constructed rounding pin
+  (266.49+1002.44+750.10+500+300+749+501: cent-sum 4,069.03 vs per-asset 4,068); FA-4562-DEST-01/
+  ROUND-01 staged. Seeded to RS prod; deployed export verified (17 rules / 16 diagnostics / 27 facts /
+  32 scenarios); delvio mirror form_4562_spec.json refreshed verbatim. App leg: delvio 3dfb977 (mig
+  0217 BOTH DBs; Benkoski prod recompute exact; deploy verified index-BZjYNARY.js).
+
 ## 2026-07-26 - FORM_8962 Part IV shared-policy allocation modeled per-row (QA Batch-001 item 9, delvio s115) - SEEDED + export-verified
 - Amended IN THE OWNING LOADER (load_1040_form_8962.py, RS 16a5bc4). R-8962-PART4 rewritten from a
   one-line placeholder to the 2025 face's own line-34 mechanic, quoted VERBATIM under NEW source
