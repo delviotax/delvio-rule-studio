@@ -627,17 +627,22 @@ SCH1_RULES: list[dict] = [
      "formula": "L22 has no entry (face: 'Reserved for future use')",
      "inputs": [], "outputs": [],
      "description": "ONCE PER RETURN. D_SCH1_005 (error) if a value lands there."},
-    {"rule_id": "R-S1-10", "title": "Attachment-backed lines warn until their topics build", "rule_type": "classification",
+    {"rule_id": "R-S1-10", "title": "Attachment-backed lines warn when the packet lacks the form", "rule_type": "classification",
      "precedence": 0, "sort_order": 10,
      "formula": ("nonzero on any of {3 (Sch C), 4 (4797/4684), 5 (Sch E), 6 (Sch F), 8d (2555), 8e (8853), "
-                 "8f (8889), 12 (2106), 13 (8889), 14 (3903), 15 (Sch SE), 24j (2555)} -> attachment-not-generated warning"),
+                 "8f (8889), 12 (2106), 13 (8889), 14 (3903), 15 (Sch SE), 24j (2555)} AND the required form "
+                 "is absent from the return's generated-form manifest -> attachment-missing warning"),
      "inputs": ["business_income_sch_c", "other_gains_4797", "rental_sch_e", "farm_income_sch_f",
                 "feie_2555_8d", "income_8853_8e", "income_8889_8f", "reservist_artist_2106",
                 "hsa_deduction_8889", "moving_expenses_3903", "deductible_se_tax", "housing_deduction_2555_24j"],
      "outputs": [],
-     "description": ("ONCE PER RETURN. Sprint no-silent-gap rule applied to attachments: the amount computes "
-                     "fine (it is direct entry) but the printed packet will not contain the attached form — "
-                     "the preparer attaches the manually prepared form. D_SCH1_004 (warning, grouped).")},
+     "description": ("ONCE PER RETURN. Amended 2026-07-25 (QA backlog #12 — mechanism only, no tax-law "
+                     "change): the app now generates many of these attachments, so the condition consults "
+                     "the return's generated-form manifest (the same per-return set that drives the printed "
+                     "packet) instead of assuming nothing generates. Warn only on a genuine omission: an "
+                     "amount is present and the required form did not generate for THIS return — an "
+                     "unsupported form the preparer attaches manually, or a supported form whose inputs are "
+                     "incomplete. D_SCH1_004 (warning, grouped).")},
 ]
 
 SCH1_LINES: list[dict] = [
@@ -757,12 +762,14 @@ SCH1_DIAGNOSTICS: list[dict] = [
      "message": ("Alimony entries need the divorce/separation agreement date (2b/19c) and, for alimony paid, "
                  "the recipient's SSN (19b, NNN-NN-NNNN)."),
      "notes": "R-S1-07. Post-2018 instruments are not alimony (TCJA) — preparer determines taxability."},
-    {"diagnostic_id": "D_SCH1_004", "title": "Attachment-backed amount entered — attachment not generated", "severity": "warning",
-     "condition": "nonzero on any of lines 3, 4, 5, 6, 8d, 8e, 8f, 12, 13, 14, 15, 24j",
-     "message": ("Amount entered on a line that requires an attached form (Schedule C/E/F/SE, Form 4797/4684, "
-                 "2555, 8853, 8889, 2106, 3903) — the software does not generate that form yet. Attach the "
-                 "manually prepared form: {lines}."),
-     "notes": "R-S1-10. One grouped finding listing the triggering lines (not one finding per line)."},
+    {"diagnostic_id": "D_SCH1_004", "title": "Attachment-backed amount entered — required form not in the packet", "severity": "warning",
+     "condition": ("nonzero on any of lines 3, 4, 5, 6, 8d, 8e, 8f, 12, 13, 14, 15, 24j AND the required "
+                   "form is absent from the return's generated-form manifest"),
+     "message": ("Amount entered on a line whose required attachment is not in this return's packet: "
+                 "{lines}. If the software generates the form, complete that form's inputs; otherwise "
+                 "attach the manually prepared form."),
+     "notes": ("R-S1-10. One grouped finding listing the triggering lines (not one finding per line). "
+               "Manifest-aware since 2026-07-25 — a line whose form generated for this return never warns.")},
     {"diagnostic_id": "D_SCH1_005", "title": "Line 22 is reserved", "severity": "error",
      "condition": "line 22 has a value",
      "message": "Schedule 1 line 22 is 'Reserved for future use' — it must be blank.",
@@ -1036,18 +1043,20 @@ SCH2_RULES: list[dict] = [
      "formula": "sec_965_installment_20 participates in NO total (left-column box)",
      "inputs": ["sec_965_installment_20"], "outputs": [],
      "description": "ONCE PER RETURN. D_SCH2_003 (info) explains when nonzero."},
-    {"rule_id": "R-S2-09", "title": "Attachment-backed lines warn until their topics build", "rule_type": "classification",
+    {"rule_id": "R-S2-09", "title": "Attachment-backed lines warn when the packet lacks the form", "rule_type": "classification",
      "precedence": 0, "sort_order": 9,
      "formula": ("nonzero on any of {1a (8962), 1b/1c (8936), 1d/1e/1f/19 (4255), 2 (6251), 4 (Sch SE), "
                  "5 (4137), 6 (8919), 8 (5329), 9 (Sch H), 11 (8959), 12 (8960), 16 (8611), 17c/17d (8889), "
-                 "17e/17f (8853), 17n (8697/8866), 17p/17q (8621), 20 (965-A)} -> attachment-not-generated warning"),
+                 "17e/17f (8853), 17n (8697/8866), 17p/17q (8621), 20 (965-A)} AND the required form is "
+                 "absent from the return's generated-form manifest -> attachment-missing warning"),
      "inputs": ["aptc_repayment_8962", "amt_6251", "se_tax_4", "unreported_tips_tax_4137_5",
                 "uncollected_ss_8919_6", "ira_additional_tax_5329_8", "household_employment_sch_h_9",
                 "additional_medicare_8959_11", "niit_8960_12", "lihc_recapture_8611_16"],
      "outputs": [],
-     "description": ("ONCE PER RETURN. Same shape as R-S1-10: amounts compute (direct entry) but the "
-                     "packet won't contain the attached form. D_SCH2_004 (warning, grouped). Topic 5's "
-                     "minimal 5329 converts line 8 to a YELLOW feeder.")},
+     "description": ("ONCE PER RETURN. Same shape as R-S1-10 (manifest-aware since 2026-07-25 — QA backlog "
+                     "#12, mechanism only): warn only when an amount is present and the required form is "
+                     "absent from the return's generated-form manifest. D_SCH2_004 (warning, grouped). "
+                     "Topic 5's minimal 5329 converts line 8 to a YELLOW feeder.")},
     {"rule_id": "R-S2-10", "title": "1e/1f require a source box (i-iv)", "rule_type": "validation",
      "precedence": 0, "sort_order": 10,
      "formula": "(excessive_payments_1e != 0 implies excessive_payments_1e_source set) AND (ep_20pct_1f != 0 implies ep_20pct_1f_source set)",
@@ -1150,11 +1159,15 @@ SCH2_DIAGNOSTICS: list[dict] = [
      "message": ("The §965 net tax liability installment (line 20) is reported for IRS tracking only — it is "
                  "NOT added into line 21 or Form 1040 line 23."),
      "notes": "R-S2-08. Face verbatim: line 21 adds '4, 7 through 16, 18, and 19'."},
-    {"diagnostic_id": "D_SCH2_004", "title": "Attachment-backed amount entered — attachment not generated", "severity": "warning",
-     "condition": "nonzero on any attachment-backed line (8962/8936/4255/6251/SE/4137/8919/5329/H/8959/8960/8611/8889/8853/8697/8866/8621/965-A)",
-     "message": ("Amount entered on a line that requires an attached form — the software does not generate "
-                 "that form yet. Attach the manually prepared form: {lines}."),
-     "notes": "R-S2-09. One grouped finding listing the triggering lines."},
+    {"diagnostic_id": "D_SCH2_004", "title": "Attachment-backed amount entered — required form not in the packet", "severity": "warning",
+     "condition": ("nonzero on any attachment-backed line (8962/8936/4255/6251/SE/4137/8919/5329/H/8959/"
+                   "8960/8611/8889/8853/8697/8866/8621/965-A) AND the required form is absent from the "
+                   "return's generated-form manifest"),
+     "message": ("Amount entered on a line whose required attachment is not in this return's packet: "
+                 "{lines}. If the software generates the form, complete that form's inputs; otherwise "
+                 "attach the manually prepared form."),
+     "notes": ("R-S2-09. One grouped finding listing the triggering lines. Manifest-aware since "
+               "2026-07-25 — a line whose form generated for this return never warns.")},
     {"diagnostic_id": "D_SCH2_005", "title": "1e/1f amount without a source box", "severity": "warning",
      "condition": "(excessive_payments_1e != 0 AND no 1e box) OR (ep_20pct_1f != 0 AND no 1f box)",
      "message": "Lines 1e/1f require checking the applicable source box (i-iv) with the amount.",
@@ -1352,17 +1365,26 @@ SCH3_RULES: list[dict] = [
      "formula": "L6e has no entry (face: 'Reserved for future use')",
      "inputs": [], "outputs": [],
      "description": "ONCE PER RETURN. D_SCH3_002 (error) if a value lands there."},
-    {"rule_id": "R-S3-07", "title": "Attachment-backed lines warn until their topics build", "rule_type": "classification",
+    {"rule_id": "R-S3-07", "title": "Attachment-backed lines warn when the packet lacks the form", "rule_type": "classification",
      "precedence": 0, "sort_order": 7,
      "formula": ("nonzero on any of {1 (1116 if required), 2 (2441), 3 (8863), 4 (8880), 5a/5b (5695), "
                  "6a (3800), 6b (8801), 6c (8839), 6d (Sch R), 6f/6m (8936), 6g (8396), 6h (8859), 6i (8834), "
-                 "6j (8911), 6k (8912), 6l (8978), 9 (8962), 12 (4136), 13a (2439)} -> attachment-not-generated warning"),
+                 "6j (8911), 6k (8912), 6l (8978), 9 (8962), 12 (4136), 13a (2439)} AND the required form is "
+                 "absent from the return's generated-form manifest AND no legal exception applies "
+                 "-> attachment-missing warning"),
      "inputs": ["foreign_tax_credit_1116_1", "dependent_care_credit_2441_2", "education_credits_8863_3",
                 "savers_credit_8880_4", "residential_clean_energy_5a", "home_improvement_5b",
                 "net_ptc_8962_9", "fuel_tax_credit_4136_12"],
      "outputs": [],
-     "description": ("ONCE PER RETURN. Same shape as R-S1-10/R-S2-09. D_SCH3_003 (warning, grouped). Topic 9 "
-                     "(8880) and post-sprint 2441/8863/8962 convert their lines to YELLOW feeders.")},
+     "exceptions": ("Line 1 (Form 1116): under the §904(j) de minimis election ($300 / $600 MFJ, "
+                    "all-passive-category, payee-statement-reported) NO Form 1116 is filed — the credit "
+                    "goes directly on Schedule 3 line 1. The elected path is no-form-required and never "
+                    "warns (the FORM_1116 spec owns the election conditions)."),
+     "description": ("ONCE PER RETURN. Same shape as R-S1-10/R-S2-09 (manifest-aware since 2026-07-25 — "
+                     "QA backlog #12, mechanism only): warn only when an amount is present, the required "
+                     "form is absent from the return's generated-form manifest, and no legal exception "
+                     "applies (see exceptions — §904(j)). D_SCH3_003 (warning, grouped). Topic 9 (8880) "
+                     "and post-sprint 2441/8863/8962 convert their lines to YELLOW feeders.")},
     {"rule_id": "R-S3-08", "title": "Line 6l (Form 8978) may be negative", "rule_type": "classification",
      "precedence": 0, "sort_order": 8,
      "formula": "form_8978_amount_6l accepts negative values; no floor inside the line-7 sum",
@@ -1436,11 +1458,17 @@ SCH3_DIAGNOSTICS: list[dict] = [
      "condition": "line 6e has a value",
      "message": "Schedule 3 line 6e is 'Reserved for future use' — it must be blank.",
      "notes": "R-S3-06."},
-    {"diagnostic_id": "D_SCH3_003", "title": "Attachment-backed amount entered — attachment not generated", "severity": "warning",
-     "condition": "nonzero on any attachment-backed line (1116/2441/8863/8880/5695/3800/8801/8839/Sch R/8936/8396/8859/8834/8911/8912/8978/8962/4136/2439)",
-     "message": ("Amount entered on a line that requires an attached form — the software does not generate "
-                 "that form yet. Attach the manually prepared form: {lines}."),
-     "notes": "R-S3-07. One grouped finding listing the triggering lines."},
+    {"diagnostic_id": "D_SCH3_003", "title": "Attachment-backed amount entered — required form not in the packet", "severity": "warning",
+     "condition": ("nonzero on any attachment-backed line (1116/2441/8863/8880/5695/3800/8801/8839/Sch R/"
+                   "8936/8396/8859/8834/8911/8912/8978/8962/4136/2439) AND the required form is absent "
+                   "from the return's generated-form manifest AND no legal exception applies (line 1: "
+                   "the §904(j) de minimis election files no Form 1116 and never warns)"),
+     "message": ("Amount entered on a line whose required attachment is not in this return's packet: "
+                 "{lines}. If the software generates the form, complete that form's inputs; otherwise "
+                 "attach the manually prepared form."),
+     "notes": ("R-S3-07. One grouped finding listing the triggering lines. Manifest-aware since "
+               "2026-07-25 — a line whose form generated for this return never warns; the §904(j) "
+               "elected path (no 1116 required) never warns.")},
 ]
 
 SCH3_SCENARIOS: list[dict] = [

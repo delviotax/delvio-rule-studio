@@ -1,3 +1,27 @@
+## 2026-07-25 - R-S1-10 / R-S2-09 / R-S3-07 manifest-aware amendment (QA backlog #12, tts s112) - SEEDED + tts leg SHIPPED
+- Amended IN THE OWNING LOADER (load_1040_sch123.py, in-place re-run safe). **No tax-law element
+  changes** - the line lists and severities are untouched; this is a MECHANISM amendment (the
+  D_8879_NEED severity-amendment class), so it did NOT enter via CHANGE_REGISTER.
+- WHY: the three attachment rules were authored when the app generated NONE of the referenced
+  forms ("warn until their topics build" - the sunset was in the TITLE). ~19 of those forms now
+  generate (Sch C/E/F/SE, 8962, 8880, 5329, 6251, 8959, 8960, 1116, 2441, 8863, 5695, 3800,
+  8911, 8936, 8889, 4797), so every such return got a false "the software does not generate
+  that form yet - attach the manually prepared form" warning (Batch-001 QA, prioritized-fix
+  #12). The rules/diagnostics now condition on "the required form is absent from the return's
+  generated-form manifest"; messages tell the preparer to complete the form's inputs when the
+  software supports it, attach manually otherwise.
+- NEW exceptions field on R-S3-07: the §904(j) de minimis election files NO Form 1116 (credit
+  direct on Sch 3 line 1) and never warns. D_SCH2_004 notes the R-5329-03 direct-report
+  shortcut (line 8 with no Form 5329 when no owner must file) likewise never warns.
+- Harness check_sch123_integrity ALL PASS; seeded to prod; deployed export verified carrying
+  all six amendments; tts mirrors sch_{1,2,3}_spec.json refreshed verbatim (only these rules/
+  diagnostics differ vs the prior mirrors).
+- tts leg landed same-session (s112): NEW apps/tts_forms/form_manifest.py - the manifest calls
+  the SAME render callables the packet/Forms view use (bytes-or-None IS the truth, no second
+  copy of any engagement gate); rules_sch123 rewired; seed_rules re-run + verified on BOTH tts
+  DBs; NEW test_form_manifest.py 10 (manifest<->packet parity both directions + the backlog's
+  only-genuine-omissions acceptance sweep + e-file extract parity pins on 5329/8880).
+
 ## 2026-07-25 - D_8879_NEED severity amendment (warning -> info; Ken-directed, tts s109) - SEEDED + tts leg SHIPPED
 - Amended IN THE OWNING LOADER (load_8879_8878.py, in-place re-run safe). **No tax-law element
   changes** - Pub. 1345 and the Form 8879 need-chart are untouched; this is a SEVERITY/workflow
