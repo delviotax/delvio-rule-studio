@@ -44,11 +44,15 @@ def r0(x):
 
 
 # ── Independent math (re-typed) ──
-IND_DAYS7 = [350, 289, 197, 75]
-IND_DAYS6 = [15, 15, 15, 15]
+# RATE RE-VERIFIED 2026-07-26 against the 2025 i2210 Penalty Worksheet: × 0.07
+# in ALL FOUR rate periods (Rate Period 4 = 1/1/2026–4/15/2026, one 7% period;
+# Table 2 total days 365/304/212/90). The prior 350/15-style 7%/6% split was a
+# pre-publication assumption.
+IND_DAYS7 = [365, 304, 212, 90]
+IND_DAYS6 = [0, 0, 0, 0]
 IND_AI_PCT = [Decimal("0.225"), Decimal("0.45"), Decimal("0.675"), Decimal("0.90")]
 IND_DUE = [date(2025, 4, 15), date(2025, 6, 15), date(2025, 9, 15), date(2026, 1, 15)]
-IND_R7_END = date(2026, 3, 31)
+IND_R7_END = date(2026, 4, 15)
 IND_CAP = date(2026, 4, 15)
 
 
@@ -127,7 +131,7 @@ def ind_compute(current_tax=0, other_taxes=0, refundable_credits=0, withholding=
 # ── 1. Loader constants + helpers vs the independent transcription ──
 check("PCT_CURRENT", D(m.PCT_CURRENT), Decimal("0.90"))
 check("RATE_7", D(m.RATE_7), Decimal("0.07"))
-check("RATE_6", D(m.RATE_6), Decimal("0.06"))
+check("RATE_6", D(m.RATE_6), Decimal("0.07"))  # equal rates in TY2025 (i2210)
 for i in range(4):
     check(f"DAYS_7[{i}]", m.DAYS_7[i], IND_DAYS7[i])
     check(f"AI_PCT[{i}]", m.AI_PCT[i], IND_AI_PCT[i])
@@ -215,10 +219,11 @@ print("FORM_2210 (facts/rules/lines/diagnostics/scenarios/links):",
       (len(spec["facts"]), len(spec["rules"]), len(spec["lines"]),
        len(spec["diagnostics"]), len(spec["scenarios"]), len(spec["rule_links"])))
 print(f"Flow assertions: {len(m.FLOW_ASSERTIONS)}; authority sources: {len(m.AUTHORITY_SOURCES)}")
-print("Independently recomputed - T1 deminimis 0 / T2 prior-SH 0 / T3 full 461 / T4 110% l9=44000 / "
-      "T5 estimates-cure 0 / T6 partial 143 / T7 dated-lump 217 / T8 late-Q4 5; the §6654 safe harbors "
-      "+ the §6621 dated accrual (earliest-first, due date -> date cured, 7%/6% split 3/31/2026, cap "
-      "4/15/2026) + the DAYS_7/DAYS_6 equivalence at the cap + Schedule AI cross-checked.")
+print("Independently recomputed - T1 deminimis 0 / T2 prior-SH 0 / T3 full 466 / T4 110% l9=44000 / "
+      "T5 estimates-cure 0 / T6 partial 145 / T7 dated-lump 219 / T8 late-Q4 5; the §6654 safe harbors "
+      "+ the §6621 dated accrual (earliest-first, due date -> date cured, FLAT 7% to the 4/15/2026 cap "
+      "per the 2025 i2210 Penalty Worksheet, re-verified 2026-07-26) + the DAYS equivalence at the cap "
+      "+ Schedule AI cross-checked.")
 
 if errors:
     print("\nFAILURES:")

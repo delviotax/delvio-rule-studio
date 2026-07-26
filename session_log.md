@@ -1,3 +1,18 @@
+## 2026-07-26 - FORM_2210 rate correction: FLAT 7% to 4/15/2026 (QA Batch-001 item 10, tts s113) - SEEDED + export-verified
+- TAX-LAW CORRECTION, verified against the OFFICIAL 2025 Instructions for Form 2210 Penalty
+  Worksheet (fetched live from irs.gov): x 0.07 in ALL FOUR rate periods - Rate Period 4 is
+  "January 1, 2026-April 15, 2026" as ONE 7% period; Table 2 total days 365/304/212/90.
+  The spec's prior "7% through 3/31/2026, 6% for 4/1-4/15/2026" was an assumption made
+  before the worksheet published (the Q2-2026 §6621 ruling postdated the June build), and
+  its authority "excerpt" had PARAPHRASED that assumption as if it were i2210 text - the
+  excerpt is now faithful to the actual worksheet. Penalties were UNDERSTATED by 15 days x
+  1% - the QA Batch-001 $1-3 TaxWise deltas (Almond Barbara: Delvio 188 vs TaxWise 189).
+- Constants RATE_6 -> 0.07 (machinery retained for a real straddle year), DAYS -> [365,304,
+  212,90], R7_END = CAP; scenario pins P-T3 461->466, P-T6 143->145, P-T7 217->219 (P-T8
+  unchanged); FA-1040-2210-02/07 text re-pinned; D_2210_TY2026 message now points at the
+  published-worksheet re-pin rule. check_2210_integrity independent constants updated to
+  the verified values; ALL CHECKS PASS. Seeded to prod; export verified (466/145/219).
+
 ## 2026-07-26 - FORM_7206 partner-arm amendment (QA Batch-001 item 8, tts s113) - SEEDED + export-verified
 - R-7206-SCHEDC amended IN THE OWNING LOADER (load_1040_form_7206.py): title/formula/description now
   name the partner source VERBATIM from the 2025 face - line 5 lists "Schedule K-1 (Form 1065), box 14,
