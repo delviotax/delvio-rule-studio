@@ -1,3 +1,38 @@
+## 2026-07-27 - 1040_INTDIV source-summary entry basis (QA Batch-001 item 15, delvio s122) - SEEDED + export-verified
+- Amended IN THE OWNING LOADER (load_1040_intdiv_qdcgt.py). RS 7cdf804.
+- NEW fact doc_entry_basis (detail | source summary); NEW rule R-AGG-SUMMARY; amended R-AGG-7A;
+  D_INTDIV_012 (error) / 013 (info) / 014 (info); scenarios ID-S1/S2/S3.
+- THE RULE comes from the 2025 Schedule B face, transcribed VERBATIM from delvio's local
+  SHA-tracked f1040sb.pdf the same day (not recalled): the face itemizes by payer EXACTLY TWO
+  amounts - taxable interest (Part I line 1 "List name of payer") and ordinary dividends
+  (Part II line 5 "List name of payer:"). Qualified dividends, capital gain distributions,
+  tax-exempt interest, foreign tax and 199A are return-level figures NO form attributes to a
+  payer. So a conversion total may carry those and may NEVER carry the two the law requires
+  listed - nor an adjustment to one (nominee / accrued interest / ABP), because those subtract
+  from the Sch B payer subtotal AND into 1040 lines 2b/3b, so honouring one on a record excluded
+  from the listing would break the Sch B line 4 = L2b tie (FA-1040-SCHB-01).
+- Supersedes the prior behavior where holding such a total required INVENTING a 1099-DIV payer,
+  which then PRINTED on Sch B Part II and was TRANSMITTED in the MeF XML as a payer element
+  (delvio QA return 8621 shipped the literal string "SOURCE TOTALS - DETAIL OMITTED").
+- R-AGG-7A source-summary arm = KEN RULING 2026-07-27 in-session, JUDGMENT ITEM 7: a summary
+  record has no boxes 2b/2c/2d to inspect, so Exception 1 condition (2) computes on the
+  preparer's existing assertion with D_INTDIV_013 recording the check was VACUOUS, not satisfied.
+  Blocking rejected on the record - it leaves the return with NO computed tax, the exact pressure
+  that produced the fabricated payer.
+- ALSO FIXED (off-scope, never silent): RS carried TWO CONTRADICTORY versions of ID-G1/ID-G2 -
+  the pre-Topic-9 pair asserting the retired D_INTDIV_001/002 block, and the Schedule-D pair that
+  replaced it. The Topic 9 leg authored corrections under NEW scenario_names and update_or_create
+  keys on the NAME, so the originals were orphaned rather than replaced. Undetected six weeks
+  because delvio's spec mirror was last refreshed 2026-06-12 and carried no ID-G scenario at all,
+  so its spec-parametrized runner had never executed either. _retire_topic9_superseded() EXTENDED
+  to delete them. LESSON: a superseded scenario must be RETIRED, not out-authored under a new name.
+- Harness check_intdiv_integrity.py green (56/18/30/11/18/30) - baseline verified green on
+  unmodified HEAD FIRST, then proven able to FAIL via two negative controls (dropped authority
+  link -> uncited rule; duplicated diagnostic id). Deployed export verified; delvio mirror
+  server/specs/intdiv_spec.json refreshed verbatim.
+- App leg: delvio 1a02124 (server) + 2d9a864 (client), migration 0220 STAGED NOT APPLIED -
+  push/deploy awaiting Ken.
+
 ## 2026-07-26 - FORM_4562 basis fidelity + 280F parallel-arm caps (QA Batch-001 item 6 Leg 3, delvio s118) - SEEDED + export-verified
 - NEW standalone amendment loader load_4562_basis_fidelity.py (the load_4562_destination_rounding
   precedent). RS 51371ec.

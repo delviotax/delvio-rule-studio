@@ -877,10 +877,13 @@ INTDIV_RULES: list[dict] = [
      "formula": ("A record with doc_entry_basis = 'source summary' MAY carry only amounts that no IRS "
                  "form itemizes by payer: DIV box1b (L3a), DIV box2a (L7a), INT box8 / DIV box12 (L2a), "
                  "INT box6 / DIV box7 (foreign tax), DIV box5 (section 199A), and box4 withholding (L25b). "
-                 "It MUST NOT carry INT box1/box3/box10 (Schedule B Part I line 1) or DIV box1a (Part II "
-                 "line 5) — those two the face requires listed BY PAYER; violation = D_INTDIV_012 (error). "
-                 "A source-summary record is EXCLUDED from the Schedule B Part I/II payer listings and "
-                 "from the corresponding MeF payer elements. Aggregation is otherwise unchanged."),
+                 "It MUST NOT carry ANYTHING THAT APPEARS IN THE SCHEDULE B PAYER LISTING — neither a "
+                 "listed amount (INT box1/box3/box10 at gross on Part I line 1; DIV box1a on Part II "
+                 "line 5) NOR an adjustment to one (INT box11/box12 = the 'ABP Adjustment' row, the "
+                 "nominee-distribution row on either Part, the 'Accrued Interest' row). Violation = "
+                 "D_INTDIV_012 (error). A source-summary record is EXCLUDED from the Schedule B Part I/II "
+                 "payer listings and from the corresponding MeF payer elements. Aggregation is otherwise "
+                 "unchanged."),
      "inputs": ["doc_entry_basis", "int_box1_interest", "int_box3_treasury", "div_box1a_ordinary"],
      "outputs": [],
      "description": ("ONCE PER DOCUMENT. NEW 2026-07-27 (QA Batch-001 item 15). The Schedule B face "
@@ -894,7 +897,13 @@ INTDIV_RULES: list[dict] = [
                      "required listing — it only stops the software demanding an identity the IRS never "
                      "asked for. Supersedes the pre-2026-07-27 behavior where the only way to hold such "
                      "a total was to invent a 1099-DIV payer, which then printed on Schedule B Part II "
-                     "and was transmitted in the MeF XML as a payer (QA return 8621).")},
+                     "and was transmitted in the MeF XML as a payer (QA return 8621). "
+                     "The adjustment arm exists for a STRUCTURAL reason, not tidiness: the nominee / "
+                     "accrued-interest / ABP rows are subtractions FROM the payer subtotal (R-SB-01/03), "
+                     "and R-AGG-2B/3B subtract the same facts into 1040 lines 2b/3b. Excluding a "
+                     "source-summary record from the listing while still honouring its adjustments would "
+                     "break the Sch B line 4 = 1040 L2b / line 6 = L3b structural tie (FA-1040-SCHB-01). "
+                     "Forbidding the adjustment on such a record keeps ONE answer on both faces.")},
     {"rule_id": "R-AGG-25B", "title": "1040 line 25b withholding roster EXTENDS to 1099-DIV box 4",
      "rule_type": "calculation", "precedence": 1, "sort_order": 6,
      "formula": "L25b = SUM over 1099-INT docs [box4] + SUM over 1099-DIV docs [box4]",
@@ -1112,13 +1121,16 @@ INTDIV_DIAGNOSTICS: list[dict] = [
      "title": "Source-summary record carries an amount the face requires listed by payer",
      "severity": "error",
      "condition": ("any doc with doc_entry_basis = 'source summary' has int box1 != 0 OR int box3 != 0 "
-                   "OR int box10 != 0 OR div box1a != 0"),
-     "message": ("A source-summary record may not carry taxable interest or ordinary dividends. Schedule B "
-                 "requires those two listed BY PAYER (Part I line 1 and Part II line 5), so they must be "
-                 "entered on real payer rows. Move the amount to a payer document, or — if the packet "
-                 "genuinely gives no payer detail for it — enter the payers you do have. Qualified "
-                 "dividends, capital gain distributions, tax-exempt interest, foreign tax and section 199A "
-                 "dividends may stay on this record; no form itemizes them by payer."),
+                   "OR int box10 != 0 OR int box11 != 0 OR int box12 != 0 OR int accrued != 0 "
+                   "OR div box1a != 0 OR nominee != 0"),
+     "message": ("A source-summary record may not carry taxable interest or ordinary dividends, or an "
+                 "adjustment to either. Schedule B requires those listed BY PAYER (Part I line 1 and "
+                 "Part II line 5), and the nominee / accrued-interest / bond-premium rows are "
+                 "subtractions from that listing — so they must be entered on real payer rows. Move the "
+                 "amount to a payer document, or — if the packet genuinely gives no payer detail for it — "
+                 "enter the payers you do have. Qualified dividends, capital gain distributions, "
+                 "tax-exempt interest, foreign tax and section 199A dividends may stay on this record; no "
+                 "form itemizes them by payer."),
      "notes": ("R-AGG-SUMMARY. This is the guard that keeps the entry-basis flag from ever buying a "
                "preparer out of a legally required listing.")},
     {"diagnostic_id": "D_INTDIV_013",
@@ -1756,7 +1768,25 @@ class Command(BaseCommand):
         2b/2d now flow to the 1040_SCHD_WS worksheets (2c-only survives as
         D_SCHD_002), and unasserted 2a distributions engage Schedule D instead
         of blocking. Idempotent (no-op once gone). Renumbering is forbidden —
-        the ids stay retired."""
+        the ids stay retired.
+
+        EXTENDED 2026-07-27 (delvio s122) to the SCENARIOS the same amendment
+        superseded. The Topic 9 leg retired the two diagnostics but authored
+        its corrected ID-G1/ID-G2 under NEW scenario_names, and
+        `update_or_create` keys on the name — so the pre-Topic-9 originals were
+        never replaced, only orphaned. RS has carried both ever since: one pair
+        asserting `D_INTDIV_001_fires` and a BLANK line 16, the other asserting
+        the Schedule-D path that actually replaced it. Two scenarios in the
+        authority contradicting each other for six weeks.
+
+        Nobody noticed because the app's `server/specs/intdiv_spec.json` mirror
+        was last refreshed 2026-06-12 and never carried any ID-G scenario, so
+        the spec-parametrized runner in `tests/test_intdiv_scenarios.py` had
+        nothing to run. The s122 mirror refresh pulled all four in at once and
+        the stale pair failed immediately — which is the system working, but
+        only after a six-week gap. Lesson recorded: a superseded scenario must
+        be RETIRED here, not merely out-authored under a new name.
+        """
         gone = FormDiagnostic.objects.filter(
             tax_form__form_number="1040_INTDIV",
             diagnostic_id__in=["D_INTDIV_001", "D_INTDIV_002"],
@@ -1764,6 +1794,21 @@ class Command(BaseCommand):
         if gone:
             self.stdout.write(self.style.WARNING(
                 f"  Topic 9 supersession: {gone} diagnostics retired (D_INTDIV_001/002)"
+            ))
+
+        stale_scenarios = [
+            "ID-G1 — box 2b blocks the checkbox path; line 16 not computed",
+            "ID-G2 — cap-gain distributions without the assertion; line 16 not computed",
+        ]
+        gone_sc = TestScenario.objects.filter(
+            tax_form__form_number="1040_INTDIV",
+            scenario_name__in=stale_scenarios,
+        ).delete()[0]
+        if gone_sc:
+            self.stdout.write(self.style.WARNING(
+                f"  Topic 9 supersession: {gone_sc} SUPERSEDED scenarios retired "
+                f"(the pre-Topic-9 ID-G1/ID-G2 blocked-path pair, replaced by "
+                f"the Schedule-D-path pair authored under new names)"
             ))
 
     # ─────────────────────────────────────────────────────────────────────────
