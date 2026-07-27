@@ -928,6 +928,33 @@ F8283_RULES: list[dict] = [
      "inputs": [],
      "outputs": [],
      "description": "J-E3 (recommend info-first). The 1040 member side is unchanged."},
+    # ── 1040 reconciliation arm (amendment 2026-07-27 — tts Batch-001 item 16) ──
+    {"rule_id": "R-8283-RECON",
+     "title": "1040: a flat line-12 override must reconcile to the Form 8283 filed with the return",
+     "rule_type": "validation", "precedence": 10, "sort_order": 10,
+     "formula": (
+         "1040 ONLY, and ONLY when BOTH a flat line-12 fact is entered non-zero AND "
+         "non-withheld NoncashContribution rows exist. R-8283-SCHA12 makes the flat fact win "
+         "per field (GREEN over YELLOW) — that override is deliberate and is NOT changed here. "
+         "But the override is silent: the Form 8283 that PRINTS with the return carries the "
+         "rows' amounts, while Schedule A line 12 carries the override, so the two can disagree "
+         "with nothing saying so. Define recon_delta = (resolved line-12 total, i.e. the two "
+         "resolved bucket inputs summed) MINUS f8283_total (non-withheld rows only — withheld "
+         "conservation rows are excluded from the feed by R-8283-SUBST/J4 and must NOT count as "
+         "a mismatch). recon_delta == 0 -> silent. recon_delta != 0 -> D_8283_017, EFFECT-SCALED: "
+         "ERROR when recon_delta > 0 with NO withheld row present (the return claims more than "
+         "the filed form substantiates — the §170(f)(11)(B) exposure D_8283_001 guards in the "
+         "no-rows case, reached here by a partial-detail return); WARNING otherwise, i.e. "
+         "recon_delta < 0 (the form reports more than is deducted — harmless, usually a stale "
+         "override) or ANY delta when a withheld row is present (D_8283_006 instructs the "
+         "preparer to key the allowable amount manually, so a gap is EXPECTED and must never "
+         "read as an error). The severity ladder mirrors the tts effect-scaled house convention "
+         "(D_4562_DEST / D_4562_BASIS). No amount moves: this rule is pure validation."),
+     "inputs": ["f8283_total", "f8283_bucket_50", "f8283_bucket_30", "f8283_row_withheld"],
+     "outputs": [],
+     "description": ("J8 (staged for Ken's ratification) — closes the 1040 gap that the 1065 "
+                     "already covers with D_8283_016. Deliberately NOT a withhold: the override "
+                     "keeps winning, exactly as R-8283-SCHA12 says; only the silence ends.")},
 ]
 
 F8283_RULE_LINKS: list[tuple[str, str, str, str]] = [
@@ -947,6 +974,8 @@ F8283_RULE_LINKS: list[tuple[str, str, str, str]] = [
     ("R-8283-TOTAL", "IRS_2025_8283_INSTR", "secondary", "Reductions to contribution verbatim (ordinary income property basis limit — D_8283_009)"),
     ("R-8283-SCHA12", "IRS_PUB526_2025", "primary", "The line-12 bucket semantics (matches R-SCHA-CHARITABLE's inputs)"),
     ("R-8283-SCHA12", "IRS_2025_8283_INSTR", "secondary", "Carryover-year re-attachment rule (D_8283_012)"),
+    ("R-8283-RECON", "USC_26_170F11", "primary", "(A)(i)+(B): the deduction is denied absent a Form 8283 meeting the requirements — a line-12 amount exceeding the filed form's items is unsubstantiated to that extent"),
+    ("R-8283-RECON", "IRS_2025_8283_INSTR", "primary", "Failure To File verbatim: an incomplete or non-responsive Form 8283 is treated as not filed (the basis for scaling the over-claim to an error)"),
 ]
 
 F8283_LINES: list[dict] = [
@@ -1148,6 +1177,21 @@ F8283_DIAGNOSTICS: list[dict] = [
                  "not deductible."),
      "notes": ("J6-family: error fires, feed follows the entry (Ken 2026-07-03 warn-only ruling). "
                "The >$500 arm routes to Section B + D_8283_004 instead.")},
+    {"diagnostic_id": "D_8283_017", "title": "Schedule A line 12 does not reconcile to the Form 8283 items", "severity": "error",
+     "condition": ("1040 return with BOTH a non-zero flat line-12 fact AND non-withheld "
+                   "NoncashContribution rows, whose resolved line-12 total differs from the rows' "
+                   "total. EFFECT-SCALED: error when the line-12 total EXCEEDS the rows' total and "
+                   "no withheld (conservation/historic) row is present; warning when the rows "
+                   "exceed line 12, or when any withheld row is present"),
+     "message": ("Schedule A line 12 does not match the items on the Form 8283 that will print "
+                 "with this return. The direct entry overrides the item total (that override is "
+                 "intended), but the difference is claimed without a Form 8283 item to support "
+                 "it — §170(f)(11)(B) requires the form to cover the noncash deduction. Either "
+                 "enter the missing donated items, or clear the direct entry so line 12 totals "
+                 "the items you have keyed."),
+     "notes": ("R-8283-RECON (J8, staged for Ken). The 1040 sibling of D_8283_016 (which covers "
+               "the same silence on the 1065's combined line 13a). Never a withhold — the "
+               "override still wins; the warning arm carries the reversed/conservation wording.")},
 ]
 
 F8283_SCENARIOS: list[dict] = [
@@ -1301,7 +1345,7 @@ F8283_SCENARIOS: list[dict] = [
                "guardrail, not a silent rewrite).")},
     # ── Entity arm (amendment 2026-07-12) ──
     {"scenario_name": "8283-T14 — 1120-S entity engagement + the K12b YELLOW default / GREEN override", "scenario_type": "normal", "sort_order": 14,
-     "inputs": {"tax_year": 2025, "entity_type": "1120S", "rows": [
+     "inputs": {"tax_year": 2025, "entity_type": "1120S", "k12b_typed_probe": 2500, "rows": [
          {"donee_name": "Food Bank of NE Georgia", "description": "Warehouse shelving and pallet racks",
           "date_contributed": "2025-09-15", "date_acquired": "02/2019", "how_acquired": "Purchase",
           "cost_basis": 5200, "amount": 3000, "valuation_method": "Comparable sales",
@@ -1337,6 +1381,57 @@ F8283_SCENARIOS: list[dict] = [
      "notes": ("R-8283-ENTFEED's 1065 arm (J-E2): the form engages and prints with the 1065, but "
                "line 13a is NEVER auto-written (the face line is combined cash+noncash). 13a "
                "entered 0 < rows 2,000 -> D_8283_016 warns; keying 13a = 2,000 clears it.")},
+    {"scenario_name": "8283-T17 — 1040: flat line-12 override exceeds the keyed items (the conversion case)", "scenario_type": "edge_case", "sort_order": 17,
+     "inputs": {"tax_year": 2025, "entity_type": "1040",
+                "scha_charitable_noncash_fmv_entered": 1100,
+                "rows": [
+         {"donee_name": "Goodwill", "description": "Household goods", "date_contributed": "2025-08-04",
+          "date_acquired": "Various", "how_acquired": "Purchase", "cost_basis": 2400,
+          "amount": 700, "valuation_method": "Thrift shop value", "capgain_property": False}]},
+     "expected_outputs": {"f8283_total": 700, "f8283_bucket_50": 700, "f8283_bucket_30": 0,
+                          "scha_line12_resolved": 1100, "recon_delta": 400,
+                          "D_8283_017": True, "D_8283_017_severity": "error",
+                          "D_8283_001": False},
+     "notes": ("THE R-8283-RECON PIN (J8). A TaxWise conversion where the preparer kept the "
+               "packet's 1,100 total but keyed only the 700 item they had detail for: line 12 "
+               "stays 1,100 (R-8283-SCHA12's GREEN override is untouched — no amount moves), the "
+               "printed 8283 shows 700, and the 400 difference is claimed with nothing on the "
+               "form to support it -> ERROR. D_8283_001 stays quiet because rows DO exist — that "
+               "is precisely the gap this rule fills. Keying the missing item (or clearing the "
+               "flat entry to let 700 flow) clears it WITHOUT changing any other line.")},
+    {"scenario_name": "8283-T18 — 1040: the items exceed line 12 — reversed delta is a warning, never an error", "scenario_type": "edge_case", "sort_order": 18,
+     "inputs": {"tax_year": 2025, "entity_type": "1040",
+                "scha_charitable_noncash_fmv_entered": 600,
+                "rows": [
+         {"donee_name": "Habitat ReStore", "description": "Appliances", "date_contributed": "2025-04-12",
+          "date_acquired": "Various", "how_acquired": "Purchase", "cost_basis": 3000,
+          "amount": 900, "valuation_method": "Thrift shop value", "capgain_property": False}]},
+     "expected_outputs": {"f8283_total": 900, "scha_line12_resolved": 600, "recon_delta": -300,
+                          "D_8283_017": True, "D_8283_017_severity": "warning"},
+     "notes": ("The reversed arm: rows 900 > line-12 600. The form reports MORE than is deducted "
+               "— nothing is unsubstantiated, so this is harmless (almost always a stale flat "
+               "override the preparer forgot to clear). Warning, never error.")},
+    {"scenario_name": "8283-T19 — 1040: a withheld conservation row degrades the positive delta to a warning", "scenario_type": "edge_case", "sort_order": 19,
+     "inputs": {"tax_year": 2025, "entity_type": "1040",
+                "scha_charitable_noncash_fmv_entered": 5000,
+                "rows": [
+         {"donee_name": "Habitat ReStore", "description": "Appliances", "date_contributed": "2025-04-12",
+          "date_acquired": "Various", "how_acquired": "Purchase", "cost_basis": 3000,
+          "amount": 900, "valuation_method": "Thrift shop value", "capgain_property": False},
+         {"donee_name": "Oconee Land Trust", "description": "Facade easement", "property_type": "conservation",
+          "date_contributed": "2025-09-30", "date_acquired": "03/1998", "how_acquired": "Purchase",
+          "cost_basis": 120000, "amount": 40000, "capgain_property": True,
+          "appraisal_obtained": True, "appraisal_attached": True}]},
+     "expected_outputs": {"f8283_total": 900, "f8283_row_withheld": [False, True],
+                          "scha_line12_resolved": 5000, "recon_delta": 4100,
+                          "D_8283_006": True,
+                          "D_8283_017": True, "D_8283_017_severity": "warning"},
+     "notes": ("THE FALSE-POSITIVE GUARD. The easement row is WITHHELD from the feed by J4/"
+               "D_8283_006, which tells the preparer to compute the allowable amount manually and "
+               "key it as a GREEN override — so a positive delta (5,000 vs the 900 that feeds) is "
+               "EXPECTED on a correctly-prepared return. Severity must degrade to warning here. "
+               "Erroring on the raw delta would put a permanent red flag on every conservation "
+               "return, which is exactly how a diagnostic becomes one nobody reads.")},
 ]
 
 FLOW_ASSERTIONS: list[dict] = [

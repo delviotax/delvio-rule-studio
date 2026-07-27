@@ -39,6 +39,9 @@ def check(name, got, want):
     elif isinstance(want, list):
         if list(got) != list(want):
             err(f"{name}: recomputed {got} != authored {want}")
+    elif isinstance(want, str) or isinstance(got, str):
+        if str(got) != str(want):
+            err(f"{name}: recomputed {got!r} != authored {want!r}")
     else:
         if D(got) != D(want):
             err(f"{name}: recomputed {got} != authored {want}")
@@ -149,6 +152,52 @@ def run_scenario(inp):
         **diags,
         "D_8283_001": False,  # rows present in every scenario -> never fires here
     }
+    # R-8283-RECON (J8) -- independently re-derived, not read from the loader.
+    # Fires only when a flat override is actually in play AND rows exist; the
+    # delta is measured against the NON-WITHHELD total (the amount that feeds),
+    # because a withheld conservation row is excluded from the feed by design.
+    out["scha_line12_resolved"] = noncash_input + capgain_input
+    has_override = flat_noncash > 0 or flat_capgain > 0
+    if rows and has_override:
+        delta = out["scha_line12_resolved"] - total
+        out["recon_delta"] = delta
+        out["D_8283_017"] = delta != 0
+        if delta != 0:
+            # error ONLY when the return over-claims with no withheld row to
+            # explain the gap; every other shape is a warning.
+            over_claim = delta > 0 and not any(withhelds)
+            out["D_8283_017_severity"] = "error" if over_claim else "warning"
+    else:
+        out["recon_delta"] = Decimal(0)
+        out["D_8283_017"] = False
+    # ── Entity arm (R-8283-ENTFILE / ENTSECB / ENTFEED / ENTCOPY) ──
+    # Added 2026-07-27: the s65 entity amendment authored T14-T16 but never
+    # extended this transcription, so those three scenarios reported
+    # "expected key not produced" and the harness has been RED since
+    # 2026-07-12. A permanently-red harness is one nobody reads.
+    entity = inp.get("entity_type")
+    if entity in ("1120S", "1065"):
+        out["D_8283_015"] = engaged  # completed copy to each allocated member
+        if entity == "1120S":
+            # J-E1: K12b defaults to the non-withheld total; a typed value wins.
+            out["k12b_default"] = total
+            # The override probe: a typed non-zero K12b wins over the default.
+            # Derived from the scenario's own probe input -- NEVER echoed back
+            # from the authored expectation, or this check proves nothing.
+            probe = D(inp.get("k12b_typed_probe", 0))
+            out["k12b_with_typed_override_2500"] = probe if probe > 0 else total
+            # D_8283_014 = the D_8283_001 entity sibling: K12b > 500 with NO rows.
+            out["D_8283_014"] = (not rows) and D(inp.get("k12b_entered", 0)) > IND_FILE_THRESHOLD
+        else:
+            # J-E2: the 1065 never auto-writes the combined 13a line.
+            k13a = D(inp.get("k13a_entered", 0))
+            out["k13a_after_compute"] = k13a
+            out["D_8283_016"] = total > k13a
+        members = inp.get("shareholders") or inp.get("partners") or []
+        if members and rows:
+            # ENTSECB pin: allocations are INFORMATIONAL — the Section test
+            # already read the entity amount above, never this number.
+            out["per_member_allocation"] = D(rows[0]["amount"]) * D(members[0]["pct"]) / Decimal(100)
     # The T6 Schedule A bucket-limit worksheet (TY2025 -- no 0.5% floor)
     if "agi" in inp:
         agi = D(inp["agi"])
