@@ -64,6 +64,35 @@ JUDGMENT ITEMS FOR KEN'S REVIEW WALK (each also flagged in its rule):
   6. Qualified dividends (3a) compute as sum(box 1b) with preparer OVERRIDE as
      the holding-period-exception escape hatch (61-day rule etc. is preparer
      judgment per i1040gi).
+  7. SOURCE-SUMMARY condition-(2) arm — KEN RULED 2026-07-27, do not
+     re-litigate. A source-summary record carries a return-level capital-gain-
+     distribution total with no boxes 2b/2c/2d behind it, so Exception 1
+     condition (2) cannot be machine-checked for it. Ken ruled the path
+     COMPUTES on the preparer's existing assertion, with D_INTDIV_013 (info)
+     recording that the check was vacuous. Blocking would leave the return with
+     no computed tax at all — the exact pressure that produced the fabricated
+     payer row in QA return 8621.
+
+AMENDMENT 2026-07-27 (QA Batch-001 item 15 — conversion / source-summary mode)
+-----------------------------------------------------------------------------
+NEW `doc_entry_basis` fact + NEW rule R-AGG-SUMMARY + amended R-AGG-7A +
+D_INTDIV_012/013/014 + scenarios ID-S1/S2/S3.
+
+The governing asymmetry, transcribed from the 2025 Schedule B template the
+same day: the face itemizes by payer EXACTLY TWO amounts — taxable interest
+(Part I line 1 "List name of payer") and ordinary dividends (Part II line 5
+"List name of payer:"). Qualified dividends, capital gain distributions,
+tax-exempt interest, foreign tax paid and §199A dividends reach the return as
+return-level figures that NO form attributes to a payer. So a conversion
+packet giving only those totals can now be entered as a source-summary record
+that carries them honestly, while the two amounts the law requires listed can
+never hide behind the flag (D_INTDIV_012, error). The flag never loosens a
+legally required listing — it only stops the software demanding an identity
+the IRS never asked for.
+
+Supersedes the prior behavior, in which the only way to hold such a total was
+to invent a 1099-DIV payer — which then PRINTED on Schedule B Part II and was
+TRANSMITTED in the MeF XML as a payer.
 
 Safety guard
 ------------
@@ -215,6 +244,30 @@ AUTHORITY_SOURCES: list[dict] = [
                 ),
                 "summary_text": "Seller-financed interest lists FIRST with buyer SSN + address on the face.",
                 "is_key_excerpt": False,
+            },
+            {
+                "excerpt_label": "Payer-listing scope: which amounts the face itemizes by payer",
+                "location_reference": "Schedule B (2025), Part I line 1 + Part I Note; Part II line 5 + Part II Note",
+                "excerpt_text": (
+                    "[Part I line 1] List name of payer. ... [Part I Note] If you received a "
+                    "Form 1099-INT, Form 1099-OID, or substitute statement from a brokerage "
+                    "firm, list the firm's name as the payer and enter the total interest "
+                    "shown on that form. "
+                    "[Part II line 5] List name of payer: ... [Part II Note] If you received "
+                    "a Form 1099-DIV or substitute statement from a brokerage firm, list the "
+                    "firm's name as the payer and enter the ordinary dividends shown on that "
+                    "form."
+                ),
+                "summary_text": (
+                    "R-AGG-SUMMARY authority. The Schedule B face itemizes by payer EXACTLY "
+                    "TWO things: taxable interest (Part I line 1) and ordinary dividends "
+                    "(Part II line 5). Qualified dividends (1040 L3a), capital gain "
+                    "distributions (1040 L7a), tax-exempt interest (1040 L2a), foreign tax "
+                    "paid and section 199A dividends appear on NO payer-itemized line on any "
+                    "form — so a source-summary record may carry them, and may NOT carry the "
+                    "two the face demands be listed."
+                ),
+                "is_key_excerpt": True,
             },
         ],
     },
@@ -603,6 +656,14 @@ INTDIV_IDENTITY = {
 }
 
 INTDIV_FACTS: list[dict] = [
+    # ── Entry basis (AMENDED 2026-07-27, QA Batch-001 item 15 — R-AGG-SUMMARY) ──
+    {"fact_key": "doc_entry_basis", "label": "1099-INT/DIV: entry basis (detail | source summary)",
+     "data_type": "string", "default_value": "detail", "sort_order": 0,
+     "notes": ("PER DOCUMENT. 'detail' = a real payer document. 'source summary' = an "
+               "authoritative return-level total carried over from a source packet with no "
+               "payer detail behind it. Governs R-AGG-SUMMARY (what the record may carry) "
+               "and the R-AGG-7A condition-(2) arm. Aggregation is UNAFFECTED — a summary "
+               "record sums into 2a/3a/7a/25b exactly like a detail record.")},
     # ── 1099-INT document facts (per-document; existing InterestIncome model) ──
     {"fact_key": "int_payer_name", "label": "1099-INT: payer name", "data_type": "string", "sort_order": 1,
      "notes": "PER DOCUMENT. Existing InterestIncome.payer_name (+ EIN/address snapshot block)."},
@@ -789,15 +850,51 @@ INTDIV_RULES: list[dict] = [
      "rule_type": "calculation", "precedence": 1, "sort_order": 5,
      "formula": ("IF capital_gain_distributions_only AND every 1099-DIV doc has box2b = box2c = box2d = 0 "
                  "AND SUM(box2a) > 0: L7a = SUM(box2a); 7b 'Schedule D not required' box CHECKED at render. "
-                 "ELSE IF SUM(box2a) > 0: 7a NOT computed; D_INTDIV_001/002 RED; line 16 not computed."),
+                 "ELSE IF SUM(box2a) > 0: 7a NOT computed; D_INTDIV_001/002 RED; line 16 not computed. "
+                 "SOURCE-SUMMARY ARM (2026-07-27): a record with doc_entry_basis = 'source summary' has "
+                 "no per-payer 2b/2c/2d to inspect, so it satisfies condition (2) by PREPARER ASSERTION "
+                 "rather than by inspection; the path engages and D_INTDIV_013 (info) records that the "
+                 "check was vacuous for that record."),
      "inputs": ["capital_gain_distributions_only", "div_box2a_capgain", "div_box2b_unrecap_1250",
-                "div_box2c_1202", "div_box2d_collectibles"],
+                "div_box2c_1202", "div_box2d_collectibles", "doc_entry_basis"],
      "outputs": ["1040.L7a"],
      "description": ("ONCE PER RETURN. i1040gi Exception 1 verbatim: condition (2) (no 2b/2c/2d on ANY "
                      "document) is checked computationally; condition (1) (no capital losses, no other "
                      "capital gains, no QOF deferral) is the preparer assertion fact — JUDGMENT ITEM 5. "
                      "Nominee capital-gain distributions: report only the owned portion (preparer adjusts "
-                     "the document's 2a; statement = render-leg note).")},
+                     "the document's 2a; statement = render-leg note). "
+                     "AMENDED 2026-07-27 (QA Batch-001 item 15 — KEN RULING, do not re-litigate): a "
+                     "source-summary record carries a return-level capital-gain-distribution total with no "
+                     "boxes behind it, so condition (2) cannot be machine-checked for it. Ken ruled the "
+                     "path COMPUTES on the preparer's existing Exception-1 assertion, with D_INTDIV_013 "
+                     "(info) recording that condition (2) was asserted, not inspected. Rationale on the "
+                     "record: condition (1) is already an assertion by design (JUDGMENT ITEM 5), and "
+                     "blocking leaves the return with NO computed tax at all — which is precisely what "
+                     "drove preparers to fabricate a payer row (QA return 8621). JUDGMENT ITEM 7.")},
+    {"rule_id": "R-AGG-SUMMARY",
+     "title": "Source-summary records: what a conversion total may and may not carry",
+     "rule_type": "validation", "precedence": 1, "sort_order": 7,
+     "formula": ("A record with doc_entry_basis = 'source summary' MAY carry only amounts that no IRS "
+                 "form itemizes by payer: DIV box1b (L3a), DIV box2a (L7a), INT box8 / DIV box12 (L2a), "
+                 "INT box6 / DIV box7 (foreign tax), DIV box5 (section 199A), and box4 withholding (L25b). "
+                 "It MUST NOT carry INT box1/box3/box10 (Schedule B Part I line 1) or DIV box1a (Part II "
+                 "line 5) — those two the face requires listed BY PAYER; violation = D_INTDIV_012 (error). "
+                 "A source-summary record is EXCLUDED from the Schedule B Part I/II payer listings and "
+                 "from the corresponding MeF payer elements. Aggregation is otherwise unchanged."),
+     "inputs": ["doc_entry_basis", "int_box1_interest", "int_box3_treasury", "div_box1a_ordinary"],
+     "outputs": [],
+     "description": ("ONCE PER DOCUMENT. NEW 2026-07-27 (QA Batch-001 item 15). The Schedule B face "
+                     "itemizes by payer EXACTLY TWO things — taxable interest (Part I line 1 'List name "
+                     "of payer') and ordinary dividends (Part II line 5 'List name of payer:'). Every "
+                     "other 1099-INT/DIV amount reaches the return as a return-level figure that no form "
+                     "asks to be attributed to a payer. That asymmetry IS the rule: a conversion packet "
+                     "that gives return-level qualified dividends / capital gain distributions / foreign "
+                     "tax / section 199A can be entered honestly, while the two amounts the law requires "
+                     "listed can never be hidden behind the flag. The flag NEVER loosens a legally "
+                     "required listing — it only stops the software demanding an identity the IRS never "
+                     "asked for. Supersedes the pre-2026-07-27 behavior where the only way to hold such "
+                     "a total was to invent a 1099-DIV payer, which then printed on Schedule B Part II "
+                     "and was transmitted in the MeF XML as a payer (QA return 8621).")},
     {"rule_id": "R-AGG-25B", "title": "1040 line 25b withholding roster EXTENDS to 1099-DIV box 4",
      "rule_type": "calculation", "precedence": 1, "sort_order": 6,
      "formula": "L25b = SUM over 1099-INT docs [box4] + SUM over 1099-DIV docs [box4]",
@@ -1010,6 +1107,42 @@ INTDIV_DIAGNOSTICS: list[dict] = [
      "message": ("Section 199A dividends (box 5) are stored and will flow to the QBI deduction when the "
                  "8995 topic lands (post-sprint #1) — no current-return effect."),
      "notes": "SPRINT_SCOPE Topic 3 DoD names this storage explicitly."},
+    # ── Source-summary (conversion) entry basis — NEW 2026-07-27, QA Batch-001 item 15 ──
+    {"diagnostic_id": "D_INTDIV_012",
+     "title": "Source-summary record carries an amount the face requires listed by payer",
+     "severity": "error",
+     "condition": ("any doc with doc_entry_basis = 'source summary' has int box1 != 0 OR int box3 != 0 "
+                   "OR int box10 != 0 OR div box1a != 0"),
+     "message": ("A source-summary record may not carry taxable interest or ordinary dividends. Schedule B "
+                 "requires those two listed BY PAYER (Part I line 1 and Part II line 5), so they must be "
+                 "entered on real payer rows. Move the amount to a payer document, or — if the packet "
+                 "genuinely gives no payer detail for it — enter the payers you do have. Qualified "
+                 "dividends, capital gain distributions, tax-exempt interest, foreign tax and section 199A "
+                 "dividends may stay on this record; no form itemizes them by payer."),
+     "notes": ("R-AGG-SUMMARY. This is the guard that keeps the entry-basis flag from ever buying a "
+               "preparer out of a legally required listing.")},
+    {"diagnostic_id": "D_INTDIV_013",
+     "title": "Exception 1 condition (2) was preparer-asserted, not machine-checked",
+     "severity": "info",
+     "condition": ("the line-7a checkbox path is active AND at least one doc with "
+                   "doc_entry_basis = 'source summary' carries box2a > 0"),
+     "message": ("Capital gain distributions on this return include a source-summary total, which has no "
+                 "per-payer boxes 2b/2c/2d for the software to inspect. Exception 1 condition (2) — no "
+                 "unrecaptured section 1250 gain, section 1202 gain, or collectibles gain — rests on your "
+                 "assertion for that amount. If the source packet shows any of the three, Schedule D is "
+                 "required and line 7a is not the right path."),
+     "notes": ("R-AGG-7A source-summary arm. KEN RULING 2026-07-27: compute on the assertion rather than "
+               "block, and record the vacuous check here. JUDGMENT ITEM 7.")},
+    {"diagnostic_id": "D_INTDIV_014",
+     "title": "Interest/dividend amounts entered from a source packet",
+     "severity": "info",
+     "condition": "any doc has doc_entry_basis = 'source summary'",
+     "message": ("One or more interest/dividend amounts on this return were entered from a source packet "
+                 "as return-level totals; the payer detail behind them was never keyed. The totals are "
+                 "authoritative and flow normally. These records are excluded from the Schedule B payer "
+                 "listing and from the e-file payer elements — nothing invented is filed."),
+     "notes": ("R-AGG-SUMMARY. The honest label the conversion workflow was missing; feeds the "
+               "return-level source-summary banner and the reconciliation panel.")},
 ]
 
 INTDIV_SCENARIOS: list[dict] = [
@@ -1038,6 +1171,42 @@ INTDIV_SCENARIOS: list[dict] = [
                 "div_docs": [{"box2a": 1200}, {"box2a": 800}]},
      "expected_outputs": {"1040_line_7a": 2000, "line_7b_box_checked": True, "schedule_d_engaged": False},
      "notes": "Exception 1 satisfied: assertion + no 2b/2c/2d anywhere. (Topic 9: the D_INTDIV_001/002-quiet pins became the not-engaged pin.)"},
+    # ── Source-summary (conversion) entry basis — NEW 2026-07-27, QA Batch-001 item 15 ──
+    {"scenario_name": ("ID-S1 — QA return 8621: payer ordinary dividends + return-level totals -> "
+                       "3b = 9,400; 3a = 12,533; 7a = 32,686; NO fabricated payer"),
+     "scenario_type": "normal", "sort_order": 3.1,
+     "inputs": {"capital_gain_distributions_only": True,
+                "div_docs": [{"entry_basis": "detail", "payer_name": "FIRST BANK", "box1a": 6000},
+                             {"entry_basis": "detail", "payer_name": "SECOND BROKER", "box1a": 3400},
+                             {"entry_basis": "source summary", "box1a": 0, "box1b": 12533,
+                              "box2a": 32686, "box7": 68, "box5": 43}]},
+     "expected_outputs": {"1040_line_3b": 9400, "1040_line_3a": 12533, "1040_line_7a": 32686,
+                          "line_7b_box_checked": True, "schb_part_ii_payer_rows": 2,
+                          "mef_schb_dividend_rows": 2,
+                          "diagnostics_fired": ["D_INTDIV_013", "D_INTDIV_014"]},
+     "notes": ("The QA batch's own regression, pinned verbatim from report 8621: 'Enter ordinary "
+               "dividends by payer plus return-level 12,533 qualified dividends, 32,686 capital-gain "
+               "distributions, 68 foreign tax, and 43 section 199A dividends. Federal totals must "
+               "calculate without creating a fictitious 1099-DIV payer.' The summary record aggregates "
+               "identically to a detail record but appears in NEITHER the Schedule B Part II listing "
+               "(2 rows, not 3) NOR the MeF payer elements. D_INTDIV_013 records the vacuous "
+               "condition-(2) check; D_INTDIV_014 is the honest return-level label.")},
+    {"scenario_name": "ID-S2 — source-summary record carrying ordinary dividends -> D_INTDIV_012 error",
+     "scenario_type": "edge_case", "sort_order": 3.2,
+     "inputs": {"div_docs": [{"entry_basis": "source summary", "box1a": 5000, "box1b": 2000}]},
+     "expected_outputs": {"diagnostics_fired": ["D_INTDIV_012"]},
+     "notes": ("NEGATIVE CONTROL for the guard. Box 1a is the one dividend amount Schedule B Part II "
+               "line 5 requires listed by payer, so the flag must NOT carry it — the error fires even "
+               "though the same record's box 1b (12,533-style qualified total) would be perfectly "
+               "legitimate. Proves the flag cannot buy out of a required listing.")},
+    {"scenario_name": "ID-S3 — source-summary record with box 2c -> Schedule D, path NOT engaged",
+     "scenario_type": "edge_case", "sort_order": 3.3,
+     "inputs": {"capital_gain_distributions_only": True,
+                "div_docs": [{"entry_basis": "source summary", "box2a": 10000, "box2c": 500}]},
+     "expected_outputs": {"line_7b_box_checked": False, "diagnostics_fired": ["D_SCHD_002"]},
+     "notes": ("The condition-(2) arm is about a SILENT box, not a disclosed one. When the preparer DOES "
+               "key a 2b/2c/2d amount onto the summary record, the ordinary blocking/Schedule-D routing "
+               "applies unchanged — the assertion arm never overrides a fact actually on the record.")},
     # ── QDCGT computes (Tax Table values via midpoint/half-up; TCW exact at >= $100K) ──
     {"scenario_name": "ID-Q1 — single TY2025, QD entirely in the 0% slice -> WS25 = 3,965",
      "scenario_type": "normal", "sort_order": 4,
@@ -1142,6 +1311,11 @@ INTDIV_RULE_LINKS: list[tuple[str, str, str, str]] = [
     ("R-AGG-3A", "IRS_2025_1040_INSTR", "primary", "Line 3a <- box 1b + the holding-period Exception list"),
     ("R-AGG-3A", "IRS_1099DIV_FORM", "primary", "Box 1b 'portion of box 1a' (subset)"),
     ("R-AGG-7A", "IRS_2025_1040_INSTR", "primary", "Exception 1 + the 7a/7b checkbox mechanics (verbatim)"),
+    ("R-AGG-SUMMARY", "IRS_2025_SCHB_FORM", "primary",
+     "Part I line 1 / Part II line 5 'List name of payer' — the face itemizes by payer ONLY taxable "
+     "interest and ordinary dividends (verbatim, transcribed from the 2025 template 2026-07-27)"),
+    ("R-AGG-SUMMARY", "IRS_2025_1040_INSTR", "secondary",
+     "Lines 2a/3a/7a are return-level figures with no payer attribution on any form"),
     ("R-AGG-25B", "IRS_1099DIV_FORM", "primary", "Box 4 'include this amount ... as tax withheld'"),
     ("R-AGG-25B", "IRS_1099INT_FORM", "secondary", "Box 4 backup withholding (existing 25b source)"),
     ("R-QDCGT-GATE", "IRS_2025_1040_INSTR", "primary", "Line 16 trigger list + 'use this worksheet to figure your tax'"),
