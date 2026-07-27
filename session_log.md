@@ -1,3 +1,40 @@
+## 2026-07-27 - 4562 D_4562_RECON amended for the 179 business-income limitation (delvio s124) - SEEDED + export-verified
+- NEW loader load_4562_recon_179_limitation.py (AMENDS the existing multi-entity 4562; the
+  load_4562_destination_rounding s116 pattern - looks up the TaxForm, never re-creates).
+- INTAKE WAS A DEFECT, not a law change. delvio s124 was settling the 8 pre-existing suite
+  failures; widening the D_4562 family list surfaced D_4562_RECON firing on a CORRECT return.
+  The s116 condition was unconditional per-destination equality, which cannot survive
+  section 179(b)(3)(A): 10,000 of equipment fully elected against 8,000 of Schedule C income
+  puts the ALLOWED 8,000 on Schedule C line 13 and carries 2,000 to Form 4562 line 13, while
+  the asset module still holds the full election. The guard read that as a routing failure and
+  told the preparer "The difference would file a wrong return."
+- KEN APPROVED THE FIX IN-SESSION (AskUserQuestion) over downgrading the severity or deferring.
+- AUTHORED: R020 (reconciliation basis) + amended D_4562_RECON condition/notes + 4 scenarios.
+  Two-part: (a) every destination must carry at least its NON-179 total - less is ordinary
+  depreciation that failed to route, still blocking; (b) the 179 that actually landed across
+  the business/farm schedules must equal LINE 12, the allowed amount after the limitation.
+  With no 179 on the return the two parts collapse to the original strict equality, unchanged -
+  so this is strictly STRONGER for the ordinary return, not a relaxation.
+- Face text re-pinned VERBATIM off delvio's local SHA-tracked f4562.pdf (pymupdf, same day):
+  L11 "Business income limitation. Enter the smaller of business income (not less than zero)
+  or line 5. See instructions" / L12 "Section 179 expense deduction. Add lines 9 and 10, but
+  don't enter more than line 11 ." / L13 "Carryover of disallowed deduction to 2026. Add lines
+  9 and 10, less line 12". Statute: 179(b)(3)(A) income cap, (B) carryover.
+- HARNESS check_4562_recon_integrity.py recomputes every scenario from its OWN transcription
+  and, crucially, re-implements the PRE-amendment condition and asserts it MISFIRES on the
+  limited-but-correct scenario - so the harness proves the amendment changes a real verdict
+  rather than restating the authored answer (the s121 lesson). THREE perturbation controls
+  each OBSERVED FAILING before restore: the limited scenario authored as firing; severity
+  quietly downgraded to warning; R020 paraphrasing the line-12 face text.
+- SEEDED to prod: 4562 now 20 rules / 17 diagnostics / 39 scenarios. Deployed
+  lookup/4562/export/ verified carrying R020 + the amended condition; mirrored verbatim to
+  delvio server/specs/form_4562_spec.json (was 19 rules / 35 tests).
+- FLAGGED for Ken (NOT IRS-sourced, in delvio REVIEW_QUEUE): accrual Schedule F is scoped out
+  of part (b) because the app's limitation skips it entirely (the whole farm RED-defers,
+  D_SF_ACCRUAL, cash-method-only v1), and part (b) stands down in the pure-prior-year-carryover
+  shape where the deduction is distributed by net profit and can land on an activity holding
+  no depreciation assets.
+
 ## 2026-07-27 - 1040_INTDIV source-summary entry basis (QA Batch-001 item 15, delvio s122) - SEEDED + export-verified
 - Amended IN THE OWNING LOADER (load_1040_intdiv_qdcgt.py). RS 7cdf804.
 - NEW fact doc_entry_basis (detail | source summary); NEW rule R-AGG-SUMMARY; amended R-AGG-7A;

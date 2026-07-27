@@ -66,6 +66,30 @@ Statuses: `INTAKE → GAP-CHECKED → DRAFTING → ⏳ AWAITING KEN → APPROVED
 *No independent backlog here (see header). Sequence = BUILD_ORDER.md SPINE; statuses seeded
 from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 
+> **⟨GATE-1⟩ APPROVED + SEEDED — 2026-07-27 (tts s124): Form 4562 `D_4562_RECON`
+> amended for the §179 business-income limitation. State: DONE.**
+> Defect intake was a DEFECT, not a law change — the tts s124 test-settlement pass
+> found the s116 reconciliation guard raising a BLOCKING error on a CORRECT return
+> whenever §179(b)(3)(A) capped the deduction ($10,000 elected against $8,000 of
+> Schedule C income legitimately puts the allowed 8,000 on Schedule C line 13 and
+> carries 2,000 to line 13 of the 4562, and the guard compared against the full
+> election). **Ken approved the two-part fix in-session over the alternatives of
+> downgrading the severity or deferring.**
+> Authored: **R020** (reconciliation basis — (a) each destination carries at least
+> its non-§179 total; (b) the §179 that landed ties to LINE 12) + the amended
+> `D_4562_RECON` condition/notes + **4 scenarios** incl. the false-positive negative
+> control and a genuine gap that must still fire under an active limitation.
+> Face text re-pinned verbatim off the local SHA-tracked `f4562.pdf` (L11/L12/L13,
+> pymupdf 2026-07-27) — not memory. Harness `check_4562_recon_integrity.py`
+> recomputes every scenario independently and re-implements the PRE-amendment
+> condition as a negative control; **three perturbation controls each observed
+> failing** before restore. Seeded to prod (4562 now 20 rules · 17 diagnostics ·
+> 39 scenarios); deployed `lookup/4562/export/` verified carrying R020 and the new
+> condition; mirrored verbatim to tts `server/specs/form_4562_spec.json`.
+> FLAGGED for ratification (in tts REVIEW_QUEUE, not IRS-sourced): accrual Schedule F
+> scoped out of part (b), and part (b) standing down in the pure-prior-year-carryover
+> shape.
+
 > **⟨GATE-1⟩ ×5 APPROVED + SEEDED — 2026-07-14 (tts s83): Ken approve-all across
 > WO-28 (9465) · WO-29 (8888) · WO-30 (1040-V/ES pair) · WO-31 (4868) · WO-32 (8915-F),
 > recommendations adopted as filed.** Sentinels flipped (+approval in docstrings); the five
