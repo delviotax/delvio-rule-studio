@@ -27,15 +27,15 @@
   g_num_unborn_dependents joins R-GA500-L14-DEP (retitled "Lines 7c + 14"), outputs +7c;
   unborn COUNT for line 14 (LIFE Act). T2 re-pinned with 2 qualified + 1 unborn (7c 3,
   L14 12,000, tax 3,322). R-GA500-S3 inputs grew the unborn fact (S3-11 same math).
-- (3) R-GA500-LIC (Ken ruling s182, batch-002 BARROW): exemptions = IT-511 p35 VERBATIM
+- (3) R-GA500-LIC (Ken ruling s182, the batch-002 LIC hold): exemptions = IT-511 p35 VERBATIM
   "self, spouse and natural or legally adopted children" + age-65 count. NEW fact
   g_lic_children (the app's derived LIC-CHILD line; ODC brother/grandchild/foster/step and
   unborn all excluded) replaces g_num_dependents in the rule; the LIC authority excerpt's
   wrong paraphrase ("self+spouse+dependents, excluding unborn") corrected AT THE SOURCE -
   the excerpt is what misled the code. NEW T20 (HOH + ODC brother: L14 4,000 but 17a = 1,
-  credit $5 not $10 - the filed BARROW answer).
+  credit $5 not $10 - the filed answer).
 - KEN DECISION IN THE WALK: g_lic_not_dependent default flipped true -> false. The engine
-  gates the ENTIRE credit on the explicit LIC-NODEP assertion (batch-005 LOGGANS: unasserted
+  gates the ENTIRE credit on the explicit LIC-NODEP assertion (batch-005 finding: unasserted
   = no credit, penalty-safe); a spec default of true is a default-granted eligibility
   assertion. Flag for Ken's explicit blessing at Gate 1.
 - GATE check_ga500_integrity.py ALL CHECKS PASS - 20 scenarios (was 18; loader and gate

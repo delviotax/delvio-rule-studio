@@ -85,13 +85,13 @@ from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 > repointed to 7a (its old note contradicted itself), `g_num_unborn_dependents` joins
 > R-GA500-L14-DEP's inputs (unborn COUNT for line 14 — LIFE Act); T2 re-pinned with an
 > unborn dependent (7c 3 → L14 12,000 → tax 3,322).
-> **③ R-GA500-LIC** (Ken ruling s182, batch-002 BARROW): exemptions = IT-511 p35 VERBATIM
+> **③ R-GA500-LIC** (Ken ruling s182, the batch-002 LIC hold): exemptions = IT-511 p35 VERBATIM
 > "self, spouse and natural or legally adopted children" + age-65 count — NEW fact
 > `g_lic_children` (the app's derived LIC-CHILD) replaces the all-7c count; the wrong
 > excerpt paraphrase corrected at the source; NEW T20 (HOH + ODC brother: L14 4,000 but
 > 17a = 1, credit $5 not $10). **Plus one DEFAULT DECISION for Ken:** `g_lic_not_dependent`
 > default flipped true → false — the engine gates the whole credit on the explicit
-> LIC-NODEP assertion (batch-005 LOGGANS), and a default-granted eligibility is a silent
+> LIC-NODEP assertion (the batch-005 finding), and a default-granted eligibility is a silent
 > credit. **Gate `check_ga500_integrity.py` ALL CHECKS PASS — 20 scenarios** (loader and
 > gate share no math). NOT re-seeded / NOT re-exported — awaiting Ken's Gate-1 approval;
 > then: re-seed RS DB → re-export canonical `tts server/specs/500_spec.json` (id-level

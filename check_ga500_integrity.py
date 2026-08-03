@@ -235,7 +235,7 @@ def recompute(inp):
     if fed_agi < D(IND_LIC_CEIL[year]) and inp.get("g_lic_not_dependent") and l16 > 0:
         # s187 (Ken ruling s182, IT-511 p35 verbatim): exemptions = "self,
         # spouse and natural or legally adopted children" — the children-only
-        # count, NOT all 7c dependents (BARROW), and unborn never count.
+        # count, NOT all 7c dependents (the b002 LIC client), and unborn never count.
         base_ex = 1 + (1 if fs == "B" else 0) + int(D(inp.get("g_lic_children")))
         ex = base_ex + int(D(inp.get("g_lic_age65_count")))
         credit = ind_lic_credit(int(fed_agi))

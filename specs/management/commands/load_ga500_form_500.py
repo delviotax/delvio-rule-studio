@@ -403,7 +403,7 @@ AUTHORITY_SOURCES: list[dict] = [
                     "exemption from the table → L17b: under $6,000 $26; $6,000-7,999 $20; $8,000-9,999 "
                     "$14; $10,000-14,999 $8; $15,000-19,999 $5. L6 = L4 × L5 → L17c. Credit ≤ tax (L16). "
                     "(Excerpt corrected 2026-08-02 — the prior paraphrase \"self+spouse+dependents, "
-                    "excluding unborn\" misread the page and misled the app: batch-002 BARROW, Ken "
+                    "excluding unborn\" misread the page and misled the app: the batch-002 LIC hold, Ken "
                     "ruling s182.)"
                 ),
                 "summary_text": "LIC = exemptions × per-FAGI-bracket credit; exemptions = self, spouse and natural/adopted CHILDREN (not all 7c dependents) + age-65 count.",
@@ -719,8 +719,8 @@ GA500_FACTS: list[dict] = [
     {"fact_key": "g_nol_carryforward_2018plus", "label": "GA NOL carryforward available — 2018 and later (80% limit)", "data_type": "decimal", "default_value": "0", "sort_order": 111, "notes": "80%-limit worksheet line 2; applied ≤ 80% of GA income before NOL. W3."},
 
     # — Low Income Credit —
-    {"fact_key": "g_lic_children", "label": "LIC worksheet L2 — natural or legally adopted children count", "data_type": "integer", "default_value": "0", "sort_order": 119, "notes": "IT-511 p35 VERBATIM: exemptions = \"self, spouse and natural or legally adopted children.\" NARROWER than line 7c — a brother/grandchild/niece/foster/step dependent counts for 7c and line 14 but NOT here; an unborn dependent is not a natural or adopted child either. The app derives it from the federal Dependent rows (relationship son/daughter/adopted child — the tts LIC-CHILD line), preparer-overridable. Ken ruling 2026-08-02 (batch-002 BARROW: HOH with an ODC brother — filed 1 exemption, the old all-7c count gave 2)."},
-    {"fact_key": "g_lic_not_dependent", "label": "Taxpayer is NOT claimed/eligible as a dependent (LIC eligibility assertion)", "data_type": "boolean", "default_value": "false", "sort_order": 120, "notes": "LIC requires the taxpayer not be claimed (or eligible to be claimed) as a dependent on another return. Default FALSE — an explicit preparer assertion: the app gates the ENTIRE credit on it (the LIC-NODEP entry) and an unasserted return computes NO credit (penalty-safe; the batch-005 LOGGANS convention). (Amended 2026-08-02 from default true — a default-granted eligibility assertion is a silent credit.)"},
+    {"fact_key": "g_lic_children", "label": "LIC worksheet L2 — natural or legally adopted children count", "data_type": "integer", "default_value": "0", "sort_order": 119, "notes": "IT-511 p35 VERBATIM: exemptions = \"self, spouse and natural or legally adopted children.\" NARROWER than line 7c — a brother/grandchild/niece/foster/step dependent counts for 7c and line 14 but NOT here; an unborn dependent is not a natural or adopted child either. The app derives it from the federal Dependent rows (relationship son/daughter/adopted child — the tts LIC-CHILD line), preparer-overridable. Ken ruling 2026-08-02 (the batch-002 LIC hold: HOH with an ODC brother — filed 1 exemption, the old all-7c count gave 2)."},
+    {"fact_key": "g_lic_not_dependent", "label": "Taxpayer is NOT claimed/eligible as a dependent (LIC eligibility assertion)", "data_type": "boolean", "default_value": "false", "sort_order": 120, "notes": "LIC requires the taxpayer not be claimed (or eligible to be claimed) as a dependent on another return. Default FALSE — an explicit preparer assertion: the app gates the ENTIRE credit on it (the LIC-NODEP entry) and an unasserted return computes NO credit (penalty-safe; the batch-005 LIC-assertion convention). (Amended 2026-08-02 from default true — a default-granted eligibility assertion is a silent credit.)"},
     {"fact_key": "g_lic_age65_count", "label": "LIC worksheet L3 — age-65 count (1 if you/spouse 65+, 2 if both)", "data_type": "integer", "default_value": "0", "sort_order": 121, "notes": "Added to the base exemption count for the Low Income Credit."},
 
     # — Child & dependent care credit (IND-CR 202) —
@@ -820,7 +820,7 @@ GA500_RULES: list[dict] = [
     {"rule_id": "R-GA500-LIC", "title": "Line 17 — Low Income Credit", "rule_type": "calculation", "precedence": 9, "sort_order": 14,
      "formula": "Eligible if federal AGI (L8) < $20,000 AND the taxpayer is not claimed/eligible as a dependent on another return (explicit preparer assertion — unasserted computes NO credit) AND line 16 > 0. L17a = 1 (self) + 1 if filing status B (spouse) + the natural-or-legally-adopted-children count + the age-65 count (1 if you/spouse 65+, 2 if both); L17b = per-exemption credit from the FAGI table ($26/$20/$14/$8/$5); L17c = L17a × L17b (≤ line 16). The exemption count is IT-511 p35 VERBATIM — \"self, spouse and natural or legally adopted children\" — NARROWER than line 7c: an ODC brother/grandchild/niece/foster/step dependent earns the line-14 exemption but is NOT an LIC exemption; unborn dependents are excluded a fortiori.",
      "inputs": ["g_federal_agi", "g_lic_not_dependent", "g_filing_status", "g_lic_children", "g_lic_age65_count"], "outputs": ["17a", "17b", "17c"],
-     "description": "The Low Income Credit (a per-exemption credit that phases out at $20,000 federal AGI). AMENDED 2026-08-02 (Ken ruling s182, batch-002 BARROW): the exemption count swaps all-7c-dependents for the IT-511 p35 children-only count (the app's derived LIC-CHILD line); the not-a-dependent gate is an explicit assertion (the LIC-NODEP convention, batch-005 LOGGANS)."},
+     "description": "The Low Income Credit (a per-exemption credit that phases out at $20,000 federal AGI). AMENDED 2026-08-02 (Ken ruling s182, the batch-002 LIC hold): the exemption count swaps all-7c-dependents for the IT-511 p35 children-only count (the app's derived LIC-CHILD line); the not-a-dependent gate is an explicit assertion (the LIC-NODEP convention, the batch-005 finding)."},
 
     {"rule_id": "R-GA500-OSC", "title": "Line 18 — Other State(s) Tax Credit", "rule_type": "calculation", "precedence": 9, "sort_order": 15,
      "formula": "Credit = lesser( income taxed by both GA and the other state × GA rate, tax actually paid to the other state on that income [reduced by other-state credits] ). → line 18.",
@@ -1160,7 +1160,7 @@ GA500_SCENARIOS: list[dict] = [
      "inputs": {"tax_year": 2025, "g_residency_status": "full_year", "g_filing_status": "D", "g_num_dependents": 1, "g_lic_children": 0,
                 "g_federal_agi": 18000, "g_lic_not_dependent": True, "g_lic_age65_count": 0},
      "expected_outputs": {"7c": 1, "10": 18000, "11": 12000, "13": 6000, "14": 4000, "15a": 2000, "15c": 2000, "16": 104, "17a": 1, "17b": 5, "17c": 5, "22": 5, "23": 99},
-     "notes": "HAND-COMPUTED (the batch-002 BARROW shape, Ken ruling s182). One qualified dependent who is a BROTHER: he earns the line-14 exemption (7c = 1 → 4,000) but is NOT a natural/adopted child, so g_lic_children = 0 and L17a = self only = 1 (the old all-7c count gave 2 → a $10 credit vs the filed $5). Tax 2,000 × 5.19% = 103.80 → 104; LIC 1 × $5 = 5; balance 99."},
+     "notes": "HAND-COMPUTED (the batch-002 LIC-hold shape, Ken ruling s182). One qualified dependent who is a BROTHER: he earns the line-14 exemption (7c = 1 → 4,000) but is NOT a natural/adopted child, so g_lic_children = 0 and L17a = self only = 1 (the old all-7c count gave 2 → a $10 credit vs the filed $5). Tax 2,000 × 5.19% = 103.80 → 104; LIC 1 × $5 = 5; balance 99."},
 ]
 
 
