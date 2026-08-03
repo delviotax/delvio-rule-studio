@@ -1,3 +1,42 @@
+## 2026-08-02 - GA-500 spec reconciliation DRAFTED (delvio s187) - gate ALL PASS, AWAITING KEN (Gate 1)
+- INTAKE: Ken ("GA 500 spec next") after the s187 correction that the GA-500 spec EXISTS
+  (authored/seeded/exported 6-25, W7 tips/OT 7-02) but drifted behind three Ken-ruled engine
+  corrections. NO new law authored - every change implements a ruling already live in the
+  tts engine, so Gate 1 is a reconciliation walk, not a law walk.
+- (1) R-GA500-MIL: the 2026-07-05 military over-exclusion handoff FINALLY applied RS-side
+  (tts docs/rs_handoff/2026-07-05_ga500_military_exclusion_fix.md sat unexecuted for a
+  month). Worksheet L7 = the PREPRINTED $35,000 total cap, L8 = min(retirement, L7) entered
+  ALONE - never L3+L8. The authority excerpt itself had mis-transcribed the worksheet
+  ("Total exclusion = L3 + L8") and was corrected to the face + the IT-511 "against the
+  total military retirement income they received" sentence. T5 re-pinned (MIL-7/8 35000);
+  NEW T19 midrange proof (mret 20,000 -> excluded 20,000, tax 1,453 vs the buggy 675).
+- (2) Line 7c DERIVED (tts s176): 7c = 7a + 7b, preparer-saved 7c wins. g_num_dependents
+  repointed to 7a (its old note said "line 7c (excludes unborn)" - self-contradictory);
+  g_num_unborn_dependents joins R-GA500-L14-DEP (retitled "Lines 7c + 14"), outputs +7c;
+  unborn COUNT for line 14 (LIFE Act). T2 re-pinned with 2 qualified + 1 unborn (7c 3,
+  L14 12,000, tax 3,322). R-GA500-S3 inputs grew the unborn fact (S3-11 same math).
+- (3) R-GA500-LIC (Ken ruling s182, batch-002 BARROW): exemptions = IT-511 p35 VERBATIM
+  "self, spouse and natural or legally adopted children" + age-65 count. NEW fact
+  g_lic_children (the app's derived LIC-CHILD line; ODC brother/grandchild/foster/step and
+  unborn all excluded) replaces g_num_dependents in the rule; the LIC authority excerpt's
+  wrong paraphrase ("self+spouse+dependents, excluding unborn") corrected AT THE SOURCE -
+  the excerpt is what misled the code. NEW T20 (HOH + ODC brother: L14 4,000 but 17a = 1,
+  credit $5 not $10 - the filed BARROW answer).
+- KEN DECISION IN THE WALK: g_lic_not_dependent default flipped true -> false. The engine
+  gates the ENTIRE credit on the explicit LIC-NODEP assertion (batch-005 LOGGANS: unasserted
+  = no credit, penalty-safe); a spec default of true is a default-granted eligibility
+  assertion. Flag for Ken's explicit blessing at Gate 1.
+- GATE check_ga500_integrity.py ALL CHECKS PASS - 20 scenarios (was 18; loader and gate
+  share no math; _mil re-derivation + the 7c/LIC counts independently re-typed).
+- NOT re-seeded / NOT re-exported - Gate 1 pending. After approval: re-seed RS DB ->
+  re-export canonical tts server/specs/500_spec.json -> id-level diff (expect only
+  R-GA500-MIL / R-GA500-L14-DEP / R-GA500-LIC / R-GA500-S3 + 2 facts + g_lic_children +
+  2 excerpts + T2/T5 re-pins + T19/T20) -> tts pure-scenario suite green.
+- OUT OF SCOPE (the follow-on "August GA build unit", priced separately): UET worksheet
+  computation (L42 direct-entry by design today); S4-8/S4-NB-18 seeded-computed-but-
+  never-written; SB 31 TY2026 military full exemption (standing loader W-item).
+- WORK_ORDERS.md: [WO-GA500-RECON] recorded AWAITING KEN.
+
 ## 2026-07-27 - 4562 D_4562_RECON amended for the 179 business-income limitation (delvio s124) - SEEDED + export-verified
 - NEW loader load_4562_recon_179_limitation.py (AMENDS the existing multi-entity 4562; the
   load_4562_destination_rounding s116 pattern - looks up the TaxForm, never re-creates).

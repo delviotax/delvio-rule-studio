@@ -95,7 +95,14 @@ def _rie(inp, year, prefix):
 
 
 def _mil(inp, year, prefix):
-    """Military RIE worksheet for one person → (total exclusion, worksheet dict)."""
+    """Military RIE worksheet for one person → (total exclusion, worksheet dict).
+
+    Corrected 2026-08-02 (the 2026-07-05 over-exclusion fix, tts
+    docs/rs_handoff/2026-07-05_ga500_military_exclusion_fix.md): the worksheet's
+    line 7 is the PREPRINTED $35,000 total cap and line 8 = lesser(L1, L7) is
+    entered ALONE — the exclusion never exceeds the retirement received. The old
+    re-derivation returned l3 + l8 (base counted twice), over-excluding the
+    $17,501-$34,999 midrange."""
     if not inp.get(f"g_{prefix}_military_under62"):
         return Decimal(0), {}
     mret = D(inp.get(f"g_{prefix}_military_retirement"))
@@ -105,12 +112,11 @@ def _mil(inp, year, prefix):
     l3 = min(mret, base)
     ga_earned = D(inp.get(f"g_{prefix}_military_ga_earned"))
     if mret < 17501 or ga_earned < 17501:
-        l7 = Decimal(0)
-        l8 = Decimal(0)
-    else:
-        l7 = base
-        l8 = min(mret, l7)
-    return l3 + l8, {"MIL-3": l3, "MIL-7": l7, "MIL-8": l8}
+        # STOP branches: enter line 3 alone.
+        return l3, {"MIL-3": l3, "MIL-7": Decimal(0), "MIL-8": Decimal(0)}
+    l7 = base * 2   # the preprinted $35,000 total cap
+    l8 = min(mret, l7)
+    return l8, {"MIL-3": l3, "MIL-7": l7, "MIL-8": l8}
 
 
 def recompute(inp):
@@ -153,7 +159,10 @@ def recompute(inp):
     out["S1-14"] = net_adj
 
     dep_exemption = D(IND_DEP[year])
-    num_deps = D(inp.get("g_num_dependents"))
+    # s187: line 7c = 7a (qualified) + 7b (unborn) — DERIVED; unborn COUNT for
+    # line 14 (LIFE Act). The LIC uses the NARROWER children-only count below.
+    num_deps = D(inp.get("g_num_dependents")) + D(inp.get("g_num_unborn_dependents"))
+    out["7c"] = num_deps
 
     if residency in ("part_year", "nonresident"):
         # — Schedule 3 (3-column proration) —
@@ -224,7 +233,10 @@ def recompute(inp):
     # — Low Income Credit —
     lic = Decimal(0)
     if fed_agi < D(IND_LIC_CEIL[year]) and inp.get("g_lic_not_dependent") and l16 > 0:
-        base_ex = 1 + (1 if fs == "B" else 0) + int(num_deps)
+        # s187 (Ken ruling s182, IT-511 p35 verbatim): exemptions = "self,
+        # spouse and natural or legally adopted children" — the children-only
+        # count, NOT all 7c dependents (BARROW), and unborn never count.
+        base_ex = 1 + (1 if fs == "B" else 0) + int(D(inp.get("g_lic_children")))
         ex = base_ex + int(D(inp.get("g_lic_age65_count")))
         credit = ind_lic_credit(int(fed_agi))
         out["17a"] = Decimal(ex)

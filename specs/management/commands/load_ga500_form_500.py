@@ -355,11 +355,14 @@ AUTHORITY_SOURCES: list[dict] = [
                     "Under age 62 only. 1 Taxable military retirement (1099-R); 2 Base Military "
                     "Exclusion $17,500; 3 lesser(L1,L2) — if taxable military retirement < $17,501 STOP, "
                     "enter L3 on Sch 1 L7b/7e. 4 Taxable GA salary/wages; 5 Other earned GA income; 6 "
-                    "Total GA earned income — if < $17,501 STOP, enter L3. 7 Total additional military "
-                    "exclusion allowed (up to +$17,500); 8 lesser(L1,L7) → Sch 1 L7b/7e. Total exclusion "
-                    "= L3 + L8 (max $35,000); entered on Sch 1 L9 as negative."
+                    "Total GA earned income — if < $17,501 STOP, enter L3. 7 = $35,000 (the PREPRINTED "
+                    "total cap); 8 = lesser of Line 1 or Line 7, entered ALONE on Sch 1 L7b/7e. IT-511: "
+                    "the additional $17,500 is claimed 'against the total military retirement income "
+                    "they received.' Entered on Sch 1 L9 as negative. (Excerpt corrected 2026-08-02: the "
+                    "prior transcription's 'Total exclusion = L3 + L8' misread the worksheet and "
+                    "over-excluded the $17,501-$34,999 midrange — the 2026-07-05 fix.)"
                 ),
-                "summary_text": "Military RIE (under 62): $17,500 base + up to $17,500 more once GA earned ≥ $17,501.",
+                "summary_text": "Military RIE (under 62): min(retirement, $17,500) on the STOP branches; min(retirement, $35,000) once GA earned ≥ $17,501 — never exceeds the retirement received.",
                 "is_key_excerpt": True,
             },
             {
@@ -392,12 +395,18 @@ AUTHORITY_SOURCES: list[dict] = [
                 "excerpt_label": "Low Income Credit table + worksheet (IT-511 p35, 2025)",
                 "excerpt_text": (
                     "Eligible if Federal AGI < $20,000 and not claimed/eligible as a dependent. "
-                    "Worksheet: L2 exemptions (self+spouse+dependents, excluding unborn); L3 age-65 "
+                    "Worksheet: L2 exemptions — the booklet's words are \"self, spouse and natural or "
+                    "legally adopted children\" (VERBATIM — narrower than Form 500 line 7c: a brother, "
+                    "grandchild, niece/nephew, foster or step child is a 7c dependent but NOT an LIC "
+                    "exemption; an unborn dependent is not a natural or adopted child either); L3 age-65 "
                     "count (1 if you/spouse 65+, 2 if both); L4 = L2+L3 → Form 500 L17a. L5 credit per "
                     "exemption from the table → L17b: under $6,000 $26; $6,000-7,999 $20; $8,000-9,999 "
-                    "$14; $10,000-14,999 $8; $15,000-19,999 $5. L6 = L4 × L5 → L17c. Credit ≤ tax (L16)."
+                    "$14; $10,000-14,999 $8; $15,000-19,999 $5. L6 = L4 × L5 → L17c. Credit ≤ tax (L16). "
+                    "(Excerpt corrected 2026-08-02 — the prior paraphrase \"self+spouse+dependents, "
+                    "excluding unborn\" misread the page and misled the app: batch-002 BARROW, Ken "
+                    "ruling s182.)"
                 ),
-                "summary_text": "Low Income Credit = #exemptions × per-FAGI-bracket credit ($26/$20/$14/$8/$5).",
+                "summary_text": "LIC = exemptions × per-FAGI-bracket credit; exemptions = self, spouse and natural/adopted CHILDREN (not all 7c dependents) + age-65 count.",
                 "is_key_excerpt": True,
             },
             {
@@ -625,8 +634,8 @@ GA500_FACTS: list[dict] = [
     # — status / residency / dependents —
     {"fact_key": "g_residency_status", "label": "Residency status (full_year / part_year / nonresident)", "data_type": "choice", "default_value": "full_year", "sort_order": 1, "notes": "Form 500 line 4. part_year/nonresident → Schedule 3 path (omit Form 500 L9-L14)."},
     {"fact_key": "g_filing_status", "label": "Filing status (A Single / B MFJ / C MFS / D HOH-QSS)", "data_type": "choice", "default_value": "A", "sort_order": 2, "notes": "Form 500 line 5. Drives the standard deduction (B → $24,000, else $12,000)."},
-    {"fact_key": "g_num_dependents", "label": "Number of qualified dependents (line 7c)", "data_type": "integer", "default_value": "0", "sort_order": 3, "notes": "Form 500 line 7c (excludes self/spouse/unborn). Drives line 14 = L7c × the dependent exemption."},
-    {"fact_key": "g_num_unborn_dependents", "label": "Number of unborn dependents (line 7b)", "data_type": "integer", "default_value": "0", "sort_order": 4, "notes": "Form 500 line 7b. Counts as a dependent for line 14 but is EXCLUDED from the Low Income Credit exemption count."},
+    {"fact_key": "g_num_dependents", "label": "Number of qualified dependents (line 7a)", "data_type": "integer", "default_value": "0", "sort_order": 3, "notes": "Form 500 line 7a — qualified dependents (excludes self/spouse; unborn are counted separately on 7b). Line 7c = 7a + 7b is DERIVED (tts s176; a preparer-saved 7c wins) and drives line 14 = L7c × the dependent exemption. (Amended 2026-08-02: this fact previously claimed to BE 7c while excluding unborn — contradictory; it is the 7a input.)"},
+    {"fact_key": "g_num_unborn_dependents", "label": "Number of unborn dependents (line 7b)", "data_type": "integer", "default_value": "0", "sort_order": 4, "notes": "Form 500 line 7b (LIFE Act). Counts in 7c and therefore in line 14; NOT an LIC exemption (not a natural or legally adopted child — IT-511 p35)."},
 
     # — federal handoff —
     {"fact_key": "g_federal_agi", "label": "Federal adjusted gross income (Form 500 line 8)", "data_type": "decimal", "default_value": "0", "sort_order": 10, "notes": "← federal 1040 line 11. The GA computation starting point."},
@@ -710,7 +719,8 @@ GA500_FACTS: list[dict] = [
     {"fact_key": "g_nol_carryforward_2018plus", "label": "GA NOL carryforward available — 2018 and later (80% limit)", "data_type": "decimal", "default_value": "0", "sort_order": 111, "notes": "80%-limit worksheet line 2; applied ≤ 80% of GA income before NOL. W3."},
 
     # — Low Income Credit —
-    {"fact_key": "g_lic_not_dependent", "label": "Taxpayer is NOT claimed/eligible as a dependent (LIC eligibility)", "data_type": "boolean", "default_value": "true", "sort_order": 120, "notes": "LIC requires the taxpayer not be a dependent on another return."},
+    {"fact_key": "g_lic_children", "label": "LIC worksheet L2 — natural or legally adopted children count", "data_type": "integer", "default_value": "0", "sort_order": 119, "notes": "IT-511 p35 VERBATIM: exemptions = \"self, spouse and natural or legally adopted children.\" NARROWER than line 7c — a brother/grandchild/niece/foster/step dependent counts for 7c and line 14 but NOT here; an unborn dependent is not a natural or adopted child either. The app derives it from the federal Dependent rows (relationship son/daughter/adopted child — the tts LIC-CHILD line), preparer-overridable. Ken ruling 2026-08-02 (batch-002 BARROW: HOH with an ODC brother — filed 1 exemption, the old all-7c count gave 2)."},
+    {"fact_key": "g_lic_not_dependent", "label": "Taxpayer is NOT claimed/eligible as a dependent (LIC eligibility assertion)", "data_type": "boolean", "default_value": "false", "sort_order": 120, "notes": "LIC requires the taxpayer not be claimed (or eligible to be claimed) as a dependent on another return. Default FALSE — an explicit preparer assertion: the app gates the ENTIRE credit on it (the LIC-NODEP entry) and an unasserted return computes NO credit (penalty-safe; the batch-005 LOGGANS convention). (Amended 2026-08-02 from default true — a default-granted eligibility assertion is a silent credit.)"},
     {"fact_key": "g_lic_age65_count", "label": "LIC worksheet L3 — age-65 count (1 if you/spouse 65+, 2 if both)", "data_type": "integer", "default_value": "0", "sort_order": 121, "notes": "Added to the base exemption count for the Low Income Credit."},
 
     # — Child & dependent care credit (IND-CR 202) —
@@ -768,9 +778,9 @@ GA500_RULES: list[dict] = [
      "description": "The retirement income exclusion (§48-7-27(a)(5)). The center of gravity of the GA return. W5."},
 
     {"rule_id": "R-GA500-MIL", "title": "Schedule 1 line 7 — Military Retirement Exclusion worksheet", "rule_type": "calculation", "precedence": 2, "sort_order": 6,
-     "formula": "Under 62 only. L3 = min(military retirement, $17,500). If military retirement < $17,501 OR GA earned income < $17,501: additional = 0. Else L7 additional = $17,500; L8 = min(military retirement, L7). Total military exclusion = L3 + L8 (max $35,000) → Sch 1 L7b/7e, entered on Sch 1 L9 as a subtraction.",
+     "formula": "Under 62 only. L3 = min(military retirement, $17,500). STOP branches (military retirement < $17,501 OR GA earned income < $17,501): exclusion = L3, entered on Sch 1 L7b/7e. Proceed branch: L7 = $35,000 (the worksheet's PREPRINTED total cap) and L8 = min(military retirement, L7); exclusion = L8 ALONE — NEVER L3 + L8 (IT-511: the additional $17,500 is claimed 'against the total military retirement income they received', so the total exclusion can never exceed the retirement actually received). → Sch 1 L7b/7e, entered on Sch 1 L9 as a subtraction. Max $35,000.",
      "inputs": ["g_tp_military_under62", "g_tp_military_retirement", "g_tp_military_ga_earned", "g_sp_military_under62", "g_sp_military_retirement", "g_sp_military_ga_earned"], "outputs": ["MIL-3", "MIL-7", "MIL-8"],
-     "description": "Military retirement exclusion (§48-7-27(a)(5.1)) for under-62 retirees."},
+     "description": "Military retirement exclusion (§48-7-27(a)(5.1)) for under-62 retirees. AMENDED 2026-08-02 per the 2026-07-05 over-exclusion fix (tts docs/rs_handoff/2026-07-05_ga500_military_exclusion_fix.md): the prior formula's 'total = L3 + L8' over-excluded the $17,501-$34,999 midrange ($20k military retirement → $35k excluded); Form 500 Sch 1 p3 line 7 is the preprinted $35,000 and line 8 = lesser(L1, L7) is entered alone."},
 
     {"rule_id": "R-GA500-L10", "title": "Line 10 — Georgia AGI", "rule_type": "calculation", "precedence": 3, "sort_order": 7,
      "formula": "Line 10 = Line 8 + Line 9 (may be negative).",
@@ -782,14 +792,14 @@ GA500_RULES: list[dict] = [
      "inputs": ["g_itemize", "g_federal_itemized", "g_other_state_income_tax", "g_sch_a_line5d_total", "g_filing_status"], "outputs": ["11", "12a", "12b", "12c", "13"],
      "description": "GA standard ($12k/$24k) or itemized (federal Sch A less the SALT/other-state back-out). W4."},
 
-    {"rule_id": "R-GA500-L14-DEP", "title": "Line 14 — dependent exemption", "rule_type": "calculation", "precedence": 5, "sort_order": 9,
-     "formula": "Line 14 = line 7c (number of dependents) × the dependent exemption ($4,000 for 2025, $5,000 for 2026 per HB 463). No personal exemption for taxpayer/spouse.",
-     "inputs": ["g_num_dependents"], "outputs": ["14"],
-     "description": "Per-dependent exemption (HB 1437 removed the personal exemption; HB 463 raised the dependent amount to $5,000 for 2026). W2."},
+    {"rule_id": "R-GA500-L14-DEP", "title": "Lines 7c + 14 — dependent count and exemption", "rule_type": "calculation", "precedence": 5, "sort_order": 9,
+     "formula": "Line 7c = line 7a (qualified dependents) + line 7b (unborn dependents) — DERIVED per the 2025 Form 500 face; a preparer-saved 7c wins (the override escape hatch, tts s176). Line 14 = line 7c × the dependent exemption ($4,000 for 2025, $5,000 for 2026 per HB 463) — unborn dependents COUNT for line 14 (LIFE Act). No personal exemption for taxpayer/spouse.",
+     "inputs": ["g_num_dependents", "g_num_unborn_dependents"], "outputs": ["7c", "14"],
+     "description": "Per-dependent exemption (HB 1437 removed the personal exemption; HB 463 raised the dependent amount to $5,000 for 2026). AMENDED 2026-08-02: 7c is derived from 7a + 7b (was typed as an input; the tts engine derives it since s176 — a blank 7c on a return with a 7a count silently dropped the whole exemption, batch-002 BURROUGHS). W2."},
 
     {"rule_id": "R-GA500-S3", "title": "Schedule 3 — part-year / nonresident proration", "rule_type": "calculation", "precedence": 5, "sort_order": 10,
      "formula": "Col A AGI (L8) = total income (Col A) ± adjustments; Col C AGI = GA-source total ± GA adjustments. L9 ratio = L8 Col C ÷ L8 Col A (0% if GA AGI ≤0; 100% if federal AGI ≤0; bounded 0-100%). L10 deduction + L11 dependents ($4,000/$5,000 × L7c) → L12; L13 = L12 × ratio; L14 = L8 Col C − L13 → Form 500 L15a. RIE earned & unearned portions prorated separately by GA-source ratio.",
-     "inputs": ["g_residency_status", "g_s3_total_income_federal", "g_s3_total_income_ga", "g_s3_adj_1040_federal", "g_s3_adj_1040_ga", "g_s3_adj_500_federal", "g_s3_adj_500_ga", "g_num_dependents", "g_filing_status", "g_itemize"], "outputs": ["S3-8", "S3-9", "S3-10", "S3-11", "S3-12", "S3-13", "S3-14", "15a"],
+     "inputs": ["g_residency_status", "g_s3_total_income_federal", "g_s3_total_income_ga", "g_s3_adj_1040_federal", "g_s3_adj_1040_ga", "g_s3_adj_500_federal", "g_s3_adj_500_ga", "g_num_dependents", "g_num_unborn_dependents", "g_filing_status", "g_itemize"], "outputs": ["S3-8", "S3-9", "S3-10", "S3-11", "S3-12", "S3-13", "S3-14", "15a"],
      "description": "The 3-column GA-source proration for part-year/nonresident filers. Replaces Form 500 L9-L14; result → L15a. W6."},
 
     {"rule_id": "R-GA500-NOL", "title": "Schedule 4 — Georgia NOL (Part I/II)", "rule_type": "calculation", "precedence": 6, "sort_order": 11,
@@ -808,9 +818,9 @@ GA500_RULES: list[dict] = [
      "description": "The Georgia flat income tax. HB 111 (2025) / HB 463 (2026). W2."},
 
     {"rule_id": "R-GA500-LIC", "title": "Line 17 — Low Income Credit", "rule_type": "calculation", "precedence": 9, "sort_order": 14,
-     "formula": "Eligible if federal AGI (L8) < $20,000 and not a dependent. L17a = exemptions (self + spouse + dependents [exclude unborn] + age-65 count); L17b = per-exemption credit from the FAGI table ($26/$20/$14/$8/$5); L17c = L17a × L17b (≤ line 16).",
-     "inputs": ["g_federal_agi", "g_lic_not_dependent", "g_filing_status", "g_num_dependents", "g_lic_age65_count"], "outputs": ["17a", "17b", "17c"],
-     "description": "The Low Income Credit (a per-exemption credit that phases out at $20,000 federal AGI)."},
+     "formula": "Eligible if federal AGI (L8) < $20,000 AND the taxpayer is not claimed/eligible as a dependent on another return (explicit preparer assertion — unasserted computes NO credit) AND line 16 > 0. L17a = 1 (self) + 1 if filing status B (spouse) + the natural-or-legally-adopted-children count + the age-65 count (1 if you/spouse 65+, 2 if both); L17b = per-exemption credit from the FAGI table ($26/$20/$14/$8/$5); L17c = L17a × L17b (≤ line 16). The exemption count is IT-511 p35 VERBATIM — \"self, spouse and natural or legally adopted children\" — NARROWER than line 7c: an ODC brother/grandchild/niece/foster/step dependent earns the line-14 exemption but is NOT an LIC exemption; unborn dependents are excluded a fortiori.",
+     "inputs": ["g_federal_agi", "g_lic_not_dependent", "g_filing_status", "g_lic_children", "g_lic_age65_count"], "outputs": ["17a", "17b", "17c"],
+     "description": "The Low Income Credit (a per-exemption credit that phases out at $20,000 federal AGI). AMENDED 2026-08-02 (Ken ruling s182, batch-002 BARROW): the exemption count swaps all-7c-dependents for the IT-511 p35 children-only count (the app's derived LIC-CHILD line); the not-a-dependent gate is an explicit assertion (the LIC-NODEP convention, batch-005 LOGGANS)."},
 
     {"rule_id": "R-GA500-OSC", "title": "Line 18 — Other State(s) Tax Credit", "rule_type": "calculation", "precedence": 9, "sort_order": 15,
      "formula": "Credit = lesser( income taxed by both GA and the other state × GA rate, tax actually paid to the other state on that income [reduced by other-state credits] ). → line 18.",
@@ -869,7 +879,7 @@ GA500_LINES: list[dict] = [
     {"line_number": "5", "description": "Filing status (A Single / B MFJ / C MFS / D HOH-QSS)", "line_type": "input"},
     {"line_number": "7a", "description": "Number of qualified dependents", "line_type": "input"},
     {"line_number": "7b", "description": "Number of unborn dependents", "line_type": "input"},
-    {"line_number": "7c", "description": "Total number of dependents", "line_type": "input"},
+    {"line_number": "7c", "description": "Total number of dependents (7a + 7b — derived; a preparer-saved 7c wins)", "line_type": "calculated"},
     {"line_number": "8", "description": "Federal adjusted gross income (from Federal Form 1040 line 11)", "line_type": "input"},
     {"line_number": "9", "description": "Adjustments from Form 500 Schedule 1", "line_type": "calculated"},
     {"line_number": "10", "description": "Georgia adjusted gross income (net of line 8 and line 9)", "line_type": "calculated"},
@@ -946,8 +956,8 @@ GA500_LINES: list[dict] = [
     # — Military RIE worksheet (Sch 1 p3) —
     {"line_number": "MIL-2", "description": "Military worksheet: base military exclusion ($17,500)", "line_type": "informational"},
     {"line_number": "MIL-3", "description": "Military worksheet: lesser of military retirement or $17,500", "line_type": "calculated"},
-    {"line_number": "MIL-7", "description": "Military worksheet: additional exclusion allowed (≤ $17,500)", "line_type": "calculated"},
-    {"line_number": "MIL-8", "description": "Military worksheet: additional = lesser(L1, L7) → Sch 1 L7b/7e", "line_type": "calculated"},
+    {"line_number": "MIL-7", "description": "Military worksheet: total exclusion cap when the additional unlocks (preprinted $35,000; 0 on the STOP branches)", "line_type": "calculated"},
+    {"line_number": "MIL-8", "description": "Military worksheet: exclusion = lesser(L1, L7), entered ALONE → Sch 1 L7b/7e (STOP branches enter line 3 instead — never L3 + L8)", "line_type": "calculated"},
 
     # — Schedule 3 (PY/NR) —
     {"line_number": "S3-8", "description": "Sch 3: adjusted gross income (Col A / Col C)", "line_type": "calculated"},
@@ -1061,10 +1071,10 @@ GA500_SCENARIOS: list[dict] = [
      "inputs": {"tax_year": 2025, "g_residency_status": "full_year", "g_filing_status": "A", "g_num_dependents": 0, "g_federal_agi": 60000},
      "expected_outputs": {"8": 60000, "9": 0, "10": 60000, "11": 12000, "13": 48000, "14": 0, "15a": 48000, "15b": 0, "15c": 48000, "16": 2491, "22": 0, "23": 2491},
      "notes": "Baseline. 48,000 × 5.19% = 2,491.20 → 2,491."},
-    {"scenario_name": "GA500-T2 — full-year MFJ, standard deduction, 2 dependents (2025)", "scenario_type": "normal", "sort_order": 2,
-     "inputs": {"tax_year": 2025, "g_residency_status": "full_year", "g_filing_status": "B", "g_num_dependents": 2, "g_federal_agi": 100000},
-     "expected_outputs": {"10": 100000, "11": 24000, "13": 76000, "14": 8000, "15a": 68000, "15c": 68000, "16": 3529},
-     "notes": "MFJ std 24,000; 2 deps × 4,000 = 8,000. 68,000 × 5.19% = 3,529.20 → 3,529."},
+    {"scenario_name": "GA500-T2 — full-year MFJ, standard deduction, 2 qualified + 1 unborn dependent (2025)", "scenario_type": "normal", "sort_order": 2,
+     "inputs": {"tax_year": 2025, "g_residency_status": "full_year", "g_filing_status": "B", "g_num_dependents": 2, "g_num_unborn_dependents": 1, "g_federal_agi": 100000},
+     "expected_outputs": {"7c": 3, "10": 100000, "11": 24000, "13": 76000, "14": 12000, "15a": 64000, "15c": 64000, "16": 3322},
+     "notes": "HAND-COMPUTED. 7c DERIVED = 7a 2 + 7b 1 = 3 (s187 amendment); the unborn dependent COUNTS for line 14 (LIFE Act): 3 × 4,000 = 12,000. MFJ std 24,000. 100,000 − 24,000 − 12,000 = 64,000 × 5.19% = 3,321.60 → 3,322."},
     {"scenario_name": "GA500-T3 — retirement income exclusion, age 65+ (2025)", "scenario_type": "normal", "sort_order": 3,
      "inputs": {"tax_year": 2025, "g_residency_status": "full_year", "g_filing_status": "A", "g_num_dependents": 0, "g_federal_agi": 88000,
                 "g_tp_rie_applies": True, "g_tp_age_65_plus": True, "g_tp_rie_salary_wages": 8000, "g_tp_rie_interest": 30000, "g_tp_rie_taxable_pension": 50000},
@@ -1078,8 +1088,8 @@ GA500_SCENARIOS: list[dict] = [
     {"scenario_name": "GA500-T5 — military retirement exclusion, under 62 (2025)", "scenario_type": "normal", "sort_order": 5,
      "inputs": {"tax_year": 2025, "g_residency_status": "full_year", "g_filing_status": "A", "g_num_dependents": 0, "g_federal_agi": 60000,
                 "g_tp_military_under62": True, "g_tp_military_retirement": 40000, "g_tp_military_ga_earned": 20000},
-     "expected_outputs": {"MIL-3": 17500, "MIL-7": 17500, "MIL-8": 17500, "S1-7": 35000, "9": -35000, "10": 25000, "13": 13000, "15c": 13000, "16": 675},
-     "notes": "Base 17,500 + additional 17,500 (GA earned 20,000 ≥ 17,501) = 35,000. 25,000 − 12,000 = 13,000 × 5.19% = 674.70 → 675."},
+     "expected_outputs": {"MIL-3": 17500, "MIL-7": 35000, "MIL-8": 35000, "S1-7": 35000, "9": -35000, "10": 25000, "13": 13000, "15c": 13000, "16": 675},
+     "notes": "RE-PINNED 2026-08-02 (the 7/05 over-exclusion fix): proceed branch → L7 = the preprinted 35,000 cap, L8 = min(40,000, 35,000) = 35,000 entered ALONE (the exclusion total is unchanged here because mret 40,000 ≥ the cap — the midrange scenario T19 is where the fix bites). 25,000 − 12,000 = 13,000 × 5.19% = 674.70 → 675."},
     {"scenario_name": "GA500-T6 — Low Income Credit (2025)", "scenario_type": "edge_case", "sort_order": 6,
      "inputs": {"tax_year": 2025, "g_residency_status": "full_year", "g_filing_status": "A", "g_num_dependents": 0, "g_federal_agi": 18000, "g_lic_not_dependent": True, "g_lic_age65_count": 0},
      "expected_outputs": {"10": 18000, "11": 12000, "13": 6000, "15c": 6000, "16": 311, "17a": 1, "17b": 5, "17c": 5, "22": 5, "23": 306},
@@ -1141,6 +1151,16 @@ GA500_SCENARIOS: list[dict] = [
                 "g_sub_tips_tp": 900, "g_ot_fthourly_tp": True, "g_sub_ot_tp": 600},
      "expected_outputs": {"S1-12a": 900, "S1-12b": 600, "S1-13": 1500, "9": -1500, "10": 48500, "11": 15000, "13": 33500, "15c": 33500, "16": 1672},
      "notes": "HAND-COMPUTED. Under-cap amounts pass through unclipped: 900 + 600 = 1,500. 50,000 − 1,500 = 48,500 − 15,000 = 33,500 × 4.99% = 1,671.65 → 1,672."},
+    {"scenario_name": "GA500-T19 — military retirement midrange ($17,501-$34,999) is NOT over-excluded (2025)", "scenario_type": "edge_case", "sort_order": 19,
+     "inputs": {"tax_year": 2025, "g_residency_status": "full_year", "g_filing_status": "A", "g_num_dependents": 0, "g_federal_agi": 60000,
+                "g_tp_military_under62": True, "g_tp_military_retirement": 20000, "g_tp_military_ga_earned": 20000},
+     "expected_outputs": {"MIL-3": 17500, "MIL-7": 35000, "MIL-8": 20000, "S1-7": 20000, "9": -20000, "10": 40000, "11": 12000, "13": 28000, "15c": 28000, "16": 1453},
+     "notes": "HAND-COMPUTED (the 2026-07-05 over-exclusion fix's proof case). Military retirement 20,000, GA earned 20,000 ≥ 17,501 → proceed: L7 = 35,000, L8 = min(20,000, 35,000) = 20,000 excluded — the exclusion equals the retirement RECEIVED, never L3 + L8 = 37,500→35,000 as the buggy formula gave. 60,000 − 20,000 = 40,000 − 12,000 = 28,000 × 5.19% = 1,453.20 → 1,453 (the pre-fix formula gave tax 675)."},
+    {"scenario_name": "GA500-T20 — LIC counts children only: HOH with an ODC brother dependent (2025)", "scenario_type": "edge_case", "sort_order": 20,
+     "inputs": {"tax_year": 2025, "g_residency_status": "full_year", "g_filing_status": "D", "g_num_dependents": 1, "g_lic_children": 0,
+                "g_federal_agi": 18000, "g_lic_not_dependent": True, "g_lic_age65_count": 0},
+     "expected_outputs": {"7c": 1, "10": 18000, "11": 12000, "13": 6000, "14": 4000, "15a": 2000, "15c": 2000, "16": 104, "17a": 1, "17b": 5, "17c": 5, "22": 5, "23": 99},
+     "notes": "HAND-COMPUTED (the batch-002 BARROW shape, Ken ruling s182). One qualified dependent who is a BROTHER: he earns the line-14 exemption (7c = 1 → 4,000) but is NOT a natural/adopted child, so g_lic_children = 0 and L17a = self only = 1 (the old all-7c count gave 2 → a $10 credit vs the filed $5). Tax 2,000 × 5.19% = 103.80 → 104; LIC 1 × $5 = 5; balance 99."},
 ]
 
 

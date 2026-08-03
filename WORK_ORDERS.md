@@ -66,6 +66,36 @@ Statuses: `INTAKE → GAP-CHECKED → DRAFTING → ⏳ AWAITING KEN → APPROVED
 *No independent backlog here (see header). Sequence = BUILD_ORDER.md SPINE; statuses seeded
 from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 
+> **[WO-GA500-RECON] Ken (2026-08-02, "GA 500 spec next") · GA-500 spec reconciliation ·
+> ⏳ AWAITING KEN (Gate 1) · scope: bring the seeded GA-500 spec up to the season's three
+> Ken-ruled engine corrections it drifted behind — NO new law, every change implements a
+> ruling already live in the tts engine:**
+> **① R-GA500-MIL** — the 2026-07-05 military over-exclusion fix finally applied RS-side
+> (the handoff `tts docs/rs_handoff/2026-07-05_ga500_military_exclusion_fix.md` was never
+> executed): worksheet L7 = the preprinted $35,000 cap, L8 = min(retirement, L7) entered
+> ALONE (never L3+L8); the mis-transcribed authority excerpt corrected; scenario T5
+> re-pinned + NEW T19 (midrange $20k retirement → $20k excluded, tax 1,453 vs the buggy 675).
+> **② Line 7c derived** (tts s176): 7c = 7a + 7b, preparer-saved 7c wins; `g_num_dependents`
+> repointed to 7a (its old note contradicted itself), `g_num_unborn_dependents` joins
+> R-GA500-L14-DEP's inputs (unborn COUNT for line 14 — LIFE Act); T2 re-pinned with an
+> unborn dependent (7c 3 → L14 12,000 → tax 3,322).
+> **③ R-GA500-LIC** (Ken ruling s182, batch-002 BARROW): exemptions = IT-511 p35 VERBATIM
+> "self, spouse and natural or legally adopted children" + age-65 count — NEW fact
+> `g_lic_children` (the app's derived LIC-CHILD) replaces the all-7c count; the wrong
+> excerpt paraphrase corrected at the source; NEW T20 (HOH + ODC brother: L14 4,000 but
+> 17a = 1, credit $5 not $10). **Plus one DEFAULT DECISION for Ken:** `g_lic_not_dependent`
+> default flipped true → false — the engine gates the whole credit on the explicit
+> LIC-NODEP assertion (batch-005 LOGGANS), and a default-granted eligibility is a silent
+> credit. **Gate `check_ga500_integrity.py` ALL CHECKS PASS — 20 scenarios** (loader and
+> gate share no math). NOT re-seeded / NOT re-exported — awaiting Ken's Gate-1 approval;
+> then: re-seed RS DB → re-export canonical `tts server/specs/500_spec.json` (id-level
+> diff: only R-GA500-MIL / R-GA500-L14-DEP / R-GA500-LIC + the two facts + the two
+> excerpts) → verify the tts pure-scenario suite stays green. Out of scope (priced
+> separately as the follow-on "August GA build unit"): the UET worksheet computation
+> (line 42, currently direct-entry by design) and the S4-8/S4-NB-18
+> seeded-computed-but-never-written NOL lines; TY2026 military full exemption (SB 31)
+> stays the standing loader W-item.**
+
 > **⟨GATE-1⟩ APPROVED + SEEDED — 2026-07-27 (tts s124): Form 4562 `D_4562_RECON`
 > amended for the §179 business-income limitation. State: DONE.**
 > Defect intake was a DEFECT, not a law change — the tts s124 test-settlement pass
