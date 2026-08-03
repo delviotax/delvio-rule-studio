@@ -67,7 +67,13 @@ Statuses: `INTAKE → GAP-CHECKED → DRAFTING → ⏳ AWAITING KEN → APPROVED
 from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 
 > **[WO-GA500-RECON] Ken (2026-08-02, "GA 500 spec next") · GA-500 spec reconciliation ·
-> ⏳ AWAITING KEN (Gate 1) · scope: bring the seeded GA-500 spec up to the season's three
+> ✅ DONE — Gate 1 APPROVED by Ken in-session 2026-08-02 ("Approve as drafted", incl. the
+> g_lic_not_dependent default flip) → re-seeded (84 facts / 23 rules / 91 lines / 17 diag /
+> 20 scenarios; the stale renamed-T2 orphan deleted — the 6-25 renamed-T11 precedent) →
+> re-exported canonical `tts server/specs/500_spec.json` → id-level diff EXACTLY the
+> intended set → tts GA-500 band 596 green. No app build to dispatch (the engine already
+> implements all three rulings — this order reconciled the spec TO the engine). ·
+> original scope: bring the seeded GA-500 spec up to the season's three
 > Ken-ruled engine corrections it drifted behind — NO new law, every change implements a
 > ruling already live in the tts engine:**
 > **① R-GA500-MIL** — the 2026-07-05 military over-exclusion fix finally applied RS-side

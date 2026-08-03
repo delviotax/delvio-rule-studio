@@ -1,4 +1,16 @@
-## 2026-08-02 - GA-500 spec reconciliation DRAFTED (delvio s187) - gate ALL PASS, AWAITING KEN (Gate 1)
+## 2026-08-02 - GA-500 spec reconciliation SEEDED + EXPORTED (delvio s187) - Gate 1 APPROVED, DONE
+- KEN APPROVED IN-SESSION (AskUserQuestion: "Approve as drafted", including the
+  g_lic_not_dependent default flip). Re-seeded (84 facts / 23 rules / 91 lines / 17 diag /
+  20 scenarios). The renamed T2 left a stale old-name orphan in the DB (the 6-25
+  renamed-T11 precedent) - deleted via shell, re-exported. Id-level diff of the canonical
+  tts 500_spec.json = EXACTLY the intended set (facts +g_lic_children, 3 fact edits, rules
+  MIL/L14-DEP/LIC/S3, lines 7c/MIL-7/MIL-8, tests T2 renamed + T5 re-pin + T19/T20 new,
+  diagnostics untouched). tts verification: GA-500 compute leg 30 green + the full GA-500
+  band incl. render/diagnostics/pulls + flow assertions = 596 green against the new export.
+  tts REVIEW_QUEUE s176 RS-sync item closed; the 7/05 military handoff doc marked DONE.
+  No app build to dispatch - the engine already implements all three rulings.
+
+## (drafting record, same day, superseded by the above)
 - INTAKE: Ken ("GA 500 spec next") after the s187 correction that the GA-500 spec EXISTS
   (authored/seeded/exported 6-25, W7 tips/OT 7-02) but drifted behind three Ken-ruled engine
   corrections. NO new law authored - every change implements a ruling already live in the
