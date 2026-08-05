@@ -18,9 +18,16 @@
   **CR-2026-001 — f6252.pdf changed on irs.gov vs the July manifest sha** — digest renders it above
   the line with blast radius "5 authored rules (R-6252-*)" + admin triage link. The pipeline's
   success criterion demonstrated on day one.
-- **KEN ACTIONS**: (1) Render dashboard — confirm blueprint created cron `sherpa-rs-change-digest`;
-  set RESEND_API_KEY on it (optional DIGEST_EMAIL_TO/FROM, RS_BASE_URL, PUSHOVER_*). Poll cron is
-  now daily. First digest email lands Friday 2026-08-07 if the key is set. (2) Triage CR-2026-001
+- **RENDER REALITY CHECK (later same session)**: the service list showed **NO rule-studio crons
+  existed at all** — render.yaml was never blueprint-synced (all services built manually), so the
+  "Mondays 12:00" poll had never run. Created BOTH crons via the Render API (feeds
+  crn-d9pohfl3erlc7399ijig daily 11:00 UTC; digest crn-d9pohg6417fc73c16bh0 Fridays 13:00 UTC
+  with RESEND_API_KEY + DATABASE_URL copied from the web service) — both built LIVE. ⚠ Render is
+  NOT blueprint-synced: future render.yaml changes must be applied via dashboard/API, not assumed.
+  **First digest email SENT + delivered** to ken@delviotax.com after fixing Cloudflare 403 error
+  1010 (urllib's default User-Agent is blocked — emailer sends its own now, `49ee486`). Repo
+  transferred klill6506 → **delviotax org**; Render followed automatically; local remote updated.
+- **KEN ACTIONS**: (1) ~~Render cron setup~~ DONE in-session via API. (2) Triage CR-2026-001
   (likely a routine IRS PDF refresh — but the 5 rules + delvio-tax field map need the diff checked;
   delvio-tax's own manifest sha is now stale for f6252 → update_irs_forms path). (3) Open decisions
   from the plan: editorial subscription (Parker recommended), Lacerte cross-check formality.

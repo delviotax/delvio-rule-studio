@@ -19,10 +19,17 @@ courts) poll DAILY (cron 11:00 UTC); the **Friday digest cron** (13:00 UTC) emai
 view — ranked items, inline blast radius, aging, arm health — via Resend from rules@delviotax.com.
 Suite 211 green. **Checksum watch seeded from delvio-tax's forms_manifest (63 bound / 34 unmatched
 reported) and the first real detection opened: CR-2026-001, f6252.pdf changed on irs.gov —
-awaiting Ken triage.** KEN: set RESEND_API_KEY on the new `sherpa-rs-change-digest` Render cron
-(confirm blueprint created it); triage CR-2026-001; plan's open decisions = editorial
-subscription + Lacerte-gate formality. Everything automated stops at DETECTED — Gates 1/2
-untouched. Detail: session_log 2026-08-05.
+awaiting Ken triage.** LATER SAME SESSION: **discovered Render had NO rule-studio crons at all**
+(render.yaml was aspirational — the services were built manually, never blueprint-synced; the
+"Mondays 12:00" poll never existed). **Both crons CREATED via the Render API and verified live**:
+`sherpa-rs-change-feeds` (crn-d9pohfl3erlc7399ijig, daily 11:00 UTC) and `sherpa-rs-change-digest`
+(crn-d9pohg6417fc73c16bh0, Fridays 13:00 UTC, RESEND_API_KEY set). **First digest email SENT and
+delivered to ken@delviotax.com** after fixing a live 403: Resend sits behind Cloudflare, which
+blocks urllib's default User-Agent (error 1010) — emailer now sends its own UA (`49ee486`).
+Repo also transferred to the org: **github.com/delviotax/delvio-rule-studio**; Render followed
+the transfer automatically. KEN remaining: triage CR-2026-001; rules.delviotax.com custom
+domain; plan's open decisions = editorial subscription + Lacerte-gate formality. Everything
+automated stops at DETECTED — Gates 1/2 untouched. Detail: session_log 2026-08-05.
 
 **2026-07-25 — FORM_5695 AMENDED TO **v2**, THE "LIGHT 2025 FACE" (tts s110).**
 Ken's scope call, live, verbatim: *"I think this form goes away for 2026 so you can do a light version.
