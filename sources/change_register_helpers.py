@@ -51,6 +51,9 @@ def open_detected(
     published_date=None,
     tax_year: int | None = None,
     affected_forms=None,
+    authority_source=None,
+    authority_version=None,
+    feed=None,
     dry_run: bool = False,
 ) -> OpenResult:
     """Score an item and open it as DETECTED — the one path every automated arm uses.
@@ -100,6 +103,9 @@ def open_detected(
                     relevance_score=score_val,
                     relevance_signals=signals,
                     affected_forms=list(affected_forms or []),
+                    authority_source=authority_source,
+                    authority_version=authority_version,
+                    feed=feed,
                 )
             return OpenResult(created=True, score=score_val, signals=signals, change_code=code, item=item)
         except IntegrityError:

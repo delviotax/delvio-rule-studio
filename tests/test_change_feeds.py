@@ -248,8 +248,14 @@ class TestPollChangeFeeds:
         monkeypatch.setattr(ix, "fetch_index", boom)
         monkeypatch.setattr(
             "sources.management.commands.fetch_federal_register._http_get_json", boom)
+        import sources.management.commands.fetch_court_opinions as court
+        import sources.management.commands.fetch_irs_form_checksums as chk
+        monkeypatch.setattr(court, "_http_get_json", boom)
+        monkeypatch.setattr(chk, "_http_head", boom)
+        # chk is skipped rather than boomed: with zero watched URLs it succeeds without any
+        # network, which is correct behavior — an empty watch list is not an outage.
         with pytest.raises(CommandError):
-            run("poll_change_feeds")
+            run("poll_change_feeds", no_chk=True)
 
     def test_only_runs_a_single_arm(self, ecfr_net, drop_net):
         run("poll_change_feeds", only="drop")

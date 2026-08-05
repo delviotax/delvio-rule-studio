@@ -16,6 +16,9 @@ Arms (each gets a generated --no-<key> flag):
                                   `drop` gets the same items weeks earlier and item-by-item.
   ecfr  fetch_ecfr_title26      — 26 CFR section-level amendments
   drop  fetch_irs_drop          — individual Rev. Procs / Notices / Rev. Ruls / Announcements
+  dft   fetch_irs_drafts        — draft forms/instructions, exact perimeter filter (Phase 3)
+  chk   fetch_irs_form_checksums— final-form PDF checksum watch, HEAD-first (Phase 3)
+  court fetch_court_opinions    — Tax Court / 11th Cir. / 4th Cir. / SCOTUS via CourtListener (Phase 3)
 
 Usage:
   manage.py poll_change_feeds                      # all arms, scheduler defaults
@@ -54,6 +57,12 @@ ARMS = (
         lambda o: {"lookback_days": o["ecfr_lookback_days"], "dry_run": o["dry_run"]}),
     Arm("drop", "fetch_irs_drop",
         lambda o: {"pages": o["drop_pages"], "no_text": o["drop_no_text"], "dry_run": o["dry_run"]}),
+    Arm("dft", "fetch_irs_drafts",
+        lambda o: {"pages": o["dft_pages"], "dry_run": o["dry_run"]}),
+    Arm("chk", "fetch_irs_form_checksums",
+        lambda o: {"dry_run": o["dry_run"]}),
+    Arm("court", "fetch_court_opinions",
+        lambda o: {"days": o["court_days"], "dry_run": o["dry_run"]}),
 )
 
 
@@ -86,6 +95,10 @@ class Command(BaseCommand):
                             help="irs-drop listing pages, 50 rows each (default 1).")
         parser.add_argument("--drop-no-text", action="store_true",
                             help="irs-drop: skip PDF downloads (fast; everything scores unscoreable).")
+        parser.add_argument("--dft-pages", type=int, default=1,
+                            help="irs-dft listing pages, 50 rows each (default 1).")
+        parser.add_argument("--court-days", type=int, default=10,
+                            help="Court-opinion lookback for the daily poll (default 10; overlap is dedup'd).")
         parser.add_argument("--only", help="Run exactly one arm by key: " + ", ".join(a.key for a in ARMS))
         parser.add_argument("--dry-run", action="store_true", help="Run every arm; open nothing.")
         for arm in ARMS:

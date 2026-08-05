@@ -132,6 +132,41 @@ ECFR_VERSIONS_JSON = {
 }
 
 
+# ── CourtListener v4 search, response-shaped per the documented v4 search schema ──
+# (Search endpoint verified 200 unauthenticated 2026-08-05; /opinions/ 401s.)
+CL_SEARCH_TAX_JSON = {
+    "count": 3,
+    "next": None,
+    "previous": None,
+    "results": [
+        {"cluster_id": 9911001, "caseName": "Smith v. Commissioner of Internal Revenue",
+         "court": "United States Tax Court", "court_id": "tax", "dateFiled": "2026-07-28",
+         "snippet": "…the section 179 deduction claimed on Form 4562 for the passenger automobile…",
+         "absolute_url": "/opinion/9911001/smith-v-commissioner/"},
+        {"cluster_id": 9911002, "caseName": "Estate of Doe v. Commissioner",
+         "court": "United States Tax Court", "court_id": "tax", "dateFiled": "2026-07-21",
+         "snippet": "…valuation of closely held stock for estate tax purposes…",
+         "absolute_url": "/opinion/9911002/estate-of-doe-v-commissioner/"},
+        # A row missing its cluster_id — must be counted unusable, not crash the arm.
+        {"caseName": "Malformed Row v. Commissioner", "dateFiled": "2026-07-20",
+         "snippet": "", "absolute_url": ""},
+    ],
+}
+
+CL_SEARCH_CA11_JSON = {
+    "count": 1,
+    "next": None,
+    "previous": None,
+    "results": [
+        {"cluster_id": 9922001, "caseName": "United States v. Jones",
+         "court": "Court of Appeals for the Eleventh Circuit", "court_id": "ca11",
+         "dateFiled": "2026-07-30",
+         "snippet": "…conviction under 26 U.S.C. § 7201 for evasion of the qualified business income…",
+         "absolute_url": "/opinion/9922001/us-v-jones/"},
+    ],
+}
+
+
 # ── A real excerpt of extracted rp-26-28 text ─────────────────────────────
 # Verbatim output of pdf_text.extract_text() on the live PDF, 2026-08-05. Kern-split exactly as
 # the extractor produces it. This is the canonical "scores LOW" relevance case: exempt

@@ -25,8 +25,9 @@ services:
       - key: NODE_VERSION
         value: "22"
 
-  # Change-register scheduler — polls the automated FEED_POLL detectors (Federal Register + IRB)
-  # weekly and opens DETECTED items. Only fills the register; the gates are untouched.
+  # Change-register scheduler — runs every automated FEED_POLL detector arm DAILY and opens
+  # DETECTED items (drafts post ~6/day in season; weekly was too slow — Phase 2 split, 2026-08-05).
+  # Only fills the register; the gates are untouched.
   # DATABASE_URL must match the web service's (same Supabase project). Optional: set
   # PUSHOVER_TOKEN + PUSHOVER_USER to get a ping when new items are opened.
   - type: cron
@@ -34,7 +35,7 @@ services:
     runtime: python
     region: virginia
     plan: starter
-    schedule: "0 12 * * 1"  # Mondays 12:00 UTC (IRB publishes weekly; FR uses an 8-day overlap)
+    schedule: "0 11 * * *"  # daily 11:00 UTC (7am ET); arms overlap their lookbacks, dedup absorbs it
     buildCommand: pip install -r requirements.txt  # no frontend build needed for the cron
     startCommand: python manage.py poll_change_feeds
     envVars:
@@ -43,6 +44,35 @@ services:
       - key: PYTHON_VERSION
         value: "3.13.2"
       # Optional notification (leave unset to skip the ping):
+      - key: PUSHOVER_TOKEN
+        sync: false
+      - key: PUSHOVER_USER
+        sync: false
+
+  # Friday digest — renders the week's register into the triage email (read-only; Phase 2).
+  # RESEND_API_KEY comes from Ken's Resend account (delviotax.com is the verified domain);
+  # DIGEST_EMAIL_TO defaults to ken@delviotax.com in code, override here if needed.
+  - type: cron
+    name: sherpa-rs-change-digest
+    runtime: python
+    region: virginia
+    plan: starter
+    schedule: "0 13 * * 5"  # Fridays 13:00 UTC (9am ET) — matches the policy doc's triage slot
+    buildCommand: pip install -r requirements.txt
+    startCommand: python manage.py change_digest --since-days 7 --email
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: PYTHON_VERSION
+        value: "3.13.2"
+      - key: RESEND_API_KEY
+        sync: false
+      - key: DIGEST_EMAIL_TO
+        sync: false
+      - key: DIGEST_EMAIL_FROM
+        sync: false
+      - key: RS_BASE_URL
+        sync: false
       - key: PUSHOVER_TOKEN
         sync: false
       - key: PUSHOVER_USER

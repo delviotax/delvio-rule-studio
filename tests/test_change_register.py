@@ -383,7 +383,8 @@ class TestPollChangeFeeds:
     """
 
     # Keeps this class pinned to the two arms it was written for.
-    ONLY_ORIGINAL = ("--no-ecfr", "--no-drop")
+    # (Extended 2026-08-05 with the Phase-3 arms: dft/chk/court.)
+    ONLY_ORIGINAL = ("--no-ecfr", "--no-drop", "--no-dft", "--no-chk", "--no-court")
 
     def _patch_both(self, monkeypatch, fr_docs=("2026-100",), irb_nums=("2026-28",)):
         monkeypatch.setattr(fr, "_http_get_json",
@@ -395,13 +396,17 @@ class TestPollChangeFeeds:
     def _forbid_network(monkeypatch):
         """Belt-and-braces: if a skip flag is ever dropped, fail loudly instead of hitting irs.gov."""
         import sources.irs_directory as _ix
+        import sources.management.commands.fetch_court_opinions as _court
         import sources.management.commands.fetch_ecfr_title26 as _ecfr
+        import sources.management.commands.fetch_irs_form_checksums as _chk
 
         def _no_net(*a, **k):
             raise AssertionError("test attempted a real network call")
 
         monkeypatch.setattr(_ecfr, "_http_get_json", _no_net)
         monkeypatch.setattr(_ix, "fetch_index", _no_net)
+        monkeypatch.setattr(_chk, "_http_head", _no_net)
+        monkeypatch.setattr(_court, "_http_get_json", _no_net)
 
     def test_runs_both_arms(self, db, monkeypatch):
         self._patch_both(monkeypatch, fr_docs=["2026-100", "2026-101"], irb_nums=["2026-28"])
