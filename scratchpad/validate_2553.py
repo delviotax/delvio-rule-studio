@@ -11,7 +11,7 @@ import os
 import sys
 from datetime import date
 
-PROJECT_ROOT = r"D:\dev\sherpa-tax-rule-studio"
+PROJECT_ROOT = r"D:\dev\delvio-rule-studio"
 sys.path.insert(0, PROJECT_ROOT)
 
 SQLITE_PATH = os.path.join(PROJECT_ROOT, "scratchpad", "validate_2553.sqlite3")

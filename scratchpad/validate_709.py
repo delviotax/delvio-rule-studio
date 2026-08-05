@@ -8,7 +8,7 @@ ASCII-only. Run: poetry run python scratchpad/validate_709.py
 import os
 import sys
 
-PROJECT_ROOT = r"D:\dev\sherpa-tax-rule-studio"
+PROJECT_ROOT = r"D:\dev\delvio-rule-studio"
 sys.path.insert(0, PROJECT_ROOT)
 
 SQLITE_PATH = os.path.join(PROJECT_ROOT, "scratchpad", "validate_709.sqlite3")

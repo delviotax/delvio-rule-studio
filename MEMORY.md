@@ -1,10 +1,16 @@
 ---
 type: project-memory
-project: sherpa-tax-rule-studio
-last_updated: 2026-07-06
+project: delvio-rule-studio
+last_updated: 2026-08-05
 ---
 
-# MEMORY — sherpa-tax-rule-studio
+# MEMORY — delvio-rule-studio (formerly sherpa-tax-rule-studio, renamed 2026-08-05)
+
+**⚠ Post-rename facts (2026-08-05):** local path is now `D:\dev\delvio-rule-studio`;
+GitHub is `klill6506/delvio-rule-studio` (old URL redirects). The Poetry venv keyed to
+the old path (`sherpa-tax-rule-studio-r4Fx4aS5-...`) is ORPHANED — run `poetry install`
+fresh on next local work. Render service name + onrender URL are UNCHANGED
+(sherpa-tax-rule-studio.onrender.com) until the rules.delviotax.com custom domain lands.
 
 *Standing facts, preferences, and accumulated context. Long-lived — not "what I did yesterday" (that's STATUS.md). Update when you learn something worth keeping.*
 

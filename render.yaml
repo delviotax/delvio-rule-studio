@@ -1,5 +1,8 @@
 services:
   - type: web
+    # Service name deliberately NOT renamed to delvio-rule-studio: changing it would make
+    # Render's blueprint sync create a brand-new service (new DB conn, new URL, cold start).
+    # Repo/folder renamed 2026-08-05; the URL fix is the rules.delviotax.com custom domain.
     name: sherpa-tax-rule-studio
     runtime: python
     region: virginia

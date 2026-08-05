@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "sherpa-tax-rule-studio"
+name = "delvio-rule-studio"
 version = "0.1.0"
 description = "Tax law specification engine for authoring structured, machine-readable rule packages"
 authors = ["Ken"]

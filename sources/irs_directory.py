@@ -32,7 +32,7 @@ import urllib.request
 from dataclasses import dataclass
 
 BASE = "https://www.irs.gov/downloads"
-USER_AGENT = "Mozilla/5.0 (compatible; sherpa-tax-rule-studio change-register; +https://kenlill.com)"
+USER_AGENT = "Mozilla/5.0 (compatible; delvio-rule-studio change-register; +https://kenlill.com)"
 
 DROP = "irs-drop"
 DFT = "irs-dft"

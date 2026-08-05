@@ -7,7 +7,7 @@ Checks CharField caps; every rule >= 1 authority link; rule_link coverage; arith
 import os
 import sys
 
-PROJECT_ROOT = r"D:\dev\sherpa-tax-rule-studio"
+PROJECT_ROOT = r"D:\dev\delvio-rule-studio"
 sys.path.insert(0, PROJECT_ROOT)
 
 SQLITE_PATH = os.path.join(PROJECT_ROOT, "scratchpad", "validate_4684.sqlite3")

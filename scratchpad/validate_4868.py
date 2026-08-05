@@ -12,7 +12,7 @@ present in the spec text. ASCII-only. Run: <RS venv python> scratchpad/validate_
 import os
 import sys
 
-PROJECT_ROOT = r"D:\dev\sherpa-tax-rule-studio"
+PROJECT_ROOT = r"D:\dev\delvio-rule-studio"
 sys.path.insert(0, PROJECT_ROOT)
 
 SQLITE_PATH = os.path.join(PROJECT_ROOT, "scratchpad", "validate_4868.sqlite3")

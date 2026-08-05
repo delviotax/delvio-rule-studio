@@ -1,10 +1,10 @@
 ---
 type: project-status
-project: sherpa-tax-rule-studio
-last_updated: 2026-07-25
+project: delvio-rule-studio
+last_updated: 2026-08-05
 ---
 
-# STATUS — sherpa-tax-rule-studio
+# STATUS — delvio-rule-studio (renamed from sherpa-tax-rule-studio 2026-08-05; GitHub + local folder renamed, Render service name unchanged — see render.yaml note)
 
 *The freshest file. Answers "where am I on this project?" Updated at the end of every substantive session.*
 

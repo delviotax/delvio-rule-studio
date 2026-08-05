@@ -1,10 +1,10 @@
 ---
 type: project-decisions
-project: sherpa-tax-rule-studio
-last_updated: 2026-07-04
+project: delvio-rule-studio
+last_updated: 2026-08-05
 ---
 
-# DECISIONS — sherpa-tax-rule-studio
+# DECISIONS — delvio-rule-studio (formerly sherpa-tax-rule-studio, renamed 2026-08-05)
 
 *Architectural and scope choices. Append-only log. Each entry is a decision that shouldn't be re-litigated without new information. If you find yourself reopening a decision, either add a new entry that overrides the old (and say why) or leave both so the history is visible.*
 
