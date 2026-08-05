@@ -88,6 +88,50 @@ def dft_page(rows=None):
     return page("irs-dft", DFT_ROWS if rows is None else rows)
 
 
+# ── eCFR versioner API, captured verbatim 2026-08-05 ──────────────────────
+ECFR_TITLES_JSON = {
+    "titles": [
+        {"number": 25, "name": "Indians", "latest_amended_on": "2026-07-30",
+         "latest_issue_date": "2026-07-30", "up_to_date_as_of": "2026-08-03", "reserved": False},
+        {"number": 26, "name": "Internal Revenue", "latest_amended_on": "2026-08-03",
+         "latest_issue_date": "2026-08-03", "up_to_date_as_of": "2026-08-03", "reserved": False},
+    ]
+}
+
+# `1.0-1` is THE regression case: a recent issue_date carrying a 2016 amendment_date.
+# Filtering on issue_date would report a ten-year-old amendment as this year's news.
+ECFR_VERSIONS_JSON = {
+    "content_versions": [
+        {"date": "2016-12-19", "amendment_date": "2016-12-19", "issue_date": "2026-04-03",
+         "identifier": "1.0-1", "name": "§ 1.0-1   Internal Revenue Code of 1954 and regulations.",
+         "part": "1", "substantive": False, "removed": False, "subpart": None,
+         "title": "26", "type": "section"},
+        {"date": "2026-07-09", "amendment_date": "2026-07-09", "issue_date": "2026-07-09",
+         "identifier": "1.101-1",
+         "name": "§ 1.101-1   Exclusion from gross income of proceeds of life insurance contracts.",
+         "part": "1", "substantive": True, "removed": False, "subpart": None,
+         "title": "26", "type": "section"},
+        {"date": "2026-07-24", "amendment_date": "2026-07-24", "issue_date": "2026-07-24",
+         "identifier": "20.2056A-2", "name": "§ 20.2056A-2   Requirements for qualified domestic trust.",
+         "part": "20", "substantive": True, "removed": False, "subpart": None,
+         "title": "26", "type": "section"},
+        {"date": "2026-07-30", "amendment_date": "2026-07-30", "issue_date": "2026-07-30",
+         "identifier": "301.7701-3", "name": "§ 301.7701-3   Classification of certain business entities.",
+         "part": "301", "substantive": True, "removed": False, "subpart": None,
+         "title": "26", "type": "section"},
+        {"date": "2026-08-03", "amendment_date": "2026-08-03", "issue_date": "2026-08-03",
+         "identifier": "1.199A-3", "name": "§ 1.199A-3   Qualified business income.",
+         "part": "1", "substantive": True, "removed": False, "subpart": None,
+         "title": "26", "type": "section"},
+        {"date": "2026-08-03", "amendment_date": "2026-08-03", "issue_date": "2026-08-03",
+         "identifier": "1.9999-9", "name": "§ 1.9999-9   Obsolete provision.",
+         "part": "1", "substantive": False, "removed": True, "subpart": None,
+         "title": "26", "type": "section"},
+    ],
+    "meta": {"title": "26"},
+}
+
+
 # ── A real excerpt of extracted rp-26-28 text ─────────────────────────────
 # Verbatim output of pdf_text.extract_text() on the live PDF, 2026-08-05. Kern-split exactly as
 # the extractor produces it. This is the canonical "scores LOW" relevance case: exempt

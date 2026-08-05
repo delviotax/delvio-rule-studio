@@ -374,14 +374,38 @@ class TestFetchIrb:
 
 @pytest.mark.django_db
 class TestPollChangeFeeds:
+    """Covers the FR + IRB interplay specifically.
+
+    poll_change_feeds grew from 2 arms to 4 on 2026-08-05. These tests keep their original
+    scope by skipping the newer arms explicitly (`ONLY_ORIGINAL`), so the arm-count assertions
+    still mean what they meant. The eCFR and irs-drop arms, and the registry mechanics that
+    generate the --no-<key> flags, are covered in tests/test_change_feeds.py.
+    """
+
+    # Keeps this class pinned to the two arms it was written for.
+    ONLY_ORIGINAL = ("--no-ecfr", "--no-drop")
+
     def _patch_both(self, monkeypatch, fr_docs=("2026-100",), irb_nums=("2026-28",)):
         monkeypatch.setattr(fr, "_http_get_json",
                             lambda url: {"results": [_fr_doc(n) for n in fr_docs], "next_page_url": None})
         monkeypatch.setattr(irb, "_http_get_text", lambda url: _irb_html(list(irb_nums)))
+        self._forbid_network(monkeypatch)
+
+    @staticmethod
+    def _forbid_network(monkeypatch):
+        """Belt-and-braces: if a skip flag is ever dropped, fail loudly instead of hitting irs.gov."""
+        import sources.irs_directory as _ix
+        import sources.management.commands.fetch_ecfr_title26 as _ecfr
+
+        def _no_net(*a, **k):
+            raise AssertionError("test attempted a real network call")
+
+        monkeypatch.setattr(_ecfr, "_http_get_json", _no_net)
+        monkeypatch.setattr(_ix, "fetch_index", _no_net)
 
     def test_runs_both_arms(self, db, monkeypatch):
         self._patch_both(monkeypatch, fr_docs=["2026-100", "2026-101"], irb_nums=["2026-28"])
-        out = run("poll_change_feeds")
+        out = run("poll_change_feeds", *self.ONLY_ORIGINAL)
         assert ChangeRegisterItem.objects.filter(external_ref="2026-100").exists()
         assert ChangeRegisterItem.objects.filter(external_ref="IRB-2026-28").exists()
         assert "3 new item(s) opened" in out
@@ -392,7 +416,8 @@ class TestPollChangeFeeds:
         monkeypatch.setattr(fr, "_http_get_json",
                             lambda url: (_ for _ in ()).throw(urllib.error.URLError("down")))
         monkeypatch.setattr(irb, "_http_get_text", lambda url: _irb_html(["2026-28"]))
-        out = run("poll_change_feeds")  # must NOT raise — IRB still succeeds
+        self._forbid_network(monkeypatch)
+        out = run("poll_change_feeds", *self.ONLY_ORIGINAL)  # must NOT raise — IRB still succeeds
         assert ChangeRegisterItem.objects.filter(external_ref="IRB-2026-28").exists()
         assert "ERR fetch_federal_register" in out
         assert "1/2 arms ok" in out
@@ -403,18 +428,19 @@ class TestPollChangeFeeds:
                             lambda url: (_ for _ in ()).throw(urllib.error.URLError("down")))
         monkeypatch.setattr(irb, "_http_get_text",
                             lambda url: (_ for _ in ()).throw(urllib.error.URLError("down")))
+        self._forbid_network(monkeypatch)
         with pytest.raises(CommandError):
-            run("poll_change_feeds")
+            run("poll_change_feeds", *self.ONLY_ORIGINAL)
 
     def test_dry_run_opens_nothing(self, db, monkeypatch):
         self._patch_both(monkeypatch)
-        out = run("poll_change_feeds", "--dry-run")
+        out = run("poll_change_feeds", "--dry-run", *self.ONLY_ORIGINAL)
         assert ChangeRegisterItem.objects.count() == 0
         assert "dry-run" in out
 
     def test_no_fr_skips_arm(self, db, monkeypatch):
         self._patch_both(monkeypatch)
-        run("poll_change_feeds", "--no-fr")
+        run("poll_change_feeds", "--no-fr", *self.ONLY_ORIGINAL)
         assert not ChangeRegisterItem.objects.filter(detected_via=ChangeDetectionSource.FEED_POLL, external_ref="2026-100").exists()
         assert ChangeRegisterItem.objects.filter(external_ref="IRB-2026-28").exists()
 
