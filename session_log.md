@@ -1,3 +1,34 @@
+## 2026-08-05 - CHANGE FUNNEL COMPLETE (Phases 0-3 deployed) + repo renamed delvio-rule-studio
+- Built from the 2026-08-04/05 funnel plan (`~\.claude\plans\i-ve-created-this-session-cozy-widget.md`),
+  Ken-directed "finish Phase 2 and 3". Phases 0+1 were the prior night's commits (pushed today,
+  migration applied on deploy). Phase 2: `sources/digest.py` + `change_digest` command (above/below
+  line, aging >14d, arm health w/ zero-row + stale flags, INLINE blast radius per item) + Resend
+  email (`sources/emailer.py`; verified domain delviotax.com, from rules@ to ken@delviotax.com) +
+  render.yaml cron split (poll DAILY 11:00 UTC; NEW `sherpa-rs-change-digest` cron Fridays 13:00 UTC).
+  Phase 3: `fetch_irs_drafts` (exact perimeter filter — the one allowed filtering arm, drops logged;
+  dedup filename@posted_date so a re-post = second item), `fetch_irs_form_checksums` (HEAD-first;
+  null checksum = baseline + NOTHING opened; --seed-manifest matches delvio-tax forms_manifest on
+  official_url), `fetch_court_opinions` (CourtListener v4 SEARCH only; tax unfiltered, ca11/ca4/
+  scotus filtered SERVER-side so nothing fetched is suppressed). Registry = 7 arms. Tests: 44 new,
+  legacy poll tests pinned to the enlarged registry, full suite 211 green (roaming full-run setup
+  errors were test_postgres session contention — each test green standalone AND in the final clean
+  full run). Deploy `4ef60cb`.
+- **SEEDED + FIRST REAL DETECTION**: manifest seed bound 63 of 97 entries (34 unmatched REPORTED —
+  RS authority rows missing or different official_url; future authoring pass). First live sweep:
+  **CR-2026-001 — f6252.pdf changed on irs.gov vs the July manifest sha** — digest renders it above
+  the line with blast radius "5 authored rules (R-6252-*)" + admin triage link. The pipeline's
+  success criterion demonstrated on day one.
+- **KEN ACTIONS**: (1) Render dashboard — confirm blueprint created cron `sherpa-rs-change-digest`;
+  set RESEND_API_KEY on it (optional DIGEST_EMAIL_TO/FROM, RS_BASE_URL, PUSHOVER_*). Poll cron is
+  now daily. First digest email lands Friday 2026-08-07 if the key is set. (2) Triage CR-2026-001
+  (likely a routine IRS PDF refresh — but the 5 rules + delvio-tax field map need the diff checked;
+  delvio-tax's own manifest sha is now stale for f6252 → update_irs_forms path). (3) Open decisions
+  from the plan: editorial subscription (Parker recommended), Lacerte cross-check formality.
+- **RENAME (same session, earlier)**: repo+folder+session-store renamed sherpa-tax-rule-studio →
+  delvio-rule-studio; Render service name + onrender URL DELIBERATELY unchanged (blueprint would
+  spawn a new service) — the URL fix is a rules.delviotax.com custom domain (Ken, pending). Poetry
+  venv re-created (old path-keyed venv orphaned).
+
 ## 2026-08-02 - GA-500 spec reconciliation SEEDED + EXPORTED (delvio s187) - Gate 1 APPROVED, DONE
 - KEN APPROVED IN-SESSION (AskUserQuestion: "Approve as drafted", including the
   g_lic_not_dependent default flip). Re-seeded (84 facts / 23 rules / 91 lines / 17 diag /

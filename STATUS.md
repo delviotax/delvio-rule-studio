@@ -12,7 +12,19 @@ last_updated: 2026-08-05
 
 ## Current state
 
-**NEW 2026-07-25 (latest) — FORM_5695 AMENDED TO **v2**, THE "LIGHT 2025 FACE" (tts s110).**
+**NEW 2026-08-05 (latest) — THE TAX-LAW CHANGE FUNNEL IS LIVE (Phases 0-3 deployed, `4ef60cb`).**
+Seven detection arms (Federal Register · IRB backstop · eCFR Title 26 · irs-drop guidance ·
+irs-dft drafts w/ exact perimeter filter · final-form checksums HEAD-first · CourtListener
+courts) poll DAILY (cron 11:00 UTC); the **Friday digest cron** (13:00 UTC) emails the triage
+view — ranked items, inline blast radius, aging, arm health — via Resend from rules@delviotax.com.
+Suite 211 green. **Checksum watch seeded from delvio-tax's forms_manifest (63 bound / 34 unmatched
+reported) and the first real detection opened: CR-2026-001, f6252.pdf changed on irs.gov —
+awaiting Ken triage.** KEN: set RESEND_API_KEY on the new `sherpa-rs-change-digest` Render cron
+(confirm blueprint created it); triage CR-2026-001; plan's open decisions = editorial
+subscription + Lacerte-gate formality. Everything automated stops at DETECTED — Gates 1/2
+untouched. Detail: session_log 2026-08-05.
+
+**2026-07-25 — FORM_5695 AMENDED TO **v2**, THE "LIGHT 2025 FACE" (tts s110).**
 Ken's scope call, live, verbatim: *"I think this form goes away for 2026 so you can do a light version.
 something good enough to complete the tax return."* — OBBBA terminates both credits after 2025, so this
 form has exactly one filing season left and v2 buys only what makes it FILABLE. **v1 modelled 17 cost
