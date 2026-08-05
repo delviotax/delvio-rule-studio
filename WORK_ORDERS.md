@@ -839,6 +839,28 @@ from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
     Auto-discovered by `seed_all` (reconstructable). **Status: ✅ DONE (RS).** tts app build = [APP] lane. The
     adjacent-state pass-through track is now COMPLETE (GA-700 + SC1065/SC1120S + NC + AL). [UNVERIFIED] exact NC/AL
     line numbers noted for a re-pull. **Post-WO-13: net-new RS scope needs the TaxWise forms-usage report or a law change.**
+- **▶ ACTIVE — [WO-14] Form 6765 (§41 research credit) · production-packet trigger · status `GAP-CHECKED →
+  DRAFTING` (opened 2026-08-04; Ken: "run the form 6765 rule studio spec").**
+  Trigger: delvio-tax CC batch-005 #2 — packet 227 (1120-S) carries a real Form 6765 (ASC, QREs $53,704,
+  credit $4,243 → Schedule K); the entity lane refused to improvise without a spec (`lookup/6765/export/`
+  = **404, GAP confirmed 2026-08-04**). The production-packet trigger is the "TaxWise forms-usage" class
+  of net-new scope. **✅ RESEARCH (2026-08-04):** f6765 Rev. 12-2024 face (4 pp) + i6765 Rev. 12-2025
+  (12 pp, "for use with the January 2025 revision" — label mismatch flagged, line refs verified against
+  the 12-2024 face) + i1120ssk (K-1 box 13 **code M** verbatim) fetched and read line-by-line;
+  `f6765_source_brief.md` written. Key law: Section G OPTIONAL for TYs beginning before 2026; ASC
+  election irrevocable for the current year (Reg. §1.41-9(b)(3)); §280C reduced credit = Item A on a
+  timely original return (15.8% regular / ×79% ASC); no-election ⇒ §174A deduction reduced by the credit
+  (OBBBA P.L. 119-21). Gate-1 scope walk: 4 questions (FBP entry mode; §280C diagnostic-only; Section D
+  defer; controlled-group HOLD) — see the brief's "Open scope questions".
+  **✅ GATE-1 SCOPE WALK (2026-08-04, DECISIONS D-16):** all four recommended options approved by Ken
+  (FBP preparer-entered · §280C diagnostic-only · Section D deferred+HOLD · controlled group HOLD).
+  **🟡 AUTHORED — status `⏳ AWAITING KEN (seed approval)`:** `load_6765.py` (24 facts / 7 rules /
+  50 lines / 10 diagnostics / 6 scenarios / 2 draft flow assertions; 5 sources, all rules cited;
+  READY_TO_SEED=False) + `scratchpad/validate_6765.py` = **19 pass / 0 fail** (arithmetic oracles on
+  every scenario through the loader's pure helpers + a clean SQLite seed dry-run). Scenario T1 pins
+  packet 227's shape (QREs 53,704 → credit 4,243; line 21 INFERRED — the real priors come off the
+  packet at authoring). Next: Ken's review walk → "Approve — flip, seed, export" → the delvio-tax
+  app build (compose 6765 + 8941 into Schedule K 13g — never stomp).
 - **✅ S-5 completed the front-door loop 2026-07-05** (GAP-CHECKED → DRAFTING → AWAITING KEN → seeded/exported).
   New consolidated `ENTITY_BOUNDARY` form (`load_entity_boundary.py`, 6 self-owned sources): B1 M-3 threshold
   (1065 4-prong / 1120-S $10M); B2 K-2/K-3 DFE 4-criteria gate (COMPUTED, RED on fail + D_EB_DFE_OK affirmative

@@ -1083,3 +1083,25 @@ Schedule I into a common path.
 ---
 
 <!-- Append new entries at the top. Older decisions remain below. -->
+
+---
+
+## 2026-08-04 — D-16: Form 6765 v1 scope (WO-14, Gate-1 scope walk)
+
+**Decision (Ken, four AskUserQuestion answers, all recommended options):**
+1. **Line 6 fixed-base percentage = PREPARER-ENTERED** (from the prior-year 6765 /
+   workpapers); the spec enforces the 16% cap. The §41(c)(3)(B) start-up phase-in is
+   NOT computed (needs multi-year history the app can't reach) — the 8941 line-5 shape.
+2. **§280C no-election deduction reduction = DIAGNOSTIC-ONLY** (D_6765_280C_DEDUCTION):
+   the preparer enters the already-reduced §174A deduction; the engine never silently
+   mutates a book number (the 8941 D_8941_004 precedent; entity M-1/AAA interplay).
+3. **Section D payroll election = DEFERRED v1** with an error-severity HOLD when box
+   33a is checked (QSB test + $500k cap + Form 8974 interplay = its own future unit).
+4. **Item B controlled group = HOLD diagnostic** (group computation + member-share
+   attachment out of scope; single-entity returns flow normally).
+
+**Context:** WO-14 — packet 227 (1120-S, ASC, QREs $53,704 → credit $4,243 →
+Schedule K) blocked in the delvio-tax entity lane on the RS 404. Sources fetched
+verbatim 2026-08-04 (`f6765_source_brief.md`). Section G is OPTIONAL for tax years
+beginning before 2026 — v1 records it informationally; ⚠ REQUIRED after 2025, so the
+spec carries a TY2026 staleness diagnostic.
