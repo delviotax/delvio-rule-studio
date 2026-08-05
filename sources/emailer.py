@@ -44,7 +44,10 @@ def send_digest_email(subject: str, html: str, text: str, *, to: str | None = No
     req = urllib.request.Request(
         RESEND_ENDPOINT,
         data=json.dumps(payload).encode("utf-8"),
-        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+        # The User-Agent matters: Resend sits behind Cloudflare, which 403s (error 1010)
+        # requests carrying urllib's default agent string. Found live 2026-08-05.
+        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json",
+                 "User-Agent": "delvio-rule-studio-digest/1.0"},
         method="POST",
     )
     try:
