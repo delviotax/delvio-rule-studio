@@ -74,6 +74,31 @@ class FeedType(models.TextChoices):
     PDF_LIST = "pdf_list", "PDF List"
     XML_REPO = "xml_repo", "XML Repository"
     MANUAL_UPLOAD = "manual_upload", "Manual Upload"
+    # Added 2026-08-05 with the Phase-0 detection build.
+    JSON_API = "json_api", "JSON API"                    # eCFR, Federal Register, CourtListener
+    HTML_PAGE = "html_page", "HTML Page (diff)"          # state DOR pages — whole-page checksum/diff
+    DIRECTORY_INDEX = "directory_index", "Directory Index"  # irs-drop / irs-dft file listings
+
+
+class ItemKind(models.TextChoices):
+    """What KIND of publication a change-register item represents.
+
+    Set by the detection arms so the digest can group ("3 Rev. Procs, 1 CFR amendment,
+    12 draft forms") instead of showing an undifferentiated list. Nullable: the pre-2026-08
+    arms (federal_register / irb) predate this field and their historical rows stay null.
+    """
+    REV_PROC = "rev_proc", "Revenue Procedure"
+    NOTICE = "notice", "Notice"
+    REV_RUL = "rev_rul", "Revenue Ruling"
+    ANNOUNCEMENT = "announcement", "Announcement"
+    FEDERAL_REGISTER = "federal_register", "Federal Register Document"
+    IRB_BULLETIN = "irb_bulletin", "IRB Bulletin"
+    CFR_SECTION = "cfr_section", "26 CFR Section Amendment"
+    DRAFT_FORM = "draft_form", "Draft Form/Instruction"
+    FINAL_FORM = "final_form", "Final Form/Instruction"
+    COURT_OPINION = "court_opinion", "Court Opinion"
+    PUBLIC_LAW = "public_law", "Public Law"
+    STATE_PAGE = "state_page", "State DOR Page Change"
 
 
 class ChangeStatus(models.TextChoices):
@@ -278,7 +303,13 @@ class JurisdictionConformitySource(models.Model):
 
 
 class SourceFeedDefinition(models.Model):
-    """Where to pull source updates from — for future automated ingestion."""
+    """Where to pull source updates from.
+
+    Originally documentation-only ("where to look"). Since 2026-08-05 these rows also DRIVE the
+    detection arms: `arm_command` names the owning management command, `selector_config` carries
+    per-feed parser knobs, and the `last_*` fields hold poll state (so a page-diff arm can say what
+    changed, and `change_digest` can report which arms ran and which parsed nothing).
+    """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     feed_code = models.CharField(max_length=100, unique=True)
@@ -291,6 +322,24 @@ class SourceFeedDefinition(models.Model):
     parser_strategy = models.CharField(max_length=50, help_text="html_scrape, manual_clip, zip_unpack, pdf_register")
     is_active = models.BooleanField(default=True)
     notes = models.TextField(blank=True, null=True)
+
+    # ── Arm binding + poll state (added 2026-08-05) ─────────────────────────
+    arm_command = models.CharField(
+        max_length=60, blank=True, default="",
+        help_text="Management command that owns this feed, e.g. 'poll_source_pages'. Blank = documentation-only.")
+    selector_config = models.JSONField(
+        default=dict, blank=True,
+        help_text="Per-feed parser knobs, e.g. {'content_regex': ..., 'strip_patterns': [...], 'max_pages': 2}.")
+    last_polled_at = models.DateTimeField(blank=True, null=True)
+    last_checksum_sha256 = models.CharField(
+        max_length=64, blank=True, null=True,
+        help_text="Page-diff state. Deliberately NOT AuthorityVersion.checksum_sha256 — that tracks authority "
+                  "DOCUMENTS; this tracks an arbitrary watched page. Null = no baseline yet (first poll opens nothing).")
+    last_content = models.TextField(
+        blank=True, null=True, help_text="Normalized text of the last poll, so a diff can show what was ADDED.")
+    last_result_note = models.TextField(
+        blank=True, null=True, help_text="Last run's outcome or error — feeds the digest's arm-health section.")
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -320,7 +369,10 @@ class ChangeRegisterItem(models.Model):
     status = models.CharField(max_length=20, choices=ChangeStatus.choices, default=ChangeStatus.DETECTED)
     external_ref = models.CharField(
         max_length=120, blank=True, null=True, db_index=True,
-        help_text="Stable dedup key for automated detection: FR document_number, or 'checksum:<sha>' for the checksum arm.")
+        help_text="Stable dedup key for automated detection. NAMESPACE new arms with a prefix so keys from "
+                  "different feeds can never collide: 'DROP:rp-26-28.pdf', 'CFR26:1.199A-3@2026-07-09', "
+                  "'DFT:f1040--dft.pdf@2026-08-04', 'CL:<cluster_id>', 'PAGE:<feed>@<sha12>'. The two original "
+                  "arms are unprefixed (FR document_number, 'IRB-YYYY-NN') and do not collide with the prefixes.")
 
     # ── Provenance (what authority moved) ───────────────────────────────────
     authority_source = models.ForeignKey(
@@ -341,11 +393,40 @@ class ChangeRegisterItem(models.Model):
     promoted_work_order = models.CharField(max_length=30, blank=True, null=True, help_text="The WORK_ORDERS order id, e.g. WO-24.")
     promoted_at = models.DateTimeField(blank=True, null=True)
 
+    # ── Publication metadata + relevance (added 2026-08-05) ─────────────────
+    item_kind = models.CharField(
+        max_length=30, choices=ItemKind.choices, blank=True, null=True,
+        help_text="What kind of publication this is — lets the digest group by type.")
+    source_url = models.TextField(
+        blank=True, null=True,
+        help_text="Direct link to the authority document. Previously buried in `summary` prose.")
+    published_date = models.DateField(
+        blank=True, null=True,
+        help_text="When the AUTHORITY published it — distinct from detected_at (when we noticed).")
+    relevance_score = models.IntegerField(
+        blank=True, null=True, db_index=True,
+        help_text="0-100 perimeter relevance. ORDERS the digest; NEVER gates creation — an unscored or "
+                  "low-scoring item is still recorded, just below the line. Suppressing a real change at "
+                  "write time is the silent error the prime directive forbids. Null = never scored.")
+    relevance_signals = models.JSONField(
+        default=list, blank=True,
+        help_text="Why it scored what it scored: [{'kind':'form','value':'4797','via':'TaxForm','weight':40}]. "
+                  "Makes a score auditable instead of a bare number.")
+
     detected_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ["-detected_at", "change_code"]
+        constraints = [
+            # external_ref was index-only; with 8 arms writing concurrently, dedup-by-query is racy.
+            # Partial so the many manual-clip rows (null external_ref) stay unconstrained.
+            models.UniqueConstraint(
+                fields=["external_ref"],
+                condition=models.Q(external_ref__isnull=False),
+                name="uniq_change_register_external_ref",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.change_code} [{self.status}]: {self.title}"

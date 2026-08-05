@@ -7,6 +7,7 @@ from .models import (
     AuthoritySourceTopic,
     AuthorityTopic,
     AuthorityVersion,
+    ChangeRegisterItem,
     JurisdictionConformitySource,
     RuleAuthorityLink,
     SourceFeedDefinition,
@@ -64,5 +65,22 @@ class JurisdictionConformitySourceAdmin(admin.ModelAdmin):
 
 @admin.register(SourceFeedDefinition)
 class SourceFeedDefinitionAdmin(admin.ModelAdmin):
-    list_display = ["feed_code", "feed_name", "jurisdiction_code", "is_active"]
+    list_display = ["feed_code", "feed_name", "jurisdiction_code", "is_active", "arm_command", "last_polled_at"]
     list_filter = ["jurisdiction_code", "is_active", "feed_type"]
+    readonly_fields = ["last_polled_at", "last_checksum_sha256", "last_content", "last_result_note"]
+
+
+@admin.register(ChangeRegisterItem)
+class ChangeRegisterItemAdmin(admin.ModelAdmin):
+    """The cheapest triage surface we have — the CLI is fine for one item, not for a Monday
+    morning with 40 draft-form rows. Registered 2026-08-05 with the Phase-0 detection build."""
+
+    list_display = ["change_code", "status", "relevance_score", "item_kind",
+                    "jurisdiction_code", "tax_year", "title", "detected_at"]
+    list_filter = ["status", "item_kind", "detected_via", "jurisdiction_code", "is_substantive"]
+    search_fields = ["change_code", "title", "summary", "external_ref", "promoted_work_order"]
+    date_hierarchy = "detected_at"
+    ordering = ["-relevance_score", "-detected_at"]
+    # Detection provenance is written by the arms; editing it by hand would break dedup.
+    readonly_fields = ["external_ref", "detected_via", "relevance_score", "relevance_signals",
+                       "detected_at", "updated_at"]
