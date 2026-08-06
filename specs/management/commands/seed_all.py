@@ -31,7 +31,10 @@ from django.core.management.base import BaseCommand
 # load_1120s_full amends SCH_K_1120S / SCHD_1120S (adds R010-R018 / R010-R012) — it must run
 # after load_1120s_specs creates those bases, else it skips (its .first() lookup returns None)
 # and the flow-detail rules are silently dropped on a fresh rebuild (2026-07-05 delta audit).
-AMEND_LOADERS = ["load_1040_form_3800", "load_1120s_full"]
+# load_state_conformity writes the JurisdictionConformitySource spine and anchors each row to an
+# AuthoritySource seeded by that state's own form loader — so it must run after phase 2, same as
+# a true amend loader (else the FK anchors resolve to None on a fresh rebuild).
+AMEND_LOADERS = ["load_1040_form_3800", "load_1120s_full", "load_state_conformity"]
 
 # specs commands that are NOT part of the specs-loader phase (they run in their own phases).
 NON_SEED = {

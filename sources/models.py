@@ -274,7 +274,17 @@ class AuthorityVersion(models.Model):
 
 
 class JurisdictionConformitySource(models.Model):
-    """State conformity tracking with proper authority citations."""
+    """State conformity tracking with proper authority citations.
+
+    ONE row per (jurisdiction_code, tax_year) — enforced by the unique constraint below.
+    This row is the SHARED conformity spine for a state: every module spec for that state
+    (individual / 1065 / 1120S / 1120 / 1041) exports the same block, rather than each
+    loader re-deriving the state's posture in prose. `_build_export` in specs/views.py
+    attaches it as the package's `state_conformity`.
+
+    The 45-state campaign (Tax Shelter Future D-030) authors this row FIRST for each new
+    state, before any of that state's form specs — see delvio-states/CLAUDE.md.
+    """
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     jurisdiction_code = models.CharField(max_length=10, help_text="GA, CA, etc.")
@@ -287,8 +297,14 @@ class JurisdictionConformitySource(models.Model):
     summary = models.TextField(blank=True, null=True)
     decoupled_items = models.JSONField(
         default=list, blank=True,
-        help_text="Structured list of items where state diverges from federal. "
-        "Each entry: {item, federal_treatment, state_treatment, authority_source_id, notes}",
+        help_text=(
+            "Structured list of items where the state diverges from federal. Canonical entry shape "
+            "(normalized 2026-08-05 — campaign D-8): "
+            "{item, federal_treatment, state_treatment, authority_source_code, notes}. "
+            "`authority_source_code` is the AuthoritySource.source_code string, NOT a UUID — "
+            "UUIDs differ per environment and the downstream consumer (delvio-tax) resolves "
+            "authority by code everywhere else in the export package."
+        ),
     )
     notes = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -297,6 +313,12 @@ class JurisdictionConformitySource(models.Model):
     class Meta:
         ordering = ["jurisdiction_code", "tax_year"]
         verbose_name_plural = "jurisdiction conformity sources"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["jurisdiction_code", "tax_year"],
+                name="uniq_conformity_jurisdiction_taxyear",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.jurisdiction_code} TY{self.tax_year} ({self.conformity_type})"

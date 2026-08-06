@@ -22,7 +22,6 @@ from sources.models import (
     AuthoritySource,
     AuthoritySourceTopic,
     AuthorityTopic,
-    JurisdictionConformitySource,
     RuleAuthorityLink,
 )
 from specs.models import (
@@ -318,20 +317,11 @@ class Command(BaseCommand):
                 sources[code] = src
         self.stdout.write(f"Sources ready: {len(sources)}")
 
-        # Georgia conformity record
-        JurisdictionConformitySource.objects.update_or_create(
-            jurisdiction_code="GA", tax_year=2025,
-            defaults={
-                "conformity_type": "partial",
-                "authority_source": sources.get("GA_2025_600S_INSTR"),
-                "summary": "Georgia partially conforms to federal tax law (IRC conformity Jan 1, 2026 via HB 1199, retroactive to TY2025). Does NOT conform to IRC 168(k)/(n) bonus depreciation (full addback). DOES conform to the OBBBA Section 179 limit: $2,500,000/$4,000,000, equal to federal. PTET at 5.19% (TY2025) is elective.",
-                "decoupled_items": [
-                    {"item": "IRC 168(k)/(n) bonus depreciation", "treatment": "Full addback required on Schedule 1"},
-                    {"item": "Section 179 limits", "treatment": "GA CONFORMS via HB 1199: $2,500,000/$4,000,000 = federal (retroactive to TY2025)"},
-                ],
-            },
-        )
-        self.stdout.write("  Georgia conformity record created.")
+        # NOTE (2026-08-05): the Georgia JurisdictionConformitySource row was written HERE until
+        # the 45-state campaign centralized conformity. It now lives in `load_state_conformity.py`,
+        # the single writer of that model — one row per (state, tax year), unique-constrained,
+        # carrying the normalized decoupled_items shape (campaign D-8). Two writers of one row is
+        # the reconstructability hazard the 2026-07-05 delta audit was about. Do not re-add it here.
         return sources
 
     # ─────────────────────────────────────────────────────────────────────────

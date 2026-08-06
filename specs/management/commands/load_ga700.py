@@ -294,7 +294,11 @@ AUTHORITY_SOURCES: list[dict] = [
     },
     {
         "source_code": "GA_HB149_PTET_FAQ",
-        "source_type": "state_guidance",
+        # "state_guidance" was NOT a valid SourceType choice — Django does not enforce choices at
+        # the DB layer, so the invalid value persisted silently since this loader was written.
+        # `state_instruction` is the closest valid type for DOR-published filing guidance.
+        # (Fixed 2026-08-05, campaign Phase 2 data hygiene. Takes effect on re-seed.)
+        "source_type": "state_instruction",
         "source_rank": "primary_official",
         "jurisdiction_code": "GA",
         "title": "Georgia DOR HB 149 Pass-Through Entity Tax FAQ",

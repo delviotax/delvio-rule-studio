@@ -60,11 +60,83 @@ CROSSES a gate unattended. Gate 1 = draft→published spec (Ken). Gate 2 = publi
 Statuses: `INTAKE → GAP-CHECKED → DRAFTING → ⏳ AWAITING KEN → APPROVED (seeded/exported)
 → DISPATCHED (app) → ✅ DONE`
 
+## Wave orders — the 45-state campaign batching convention (added 2026-08-05)
+*Campaign charter: Tax Shelter Future D-030; sequence detail in `delviotax/delvio-states`
+`STATE_MATRIX.md`; batching ruled by Ken as delvio-states D-4.*
+
+The one-form-per-order shape above does not scale to the campaign's ~130-200 state forms —
+it would put ~150 Gate-1 walks on Ken personally. State authoring therefore batches:
+
+- **One WO per WAVE**, not per form. A wave = **3-5 states × 1 module type**
+  (`[WO-W##-<MODULE>]`, e.g. `[WO-W03-PTE]`). Wave order: PTE (1065+1120S paired) →
+  C-corp → individual (the slow lane) → fiduciary on demand. CA runs as its own wave.
+- **Transitions are tracked at wave level** — the whole wave moves GAP-CHECKED → DRAFTING →
+  AWAITING KEN → APPROVED together. A single state that turns out to be a monster is SPLIT
+  OUT into its own WO rather than stalling its wave.
+- **Two batched Gate-1 walks per wave**, not two per form: one SCOPE walk (per-state quirks
+  — PTET regime, conformity posture, apportionment — are the walk items) and one SEED
+  approval. **Both gates still exist**; batching changes their granularity, never their
+  existence, and nothing crosses either unattended.
+- **The gap-check still runs per FORM** (`lookup/<FORM>/export/`, 404 = gap) — the batching
+  is in the approval and authoring, not in the evidence.
+- **Conformity first:** a new state's `JurisdictionConformitySource` row
+  (`load_state_conformity.py`) is authored BEFORE any of that state's form specs, so all of
+  its module specs export one shared, cited conformity block.
+
+### State form-number namespacing (settled 2026-08-05, campaign D-9)
+New state forms use **`<ST>_<FORM>`** — `SC1120`, `NC_D400`, `AL_FORM_40`. Rationale:
+`_lookup_queryset` filters on `form_number__iexact` and **does NOT filter by jurisdiction**,
+so a bare numeric form number is a live collision hazard once 45 states arrive (many states
+use bare-numeric form names). GA's individual return is seeded as bare **`500`** — a legacy
+exception, NOT a pattern; leave it (renaming breaks the app's existing mirror + field maps)
+and namespace everything new. ⚠ Also note the app-side wart this feeds: delvio-tax mixes
+`GA-500` (hyphenated) with `SC1040`/`AL40`/`NC_D400`, which already caused a live
+`FORM_TO_STATE` bug — its state-registry refactor owns normalizing that end.
+
 ---
 
 ## ▶ CURRENT ORDER — pulled from the BUILD_ORDER SPINE (canonical in `tts-tax-status`)
 *No independent backlog here (see header). Sequence = BUILD_ORDER.md SPINE; statuses seeded
 from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
+
+> **[WO-CONF-SPINE] 45-state campaign Phase 2 (Tax Shelter Future D-030, 2026-08-05) ·
+> state conformity spine + campaign scale pre-work · ⏳ AWAITING KEN (Gate-1 seed approval)**
+> · **Scope:** make `JurisdictionConformitySource` the shared, exported conformity spine for
+> every state BEFORE the campaign multiplies state specs ~10×. Not new tax research — the
+> SC/AL/NC content is TRANSCRIBED from their own already-Gate-1-approved loaders and cited to
+> the same AuthoritySource rows (GA ← load_remaining_1120s / D-8; SC ← load_sc1040 W1/W5 +
+> SC_ACT63_2025_CONFORMITY / D-6; AL ← load_al_form20c W5 + AL_CODE_40_18 §40-18-1.1 / D-14;
+> NC ← load_nc_d400 W2/W3 + NC_GS_105_153_6 / D-7). It still crosses Gate 1 because it changes
+> what the export endpoints serve.
+> · **The gap it closes:** GA/2025 was the ONLY conformity row; **SC, AL and NC each exported
+> `"state_conformity": null`**, so 3 of the 4 built states shipped no machine-readable
+> conformity to delvio-tax.
+> · **Built (all tests green, 223 passed):** `load_state_conformity.py` (new, `READY_TO_SEED=False`,
+> the SINGLE writer — GA's inline row REMOVED from `load_remaining_1120s.py`, since two writers of
+> one row is the 2026-07-05 delta-audit hazard) · migration `sources.0006` adding
+> **unique (jurisdiction_code, tax_year)** · export lookup `.get()` → `.filter().first()` (it could
+> raise MultipleObjectsReturned uncaught — a 500 on a spec-package endpoint) · `decoupled_items`
+> normalized to the documented 5-key shape with `authority_source_code` (a CODE string, not the
+> documented UUID — UUIDs differ per environment and the rest of the package resolves authority by
+> code) · added to `AMEND_LOADERS` (its FK anchors need phase-2 sources) · `tests/test_state_conformity.py`
+> (12 tests) · **`load_ga700.py` `source_type: "state_guidance"` → `state_instruction`** (that value
+> was never a valid `SourceType` choice; Django does not enforce choices at the DB layer).
+> · **W1.** Approve the four TY2025 rows as transcribed (GA partial / SC static 12-31-2024 /
+> AL rolling / NC static 01-01-2023), incl. each row's `decoupled_items`.
+> · **W2.** Approve the canonical `decoupled_items` shape — delvio-tax's state-registry refactor
+> consumes it, so it is a downstream contract.
+> · **W3.** Approve the GA row MOVING loaders (content preserved verbatim + enriched to the 5-key
+> shape; re-seed required for the GA700 `source_type` fix to reach prod).
+> · **W4.** ⚠ **FINDING, out of scope, needs its own order:** the `source_type` vocabulary is
+> systemically drifted — **232 invalid values across 74 loaders** (`statute` 108, `official_instructions`
+> 59, `federal_form` 29, `official_guidance` 28, +5 more), every one a near-miss of a real choice
+> (note `OFFICIAL_INSTRUCTION` is singular). Reconciling rewrites published exports. Phase 2 fixed
+> only the one value it touched and installed a **ratchet test** (counts may only fall; a new
+> distinct value fails). Ken: separate WO, or leave ratcheted?
+> · **On approval:** flip `READY_TO_SEED` → `migrate` → `load_state_conformity` → re-run `load_ga700`
+> → verify SC/AL/NC/GA exports carry non-null `state_conformity` → `seed_all --dry-run` →
+> explicit-path commit. **Prod probe (read-only, 2026-08-05): 1 conformity row, no duplicate
+> (state,year) keys — the unique constraint applies cleanly; all 5 authority anchors FOUND.**
 
 > **[WO-GA500-RECON] Ken (2026-08-02, "GA 500 spec next") · GA-500 spec reconciliation ·
 > ✅ DONE — Gate 1 APPROVED by Ken in-session 2026-08-02 ("Approve as drafted", incl. the

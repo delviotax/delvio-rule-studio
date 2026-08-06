@@ -129,12 +129,16 @@ def _build_export(form: TaxForm) -> dict:
         })
 
     # State conformity (only for non-federal forms)
+    # A missing row yields null (a state whose conformity has not been authored yet); the
+    # .filter().first() is deliberate — .get() raised MultipleObjectsReturned uncaught before
+    # the (jurisdiction_code, tax_year) unique constraint existed, and an export endpoint
+    # should never 500 over conformity metadata.
     state_conformity = None
-    if form.jurisdiction.lower() != "federal":
-        try:
-            conf = JurisdictionConformitySource.objects.get(
-                jurisdiction_code=form.jurisdiction, tax_year=form.tax_year,
-            )
+    if form.jurisdiction.lower() not in ("federal", "fed"):
+        conf = JurisdictionConformitySource.objects.filter(
+            jurisdiction_code=form.jurisdiction, tax_year=form.tax_year,
+        ).first()
+        if conf is not None:
             state_conformity = {
                 "jurisdiction_code": conf.jurisdiction_code,
                 "tax_year": conf.tax_year,
@@ -144,8 +148,6 @@ def _build_export(form: TaxForm) -> dict:
                 "decoupled_items": conf.decoupled_items,
                 "notes": conf.notes,
             }
-        except JurisdictionConformitySource.DoesNotExist:
-            pass
 
     return {
         "export_version": "1.0",
