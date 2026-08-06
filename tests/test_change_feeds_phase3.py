@@ -108,6 +108,7 @@ class TestFetchIrsDrafts:
 # ══════════════════════════════════════════════════════════════════════════
 
 SHA_A = "a" * 64
+SHA_B = "b" * 64
 PDF_BYTES_1 = b"%PDF-1.7 original"
 PDF_BYTES_2 = b"%PDF-1.7 revised!!"
 
@@ -206,6 +207,59 @@ class TestFetchIrsFormChecksums:
         assert version.checksum_sha256 == SHA_A
         assert "1 manifest entr(ies) with no matching AuthoritySource" in out
         assert "9999" in out
+
+    def test_seed_prefers_source_sha_for_a_derived_template(self, tmp_path, db):
+        """CR-2026-001. A DERIVED template's `sha256` is the hash of the local
+        artifact, not of the bytes at irs_url — f6252's template is trimmed to
+        its one form page while the download bundles three instruction pages.
+        Seeding the trimmed hash guaranteed a first-poll mismatch and opened a
+        false "the form changed" item against an unchanged form. The manifest now
+        carries `source_sha256`; the seeder must take it."""
+        src, version = make_watched(checksum=None)
+        manifest = {"forms": [{
+            "form_code": "6252", "irs_url": src.official_url,
+            "sha256": SHA_B, "source_sha256": SHA_A, "tax_year": 2025,
+            "notes": "Template TRIMMED to the form page only.",
+        }]}
+        path = tmp_path / "forms_manifest.json"
+        path.write_text(json.dumps(manifest), encoding="utf-8")
+        run("fetch_irs_form_checksums", seed_manifest=str(path))
+        version.refresh_from_db()
+        assert version.checksum_sha256 == SHA_A      # the RAW download hash
+        assert version.checksum_sha256 != SHA_B      # never the trimmed artifact
+
+    def test_derived_template_without_a_source_sha_seeds_no_checksum(
+            self, tmp_path, db):
+        """The safe path: with no source hash to trust, record the URL and leave
+        the checksum null so the FIRST POLL baselines it from the real bytes and
+        opens nothing — rather than seeding a hash that is known to be wrong."""
+        src, version = make_watched(checksum=None)
+        manifest = {"forms": [{
+            "form_code": "6252", "irs_url": src.official_url,
+            "sha256": SHA_B, "tax_year": 2025,
+            "notes": "Template TRIMMED to the form page only.",
+        }]}
+        path = tmp_path / "forms_manifest.json"
+        path.write_text(json.dumps(manifest), encoding="utf-8")
+        out = run("fetch_irs_form_checksums", seed_manifest=str(path))
+        version.refresh_from_db()
+        assert not version.checksum_sha256
+        assert version.retrieval_url == src.official_url
+        assert "DERIVED TEMPLATE" in out and "6252" in out
+
+    def test_an_ordinary_template_is_unaffected(self, tmp_path, db):
+        """No TRIM note, no source_sha256 — the existing behavior stands."""
+        src, version = make_watched(checksum=None)
+        manifest = {"forms": [{
+            "form_code": "4797", "irs_url": src.official_url,
+            "sha256": SHA_A, "tax_year": 2025,
+            "notes": "Sales of Business Property. 2 pages.",
+        }]}
+        path = tmp_path / "forms_manifest.json"
+        path.write_text(json.dumps(manifest), encoding="utf-8")
+        run("fetch_irs_form_checksums", seed_manifest=str(path))
+        version.refresh_from_db()
+        assert version.checksum_sha256 == SHA_A
 
 
 # ══════════════════════════════════════════════════════════════════════════

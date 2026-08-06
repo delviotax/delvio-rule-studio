@@ -41,6 +41,12 @@ from sources.models import (
     AuthoritySource, AuthorityVersion, ChangeRegisterItem, FeedType, ItemKind, SourceFeedDefinition,
 )
 
+def _looks_derived(entry: dict) -> bool:
+    """True when the manifest says its local template is a DERIVED artifact, so
+    the recorded `sha256` is NOT the hash of the bytes at `irs_url`."""
+    return "TRIM" in (entry.get("notes") or "").upper()
+
+
 FEED_CODE = "IRS_FORM_CHECKSUMS"
 USER_AGENT = "Mozilla/5.0 (compatible; delvio-rule-studio change-register; +https://kenlill.com)"
 HEAD_KEYS = ("etag", "last_modified", "content_length")
@@ -81,11 +87,30 @@ class Command(BaseCommand):
         if not isinstance(entries, list) or not entries:
             raise CommandError("Manifest has no 'forms' list — wrong file?")
 
-        seeded, already, unmatched = 0, 0, []
+        seeded, already, unmatched, derived = 0, 0, [], []
         for entry in entries:
-            url, sha = entry.get("irs_url"), entry.get("sha256")
-            if not url or not sha:
-                unmatched.append(f"{entry.get('form_code', '?')} (no url/sha)")
+            url = entry.get("irs_url")
+            # ⚠ CR-2026-001 (2026-08-06). The manifest's `sha256` is of the
+            # TEMPLATE ON DISK, which for a DERIVED template is not the bytes at
+            # `irs_url`. f6252's template is trimmed to its single form page; the
+            # irs.gov download bundles three instruction pages. Seeding the
+            # trimmed hash as the source-of-record checksum guaranteed a mismatch
+            # on the very first poll, and the funnel dutifully opened "f6252.pdf
+            # changed on irs.gov" against a form that had not changed at all
+            # (page-1 text byte-identical, all 49 AcroForm field names identical).
+            #
+            # A false positive in a weekly triage digest is worse than a missed
+            # one: it teaches the reader to skim. So prefer the manifest's
+            # explicit `source_sha256` (the RAW download hash), and when an entry
+            # has only a derived hash, seed NO checksum — leaving it null puts the
+            # entry on this command's own documented safe path, where the first
+            # poll records the real baseline and opens nothing.
+            sha = entry.get("source_sha256") or entry.get("sha256")
+            if entry.get("source_sha256") is None and _looks_derived(entry):
+                sha = None
+                derived.append(entry.get("form_code", "?"))
+            if not url:
+                unmatched.append(f"{entry.get('form_code', '?')} (no url)")
                 continue
             src = AuthoritySource.objects.filter(official_url=url).first()
             if src is None:
@@ -104,6 +129,13 @@ class Command(BaseCommand):
             if version.retrieval_url and version.checksum_sha256:
                 already += 1
                 continue
+            if sha is None and version is not None and not version.checksum_sha256:
+                # Derived template, no source hash: record the URL only. The next
+                # poll baselines it from the real bytes (and opens nothing).
+                if not dry_run and not version.retrieval_url:
+                    version.retrieval_url = url
+                    version.save(update_fields=["retrieval_url"])
+                continue
             if not dry_run:
                 version.retrieval_url = version.retrieval_url or url
                 version.checksum_sha256 = version.checksum_sha256 or sha
@@ -112,6 +144,11 @@ class Command(BaseCommand):
 
         self.stdout.write(f"seed: {seeded} version(s) seeded / {already} already seeded / "
                           f"{len(unmatched)} manifest entr(ies) with no matching AuthoritySource")
+        if derived:
+            self.stdout.write(
+                "  DERIVED TEMPLATE (no source_sha256) - URL seeded, checksum left "
+                "null so the first poll baselines from the real bytes: "
+                + ", ".join(derived))
         for miss in unmatched:
             self.stdout.write(f"  UNMATCHED (create the AuthoritySource or fix official_url): {miss}")
 
