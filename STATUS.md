@@ -12,7 +12,45 @@ last_updated: 2026-08-05
 
 ## Current state
 
-**NEW 2026-08-05 (latest) — THE TAX-LAW CHANGE FUNNEL IS LIVE (Phases 0-3 deployed, `4ef60cb`).**
+**NEW 2026-08-05 (latest) — THE STATE CONFORMITY SPINE IS BUILT, ⏳ AWAITING KEN'S GATE-1 WALK
+(`WO-CONF-SPINE`, commit `8948e2e`).** Phase 2 of the 45-state campaign (Tax Shelter Future D-030;
+campaign HQ = `delviotax/delvio-states`) — the scale pre-work that had to land BEFORE the campaign
+multiplies state specs ~10×. **The gap it closes:** `JurisdictionConformitySource` held exactly ONE
+row (GA/2025, written inline by `load_remaining_1120s`), so **SC, AL and NC every one exported
+`"state_conformity": null`** — three of the four built states shipped no machine-readable conformity
+to delvio-tax, even though their conformity was fully Gate-1-verified in prose, rules and authority
+sources. Now: **`load_state_conformity.py`** is the SINGLE writer, **one unique row per
+(jurisdiction_code, tax_year)** (migration `sources.0006`), covering GA (partial, HB 1199) · SC
+(static 12/31/2024, OBBBA not adopted) · AL (**rolling** — conforms to §168(k)/§179, the opposite of
+its neighbours) · NC (static 01/01/2023, 85%/20%-over-5-years). **No new tax research** — every figure
+is transcribed from that state's own already-approved loader and cited to the same AuthoritySource
+rows (GA←D-8 · SC←load_sc1040 W1/W5 · AL←load_al_form20c W5 · NC←load_nc_d400 W2/W3); it still crosses
+Gate 1 because it changes what the export endpoints serve. GA's inline row was **removed** from
+`load_remaining_1120s` — two writers of one row is exactly the 2026-07-05 delta-audit hazard.
+Also: export lookup `.get()` → `.filter().first()` (it could raise **MultipleObjectsReturned uncaught
+— a 500 on a spec-package endpoint**) + the federal guard now covers the `"FED"` spelling too;
+`decoupled_items` normalized to the documented 5-key shape but with **`authority_source_code`, a CODE
+string not the documented UUID** (UUIDs differ per environment; the rest of the package resolves
+authority by code — delvio-tax's state-registry refactor consumes this shape, so it is a downstream
+contract); loader added to `AMEND_LOADERS` (its FK anchors need phase-2 sources); **`load_ga700.py`
+`source_type: "state_guidance"` → `state_instruction`** (never a valid `SourceType` choice — Django
+does not enforce choices at the DB layer). `WORK_ORDERS.md` gains the **wave-batching convention**
+(one WO per wave of 3-5 states × 1 module, two batched Gate-1 walks per wave — both gates survive,
+only their granularity changes) and the **`<ST>_<FORM>` namespacing rule** (lookup does NOT filter by
+jurisdiction; GA's bare `500` stays a legacy exception). **`tests/test_state_conformity.py` — 12 tests;
+full suite 223 passed** (the 16 errors on the first run were the known stale-`test_postgres` collision,
+clean under `--reuse-db`). Prod probe (read-only): 1 row, no duplicate keys, all 5 authority anchors
+FOUND — the constraint applies cleanly. **NOTHING SEEDED** (`READY_TO_SEED=False`).
+⚠ **W4 FINDING, out of scope, needs its own order:** the `source_type` vocabulary is systemically
+drifted — **232 invalid values across 74 loaders** (`statute` 108 · `official_instructions` 59 ·
+`federal_form` 29 · `official_guidance` 28 · +5), each a near-miss of a real choice (note
+`OFFICIAL_INSTRUCTION` is singular). Reconciling rewrites published exports. Phase 2 fixed only the
+value it touched and installed a **ratchet** test (counts may only fall; a new distinct value fails).
+*(Survey caveat for whoever takes that WO: scope the AST walk to dicts carrying `source_code` —
+`source_type` also appears in TestScenario `inputs` payloads meaning something else, which produced
+13 false positives on the first run.)*
+
+**NEW 2026-08-05 — THE TAX-LAW CHANGE FUNNEL IS LIVE (Phases 0-3 deployed, `4ef60cb`).**
 Seven detection arms (Federal Register · IRB backstop · eCFR Title 26 · irs-drop guidance ·
 irs-dft drafts w/ exact perimeter filter · final-form checksums HEAD-first · CourtListener
 courts) poll DAILY (cron 11:00 UTC); the **Friday digest cron** (13:00 UTC) emails the triage
