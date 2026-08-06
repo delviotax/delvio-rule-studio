@@ -100,7 +100,21 @@ and namespace everything new. ⚠ Also note the app-side wart this feeds: delvio
 from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 
 > **[WO-CONF-SPINE] 45-state campaign Phase 2 (Tax Shelter Future D-030, 2026-08-05) ·
-> state conformity spine + campaign scale pre-work · ⏳ AWAITING KEN (Gate-1 seed approval)**
+> state conformity spine + campaign scale pre-work · ✅ DONE — Gate 1 APPROVED by Ken
+> in-session 2026-08-05 (W1 "Approve — flip, seed, verify"; W4 "Separate WO, ratchet holds
+> meanwhile") → sentinel flipped → migration `sources.0006` confirmed applied (the Render
+> deploy of `8948e2e` ran it via `build.sh`; unique constraint verified present in prod) →
+> `load_state_conformity` seeded **4 rows** (GA updated, SC/AL/NC created) → `load_ga700`
+> re-seeded so the `source_type` fix reached prod (verified `state_instruction`) →
+> **ALL 17 STATE FORM EXPORTS NOW CARRY NON-NULL `state_conformity`** (GA×5 partial · SC×4
+> static · AL×4 rolling · NC×4 static; federal 4797 correctly null) → `seed_all --dry-run`
+> lists `load_state_conformity` under phase 3 amends → **full suite 224 passed**.
+> ⚠ One self-inflicted catch worth recording: the first version of `test_conformity_loader_is_gated`
+> asserted `READY_TO_SEED is False`, which went red the instant the loader was legitimately
+> approved — the same "permanently-red test is one nobody reads" class as the 8879 harness rot.
+> Rewritten to pin the guard MECHANISM (monkeypatch to False, assert it refuses and writes
+> nothing) plus a --dry-run case. · W4 → new order **[WO-SOURCETYPE-RECON]** below.**
+> · original scope follows:
 > · **Scope:** make `JurisdictionConformitySource` the shared, exported conformity spine for
 > every state BEFORE the campaign multiplies state specs ~10×. Not new tax research — the
 > SC/AL/NC content is TRANSCRIBED from their own already-Gate-1-approved loaders and cited to
@@ -137,6 +151,28 @@ from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 > → verify SC/AL/NC/GA exports carry non-null `state_conformity` → `seed_all --dry-run` →
 > explicit-path commit. **Prod probe (read-only, 2026-08-05): 1 conformity row, no duplicate
 > (state,year) keys — the unique constraint applies cleanly; all 5 authority anchors FOUND.**
+
+> **[WO-SOURCETYPE-RECON] Ken (2026-08-05, WO-CONF-SPINE W4: "Separate WO, ratchet holds
+> meanwhile") · repo-wide `source_type` vocabulary reconciliation · INTAKE**
+> · **The finding:** `AuthoritySource.source_type` is a CharField with `choices`, and Django does
+> NOT enforce choices at the DB layer — so an informal vocabulary has been persisting silently
+> since the earliest loaders. Survey 2026-08-05: **232 invalid values across 74 loaders** —
+> `statute` 108 · `official_instructions` 59 · `federal_form` 29 · `official_guidance` 28 ·
+> `instructions` 2 · `revenue_procedure` 2 · `form` 2 · `irs_guidance` 1 · `case_law` 1.
+> Every one is a near-miss of a real choice (note `OFFICIAL_INSTRUCTION` is **singular**;
+> `statute` should be `code_section` or `state_statute` depending on jurisdiction).
+> · **Why it matters:** the field is unusable for filtering, grouping or reporting, and the
+> campaign is about to add ~130-200 more state forms on top of it.
+> · **Why it is its own order:** correcting the values rewrites **published exports** across 74
+> forms, so it needs its own Gate-1 review and its own verification pass — it is not a
+> drive-by fix.
+> · **Holding pattern (live now):** `tests/test_state_conformity.py::test_no_new_invalid_source_types`
+> is a RATCHET — per-value counts may only fall, and any NEW distinct value fails the suite.
+> `test_state_conformity_loader_uses_valid_source_types` keeps campaign loaders clean from the start.
+> · ⚠ **Survey caveat for whoever takes this:** scope the AST walk to dicts that carry
+> `source_code`. `source_type` also appears inside TestScenario `inputs` payloads meaning
+> something unrelated ("this K-1 came from a 1065"), which produced 13 false positives on the
+> first run of the survey. Verify the gate against a known case before trusting its output.
 
 > **[WO-GA500-RECON] Ken (2026-08-02, "GA 500 spec next") · GA-500 spec reconciliation ·
 > ✅ DONE — Gate 1 APPROVED by Ken in-session 2026-08-02 ("Approve as drafted", incl. the

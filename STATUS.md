@@ -12,8 +12,19 @@ last_updated: 2026-08-05
 
 ## Current state
 
-**NEW 2026-08-05 (latest) — THE STATE CONFORMITY SPINE IS BUILT, ⏳ AWAITING KEN'S GATE-1 WALK
-(`WO-CONF-SPINE`, commit `8948e2e`).** Phase 2 of the 45-state campaign (Tax Shelter Future D-030;
+**NEW 2026-08-05 (latest) — THE STATE CONFORMITY SPINE IS LIVE ✅ (`WO-CONF-SPINE`, Gate-1
+APPROVED by Ken in-session: W1 "Approve — flip, seed, verify" / W4 "Separate WO, ratchet holds
+meanwhile").** Seeded to prod: **4 rows** (GA updated · SC/AL/NC created), `load_ga700` re-seeded
+so the `source_type` fix landed, and **all 17 state form exports now carry non-null
+`state_conformity`** (GA×5 partial · SC×4 static · AL×4 rolling · NC×4 static; federal 4797
+correctly null). `seed_all --dry-run` lists the loader under phase-3 amends; **full suite 224
+passed**. Migration `sources.0006` was already applied when the flip came — the Render deploy of
+`8948e2e` ran it via `build.sh`; the unique constraint was verified present in prod before seeding.
+⚠ Self-inflicted catch worth carrying forward: the first `test_conformity_loader_is_gated` asserted
+`READY_TO_SEED is False` and went red the instant the loader was legitimately approved — the same
+"a permanently-red test is one nobody reads" class as the 8879 harness rot. It now pins the guard
+MECHANISM (monkeypatch to False → assert it refuses and writes nothing) plus a `--dry-run` case.
+W4 opened **[WO-SOURCETYPE-RECON]**. Build detail follows: Phase 2 of the 45-state campaign (Tax Shelter Future D-030;
 campaign HQ = `delviotax/delvio-states`) — the scale pre-work that had to land BEFORE the campaign
 multiplies state specs ~10×. **The gap it closes:** `JurisdictionConformitySource` held exactly ONE
 row (GA/2025, written inline by `load_remaining_1120s`), so **SC, AL and NC every one exported

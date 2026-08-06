@@ -70,7 +70,9 @@ from sources.models import AuthoritySource, JurisdictionConformitySource
 # ═══════════════════════════════════════════════════════════════════════════
 # SAFETY GUARD
 # ═══════════════════════════════════════════════════════════════════════════
-READY_TO_SEED = False
+# FLIPPED 2026-08-05 — Ken's Gate-1 walk (WO-CONF-SPINE), in-session, verbatim:
+# W1 "Approve — flip, seed, verify"; W4 "Separate WO, ratchet holds meanwhile".
+READY_TO_SEED = True
 
 TAX_YEAR = 2025
 

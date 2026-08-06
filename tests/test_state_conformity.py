@@ -139,20 +139,38 @@ def test_federal_form_has_no_conformity_block(client):
 
 
 @pytest.mark.django_db
-def test_conformity_loader_is_gated():
-    """The seed guard refuses to write until Ken approves (Gate 1)."""
+def test_conformity_loader_guard_refuses_when_unflipped(monkeypatch):
+    """The seed guard must REFUSE and write nothing while it is unflipped.
+
+    This pins the guard MECHANISM, not the current value of the sentinel: the sentinel
+    ships False and is flipped in-session once Ken approves the Gate-1 walk (here,
+    2026-08-05, WO-CONF-SPINE), so asserting `is False` would make this test go red the
+    moment the loader was legitimately approved — a permanently-red test nobody reads.
+    """
     from django.core.management import call_command
     from django.core.management.base import CommandError
 
     from specs.management.commands import load_state_conformity
 
-    assert load_state_conformity.READY_TO_SEED is False, (
-        "READY_TO_SEED must ship False — flipping it is Ken's Gate-1 action, recorded in-session."
-    )
+    monkeypatch.setattr(load_state_conformity, "READY_TO_SEED", False)
+
     with pytest.raises(CommandError, match="READY_TO_SEED"):
         call_command("load_state_conformity")
 
     assert JurisdictionConformitySource.objects.count() == 0, "the guard must write nothing"
+
+
+@pytest.mark.django_db
+def test_conformity_dry_run_bypasses_guard_without_writing(monkeypatch):
+    """--dry-run inspects the planned rows even while gated, and still writes nothing."""
+    from django.core.management import call_command
+
+    from specs.management.commands import load_state_conformity
+
+    monkeypatch.setattr(load_state_conformity, "READY_TO_SEED", False)
+    call_command("load_state_conformity", "--dry-run")
+
+    assert JurisdictionConformitySource.objects.count() == 0
 
 
 def test_conformity_rows_use_canonical_decoupled_shape():
