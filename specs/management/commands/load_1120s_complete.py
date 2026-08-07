@@ -850,7 +850,10 @@ class Command(BaseCommand):
                 "13a/13b), Liabilities L16-21 (the face has NO total-liabilities "
                 "subtotal), Equity L22-26, Total L&SE L27. Not required if Schedule B "
                 "question 11 is 'Yes' (receipts < $250K AND assets < $250K); when "
-                "required, L15 column (d) also goes to page 1 item F (i1120s 2025 p.49)."
+                "required, L15 column (d) also goes to page 1 item F (i1120s 2025 p.49). "
+                "L24 column (d) is the BOOK retained-earnings figure, bridged from the M-2 "
+                "through Schedule M-1 (R010, Ken-ratified 2026-08-07) — NOT the M-2 ending "
+                "balances, which are tax accounts."
             ),
         )
         facts = []
@@ -864,6 +867,16 @@ class Command(BaseCommand):
             {"fact_key": "total_receipts", "label": "Total receipts (for the Schedule B question 11 exception)", "data_type": "decimal", "sort_order": 90},
             {"fact_key": "m2_ending_balance", "label": "M-2 ending balance (for retained earnings tie)", "data_type": "decimal", "sort_order": 91},
             {"fact_key": "f1125a_boy_inventory", "label": "Form 1125-A line 1 beginning inventory (cross-form, for the R008 no-prior-year default)", "data_type": "decimal", "sort_order": 92},
+            # R010 — the current-year book bridge (Ken-ratified 2026-08-07).
+            # The four genuinely book-only M-1 movements, plus the bridge output.
+            {"fact_key": "m1_5b_other_book_income", "label": "M-1 line 5b — other income recorded on books, on NO Schedule K line (detail rows subtotal)", "data_type": "decimal", "sort_order": 93,
+             "notes": "The M-1 line 5 residue AFTER 5a tax-exempt interest and AFTER the section 179 passthrough disposition gain are removed — both of those already move an M-2 column (5a → OAA; the 179 gain → AAA). Only this residue is book-only."},
+            {"fact_key": "m1_6a_tax_depreciation_excess", "label": "M-1 line 6a — depreciation on Schedule K in excess of the book figure", "data_type": "decimal", "sort_order": 94},
+            {"fact_key": "m1_6b_other_k_deductions", "label": "M-1 line 6b — other deductions on Schedule K never charged against book income", "data_type": "decimal", "sort_order": 95},
+            {"fact_key": "m1_2_income_on_k_not_books", "label": "M-1 line 2 — income on Schedule K never recorded on the books", "data_type": "decimal", "sort_order": 96},
+            {"fact_key": "m1_3a_book_depreciation_excess", "label": "M-1 line 3a — book depreciation in excess of the Schedule K deduction", "data_type": "decimal", "sort_order": 97},
+            {"fact_key": "l24_book_bridge", "label": "Current-year book bridge added to L24 column (d) (R010 output)", "data_type": "decimal", "sort_order": 98,
+             "notes": "Zero on any return whose books equal its tax figures. Never printed on a face — it is the reconciling term inside L24 column (d)."},
         ]
         self._upsert_facts(form, facts)
 
@@ -906,10 +919,18 @@ class Command(BaseCommand):
              "inputs": ["l15_total_assets_boy", "l15_total_assets_eoy", "l27_total_lse_boy", "l27_total_lse_eoy"],
              "outputs": [], "precedence": 4, "sort_order": 4,
              "description": "Total assets (L15) must equal total liabilities & shareholders' equity (L27) for both BOY and EOY."},
-            {"rule_id": "R005", "title": "Retained earnings tie to M-2", "rule_type": "validation",
-             "formula": "l24_retained_earnings_eoy == m2_ending_balance",
-             "inputs": ["l24_retained_earnings_eoy", "m2_ending_balance"], "outputs": [], "precedence": 5, "sort_order": 5,
-             "description": "L24 (retained earnings) EOY should tie to Schedule M-2 ending balance."},
+            {"rule_id": "R005", "title": "Retained earnings tie to M-2 — AFTER the R010 book bridge", "rule_type": "validation",
+             "formula": "l24_retained_earnings_eoy == m2_ending_balance + l24_book_bridge",
+             "inputs": ["l24_retained_earnings_eoy", "m2_ending_balance", "l24_book_bridge"], "outputs": [], "precedence": 5, "sort_order": 5,
+             "description": ("CORRECTED 2026-08-07 (Ken-ratified): the tie is to the M-2 ending balance "
+                             "PLUS the R010 current-year book bridge, not to the M-2 ending balance alone. "
+                             "The prior formula was right only for the book=tax case. Schedule L is a BOOK "
+                             "balance sheet (i1120s p.49: 'The balance sheets should agree with the "
+                             "corporation's books and records'); the M-2 columns are TAX accounts tracking "
+                             "what flowed through Schedule K. When the two diverge during the year the "
+                             "numbers legitimately differ, and Schedule M-1 is the form that explains the "
+                             "difference — so the tie must run through it. A book=tax return has a zero "
+                             "bridge and this reduces to the original equality.")},
             {"rule_id": "R006", "title": "BOY inventories tie to prior year EOY", "rule_type": "validation",
              "formula": "l3_inventories_boy == prior_year_l3_inventories_eoy",
              "inputs": ["l3_inventories_boy"], "outputs": [], "precedence": 6, "sort_order": 6,
@@ -935,12 +956,62 @@ class Command(BaseCommand):
              "description": ("i1120s 2025 p.49 verbatim: 'If the corporation is required to complete "
                              "Schedule L, include total assets reported on Schedule L, line 15, "
                              "column (d), on page 1, item F.'")},
+            {"rule_id": "R010", "title": "L24 column (d) is the BOOK figure — the current-year book bridge", "rule_type": "calculation",
+             "formula": ("l24_book_bridge = m1_5b_other_book_income + m1_6a_tax_depreciation_excess "
+                         "+ m1_6b_other_k_deductions - m1_2_income_on_k_not_books "
+                         "- m1_3a_book_depreciation_excess; "
+                         "l24_retained_earnings_eoy = l24_retained_earnings_boy "
+                         "+ (m2_ending_balance - m2_beginning_balance) - m2_distributions_not_charged "
+                         "+ l24_book_bridge"),
+             "inputs": ["m1_5b_other_book_income", "m1_6a_tax_depreciation_excess",
+                        "m1_6b_other_k_deductions", "m1_2_income_on_k_not_books",
+                        "m1_3a_book_depreciation_excess", "l24_retained_earnings_boy",
+                        "m2_ending_balance"],
+             "outputs": ["l24_book_bridge", "l24_retained_earnings_eoy"], "precedence": 2, "sort_order": 10,
+             "description": (
+                 "KEN-RATIFIED 2026-08-07 (delvio-tax DECISIONS.md, s224 decision pass item 15). "
+                 "Schedule L line 24 column (d) is the BOOK retained-earnings figure, bridged from the "
+                 "M-2, NOT the M-2 ending balances themselves. Authority: i1120s (2025) p.49 verbatim — "
+                 "'The balance sheets should agree with the corporation's books and records.' The M-2 "
+                 "columns (AAA/PTEP/AE&P/OAA) are TAX accounts recording what flowed through Schedule K; "
+                 "on a return whose books and tax figures diverge DURING the year those are different "
+                 "numbers, and Schedule M-1 is the form that reconciles them. Building L24(d) straight "
+                 "off the M-2 endings put the balance sheet on the TAX basis — the defect this rule "
+                 "corrects.\n\n"
+                 "THE JUDGMENT IS THE EXCLUSION LIST, NOT THE ARITHMETIC. Three book/tax differences are "
+                 "ALREADY carried by an M-2 column and must NOT be counted a second time, or the balance "
+                 "sheet is wrong in the opposite direction:\n"
+                 "  (1) tax-exempt interest (M-1 line 5a) — already INCREASES OAA (i1120s p.51);\n"
+                 "  (2) nondeductible expenses (M-1 lines 3b meals and 3c other book expenses not on "
+                 "Schedule K, i.e. Schedule K line 16c) — already DECREASE AAA (i1120s p.50 adjustment 2);\n"
+                 "  (3) the section 179 passthrough disposition gain (inside the M-1 line 5 total) — "
+                 "already INCREASES AAA.\n"
+                 "What remains — and all that the bridge picks up — are the four genuinely book-only "
+                 "movements: PLUS income on the books appearing on no Schedule K line (5b residue); PLUS "
+                 "deductions on Schedule K never charged to the books (6a + 6b); MINUS income on Schedule "
+                 "K never recorded on the books (line 2); MINUS book depreciation in excess of the tax "
+                 "figure (line 3a).\n\n"
+                 "SCOPE OF EFFECT: a corporation whose books equal its tax return has M-1 lines 2, 3a, 5b "
+                 "and 6 all blank and therefore carries a bridge of ZERO — every return that ties today is "
+                 "unmoved. The Schedule M-2 face itself never changes; only Schedule L line 24 column (d). "
+                 "Demonstrating case: books carrying 3,500 of accrual-to-cash accounts-receivable income "
+                 "that reaches no Schedule K line — real book income that raises book retained earnings "
+                 "and leaves AAA alone. L24(d) printed (6,509) on the M-2 basis; the book figure is "
+                 "(3,009), off by exactly the 3,500.\n\n"
+                 "REVISITABLE (Ken, 2026-08-07: 'we may come back to it at some point') — ratified, not "
+                 "frozen. The exclusion list is the part most likely to need revisiting on an unusual "
+                 "return; reopening it is expected, not a re-litigation. "
+                 "Implementation: delvio-tax server/apps/returns/compute.py, L24_BOOK_BRIDGE -> L24d."),
+             "notes": ("Authored into RS 2026-08-07 because the derivation previously lived ONLY in a code "
+                       "comment. Under the authoritative-source rule a formula nothing cites goes stale the "
+                       "moment someone forgets why the three exclusions exist — and the exclusions ARE the "
+                       "correctness argument.")},
         ])
 
         # In-loader stale-rule self-heal: R002 ("Total liabilities") is DELETED —
         # the 2025 face has no total-liabilities line (it was one of the two
         # fabricated numbering systems).
-        _SCHL_RULE_IDS = {"R001", "R003", "R004", "R005", "R006", "R007", "R008", "R009"}
+        _SCHL_RULE_IDS = {"R001", "R003", "R004", "R005", "R006", "R007", "R008", "R009", "R010"}
         stale_rules = FormRule.objects.filter(tax_form=form).exclude(rule_id__in=_SCHL_RULE_IDS)
         if stale_rules.exists():
             self.stdout.write(f"  deleting {stale_rules.count()} stale Schedule L rules: "
@@ -951,13 +1022,22 @@ class Command(BaseCommand):
             ("R001", "IRS_2025_1120S_SCHL_INSTR", "primary", "Asset line summation — total assets = LINE 15 (i1120s p.49: 'total assets reported on Schedule L, line 15, column (d)')"),
             ("R003", "IRS_2025_1120S_SCHL_INSTR", "primary", "L&SE total = liabilities 16-21 + equity 22-25 − 26 (2025 face: no total-liabilities subtotal)"),
             ("R004", "IRS_2025_1120S_SCHL_INSTR", "primary", "L15 must equal L27"),
-            ("R005", "IRS_2025_1120S_SCHL_INSTR", "primary", "L24 ties to M-2 ending balance"),
+            ("R005", "IRS_2025_1120S_SCHL_INSTR", "primary", "L24 ties to the M-2 ending balance PLUS the R010 book bridge (corrected 2026-08-07)"),
             ("R006", "IRS_2025_1120S_INSTR", "secondary", "BOY should equal prior year EOY"),
             ("R007", "IRS_2025_1120S_SCHL_INSTR", "primary", "i1120s p.49 verbatim: not required if Schedule B question 11 is Yes"),
             ("R008", "IRS_2025_1120S_SCHL_INSTR", "secondary",
              "Line 3 = inventories per the instructions; the no-prior-year default from 1125-A line 1 "
              "is practice logic (Ken ruling 2026-07-09)"),
             ("R009", "IRS_2025_1120S_SCHL_INSTR", "primary", "i1120s p.49 verbatim: L15 column (d) → page 1 item F"),
+            ("R010", "IRS_2025_1120S_SCHL_INSTR", "primary",
+             "i1120s (2025) p.49 verbatim: 'The balance sheets should agree with the corporation's books "
+             "and records' — the controlling sentence making L24 column (d) the BOOK figure rather than "
+             "the M-2 (tax-account) endings"),
+            ("R010", "IRS_2025_1120S_INSTR", "primary",
+             "i1120s (2025) pp.50-51 — the M-1/M-2 mechanics that fix the three exclusions: tax-exempt "
+             "interest already increases OAA; nondeductible expenses already decrease AAA (p.50 "
+             "adjustment 2); the §179 disposition gain already increases AAA. Counting any of them again "
+             "would overstate L24 column (d)"),
         ])
         self._upsert_lines(form, [
             {"line_number": "L1", "description": "Cash", "line_type": "input", "sort_order": 1},
@@ -988,7 +1068,10 @@ class Command(BaseCommand):
             {"line_number": "L21", "description": "Other liabilities (attach statement)", "line_type": "input", "sort_order": 25},
             {"line_number": "L22", "description": "Capital stock", "line_type": "input", "sort_order": 26},
             {"line_number": "L23", "description": "Additional paid-in capital", "line_type": "input", "sort_order": 27},
-            {"line_number": "L24", "description": "Retained earnings", "line_type": "input", "sort_order": 28},
+            {"line_number": "L24", "description": "Retained earnings", "line_type": "input", "source_rules": ["R010"], "sort_order": 28,
+             "notes": ("Column (d) is the BOOK figure: beginning retained earnings plus the M-2 movement, "
+                       "plus the R010 current-year book bridge (Ken-ratified 2026-08-07). It equals the "
+                       "M-2 endings ONLY when the books equal the tax figures.")},
             {"line_number": "L25", "description": "Adjustments to shareholders' equity (attach statement)", "line_type": "input", "sort_order": 29},
             {"line_number": "L26", "description": "Less cost of treasury stock", "line_type": "input", "sort_order": 30},
             {"line_number": "L27", "description": "Total liabilities and shareholders' equity", "line_type": "total", "source_rules": ["R003"], "sort_order": 31},
@@ -1015,9 +1098,15 @@ class Command(BaseCommand):
             {"diagnostic_id": "D002", "title": "Balance sheet out of balance (EOY)", "severity": "error",
              "condition": "l15_total_assets_eoy != l27_total_lse_eoy",
              "message": "EOY balance sheet out of balance: Total assets (L15) does not equal total liabilities & shareholders' equity (L27)."},
-            {"diagnostic_id": "D003", "title": "Retained earnings don't tie to M-2", "severity": "warning",
-             "condition": "l24_retained_earnings_eoy != m2_ending_balance",
-             "message": "L24 retained earnings (EOY) does not match Schedule M-2 ending balance."},
+            {"diagnostic_id": "D003", "title": "Retained earnings don't tie to M-2 after the book bridge", "severity": "warning",
+             "condition": "l24_retained_earnings_eoy != m2_ending_balance + l24_book_bridge",
+             "message": ("L24 retained earnings (EOY) does not match the Schedule M-2 ending balance plus "
+                         "the current-year book bridge. A book/tax difference by itself is NOT a finding — "
+                         "Schedule L is a book balance sheet and the M-2 tracks tax accounts, so the two "
+                         "differ legitimately whenever Schedule M-1 carries current-year activity. What "
+                         "this diagnostic tests is whether the M-1 explains the whole difference."),
+             "notes": ("Condition corrected 2026-08-07 alongside R005/R010 — the prior condition "
+                       "(l24 != m2_ending_balance) fired on every legitimate book/tax difference.")},
             {"diagnostic_id": "D004", "title": "Negative cash balance", "severity": "warning",
              "condition": "l1_cash_eoy < 0",
              "message": "Cash balance is negative at end of year. Verify bank accounts and outstanding items."},
@@ -1062,12 +1151,55 @@ class Command(BaseCommand):
                        "Pins the four asset lines (4/6/7/8) and the three contra pairs the old R001 "
                        "omitted entirely."),
              "sort_order": 4},
+            {"scenario_name": "R010 book bridge — book income on no Schedule K line", "scenario_type": "normal",
+             "inputs": {
+                 "m1_5b_other_book_income": 3500, "m1_6a_tax_depreciation_excess": 0,
+                 "m1_6b_other_k_deductions": 0, "m1_2_income_on_k_not_books": 0,
+                 "m1_3a_book_depreciation_excess": 0, "m2_ending_balance": -6509,
+             },
+             "expected_outputs": {"l24_book_bridge": 3500, "l24_retained_earnings_eoy": -3009},
+             "notes": ("The demonstrating case. Books carry 3,500 of accrual-to-cash accounts-receivable "
+                       "income that reaches no Schedule K line: real book income, so it raises book "
+                       "retained earnings, and it never went through Schedule K, so it leaves AAA alone. "
+                       "On the M-2 basis L24(d) printed (6,509); the book figure is (3,009)."),
+             "sort_order": 5},
+            {"scenario_name": "R010 book bridge — book = tax carries ZERO", "scenario_type": "edge",
+             "inputs": {
+                 "m1_5b_other_book_income": 0, "m1_6a_tax_depreciation_excess": 0,
+                 "m1_6b_other_k_deductions": 0, "m1_2_income_on_k_not_books": 0,
+                 "m1_3a_book_depreciation_excess": 0, "m2_ending_balance": 102000,
+             },
+             "expected_outputs": {"l24_book_bridge": 0, "l24_retained_earnings_eoy": 102000},
+             "notes": ("The no-movement pin. A corporation whose books equal its tax return has M-1 lines "
+                       "2, 3a, 5b and 6 all blank, so the bridge is zero and L24(d) is exactly the M-2 "
+                       "result — every return that ties today is unmoved by R010."),
+             "sort_order": 6},
+            {"scenario_name": "R010 book bridge — the three exclusions never enter it", "scenario_type": "edge",
+             "inputs": {
+                 "m1_5a_tax_exempt_interest": 4000, "m1_3b_travel_ent": 1200,
+                 "m1_3c_other_book_expenses": 800, "ent179_disposition_gain": 9000,
+                 "m1_5b_other_book_income": 0, "m1_6a_tax_depreciation_excess": 0,
+                 "m1_6b_other_k_deductions": 0, "m1_2_income_on_k_not_books": 0,
+                 "m1_3a_book_depreciation_excess": 0,
+             },
+             "expected_outputs": {"l24_book_bridge": 0},
+             "notes": ("THE JUDGMENT PIN — the reason this rule exists in RS at all. Tax-exempt interest "
+                       "(4,000) already increases OAA; the nondeductible expenses (1,200 meals + 800 other "
+                       "book expenses not on Schedule K = Schedule K line 16c) already decrease AAA; the "
+                       "§179 passthrough disposition gain (9,000) already increases AAA. All four sit on "
+                       "Schedule M-1 and all four are book/tax differences, yet the bridge must stay at "
+                       "ZERO — counting any of them again would overstate L24 column (d) by that amount. "
+                       "If this scenario ever returns a nonzero bridge, an exclusion has been dropped."),
+             "sort_order": 7},
         ])
 
         # In-loader stale-scenario self-heal (the RET-G5 rename-orphan guard).
         _SCHL_SCENARIOS = {
             "Balanced balance sheet", "Out-of-balance balance sheet",
             "Small corporation exception", "Contra-pair netting — R001 sums the face rows",
+            "R010 book bridge — book income on no Schedule K line",
+            "R010 book bridge — book = tax carries ZERO",
+            "R010 book bridge — the three exclusions never enter it",
         }
         stale_tests = TestScenario.objects.filter(tax_form=form).exclude(scenario_name__in=_SCHL_SCENARIOS)
         if stale_tests.exists():
