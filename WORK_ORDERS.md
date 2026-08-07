@@ -100,8 +100,11 @@ and namespace everything new. ⚠ Also note the app-side wart this feeds: delvio
 from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 
 > **[WO-K1-BASIS-704D] Mixed-entity pilot #7 (filing blocker; Ken chose spec-first
-> 2026-08-07 s226) · partner §704(d) basis limitation, preparer-asserted · ⏳ AWAITING KEN
-> (Gate 1) · required set: `K1_BASIS_704D` → gap CONFIRMED (no spec existed;
+> 2026-08-07 s226) · partner §704(d) basis limitation, preparer-asserted · ✅ APPROVED (seeded/exported) — Gate 1 approved by Ken in-session
+> 2026-08-07 ("Approve — flip, seed, export") → sentinel flipped (`0dab0f3`) → seeded to the
+> RS prod DB (134 forms; 12 authority links; all rules cited) → deployed
+> `lookup/K1_BASIS_704D/export/` returns 200 → spec cached to delvio-tax
+> `server/specs/k1_basis_704d_spec.json`. NEXT: DISPATCH the app build (tts session). · required set: `K1_BASIS_704D` → gap CONFIRMED (no spec existed;
 > `SCHEDULE_K1_1065 R-K1-ITEM-L` is the ENTITY-side item L capital roll-forward, itself
 > RED-deferred — item L capital ≠ outside basis, §752).
 > · **Authored:** `load_1040_k1_basis_704d.py` (`READY_TO_SEED=False`) — 8 facts / 6 rules
