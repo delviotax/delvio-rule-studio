@@ -81,7 +81,7 @@ from specs.models import (
 )
 
 
-READY_TO_SEED = False  # ⛔ Gate 1 — flips only on Ken's review walk.
+READY_TO_SEED = True  # FLIPPED 2026-08-07 — Ken approved the Gate-1 walk ("Approve — flip, seed, export").
 
 
 FORM_JURISDICTION = "FED"
