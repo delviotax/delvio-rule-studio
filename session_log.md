@@ -1,3 +1,33 @@
+## 2026-08-07 - K1_BASIS_704D authored (mixed-entity pilot #7) - AWAITING KEN (Gate 1)
+- Ken picked spec-first (s226 AskUserQuestion) for the partner §704(d) basis
+  limitation — the pilot's filing blocker (Sch E line 41 90,041 vs 106,270; AGI
+  195,006 vs 211,235, flowing to GA). Gap re-confirmed: no spec existed;
+  `SCHEDULE_K1_1065 R-K1-ITEM-L` is the ENTITY-side item L capital roll-forward
+  (item L ≠ outside basis — §752 liabilities).
+- `load_1040_k1_basis_704d.py` (`READY_TO_SEED=False`): 8 facts / 6 rules (all
+  cited) / 8 worksheet lines / 5 diagnostics / 7 scenarios (T1 = the pilot's
+  26,850/10,621/16,229) / 5 flow assertions. THE SHAPE: preparer ASSERTS
+  allowed + suspended; the app routes max(raw, −allowed) once in k1_sche_net()
+  (the Form-7203 arm's twin), checks allowed+suspended=loss and
+  allowed ≤ max(0, beginning+additions−distributions), and DIAGNOSES
+  (D_K1B_ARITH = error, never acknowledgable) — never derives the limit.
+- Law fetched 2026-08-07: §704(d)(1) verbatim; (d)(3) charitable/FTC nuance;
+  2025 Partner's Instructions verbatim (ORDER basis→at-risk→passive→EBL, agrees
+  with FORM_6198 R008; carryforward; "partner's responsibility to track" — NOT
+  attached → NO MeF doc, NO render leg); Reg §1.199A-3(b)(1)(iv)(A) (QBI never
+  double-limited). ⚠ requires_human_review: Reg §1.704-1(d) (eCFR blocked the
+  fetch; summary corroborated by the instructions) + §704(d)(2)'s odd "repaid"
+  sentence.
+- `check_k1_basis_704d_integrity.py` GREEN (independent re-typing, no shared
+  math; also pins the pilot identity 10,621+16,229=26,850 and both movement
+  deltas = the suspended amount). ⚠ THE RATCHET WORKS: the first draft copied
+  `"source_type": "statute"` from the 7206 template — `test_no_new_invalid_source_types`
+  caught the 109th occurrence; fixed to `code_section`. Never copy an older
+  loader's source_type without checking SourceType. Full suite green (226 + the
+  ratchet file 13/13). WORK_ORDERS: [WO-K1-BASIS-704D] ⏳ AWAITING KEN, walk
+  items listed there. seed_all needs no edit (dynamic discovery; gated loader
+  [FAIL]s gracefully like load_6765).
+
 ## 2026-08-05 - CHANGE FUNNEL COMPLETE (Phases 0-3 deployed) + repo renamed delvio-rule-studio
 - Built from the 2026-08-04/05 funnel plan (`~\.claude\plans\i-ve-created-this-session-cozy-widget.md`),
   Ken-directed "finish Phase 2 and 3". Phases 0+1 were the prior night's commits (pushed today,

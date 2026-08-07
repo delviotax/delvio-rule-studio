@@ -99,6 +99,36 @@ and namespace everything new. ⚠ Also note the app-side wart this feeds: delvio
 *No independent backlog here (see header). Sequence = BUILD_ORDER.md SPINE; statuses seeded
 from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 
+> **[WO-K1-BASIS-704D] Mixed-entity pilot #7 (filing blocker; Ken chose spec-first
+> 2026-08-07 s226) · partner §704(d) basis limitation, preparer-asserted · ⏳ AWAITING KEN
+> (Gate 1) · required set: `K1_BASIS_704D` → gap CONFIRMED (no spec existed;
+> `SCHEDULE_K1_1065 R-K1-ITEM-L` is the ENTITY-side item L capital roll-forward, itself
+> RED-deferred — item L capital ≠ outside basis, §752).
+> · **Authored:** `load_1040_k1_basis_704d.py` (`READY_TO_SEED=False`) — 8 facts / 6 rules
+> (R-K1B-SCOPE/ASSERT/ARITH/ORDER/QBI/CARRY, all cited) / 8 worksheet lines / 5 diagnostics
+> (D_K1B_ARITH error — arithmetically impossible never acknowledgable; EXCESS_DISTRIB;
+> PASSIVE; UNASSERTED — the D_K1_BASIS successor, saved-worksheet-clears per the 7203
+> confirm precedent; FULLY_ALLOWED) / 7 scenarios (T1 = the pilot's 26,850/10,621/16,229) /
+> 5 flow assertions (FA-1040-K1B-01…05, incl. the persistence gate — deliberately NO
+> MeF/render check). Integrity gate `check_k1_basis_704d_integrity.py` GREEN (shares no math).
+> · **The shape (the s225 REVIEW_QUEUE recommendation, Ken-picked):** the preparer ASSERTS
+> allowed + suspended from the source return's worksheet; the app routes max(raw, −allowed)
+> once in `k1_sche_net()` (the Form-7203 arm's twin), checks the two identities (allowed +
+> suspended = loss; allowed ≤ max(0, beginning + additions − distributions)) and DIAGNOSES —
+> never derives the §704(d) limit.
+> · **Law verified 2026-08-07 (fetched, not memory):** §704(d)(1) verbatim; (d)(3)(A)/(B)
+> charitable/FTC nuance; 2025 Partner's Instructions verbatim — the ORDER (basis → at-risk →
+> passive → EBL, agrees with FORM_6198 R008), the carryforward, and "the partner's
+> responsibility to track" (⚠ the scope finding: NOT attached to the return → no MeF doc, no
+> render leg); Reg §1.199A-3(b)(1)(iv)(A) — QBI never double-limited.
+> · **GATE-1 WALK ITEMS for Ken:** (1) the preparer-asserted shape (nothing derived); (2) the
+> arithmetic checks + error severity; (3) the no-attachment scope finding; (4) QBI
+> no-double-limit; (5) v1 scope = 1065 nonpassive (materially participating) only — passive
+> basis-limited keeps the Decision-4 RED; (6) the asserted "allowed" covers basis AND at-risk
+> combined (the app checkbox couples them). ⚠ Two sources flagged `requires_human_review` on
+> verbatim status: Reg §1.704-1(d) (eCFR blocked the fetch — summary corroborated by the
+> instructions) and §704(d)(2)'s odd "repaid" sentence.**
+>
 > **[WO-CONF-SPINE] 45-state campaign Phase 2 (Tax Shelter Future D-030, 2026-08-05) ·
 > state conformity spine + campaign scale pre-work · ✅ DONE — Gate 1 APPROVED by Ken
 > in-session 2026-08-05 (W1 "Approve — flip, seed, verify"; W4 "Separate WO, ratchet holds
