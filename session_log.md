@@ -1,3 +1,78 @@
+## 2026-08-08 (s232) - Form 8853 Section C authored, Gate 1 APPROVED, seeded + exported + cached
+- Ken picked spec-first for the last working day before a 10-day absence
+  (08-09 -> ~08-19): spend the day on the thing that NEEDS him, so the app build
+  can run unattended while he is away. His s224 ruling item 4 set the scope —
+  Section C ONLY (long-term care); Archer / Medicare Advantage MSA sections stay
+  out of season-one scope and Form 8889 line 4 stays keyed under D_8889_ARCHER.
+- Gap confirmed: `lookup/8853`, `lookup/1099LTC`, `lookup/1099_LTC` all 404; no
+  cached spec; no source brief. App side had no compute, model, field map or PDF
+  template (f8853 absent from forms_manifest.json).
+- ⚠ The destination already existed AND already failed: Schedule 1 line 8e is
+  seeded "Income from Form 8853" as a KEYED line, and form_manifest.py already
+  declares AttachmentRequirement("Form 8853") on it — test_form_manifest.py pins
+  the comment "Form 8853 — never generated". That comment is the build leg's
+  acceptance criterion to delete.
+- ⚠⚠ THE CENTRAL DESIGN FINDING — line 8e is COMPOSED and the IRS's own schema
+  says so: its MeF element is `TotArcherMSAMedcrLTCAmt` (Archer MSA + Medicare
+  Advantage + LTC), and the face says "include this amount in the TOTAL on line
+  8e". The s230 Schedule-K-13g ruling governs — the writer is a REGISTRY. v1
+  composes 8e = Section C component + preparer-keyed A/B residual, so a later
+  Sections A/B build joins instead of overwriting. A single-writer build would
+  silently erase a keyed Archer figure: a DISAPPEARED number, which is exactly
+  why nobody would ever report it.
+- ⚠⚠ THE STATUTE CORRECTED THE DRAFT. §7702B(d)(2) verbatim (uscode.house.gov)
+  defines the limitation as "the EXCESS (IF ANY) of— (A) the greater of ... over
+  (B) ... reimbursements". "Excess (if any)" floors line 25 at zero — and THE
+  FACE PRINTS NO FLOOR THERE (only line 26 carries "If zero or less, enter -0-").
+  I had drafted it unfloored off the face plus an LII fetch whose paraphrase had
+  dropped the phrase; a second fetch caught it. The defect was live: line 20 =
+  10,000 with reimbursements driving line 25 to −5,000 gave line 26 = 15,000 —
+  taxing half again more than the taxpayer ever received. My integrity gate had
+  independently re-typed the SAME face-only reading, so the two agreeing proved
+  nothing. Now pinned by scenario T14 plus a structural gate invariant (line 26
+  may never exceed line 20) hardcoded independently of the scenarios.
+  The lesson: a paraphrase is not a verbatim, and the face is not the statute.
+- $420 confirmed THREE independent ways: Rev. Proc. 2024-40 §2.62 verbatim, the
+  printed 2025 face at line 21, and i8853 Example 1's own footnote. ⚠ §2.62 (per
+  diem cap on an EXCLUSION) is NOT §3.28 (age-band cap on deductible LTC
+  PREMIUMS, a DEDUCTION) already in delvio-tax DECISIONS.md.
+- Scenarios T1-T3 transcribe the IRS's own worked examples verbatim, so the rate,
+  the greater-of and the zero floor are validated against an IRS answer key. The
+  gate also reproduces Example 2 Step 3's allocation on the UNROUNDED ratio
+  (33,311, not 64.7% x 51,480 = 33,308) — the s230 never-split-an-already-rounded-
+  share rule, confirmed by the IRS's arithmetic.
+- Declared refusals, never silent gaps, each with its sign checked: Multiple
+  Payees (line 15 = Yes) REFUSED because computing an unshared limitation
+  UNDER-reports income; lines 15/16 three-state so the permissive answer is never
+  the silent default; multi-period, out-of-range day counts and the 1040-NR
+  destination all hold. The terminally-ill short circuit needs BOTH conditions —
+  T7 pins a case where shortcutting on line 16 alone would wrongly exclude 29,580.
+- `load_1040_8853_sec_c.py`: 23 facts / 10 rules (all cited) / 14 face lines
+  (14a-26) / 12 diagnostics / 14 scenarios / 5 flow assertions. Integrity gate
+  `check_8853_sec_c_integrity.py` shares no math, and its teeth were PROVEN by a
+  negative control injecting 6 defects (min-for-max, stale $410 rate, drifting
+  fact default, dropped face line, invalid enum, unfloored line 25) — all 6 caught.
+- Gate 1 APPROVED in-session ("Approve as drafted", explicitly including the line
+  25 floor and the composed 8e) -> sentinel flipped -> seeded (135 forms; 18
+  authority links; all rules cited) -> deployed export 200 -> cached to delvio-tax
+  `server/specs/8853_sec_c_spec.json`, contents verified rather than assumed.
+- 1099-LTC gets NO spec (s222: information returns build from the form + a brief)
+  -> `f8853_1099ltc_source_brief.md`, incl. the lane-registry checklist and the
+  ⚠ optional-box trap: boxes 4/5 are optional and box 3 "may not be checked" when
+  the insured was terminally ill, so absence is NEVER an answer — the boxes must
+  be nullable, not defaulted false.
+- Deliberately NO spec under the bare form number `8853`: a spec covering half a
+  form while claiming all of it is the s231 Form-3800 defect. `8853_SEC_AB` is
+  reserved and the source brief explains the 404.
+- Two findings folded into WO-SOURCETYPE-RECON rather than opened as new orders:
+  Rev. Proc. 2024-40 lives under THREE source_codes (RP_2024_40 /
+  REV_PROC_2024_40 / IRS_RP_2024_40); and TaxForm.status has 5 rows carrying
+  "active", the FlowAssertion vocabulary — the same choices-not-enforced root
+  cause on a second field. Also: the export serializer omits
+  requires_human_review, so a build session cannot see which authorities are
+  flagged (for this spec, IRC_101_G is the one live flag).
+- NEXT: dispatch the app build. It needs nothing further from Ken.
+
 ## 2026-08-07 - K1_BASIS_704D authored (mixed-entity pilot #7) - AWAITING KEN (Gate 1)
 - Ken picked spec-first (s226 AskUserQuestion) for the partner §704(d) basis
   limitation — the pilot's filing blocker (Sch E line 41 90,041 vs 106,270; AGI
