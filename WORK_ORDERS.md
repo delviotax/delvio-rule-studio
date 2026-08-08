@@ -99,6 +99,88 @@ and namespace everything new. ⚠ Also note the app-side wart this feeds: delvio
 *No independent backlog here (see header). Sequence = BUILD_ORDER.md SPINE; statuses seeded
 from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 
+> **[WO-8853-SEC-C] Ken's s224 scope ruling item 4, lane re-confirmed 2026-08-08 (s232 —
+> Ken picked spec-first for the last day before a 10-day absence) · Form 8853 **Section C
+> only**, long-term care insurance contracts + accelerated death benefits · ⏳ AWAITING KEN
+> (Gate 1)**
+> · **required set:** `8853_SEC_C` → gap CONFIRMED 2026-08-08. `lookup/8853/export/`,
+> `lookup/1099LTC/export/` and `lookup/1099_LTC/export/` all 404; nothing in delvio-tax
+> `server/specs/`; no source brief in this repo. App side: NO compute, NO model, NO field
+> map, NO PDF template (f8853 absent from `forms_manifest.json`).
+> · ⚠ **The destination already exists and already fails.** Schedule 1 line **8e** is
+> seeded "Income from Form 8853" as a KEYED currency line, and `form_manifest.py` already
+> declares `AttachmentRequirement("Form 8853")` on it — `test_form_manifest.py` literally
+> pins the comment *"Form 8853 — never generated"*. So today an LTC client's taxable
+> payments must be hand-keyed and the manifest correctly reports a required attachment the
+> app cannot produce. That comment is the build leg's acceptance criterion to delete.
+> · **Authored:** `load_1040_8853_sec_c.py` (`READY_TO_SEED=False`) — 23 facts / 10 rules
+> (R-8853C-SCOPE/FILING/LINE17/LINE20/LIMIT/LINE26/MULTIPAYEE/PERIOD/DEST/ATTACH, all
+> cited) / 14 face lines (14a-26) / 12 diagnostics / 13 scenarios / 5 flow assertions.
+> Integrity gate `check_8853_sec_c_integrity.py` GREEN, shares no math — and its teeth were
+> PROVEN by a negative control that injected 5 defects (min-for-max at line 23, a stale
+> $410 rate, a fact default drifting off the constant, a dropped face line, an invalid
+> enum) and confirmed all 5 are caught.
+> · ⚠⚠ **THE CENTRAL DESIGN FINDING — Schedule 1 line 8e is a COMPOSED line, and the IRS's
+> own schema says so.** Its MeF element is **`TotArcherMSAMedcrLTCAmt`** — Total **Archer
+> MSA / Medcr / LTC** Amount — and the face itself says "include this amount in the TOTAL
+> on line 8e". i8853 confirms from the other side (an Archer MSA deemed-loan is also
+> reported on 8e). This is the s230 Schedule-K-13g situation exactly, so DECISIONS.md
+> governs: **a shared line's writer is a REGISTRY, not whichever form got there first.**
+> v1 composes 8e = (Section C component) + (preparer-keyed Sections A/B residual), so a
+> later Sections A/B build joins instead of silently overwriting. The failure mode this
+> prevents is a DISAPPEARED number — which is why nobody would ever report it.
+> · **Law verified 2026-08-08 (fetched, not memory):** §7702B(d)(1) excess includible /
+> (d)(2) the "greater of" less reimbursements — which maps 1:1 onto face lines 21/22→23→
+> less 24→25 / (d)(3)(A)+(B) verbatim (all payees for one insured treated as **1 person**;
+> limitation allocated first to the insured) / (d)(4) the $175 baseline / (d)(5) indexing.
+> **Rev. Proc. 2024-40 §2.62 verbatim: the 2025 per diem limitation is $420** — and the
+> 2025 face PRINTS $420 on line 21 while i8853's Example 1 footnote cites that exact
+> section, so the constant has **three independent confirmations**. §101(g)(1)/(3)/(4):
+> terminally ill excluded outright (the face's skip-17-through-25), chronically ill limited
+> to the §7702B treatment, and the two statuses mutually exclusive.
+> · ⚠ **NOT the §213(d)(10) item** already in delvio-tax DECISIONS.md: that is Rev. Proc.
+> 2024-40 **§3.28**, the age-band cap on deductible LTC **premiums** (a DEDUCTION). This is
+> **§2.62**, the per diem cap on an **EXCLUSION**. Different halves of the same subject.
+> · **Scenarios T1-T3 are the IRS's own published examples transcribed verbatim** (i8853
+> Example 1; Example 2 Steps 1 and 2), so the rate, the greater-of and the zero floor are
+> validated against an IRS answer key rather than against our reading. The gate also
+> reproduces Example 2 Step 3's allocation on the **UNROUNDED** ratio (33,000/51,000 ×
+> 51,480 = **33,311**, not 64.7% × 51,480 = 33,308) — the s230 never-split-an-
+> already-rounded-share rule, confirmed by the IRS's own arithmetic.
+> · **GATE-1 WALK ITEMS for Ken:** (1) line 8e becomes COMPOSED per the K13g registry
+> ruling; (2) Multiple Payees (line 15 = Yes) is **REFUSED, not approximated** — ⚠ check
+> the sign: computing an unshared limitation makes line 25 too large and line 26 too small,
+> i.e. it UNDER-reports taxable income, so refusing is the conservative direction;
+> (3) lines 15 and 16 are three-state (yes/no/**unanswered**) because the permissive answer
+> must never be the silent default; (4) the LTC-period day count is a preparer ELECTION
+> between two defined methods, so only a 1-365 range check is available — and a 365 keyed
+> where the truth is 1 inflates the limitation 365-fold in the taxpayer's favour;
+> (5) the pre-August-1-1996 reimbursement carve-out defaults OFF (excluding reimbursements
+> is taxpayer-favourable); (6) Sections A/B stay out of scope and Form 8889 line 4 stays
+> keyed under `D_8889_ARCHER`; (7) the **narrowness of the terminally-ill short circuit** —
+> line 16 = Yes alone is NOT enough, the ONLY payments must be ADB paid for that reason
+> (scenario T7 pins a case where short-circuiting on line 16 alone would wrongly exclude
+> 29,580). ⚠ Two `requires_human_review` verbatim flags: §7702B(d)(2)'s "greater of"
+> wording (the whole 21-vs-22 comparison rests on it) and the §101(g)(3) conditions.
+> · **Deliberately NO spec under the bare form number `8853`** — a spec claiming the whole
+> form while describing half of it is the s231 Form-3800 defect (a `line_map` that did not
+> match the real face). `8853_SEC_AB` is reserved for the Archer sections, and
+> `f8853_1099ltc_source_brief.md` explains the 404 to whoever hits it next.
+> · **The 1099-LTC gets no spec** (s222: information returns build from the form + a source
+> brief) → `f8853_1099ltc_source_brief.md`, incl. the lane-registry checklist and the
+> ⚠ optional-box trap: boxes 4 and 5 are optional and box 3 "may not be checked" when the
+> insured was terminally ill, so **absence is never an answer** — the nullable-not-false
+> rule, or a blank optional box silently encodes a negative.
+> · ⓘ **Adjacent observation, NOT a new order (Ken's call):** Rev. Proc. 2024-40 exists
+> under **three** source_codes — `RP_2024_40`, `REV_PROC_2024_40`, `IRS_RP_2024_40`. This
+> spec reuses `RP_2024_40` and attaches its §2.62 excerpt there rather than minting a
+> fourth. Distinct from **[WO-SOURCETYPE-RECON]** (invalid `source_type` *values*); this is
+> duplicate *source_codes for one document*, which nothing currently tracks. ✔ Re-ran that
+> order's survey while here: my counts match its 2026-08-05 figures, and the `1065`/`1041`/
+> `1120s` values that look alarming are exactly its documented 13 false positives
+> (TestScenario `inputs` payloads) — my grep wasn't scoped to dicts carrying `source_code`,
+> so the caveat earned its keep. This loader uses only valid enums.
+>
 > **[WO-K1-BASIS-704D] Mixed-entity pilot #7 (filing blocker; Ken chose spec-first
 > 2026-08-07 s226) · partner §704(d) basis limitation, preparer-asserted · ✅ APPROVED (seeded/exported) — Gate 1 approved by Ken in-session
 > 2026-08-07 ("Approve — flip, seed, export") → sentinel flipped (`0dab0f3`) → seeded to the
