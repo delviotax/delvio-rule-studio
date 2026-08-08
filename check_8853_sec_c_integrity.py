@@ -60,8 +60,12 @@ def ind_line23(l21, l22):
 
 
 def ind_line25(l23, l24):
-    # NOT floored — only line 26 is. A negative 25 correctly makes more taxable.
-    return D(l23) - D(l24)
+    # §7702B(d)(2): "the EXCESS (IF ANY) of (A) ... over (B)" — floored at zero.
+    # ⚠ The FACE prints no floor here (only on line 26), so this floor comes from
+    # the statute alone. Both this gate and the loader were first written unfloored
+    # off the face; the verbatim (d)(2) caught it. See T14.
+    diff = D(l23) - D(l24)
+    return diff if diff > 0 else D(0)
 
 
 def ind_line26(l20, l25):
@@ -180,6 +184,21 @@ for label, l20, days, l22, l24, want23, want25, want26 in (
 # check that the day counts were transcribed correctly.
 if 181 + 184 != DAYS_2025:
     err("i8853 Example 2's two LTC periods (181 + 184) do not tile 2025")
+
+# ── 3b. The §7702B(d)(2) floor on line 25, asserted structurally ──
+# The invariant the floor exists to protect: line 26 can never exceed line 20,
+# because you cannot be taxed on more than you received. Hardcoded independently
+# of the scenarios so it survives any scenario edit.
+for _l20, _days, _l22, _l24 in ((10000, 1, 0, 5420), (500, 1, 0, 99999),
+                                (24000, 365, 0, 200000), (1000, 30, 500, 40000)):
+    _l21 = ind_line21(RATE_2025, _days)
+    _l23 = ind_line23(_l21, _l22)
+    _l25 = ind_line25(_l23, _l24)
+    _l26 = ind_line26(_l20, _l25)
+    if _l25 < 0:
+        err(f"line 25 went negative ({_l25}) — §7702B(d)(2) 'excess (if any)' floors it at zero")
+    if _l26 > D(_l20):
+        err(f"line 26 ({_l26}) exceeds line 20 ({_l20}) — taxing more than was received")
 
 # Example 2 Step 3's allocation, on the UNROUNDED ratio (s230 rule). The IRS
 # prints 33,311 / 18,169 from 64.7% / 35.3% — reproducible only unrounded.

@@ -117,9 +117,21 @@ from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 > (R-8853C-SCOPE/FILING/LINE17/LINE20/LIMIT/LINE26/MULTIPAYEE/PERIOD/DEST/ATTACH, all
 > cited) / 14 face lines (14a-26) / 12 diagnostics / 13 scenarios / 5 flow assertions.
 > Integrity gate `check_8853_sec_c_integrity.py` GREEN, shares no math — and its teeth were
-> PROVEN by a negative control that injected 5 defects (min-for-max at line 23, a stale
+> PROVEN by a negative control that injected 6 defects (min-for-max at line 23, a stale
 > $410 rate, a fact default drifting off the constant, a dropped face line, an invalid
-> enum) and confirmed all 5 are caught.
+> enum, and an unfloored line 25) and confirmed all 6 are caught.
+> · ⚠⚠ **THE STATUTE CORRECTED THE DRAFT — line 25 is FLOORED and the FACE DOES NOT SAY SO.**
+> §7702B(d)(2) verbatim defines the limitation as "the **excess (if any)** of— (A) the
+> greater of … over (B) … reimbursements". "Excess (if any)" is the Code's floor-at-zero
+> idiom. The face prints "If zero or less, enter -0-" on line **26 only**; line 25 says
+> merely "Subtract line 24 from line 23". This spec was FIRST DRAFTED UNFLOORED off the
+> face plus an LII fetch that returned a paraphrase with the phrase dropped; a second fetch
+> from uscode.house.gov caught it. The defect was live, not theoretical: line 20 = 10,000
+> with reimbursements driving line 25 to −5,000 produced line 26 = **15,000** — taxing half
+> again more than the taxpayer ever received. Now pinned by scenario **T14** plus a
+> structural gate invariant (line 26 may never exceed line 20) that is hardcoded
+> independently of the scenarios. **The lesson, again: a paraphrase is not a verbatim, and
+> the face is not the statute.**
 > · ⚠⚠ **THE CENTRAL DESIGN FINDING — Schedule 1 line 8e is a COMPOSED line, and the IRS's
 > own schema says so.** Its MeF element is **`TotArcherMSAMedcrLTCAmt`** — Total **Archer
 > MSA / Medcr / LTC** Amount — and the face itself says "include this amount in the TOTAL
@@ -160,8 +172,11 @@ from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 > keyed under `D_8889_ARCHER`; (7) the **narrowness of the terminally-ill short circuit** —
 > line 16 = Yes alone is NOT enough, the ONLY payments must be ADB paid for that reason
 > (scenario T7 pins a case where short-circuiting on line 16 alone would wrongly exclude
-> 29,580). ⚠ Two `requires_human_review` verbatim flags: §7702B(d)(2)'s "greater of"
-> wording (the whole 21-vs-22 comparison rests on it) and the §101(g)(3) conditions.
+> 29,580); (8) **the statutory floor on line 25** that the face does not print — the one
+> item where the spec now departs from a literal reading of the form, so it is the item
+> most worth Ken's eye. ⚠ ONE remaining `requires_human_review` verbatim flag: the
+> §101(g)(3) conditions for chronically-ill accelerated death benefits. (§7702B(d)(1) and
+> (d)(2) are now captured verbatim and the flag is cleared.)
 > · **Deliberately NO spec under the bare form number `8853`** — a spec claiming the whole
 > form while describing half of it is the s231 Form-3800 defect (a `line_map` that did not
 > match the real face). `8853_SEC_AB` is reserved for the Archer sections, and

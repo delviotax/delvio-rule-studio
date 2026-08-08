@@ -34,11 +34,24 @@ residual), so a later Sections A/B build joins as one more component instead of
 silently overwriting Section C. Ken confirms this shape at Gate 1.
 
 LAW VERIFIED 2026-08-08 against primary sources (fetched, not memory):
-  - IRC §7702B(d)(1): aggregate periodic payments in excess of the per diem
-    limitation are includible in gross income.
-  - IRC §7702B(d)(2): the limitation is the GREATER of the dollar amount or the
-    actual cost of qualified LTC services, MINUS reimbursements — which is
-    exactly face lines 21/22 → 23 → less 24 → 25.
+  - IRC §7702B(d)(1) verbatim: the excess of (A) qualified-contract periodic
+    payments plus (B) the §101(g) payments, over the per diem limitation, is
+    includible "without regard to section 72". (A) + (B) IS face line 20 — the
+    statutory reason chronically-ill ADB shares the LTC limitation.
+  - **IRC §7702B(d)(2) verbatim — AND IT CORRECTED THIS SPEC.** The limitation is
+    "the **excess (if any)** of— (A) the greater of— (i) the dollar amount … or
+    (ii) the costs incurred …, over (B) the aggregate payments received as
+    reimbursements". That is face lines 21/22 → 23 → less 24 → 25 in one
+    sentence — but "excess (if any)" is the Code's floor-at-zero idiom, and the
+    FACE PRINTS NO FLOOR ON LINE 25 (it prints one only on line 26).
+    ⚠⚠ This spec was first drafted with line 25 UNFLOORED, on the strength of the
+    face plus an LII fetch that returned only a paraphrase with the phrase
+    dropped. A second fetch from uscode.house.gov caught it. The defect was
+    live: with line 20 = 10,000 and reimbursements driving line 25 to −5,000,
+    line 26 came out 15,000 — taxing half again more than the taxpayer ever
+    received. Pinned by scenario T14 and by the integrity gate.
+    *The lesson, again: a paraphrase is not a verbatim, and the face is not the
+    statute.*
   - IRC §7702B(d)(3)(A) verbatim: "all persons receiving periodic payments
     described in paragraph (1) with respect to the same insured shall be treated
     as 1 person"; (d)(3)(B) allocates the limitation "first to the insured and
@@ -126,9 +139,20 @@ FORM_STATUS = "draft"
 #
 #   line 20 = line 18 + line 19
 #   line 21 = PER_DIEM_RATE_2025 (420) x days in the LTC period
-#   line 23 = MAX(line 21, line 22)          <- §7702B(d)(2) "greater of"
-#   line 25 = line 23 - line 24              <- less reimbursements
+#   line 23 = MAX(line 21, line 22)          <- §7702B(d)(2)(A) "the greater of"
+#   line 25 = MAX(0, line 23 - line 24)      <- §7702B(d)(2) "the EXCESS (IF ANY) of
+#                                               (A) ... over (B)" = a floor at zero
 #   line 26 = MAX(0, line 20 - line 25)      <- §7702B(d)(1) the excess
+#
+# ⚠⚠ THE FLOOR ON LINE 25 IS STATUTORY AND THE FACE DOES NOT PRINT IT. Line 26
+# carries an explicit "If zero or less, enter -0-"; line 25 says only "Subtract
+# line 24 from line 23". But §7702B(d)(2) defines the limitation as "the excess
+# (if any) of (A) ... over (B)", and "excess (if any)" is the Code's floor-at-zero
+# idiom. Without the floor a negative line 25 makes line 26 EXCEED line 20 — i.e.
+# it taxes more than the taxpayer ever received (line 20 = 10,000 with line 25 =
+# -5,000 gives 15,000 taxable). Reachable whenever reimbursements exceed the
+# greater of the dollar limit and the costs, e.g. a 1-day contract period with
+# low costs and a large expected reimbursement. Pinned by scenario T14.
 #
 # The terminally-ill short circuit (face note under line 16): if line 16 = Yes
 # AND the only payments received were accelerated death benefits paid BECAUSE
@@ -174,8 +198,9 @@ def compute_8853_sec_c(
 
     line20 = _D(line18_qualified_per_diem) + _D(line19_adb_chronically_ill)
     line21 = _D(per_diem_rate) * _D(ltc_period_days)
-    line23 = max(line21, _D(line22_costs_incurred))       # §7702B(d)(2) greater-of
-    line25 = line23 - _D(line24_reimbursements)
+    line23 = max(line21, _D(line22_costs_incurred))       # §7702B(d)(2)(A) greater-of
+    # "the EXCESS (IF ANY) of (A) ... over (B)" — statutory floor, not on the face.
+    line25 = max(Decimal("0"), line23 - _D(line24_reimbursements))
     line26 = max(Decimal("0"), line20 - line25)           # §7702B(d)(1) the excess
     return {
         "line20": line20, "line21": line21, "line23": line23,
@@ -216,23 +241,70 @@ AUTHORITY_SOURCES: list[dict] = [
         "is_substantive_authority": True,
         "is_filing_authority": False,
         "trust_score": 10.00,
-        "requires_human_review": True,
+        "requires_human_review": False,
         "notes": (
             "The operative limit, and it maps 1:1 onto face lines 20-26. (d)(1): the excess of "
-            "aggregate periodic payments over the per diem limitation is includible in gross income. "
-            "(d)(2): the limitation is the GREATER of the dollar amount or actual qualified LTC service "
-            "costs, MINUS reimbursements — face lines 21/22 → 23 → less 24 → 25. (d)(3): all persons "
-            "receiving payments with respect to the SAME INSURED are treated as one person, and the "
-            "limitation is allocated first to the insured (the statutory root of the face's line 15 and "
-            "of Multiple Payees). (d)(4): $175/day statutory baseline. (d)(5): indexed by the "
-            "§213(d)(10) mechanism → Rev. Proc. 2024-40 §2.62 = $420 for 2025. "
-            "REQUIRES HUMAN REVIEW: (d)(3)(A) and (d)(3)(B) were captured verbatim on 2026-08-08 via "
-            "LII; (d)(1)/(d)(2)/(d)(5) were captured as close paraphrase from the same fetch and are "
-            "recorded as summaries, NOT as quotes — confirm the (d)(2) 'greater of' wording at the "
-            "Gate-1 walk, since the whole 21-vs-22 comparison rests on it."
+            "aggregate periodic payments over the per diem limitation is includible in gross income "
+            "'without regard to section 72' (the annuity rules do not apply). (d)(2): the limitation is "
+            "the EXCESS (IF ANY) of the GREATER of the dollar amount or actual qualified LTC service "
+            "costs, OVER reimbursements — face lines 21/22 → 23 → less 24 → 25, with a statutory floor "
+            "at zero the face does not print. (d)(3): all persons receiving payments with respect to the "
+            "SAME INSURED are treated as one person, and the limitation is allocated first to the "
+            "insured (the statutory root of the face's line 15 and of Multiple Payees). (d)(4): "
+            "$175/day statutory baseline. (d)(5): indexed by the §213(d)(10) mechanism → Rev. Proc. "
+            "2024-40 §2.62 = $420 for 2025. "
+            "VERBATIM STATUS: (d)(1), (d)(2), (d)(3)(A) and (d)(3)(B) all captured verbatim 2026-08-08 "
+            "— (d)(1)/(d)(2) from uscode.house.gov after an initial LII fetch returned only paraphrase. "
+            "⚠ THE SECOND FETCH EARNED ITS KEEP: the verbatim (d)(2) revealed 'the excess (if any)', "
+            "which floors line 25 — this spec had been authored UNFLOORED on the strength of the face "
+            "alone, and the paraphrase had silently dropped the phrase. No longer "
+            "requires_human_review; the drafting error it caught is recorded in the module docstring."
         ),
         "topics": ["ltc_per_diem_exclusion"],
         "excerpts": [
+            {
+                "excerpt_label": "§7702B(d)(1) — the excess over the limitation is includible, without regard to §72",
+                "location_reference": "26 U.S.C. §7702B(d)(1)",
+                "excerpt_text": (
+                    "If the aggregate of— (A) the periodic payments received for any period under all "
+                    "qualified long-term care insurance contracts which are treated as made for "
+                    "qualified long-term care services for an insured, and (B) the periodic payments "
+                    "received for such period which are treated under section 101(g) as paid by reason "
+                    "of the death of such insured, exceeds the per diem limitation for such period, "
+                    "such excess shall be includible in gross income without regard to section 72."
+                ),
+                "summary_text": (
+                    "Face line 26. Note (A) + (B) IS line 20: qualified LTC per-diem benefits plus the "
+                    "§101(g) payments (the chronically-ill ADB of line 19) share ONE limitation — which "
+                    "is the statutory reason line 19 sits inside the per diem machinery rather than "
+                    "beside it. 'Without regard to section 72' rules out annuity treatment of the "
+                    "excess."
+                ),
+                "is_key_excerpt": True,
+            },
+            {
+                "excerpt_label": "§7702B(d)(2) — 'the EXCESS (IF ANY) of the greater of ... over reimbursements'",
+                "location_reference": "26 U.S.C. §7702B(d)(2)",
+                "excerpt_text": (
+                    "For purposes of paragraph (1), the per diem limitation for any period is an amount "
+                    "equal to the excess (if any) of— (A) the greater of— (i) the dollar amount in "
+                    "effect for such period under paragraph (4), or (ii) the costs incurred for "
+                    "qualified long-term care services provided for the insured for such period, over "
+                    "(B) the aggregate payments received as reimbursements (through insurance or "
+                    "otherwise) for qualified long-term care services provided for the insured during "
+                    "such period."
+                ),
+                "summary_text": (
+                    "⚠⚠ THE WHOLE OF LINES 21-25 IN ONE SENTENCE, and it carries a floor the FACE DOES "
+                    "NOT PRINT. (A)(i) = line 21, (A)(ii) = line 22, 'the greater of' = line 23, (B) = "
+                    "line 24, and 'the EXCESS (IF ANY) of ... over ...' = line 25 floored at zero. The "
+                    "face prints '-0-' guidance on line 26 only, so a build working from the face alone "
+                    "leaves line 25 unfloored — and a negative line 25 makes line 26 exceed line 20, "
+                    "taxing more than was received. This spec was drafted with that defect and the "
+                    "verbatim caught it."
+                ),
+                "is_key_excerpt": True,
+            },
             {
                 "excerpt_label": "§7702B(d)(3)(A) — all payees for the same insured are treated as ONE person",
                 "location_reference": "26 U.S.C. §7702B(d)(3)(A)",
@@ -837,9 +909,12 @@ N_FACTS: list[dict] = [
      "notes": ("OUTPUT. §7702B(d)(2)'s 'greater of'. A min-for-max slip here understates the "
                "limitation and OVER-taxes — the opposite sign from most defects on this form, and the "
                "reason FA-1040-8853C-02 pins it with costs deliberately above the dollar limit.")},
-    {"fact_key": "f8853c_line25_per_diem_limitation", "label": "Line 25 — per diem limitation (line 23 less line 24)",
+    {"fact_key": "f8853c_line25_per_diem_limitation", "label": "Line 25 — per diem limitation = MAX(0, line 23 less line 24)",
      "data_type": "decimal", "sort_order": 43,
-     "notes": ("OUTPUT. On a Multiple Payees return this is instead the taxpayer's ALLOCATED SHARE, "
+     "notes": ("OUTPUT. ⚠⚠ FLOORED AT ZERO by §7702B(d)(2)'s 'the excess (if any) of (A) ... over (B)' "
+               "even though the FACE prints no floor on line 25 (it prints one only on line 26). An "
+               "unfloored negative line 25 makes line 26 exceed line 20 — taxing more than was "
+               "received. On a Multiple Payees return this is instead the taxpayer's ALLOCATED SHARE, "
                "keyed from the aggregate statement with lines 21-24 blank (not built in v1).")},
     {"fact_key": "f8853c_line26_taxable", "label": "Line 26 — taxable payments (line 20 less line 25, floored at zero)",
      "data_type": "decimal", "sort_order": 44,
@@ -911,8 +986,10 @@ N_RULES: list[dict] = [
     {"rule_id": "R-8853C-LIMIT", "title": "The §7702B(d)(2) limitation — greater of dollars or costs, less reimbursements", "rule_type": "calculation",
      "precedence": 5, "sort_order": 5,
      "formula": ("line21 = per_diem_rate x ltc_period_days   [2025: 420 x days, 1 <= days <= 365]\n"
-                 "line23 = MAX(line21, line22)               [the statutory 'greater of']\n"
-                 "line25 = line23 − line24                   [less reimbursements received or expected]\n"
+                 "line23 = MAX(line21, line22)               [§7702B(d)(2)(A) 'the greater of']\n"
+                 "line25 = MAX(0, line23 − line24)           [§7702B(d)(2) 'the EXCESS (IF ANY) of\n"
+                 "                                            (A) ... over (B)' — a STATUTORY floor\n"
+                 "                                            the face does not print]\n"
                  "Reimbursements under a pre-August-1-1996 contract are EXCLUDED from line 24 unless "
                  "the contract was exchanged or modified after July 31, 1996 to increase per diem "
                  "payments or reimbursements."),
@@ -923,9 +1000,12 @@ N_RULES: list[dict] = [
                  "f8853c_line25_per_diem_limitation"],
      "description": ("A taxpayer with heavy real costs is protected by line 22 rather than capped at "
                      "the per-diem dollars; a taxpayer with light costs still gets the dollar floor. "
-                     "Line 25 may go negative when reimbursements exceed the limitation — the face does "
-                     "not floor line 25 (only line 26), and a negative 25 correctly makes MORE of line "
-                     "20 taxable.")},
+                     "⚠⚠ Line 25 IS FLOORED AT ZERO by the statute even though the face does not print "
+                     "a floor there (line 26 prints one, line 25 does not): §7702B(d)(2) defines the "
+                     "limitation as 'the excess (if any) of (A) ... over (B)', the Code's "
+                     "floor-at-zero idiom. Without it, reimbursements above line 23 drive line 25 "
+                     "negative and line 26 then EXCEEDS line 20 — taxing more than the taxpayer ever "
+                     "received, which is arithmetically impossible. Pinned by T14.")},
 
     {"rule_id": "R-8853C-LINE26", "title": "Line 26 = MAX(0, line 20 − line 25); the terminally-ill short circuit", "rule_type": "calculation",
      "precedence": 6, "sort_order": 6,
@@ -1300,6 +1380,21 @@ N_SCENARIOS: list[dict] = [
      "notes": ("The movement guard (s227 pattern): making 8e engine-fed must not disturb the returns "
                "already keyed. Every stored return without a Section C is unchanged — this is the "
                "regression that pins it.")},
+
+    {"scenario_name": "8853C-T14 — reimbursements exceed line 23: line 25 FLOORS at zero", "scenario_type": "edge", "sort_order": 14,
+     "inputs": {"tax_year": 2025, "line18_qualified_per_diem": 10000, "line19_adb_chronically_ill": 0,
+                "ltc_period_method": "contract_period", "ltc_period_days": 1,
+                "line22_costs_incurred": 0, "line24_reimbursements": 5420,
+                "line15_other_payees": "no", "line16_terminally_ill": "no"},
+     "expected_outputs": {"f8853c_line20_total": 10000, "f8853c_line21_dollar_limit": 420,
+                          "f8853c_line23_greater": 420, "f8853c_line25_per_diem_limitation": 0,
+                          "f8853c_line26_taxable": 10000, "f8853c_sch1_8e_component": 10000},
+     "notes": ("⚠⚠ THE DEFECT THE STATUTE CAUGHT. Reimbursements of 5,420 against a line 23 of 420 "
+               "give 420 − 5,420 = −5,000 before the floor. UNFLOORED, line 26 = 10,000 − (−5,000) = "
+               "15,000 — taxing 15,000 when only 10,000 was received, which is impossible. "
+               "§7702B(d)(2)'s 'excess (if any)' floors line 25 at zero, so all 10,000 (and no more) is "
+               "taxable. The FACE prints no floor on line 25, only on line 26, so a face-only build "
+               "gets this wrong — and the first draft of this spec did.")},
 ]
 
 N_RULE_LINKS: list[tuple[str, str, str, str]] = [
