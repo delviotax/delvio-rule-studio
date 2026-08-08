@@ -122,7 +122,11 @@ from specs.models import (
 )
 
 
-READY_TO_SEED = False  # Gate 1: flip ONLY after Ken's review walk. Never unattended.
+# FLIPPED 2026-08-08 (s232) — Ken approved the Gate-1 walk in-session:
+# "Approve as drafted", explicitly including the statutory floor on line 25 (the
+# one place this spec is stricter than the printed face) and the composed
+# Schedule 1 line 8e. Gate 1 is a human gate; never flip this unattended.
+READY_TO_SEED = True
 
 
 FORM_JURISDICTION = "FED"

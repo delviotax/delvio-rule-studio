@@ -101,8 +101,18 @@ from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 
 > **[WO-8853-SEC-C] Ken's s224 scope ruling item 4, lane re-confirmed 2026-08-08 (s232 —
 > Ken picked spec-first for the last day before a 10-day absence) · Form 8853 **Section C
-> only**, long-term care insurance contracts + accelerated death benefits · ⏳ AWAITING KEN
-> (Gate 1)**
+> only**, long-term care insurance contracts + accelerated death benefits · ✅ APPROVED
+> (seeded/exported/cached) — Gate 1 approved by Ken in-session 2026-08-08 ("Approve as
+> drafted", explicitly including the statutory floor on line 25 and the composed Schedule 1
+> line 8e) → sentinel flipped → seeded to the RS prod DB (**135 forms**; 18 authority links;
+> all 10 rules cited; 5 flow assertions) → deployed `lookup/8853_SEC_C/export/` returns
+> **200** → cached to delvio-tax `server/specs/8853_sec_c_spec.json` (69,685 bytes; 23 facts
+> / 10 rules / 14 line_map rows / 12 diagnostics / 14 tests / 7 authority sources verified
+> present in the cached file). Form `status` left at `draft`, matching the house convention
+> (126 of 135 forms, incl. every recently Gate-1-approved spec) — the approval is recorded
+> here and in the sentinel, not in the model field. **NEXT: DISPATCH the app build (tts
+> session)** — the whole point of the spec-first call was that the build needs nothing
+> further from Ken during his 08-09 → ~08-19 absence.**
 > · **required set:** `8853_SEC_C` → gap CONFIRMED 2026-08-08. `lookup/8853/export/`,
 > `lookup/1099LTC/export/` and `lookup/1099_LTC/export/` all 404; nothing in delvio-tax
 > `server/specs/`; no source brief in this repo. App side: NO compute, NO model, NO field
@@ -194,7 +204,24 @@ from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 > order's survey while here: my counts match its 2026-08-05 figures, and the `1065`/`1041`/
 > `1120s` values that look alarming are exactly its documented 13 false positives
 > (TestScenario `inputs` payloads) — my grep wasn't scoped to dicts carrying `source_code`,
-> so the caveat earned its keep. This loader uses only valid enums.
+> so the caveat earned its keep. This loader uses only valid enums, and the ratchet test
+> stayed green. ⚠ `RP_2024_40` itself still carries the invalid `source_type=revenue_procedure`
+> in the DB; this order deliberately did NOT repair it (that rewrites a published export
+> across other forms — WO-SOURCETYPE-RECON's job), and attaching an excerpt does not rewrite
+> the parent row.
+> · ⓘ **Second adjacent observation for [WO-SOURCETYPE-RECON] — the same root cause on a
+> SECOND field.** `TaxForm.status` choices are draft/review/approved/archived, but **5 rows
+> carry `active`**, which is the *FlowAssertion* Status vocabulary (draft/active/disabled).
+> Django does not enforce choices, so the two Status classes have cross-contaminated exactly
+> the way `source_type` did. Worth folding into that order's scope rather than opening a
+> third: the fix and the verification pass are identical in shape.
+> · ⓘ **Export-shape gap (small, unowned):** the spec export serializer omits
+> `requires_human_review` — the field is authoring-side only and never reaches the app's
+> cached spec. So a build session reading `server/specs/*.json` cannot see which authorities
+> are flagged as unverified. Verified 2026-08-08 against the live export (source keys:
+> citation, current_status, excerpts, is_substantive_authority, issuer, jurisdiction_code,
+> source_code, source_rank, source_type, title, topics, trust_score). For 8853_SEC_C the one
+> live flag is `IRC_101_G`, recorded here instead.
 >
 > **[WO-K1-BASIS-704D] Mixed-entity pilot #7 (filing blocker; Ken chose spec-first
 > 2026-08-07 s226) · partner §704(d) basis limitation, preparer-asserted · ✅ APPROVED (seeded/exported) — Gate 1 approved by Ken in-session
