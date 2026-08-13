@@ -1,3 +1,48 @@
+## 2026-08-12/13 (s253) - FORM_172 (NOLs) authored, Gate 1 APPROVED, seeded + exported + cached
+- Ken came online ("I'm ready to answer NOL questions") and answered the s246
+  brief's four questions live: BOTH SIDES in v1 (he overrode deduction-only);
+  farming carryback refuses by name; ATNOLD preserve-only; the 80% base
+  verbatim. Recorded in delvio-tax DECISIONS.md before authoring began.
+- Sources fetched fresh: Form 172 (Rev. 12-2024) face extracted line by line;
+  i172 (the Pub-536 successor) in full; IRC §172 verbatim from
+  uscode.house.gov (the s232 paraphrase lesson).
+- ⚠⚠ THE CLAUSE THE SHORT FORM DROPS: §172(a)(2)(B)(ii)'s 80% cap applies to
+  the excess of the TI base OVER the pre-2018 NOLs carried to the year — the
+  pre-2018 class eats the base first. The s246 brief's summary compressed
+  this away; scenario T7 pins it (base 50,000 − pre 30,000 → cap 16,000, not
+  40,000). Walked at Gate 1 explicitly.
+- ⚠ Absorption synthesis flagged requires_human_review: i172 states the MTI
+  rule and the 80% cap separately; per-vintage used = MIN(remaining, class
+  allowance, MTI remaining) is the spec's synthesis of §172(a)(2)+(b)(2).
+  Ken approved it at Gate 1.
+- ⚠ IRS drafting anomaly FLAGGED, not corrected: i172's EBL worksheet line 1
+  cites "Form 172, line 33" where the NOL is Part I line 24; the worksheet's
+  own example (T9, transcribed verbatim: $1M loss / $738k EBL → $1M carries)
+  demonstrates line-24 arithmetic.
+- load_1040_form_172.py: 37 facts / 15 rules (all cited) / 35 lines (Part I
+  1-24 + Part II transcription-only) / 10 diagnostics / 11 scenarios / 5 FAs
+  (FA-1040-NOL-01..05) / 24 rule links. check_form_172_integrity.py shares
+  NO math (explicit comparisons, own formula chain, invariants I1-I7 incl.
+  conservation); teeth proven by a 6-defect negative control — first run
+  caught 5 of 6: D5 (line 24 forgets line 23) escaped because no scenario
+  exercised a nonzero line 23 AND the I6 probe only tested the gate's own
+  math (and the control's own anchor had hit a COMMENT, the s242t
+  count-anchors lesson). Both holes closed; 6 of 6 caught.
+- Model-shape potholes hit while seeding (none in the 8853 template's path I
+  copied wrong): AuthorityTopic.topic_name is varchar(255) (my topic name ran
+  ~300 chars); AuthorityExcerpt has summary_text, not notes (mapped in the
+  upsert); AuthorityFormLink keys on form_code strings, not tax_form FKs.
+- Gate 1 APPROVED in-session ("Approve as drafted") → sentinel flipped with
+  the approval recorded → seeded (136 forms; FORM_172 all rules cited) →
+  deployed export lookup/FORM_172/export/ = 200 → cached to delvio-tax
+  server/specs/form_172_spec.json, contents VERIFIED (all five verbatim
+  probes incl. the anomaly text; T7's 16,000 pin present).
+- NEXT: the delvio-tax app build (multi-leg): the deduction engine on the
+  CFA pools → negative Schedule 1 8a (its first deriving writer) → per-
+  vintage utilization write-back (D_CFWD_001 retires for NOL kinds) → Part I
+  generation → diagnostics → the 80%-limitation statement page → the five
+  FAs wired. Unblocks BATCH-001 #4 + BATCH-002's NOL computes.
+
 ## 2026-08-08 (s232) - Form 8853 Section C authored, Gate 1 APPROVED, seeded + exported + cached
 - Ken picked spec-first for the last working day before a 10-day absence
   (08-09 -> ~08-19): spend the day on the thing that NEEDS him, so the app build

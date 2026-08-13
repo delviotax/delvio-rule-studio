@@ -103,8 +103,14 @@ from specs.models import (
 )
 
 
-# Gate 1 is a human gate; never flip this unattended.
-READY_TO_SEED = False
+# FLIPPED 2026-08-12 (s253) — Ken approved the Gate-1 walk in-session:
+# "Approve as drafted", explicitly including the 80%-base pre-2018
+# subtraction (walk item 2 / scenario T7), the per-vintage absorption
+# synthesis (item 3, requires_human_review), and the refusals/holds
+# (farming carryback, ATNOLD preserve-only, marital splits, the i172
+# worksheet anomaly flagged-not-fixed). Gate 1 is a human gate; never
+# flip this unattended.
+READY_TO_SEED = True
 
 
 FORM_JURISDICTION = "FED"
@@ -296,10 +302,9 @@ def compute_nol_absorption(vintages, ti_without_nol_qbi_250, modified_taxable_in
 
 AUTHORITY_TOPICS: list[tuple[str, str]] = [
     ("nol_deduction_and_carryover",
-     "§172 net operating losses: Part I generation in a loss year, the two-tier "
-     "§172(a)(2) deduction with the 80% limitation, oldest-first absorption and "
-     "carryover, the farming-loss carryback exception and waiver, the excess-"
-     "business-loss (§461(l)) NOL feed, and the Schedule 1 line 8a destination"),
+     "§172 NOLs: Part I generation, the two-tier §172(a)(2) deduction with the "
+     "80% limit, oldest-first absorption/carryover, the farming carryback "
+     "exception, the §461(l) EBL feed, and the Schedule 1 line 8a destination"),
 ]
 
 EXISTING_SOURCES_TO_REFERENCE: list[str] = [
@@ -1146,6 +1151,14 @@ FLOW_ASSERTIONS: list[dict] = [
 ]
 
 
+AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
+    ("IRC_172", "FORM_172", "governs"),
+    ("IRS_2024_F172_FORM", "FORM_172", "governs"),
+    ("IRS_2024_F172_INSTR", "FORM_172", "governs"),
+    ("IRS_2025_SCH1_FORM", "FORM_172", "mapping_only"),
+]
+
+
 FORMS: list[dict] = [
     {
         "identity": {
@@ -1243,6 +1256,8 @@ class Command(BaseCommand):
             sources[source.source_code] = source
             for exc in excerpts_data:
                 exc = dict(exc)
+                if "notes" in exc:  # authored as 'notes'; the model calls it summary_text
+                    exc["summary_text"] = exc.pop("notes")
                 AuthorityExcerpt.objects.update_or_create(
                     authority_source=source, excerpt_label=exc["excerpt_label"], defaults=exc)
             for tc in topic_codes:
@@ -1264,6 +1279,8 @@ class Command(BaseCommand):
             src = sources.get(code) or AuthoritySource.objects.filter(source_code=code).first()
             if src:
                 exc = dict(exc)
+                if "notes" in exc:
+                    exc["summary_text"] = exc.pop("notes")
                 AuthorityExcerpt.objects.update_or_create(
                     authority_source=src, excerpt_label=exc["excerpt_label"], defaults=exc)
             else:
@@ -1328,17 +1345,14 @@ class Command(BaseCommand):
         self.stdout.write(f"  {len(tests)} scenarios")
 
     def _upsert_form_links(self, sources):
-        form = TaxForm.objects.filter(
-            form_number="FORM_172", jurisdiction=FORM_JURISDICTION, tax_year=FORM_TAX_YEAR).first()
-        if form is None:
-            return
         ct = 0
-        for code in ("IRC_172", "IRS_2024_F172_FORM", "IRS_2024_F172_INSTR"):
-            src = sources.get(code)
-            if src is None:
-                continue
-            AuthorityFormLink.objects.get_or_create(tax_form=form, authority_source=src)
-            ct += 1
+        for source_code, form_code, link_type in AUTHORITY_FORM_LINKS:
+            source = sources.get(source_code) or AuthoritySource.objects.filter(source_code=source_code).first()
+            if source:
+                AuthorityFormLink.objects.get_or_create(
+                    authority_source=source, form_code=form_code, link_type=link_type,
+                    defaults={"note": f"{source_code} -> {form_code}"})
+                ct += 1
         self.stdout.write(f"  {ct} form-authority links")
 
     def _load_flow_assertions(self):

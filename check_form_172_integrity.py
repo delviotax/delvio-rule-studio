@@ -302,8 +302,9 @@ else:
     if "starting with the earliest" not in text:
         err("citation: the oldest-first verbatim is missing")
 
-if m.READY_TO_SEED:
-    err("gate: READY_TO_SEED is True before Gate 1 — flip it back until Ken approves")
+# Gate 1 APPROVED 2026-08-12 (Ken, in-session: "Approve as drafted") — the
+# pre-approval check that READY_TO_SEED stay False is retired; the loader's
+# sentinel comment records the approval.
 
 # ═══════════════════════════════════════════════════════════════════════════
 
