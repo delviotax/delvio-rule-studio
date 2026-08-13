@@ -258,6 +258,26 @@ AUTHORITY_SOURCES: list[dict] = [
 # New excerpts ADDED to already-existing sources (amend, never recreate).
 NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [
     (
+        "IRC_38",
+        {
+            "excerpt_label": "§38(c)(6)(A) — married individuals filing separately (verbatim)",
+            "location_reference": "26 U.S.C. §38(c)(6)(A), read from the LII text 2026-08-13",
+            "excerpt_text": (
+                "In the case of a husband or wife who files a separate return, the amount specified under "
+                "subparagraph (B) of paragraph (1) shall be $12,500 in lieu of $25,000. This subparagraph "
+                "shall not apply if the spouse of the taxpayer has no business credit carryforward or "
+                "carryback to, and has no current year business credit for, the taxable year of such "
+                "spouse which ends within or with the taxpayer's taxable year."
+            ),
+            "summary_text": (
+                "MFS: the line-13 $25,000 becomes $12,500 — UNLESS the spouse has no business credit "
+                "carryforward, carryback, or current-year credit, in which case $25,000 stays. The "
+                "exception is a fact about the spouse's return (preparer-asserted)."
+            ),
+            "is_key_excerpt": True,
+        },
+    ),
+    (
         "IRS_2025_3800_INSTR",
         {
             "excerpt_label": "Line 10b — the individuals' credit list (verbatim)",
@@ -456,11 +476,38 @@ FORM_3800_RULES: list[dict] = [
         "formula": (
             "L7 = 1040_16 + SCH2_1z; L8 = 6251_11; L9 = L7 + L8; L10a = SCH3_1; L10b = 1040_19 + "
             "SCH3(2,3,4,5a,5b) + SCH3_6x excl (6a,6b,6k); L10c = L10a + L10b; L11 = max(0, L9 - L10c); "
-            "L12 = max(0, L7 - L10c); L13 = 0.25 * max(0, L12 - 25000); L14 = 6251_9; L15 = max(L13, "
-            "L14); L16 = max(0, L11 - L15); L17 = min(L6, L16)."
+            "L12 = max(0, L7 - L10c); L13 = 0.25 * max(0, L12 - THRESHOLD); L14 = 6251_9; L15 = max(L13, "
+            "L14); L16 = max(0, L11 - L15); L17 = min(L6, L16). THRESHOLD = 25000, or 12500 per "
+            "R-3800-MFS-THRESHOLD on a married-filing-separate return."
         ),
         "inputs": [], "outputs": ["7", "8", "9", "10a", "10b", "10c", "11", "12", "13", "14", "15", "16", "17"],
-        "precedence": 4, "exceptions": "", "notes": "",
+        "precedence": 4, "exceptions": "",
+        "notes": "Amended 2026-08-13 (s257, Ken's ruling): the line-13 threshold is a variable — "
+                 "R-3800-MFS-THRESHOLD carries the §38(c)(6)(A) MFS substitution.",
+    },
+    {
+        "rule_id": "R-3800-MFS-THRESHOLD",
+        "title": "§38(c)(6)(A) — the MFS $12,500 line-13 threshold and its spouse-credit exception",
+        "description": (
+            "Statute verbatim (26 U.S.C. §38(c)(6)(A)): 'In the case of a husband or wife who files a "
+            "separate return, the amount specified under subparagraph (B) of paragraph (1) shall be "
+            "$12,500 in lieu of $25,000. This subparagraph shall not apply if the spouse of the taxpayer "
+            "has no business credit carryforward or carryback to, and has no current year business credit "
+            "for, the taxable year of such spouse which ends within or with the taxpayer's taxable year.' "
+            "The exception turns on the SPOUSE'S separate return — not derivable from this return, so it "
+            "is a preparer-asserted fact (f3800_mfs_spouse_has_credit, nullable). UNANSWERED on an MFS "
+            "return uses $12,500 — the smaller threshold raises line 13 and ALLOWS LESS credit (never a "
+            "silent over-allowance) — with D_3800_010 demanding the answer whenever line 12 > $12,500."
+        ),
+        "rule_type": "calculation",
+        "conditions": {"filing_status": "mfs"},
+        "formula": (
+            "THRESHOLD = 12500 if filing_status == 'mfs' and f3800_mfs_spouse_has_credit in (True, None) "
+            "else 25000; feeds R-3800-P2-TAXLIM's L13."
+        ),
+        "inputs": ["filing_status", "f3800_mfs_spouse_has_credit"], "outputs": ["13"],
+        "precedence": 4, "exceptions": "",
+        "notes": "Added 2026-08-13 (s257) on Ken's 2026-08-13 00:45 ruling.",
     },
     {
         "rule_id": "R-3800-P2-SECB",
@@ -551,6 +598,7 @@ RULE_AUTHORITY_LINKS: list[tuple[str, str, str, str]] = [
     ("R-3800-P2-TAXLIM", "IRS_2025_3800_FORM", "primary", "Section A lines 7-17 — face verbatim"),
     ("R-3800-P2-TAXLIM", "IRS_2025_3800_INSTR", "primary", "Line 10b credit list — instructions verbatim"),
     ("R-3800-P2-TAXLIM", "IRC_38", "secondary", "§38(c)(1) — the limitation"),
+    ("R-3800-MFS-THRESHOLD", "IRC_38", "primary", "§38(c)(6)(A) — the MFS $12,500 substitution + its spouse-no-credit exception"),
     ("R-3800-P2-SECB", "IRS_2025_3800_FORM", "primary", "Section B skip note — face verbatim"),
     ("R-3800-P2-SECC", "IRS_2025_3800_FORM", "primary", "Section C lines 27-37 — face verbatim"),
     ("R-3800-P2-SECC", "IRC_38", "primary", "§38(c)(4)(A) — TMT zeroed + limit reduced by non-specified credits"),
@@ -655,6 +703,13 @@ FORM_3800_DIAGNOSTICS: list[dict] = [
      "message": "A general business credit carryforward was entered (Part I line 4 / line 34). Verify the "
                 "amount and its regular-vs-specified character against the prior-year Form 3800 and its "
                 "carryforward statement (no automatic proforma yet)."},
+    {"diagnostic_id": "D_3800_010", "title": "MFS §38(c)(6)(A) spouse-credit question unanswered", "severity": "error",
+     "condition": "filing_status == mfs and f3800_mfs_spouse_has_credit is None and Form 3800 engaged and line 12 > 12500",
+     "message": "Married filing separately with the Form 3800 line-13 limitation in play: under "
+                "§38(c)(6)(A) the $25,000 threshold is $12,500 for a separate return — UNLESS the spouse "
+                "has no business credit carryforward, carryback, or current-year business credit on their "
+                "own return. Answer the spouse-credit question: until then the return uses $12,500, which "
+                "allows less credit and can understate it if the spouse in fact has none."},
 ]
 
 
