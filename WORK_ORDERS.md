@@ -99,7 +99,20 @@ and namespace everything new. ⚠ Also note the app-side wart this feeds: delvio
 *No independent backlog here (see header). Sequence = BUILD_ORDER.md SPINE; statuses seeded
 from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 
-> **[WO-SCHA-CHARITABLE-AMEND] ⛔ AWAITING KEN — Gate 1.** Amend the EXISTING
+> **[WO-SCHA-CHARITABLE-AMEND] ✅ DONE (same day — entered, approved, seeded, dispatched, BUILT).**
+> Ken approved at Gate 1 in-session 2026-08-15 ("Approved", full unit incl. the migration).
+> Seeded/exported/cached (RS `ee4dece`+; 36 facts / 8 rules / 14 diagnostics / 27 scenarios;
+> D_SCHA_007 deleted from the deployed spec; the D_SCHA_012 ID collision with the app's live
+> K-1 double-count diagnostic caught and fixed — the amendment's three new diagnostics are
+> 015/016/017 and the app's 012 was backfilled INTO the spec). App build shipped the same
+> day: delvio-tax `f8248dd` (mig 0323) — seven classes, the statutory floor rewrite, per-class
+> per-vintage carryovers, 7203 basis, lane + schema, both UIs. 1040 BATCH-002 closed and the
+> **entire 1040 CC queue is now EMPTY**. Residue: the C-before-B tiebreak + floored-once
+> relief are requires_human_review, PROVISIONAL until **Pub 526 (2026)** publishes — the
+> re-verification is a standing season-checklist item, and the (G)/(A) 60/50 coordination
+> question is recorded in the delvio-tax REVIEW_QUEUE. *(Original order text below.)*
+>
+> **[WO-SCHA-CHARITABLE-AMEND — original order] ⛔ AWAITING KEN — Gate 1.** Amend the EXISTING
 > `SCHEDULE_A` rule `R-SCHA-CHARITABLE` (this is an AMENDMENT, not a new form —
 > the spec is published and cached at `delvio-tax/server/specs/schedule_a_spec.json`).
 > Entered 2026-08-15 (s266) at Ken's direction, to unblock 1040 `BATCH-002` item 9
