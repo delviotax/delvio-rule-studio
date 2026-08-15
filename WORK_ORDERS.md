@@ -99,6 +99,51 @@ and namespace everything new. ⚠ Also note the app-side wart this feeds: delvio
 *No independent backlog here (see header). Sequence = BUILD_ORDER.md SPINE; statuses seeded
 from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 
+> **[WO-SCHA-CHARITABLE-AMEND] ⛔ AWAITING KEN — Gate 1.** Amend the EXISTING
+> `SCHEDULE_A` rule `R-SCHA-CHARITABLE` (this is an AMENDMENT, not a new form —
+> the spec is published and cached at `delvio-tax/server/specs/schedule_a_spec.json`).
+> Entered 2026-08-15 (s266) at Ken's direction, to unblock 1040 `BATCH-002` item 9
+> — the last open item in the entire 1040 queue.
+> · **Draft:** `delvio-tax/server/specs/R-SCHA-CHARITABLE_amendment_draft_s266.md`
+> (committed `d92a24a`+). **Nothing seeded, nothing published, no code, no
+> migration, no deploy** — the draft is the Gate 1 artifact and the gate is
+> Ken's alone ("nothing CROSSES a gate unattended").
+> · **The reported gap (defect 1):** the rule models 3 of the 7 §170(b)(1)
+> limitation classes, so K-1 charitable codes **B, D, F and G are refused
+> outright**. ⚠ CHECK THE SIGN — a refused code is deducted NOWHERE, so tax is
+> **overstated**, and no diagnostic can fire because the data model cannot hold
+> the amount. Closes the RED-deferred `D_SCHA_007` in the same unit.
+> · ⚠⚠ **TWO DEFECTS THE BATCH NEVER REPORTED, found by reading the statute to
+> write the ordering — and they are IN THE RULE ITSELF, which is why the app's
+> code is faithful and still wrong.** The rule says
+> `2026: line14 -= round(0.005 * AGI)`. §170(b)(1)(I) instead reduces the
+> **contributions taken into account** (not the deduction) in a prescribed order
+> — lowest AGI limitation first, **(D) 20% → (C) 30% → (B) 30% → (E) → (A) 50%
+> → (G) 60%** — and §170(d)(1)(C) **increases the carryover** by the floored
+> amount, where the app computes carryover-out BEFORE the floor and therefore
+> **destroys it**. Net effect: tax overstated twice, in shipped code, **for
+> TY2026 — the returns filed in the January 2027 season.**
+> · ⚠ **Root cause is visible in the rule's own `authorities` block:** OBBBA is
+> cited only as `support_level: secondary` with `excerpt: null`, and
+> **§170(b)(1)(I) is not cited at all.** The missing citation and the wrong math
+> are one event — the authoring-side instance of the standing
+> authoritative-source rule.
+> · **Open, deliberately NOT guessed (in the draft's §4):** (Q1) the (C)-vs-(B)
+> tiebreak — both are 30%, two independent readings agree on D,C,B,E,A,G and the
+> "lowest limitation first" logic is coherent, but **five attempts at verbatim
+> primary text were blocked** (uscode.house.gov refuses bulk reproduction, eCFR
+> 302s, Bloomberg 500s, the P.L. 119-21 HTML truncates before §70425, the CRS PDF
+> extracts as signature data). Draft proposes building it as D,C,B,E,A,G with the
+> T-cases pinning it so a correction is ONE constant. (Q2) the "floored only
+> once" relief needs a per-vintage marker on `CarryforwardAttribute` = an additive
+> migration, Ken's call. (Q3) **Pub 526 (2026) does not exist yet** — the current
+> revision is 2025 and predates the floor entirely, so TY2026 logic is
+> PROVISIONAL and re-verification belongs on the season checklist. (Q4) scope —
+> one unit or split the floor fix ahead of the buckets; CC recommends one unit.
+> · **On approval:** author the amended rule + 4 new facts + the diagnostics,
+> seed/export/cache, then dispatch the app build (7 buckets, per-class
+> per-vintage ordering, the floor rewrite, T1–T12, close `D_SCHA_007`).
+
 > **[WO-8853-SEC-C] Ken's s224 scope ruling item 4, lane re-confirmed 2026-08-08 (s232 —
 > Ken picked spec-first for the last day before a 10-day absence) · Form 8853 **Section C
 > only**, long-term care insurance contracts + accelerated death benefits · ✅ APPROVED
