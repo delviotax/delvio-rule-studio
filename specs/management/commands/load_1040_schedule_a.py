@@ -1135,6 +1135,13 @@ class Command(BaseCommand):
         gone, _ = FormDiagnostic.objects.filter(tax_form=form, diagnostic_id="D_SCHA_007").delete()
         if gone:
             self.stdout.write("  D_SCHA_007 RETIRED (deleted from the deployed spec — s266)")
+        # s266 also: the first seed of the amendment briefly used IDs 013/014
+        # (renumbered to 016/017 after the collision with the app's live 012
+        # was caught); upsert leaves the strays behind — delete them.
+        stray, _ = FormDiagnostic.objects.filter(
+            tax_form=form, diagnostic_id__in=("D_SCHA_013", "D_SCHA_014")).delete()
+        if stray:
+            self.stdout.write(f"  {stray} stray 013/014 rows deleted (the renumber cleanup)")
         for d in diagnostics:
             d = dict(d)
             FormDiagnostic.objects.update_or_create(tax_form=form, diagnostic_id=d.pop("diagnostic_id"), defaults=d)
