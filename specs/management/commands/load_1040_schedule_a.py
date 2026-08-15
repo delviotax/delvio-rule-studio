@@ -173,6 +173,85 @@ AUTHORITY_SOURCES: list[dict] = [
         ],
     },
     {
+        "source_code": "IRC_170",
+        "source_type": "statute",
+        "source_rank": "primary_statute",
+        "jurisdiction_code": "FED",
+        "entity_type_code": "1040",
+        "tax_year_start": 2025,
+        "tax_year_end": None,
+        "title": "IRC §170 — Charitable, etc., contributions and gifts",
+        "citation": "26 U.S.C. §170(b)(1), (d)(1) (as amended by P.L. 119-21 §70425)",
+        "issuer": "Congress",
+        "official_url": "https://www.law.cornell.edu/uscode/text/26/170",
+        "current_status": "active",
+        "is_substantive_authority": True,
+        "is_filing_authority": False,
+        "trust_score": 9.90,
+        "requires_human_review": True,
+        "notes": ("Added s266 (2026-08-15, Ken Gate-1 approval of the charitable amendment). "
+                  "The class ceilings, the 0.5% floor, and the floored-amount carryover. "
+                  "REQUIRES HUMAN REVIEW: (1) the (b)(1)(I) absorption order C-before-B tiebreak "
+                  "— both classes are 30%; two independent readings (LII full-text analysis + "
+                  "practitioner summaries) agree on D,C,B,E,A,G ('lowest limitation first') but "
+                  "FIVE attempts at verbatim primary text were blocked (uscode.house.gov, eCFR, "
+                  "Bloomberg, the P.L. 119-21 HTML truncation, the CRS PDF); (2) the "
+                  "floored-only-once carryover relief mechanics — re-verify BOTH against Pub 526 "
+                  "(2026) when it publishes. TY2026 floor logic is PROVISIONAL until then."),
+        "topics": ["itemized_deductions"],
+        "excerpts": [
+            {
+                "excerpt_label": "§170(b)(1) class ceilings (residual formulas)",
+                "location_reference": "26 U.S.C. §170(b)(1)(A)-(H)",
+                "excerpt_text": (
+                    "(A) 50% of the contribution base for contributions to 50%-limit organizations. "
+                    "(B) for other contributions, the LESSER of 30% of the contribution base or the excess "
+                    "of 50% of the contribution base over the (A) contributions. "
+                    "(C) 30% of the contribution base for capital gain property to 50%-limit organizations. "
+                    "(D) for other capital gain property, the LESSER of 20% of the contribution base or the "
+                    "excess of 30% of the contribution base over the capital gain property to which (C) "
+                    "applies. (E) qualified conservation contributions: 50% of the contribution base over "
+                    "all other charitable contributions (100% for qualified farmers and ranchers). "
+                    "(G) cash to 50%-limit organizations: 60% of the contribution base over the (A) "
+                    "contributions taken into account. (H) contribution base = AGI computed without any "
+                    "net operating loss carryback."
+                ),
+                "summary_text": "The seven-class ceiling structure: 60/50/30/30/20 with statutory residuals; conservation 50%/100%; base = AGI w/o NOL carryback.",
+                "is_key_excerpt": True,
+            },
+            {
+                "excerpt_label": "§170(b)(1)(I) — the 0.5% floor and its absorption order",
+                "location_reference": "26 U.S.C. §170(b)(1)(I), added by P.L. 119-21 §70425 (tax years beginning after 2025)",
+                "excerpt_text": (
+                    "Contributions are taken into account 'only to the extent that the aggregate of such "
+                    "contributions exceeds 0.5 percent of the taxpayer's contribution base for the taxable "
+                    "year.' The reduction applies to the CONTRIBUTIONS taken into account (not to the "
+                    "computed deduction), absorbed in a prescribed order across the (b)(1) classes — "
+                    "lowest AGI limitation first: (D), then (C), then (B), then (E), then (A), then (G). "
+                    "[The C-before-B sequencing within the two 30% classes is flagged requires_human_review "
+                    "— see source notes.]"
+                ),
+                "summary_text": "0.5% floor reduces CONTRIBUTIONS (not the deduction), absorbed D→C→B→E→A→G; effective TY2026.",
+                "is_key_excerpt": True,
+            },
+            {
+                "excerpt_label": "§170(d)(1) — 5-year carryover; floored amounts INCREASE the carryover",
+                "location_reference": "26 U.S.C. §170(d)(1), incl. (d)(1)(C) added by P.L. 119-21",
+                "excerpt_text": (
+                    "Excess contributions are treated as paid in each of the 5 succeeding taxable years, in "
+                    "order of time, after the contributions actually paid in that year. (d)(1)(C): the "
+                    "carryover rule is 'applied by increasing the excess determined under such applicable "
+                    "carryover rule for the contribution year (before the application of subparagraph (B)) "
+                    "by the amount attributable to the charitable contributions to which such rule applies "
+                    "which is not allowed as a deduction for the contribution year by reason of subsection "
+                    "(b)(1)(I).' An amount disallowed by the floor is NOT lost — it carries forward."
+                ),
+                "summary_text": "5 years, oldest first, current-year first; the floored amount is ADDED to the carryover — never destroyed.",
+                "is_key_excerpt": True,
+            },
+        ],
+    },
+    {
         "source_code": "IRS_PUB526_2025",
         "source_type": "official_publication",
         "source_rank": "primary_official",
@@ -189,7 +268,7 @@ AUTHORITY_SOURCES: list[dict] = [
         "is_filing_authority": False,
         "trust_score": 9.30,
         "requires_human_review": True,
-        "notes": "The AGI-bucket limits + ordering + carryover. REQUIRES HUMAN REVIEW: the full Worksheet 2 line-by-line ordering (the 20% / special-50%-election tail is RED-deferred D_SCHA_007).",
+        "notes": "The AGI-bucket limits + ordering + carryover. s266: all seven classes now modeled (D_SCHA_007 retired); only the special-50% ELECTION remains out (D_SCHA_013). REQUIRES HUMAN REVIEW: the Worksheet 2 line-by-line correspondence, and re-verify the floor against Pub 526 (2026) when it publishes.",
         "topics": ["itemized_deductions"],
         "excerpts": [
             {
@@ -373,8 +452,38 @@ SCHA_FACTS: list[dict] = [
      "data_type": "decimal", "default_value": "0", "sort_order": 16, "notes": "INPUT. Non-capital-gain property at FMV to 50%-limit orgs — 50% AGI limit. Form 8283 if > $500."},
     {"fact_key": "scha_charitable_capgain_50org", "label": "Line 12 — capital-gain property to 50%-orgs (30% bucket)",
      "data_type": "decimal", "default_value": "0", "sort_order": 17, "notes": "INPUT. Appreciated long-term property at FMV to 50%-limit orgs — 30% AGI limit."},
-    {"fact_key": "scha_charitable_carryover_in", "label": "Line 13 — carryover from prior year",
-     "data_type": "decimal", "default_value": "0", "sort_order": 18, "notes": "INPUT (year 1 preparer fact; the carry-out is computed — the Schedule-D-carryover pattern)."},
+    {"fact_key": "scha_charitable_cash_30_other", "label": "Line 11 — cash to non-50%-limit orgs (30% bucket)",
+     "data_type": "decimal", "default_value": "0", "sort_order": 17,
+     "notes": ("INPUT (added s266, Gate-1 2026-08-15). Cash to non-50%-limit organizations (veterans orgs, "
+               "fraternal societies, most private non-operating foundations) — §170(b)(1)(B): lesser of 30% "
+               "base or 50% base minus the (A)-class contributions. K-1 box 12/13 code B lands here.")},
+    {"fact_key": "scha_charitable_noncash_30_other", "label": "Line 12 — noncash to non-50%-limit orgs (30% bucket)",
+     "data_type": "decimal", "default_value": "0", "sort_order": 17,
+     "notes": ("INPUT (added s266). Non-capital-gain property to non-50%-limit organizations — the same "
+               "§170(b)(1)(B) class as cash-30. K-1 code D lands here. Form 8283 if > $500.")},
+    {"fact_key": "scha_charitable_capgain_20", "label": "Line 12 — capital-gain property to non-50%-limit orgs (20% bucket)",
+     "data_type": "decimal", "default_value": "0", "sort_order": 17,
+     "notes": ("INPUT (added s266 — this class was previously REFUSED at import; D_SCHA_007 retired). "
+               "Appreciated long-term property to private non-operating foundations / other non-50%-limit "
+               "orgs — §170(b)(1)(D): lesser of 20% base or 30% base minus the (C)-class capgain. "
+               "K-1 code F lands here.")},
+    {"fact_key": "scha_charitable_conservation", "label": "Line 12 — qualified conservation contributions (§170(b)(1)(E))",
+     "data_type": "decimal", "default_value": "0", "sort_order": 17,
+     "notes": ("INPUT (added s266). Qualified conservation contributions — 50% base over ALL other "
+               "contributions; 100% for qualified farmers/ranchers (scha_qualified_farmer_rancher). "
+               "K-1 code G lands here.")},
+    {"fact_key": "scha_qualified_farmer_rancher", "label": "Qualified farmer or rancher (§170(b)(1)(E)(iv))",
+     "data_type": "boolean", "default_value": "false", "sort_order": 17,
+     "notes": ("INPUT (added s266). True → conservation contributions limited to 100% of base instead of "
+               "50%. Default false = the LESS-deduction direction (the s257 unanswered-fact convention). "
+               "Only matters when conservation contributions exceed the 50% residual.")},
+    {"fact_key": "scha_charitable_carryover_in", "label": "Line 13 — carryover from prior year (LEGACY aggregate)",
+     "data_type": "decimal", "default_value": "0", "sort_order": 18,
+     "notes": ("INPUT (year 1 preparer fact; the carry-out is computed). s266: DEMOTED to the legacy "
+               "fallback — when per-class per-vintage carryover rows exist (the app's "
+               "CarryforwardAttribute, kind=charitable), THEY govern and this aggregate must reconcile "
+               "(D_CFWD_002). An unclassified aggregate cannot receive per-class ordering, the floor "
+               "absorption order, or the 5-year vintage drop — D_SCHA_012 warns when it is the only source.")},
     # ── Casualty / Other ──
     {"fact_key": "scha_casualty_loss", "label": "Line 15 — casualty/theft loss (Form 4684 result)",
      "data_type": "decimal", "default_value": "0", "sort_order": 20, "notes": "INPUT (the already-computed Form 4684 result — federally declared disaster only; D_SCHA_002)."},
@@ -463,15 +572,42 @@ SCHA_RULES: list[dict] = [
                 "scha_mortgage_insurance_premiums", "scha_investment_interest"],
      "outputs": [],
      "description": "Decisions 3/4. Debt-limit haircut = preparer fact (D_SCHA_003); PMI computed 2026 only."},
-    {"rule_id": "R-SCHA-CHARITABLE", "title": "Lines 11-14 — Pub 526 bucket limits + carryover + 2026 floor",
+    {"rule_id": "R-SCHA-CHARITABLE", "title": "Lines 11-14 — the SEVEN §170(b)(1) classes + per-vintage carryover + the §170(b)(1)(I) floor",
      "rule_type": "calculation", "precedence": 5, "sort_order": 5,
-     "formula": ("Apply AGI buckets, higher-% first: cash<=60% AGI; FMV-non-cash<=50% AGI; capgain-to-50org<="
-                 "30% AGI; overall ceiling 60% AGI (cash) within 50% for the rest. Allowed = the within-limit "
-                 "sum + carryover-in (subject to the same ceiling); over-limit -> scha_charitable_carryover_out "
-                 "(5-year). scha_line14 = allowed; 2026: line14 -= round(0.005 * AGI) (floor, not below 0)."),
-     "inputs": ["scha_charitable_cash", "scha_charitable_noncash_fmv", "scha_charitable_capgain_50org", "scha_charitable_carryover_in"],
+     "formula": (
+         "AMENDED s266 (Ken Gate-1 2026-08-15). base = max(0, AGI) [§170(b)(1)(H); a negative base yields "
+         "no ceiling and no deduction — stated explicitly, no longer an implementation interpretation]. "
+         "STEP 1 — THE FLOOR (tax years beginning after 2025): floor = round(0.005 * base). Reduce the "
+         "CONTRIBUTIONS TAKEN INTO ACCOUNT (never the computed deduction) in the §170(b)(1)(I) order, "
+         "lowest limitation first: (D) capgain_20 -> (C) capgain_30 -> (B) cash_30_other + "
+         "noncash_30_other -> (E) conservation -> (A) noncash_50 -> (G) cash_60. Each class's floored "
+         "amount is ADDED to that class's carryover-out [§170(d)(1)(C) — never destroyed]. Carryover "
+         "vintages marked floored-at-source are NOT re-floored in a use year (relief; PROVISIONAL pending "
+         "Pub 526 (2026)). 2025 and earlier: NO floor. "
+         "STEP 2 — CLASS CEILINGS on what survives, statutory residuals: (G) cash_60 <= 0.60*base; "
+         "(A) noncash_50 <= 0.50*base; (B) [cash_30_other + noncash_30_other] <= min(0.30*base, 0.50*base "
+         "- (A) taken); (C) capgain_30 <= 0.30*base; (D) capgain_20 <= min(0.20*base, 0.30*base - (C) "
+         "taken); (E) conservation <= (1.00 if scha_qualified_farmer_rancher else 0.50)*base - all other "
+         "contributions allowed; OVERALL: total <= 0.60*base (conservation-farmer may exceed via its own "
+         "100% ceiling). "
+         "STEP 3 — CARRYOVERS: per class, per vintage. Current-year contributions BEFORE carryovers "
+         "[§170(d)(1); Pub 526 'You deduct current year contributions before carryovers']; vintages oldest "
+         "first ['in order of time']; a vintage expires after its 5th succeeding year; a carryover NEVER "
+         "changes class. Per-class carryover-out = contributions + carryover-in - allowed + floored "
+         "amounts. LEGACY: if no per-vintage rows exist, scha_charitable_carryover_in keeps its prior "
+         "documented behavior (added subject to the overall ceiling) + D_SCHA_012 warns. "
+         "scha_line14 = total allowed."),
+     "inputs": ["scha_charitable_cash", "scha_charitable_noncash_fmv", "scha_charitable_capgain_50org",
+                "scha_charitable_cash_30_other", "scha_charitable_noncash_30_other",
+                "scha_charitable_capgain_20", "scha_charitable_conservation",
+                "scha_qualified_farmer_rancher", "scha_charitable_carryover_in"],
      "outputs": ["scha_line14", "scha_charitable_carryover_out"],
-     "description": "Decision 5 (Ken: full worksheet). The 20% private-foundation-capgain + special-50% election tail is RED-deferred (D_SCHA_007)."},
+     "description": ("Decision 5 (full worksheet) + the s266 amendment (Ken Gate-1 2026-08-15): all seven "
+                     "classes modeled (D_SCHA_007 RETIRED — the 20% tail and conservation now compute); the "
+                     "floor rewritten from a deduction haircut to the statutory contribution reduction with "
+                     "the (b)(1)(I) absorption order; floored amounts flow to carryover per (d)(1)(C). "
+                     "REQUIRES HUMAN REVIEW: the C-before-B tiebreak + floored-once relief (see IRC_170 "
+                     "source notes) — TY2026 provisional until Pub 526 (2026) publishes.")},
     {"rule_id": "R-SCHA-OTHER", "title": "Line 16 — gambling (§165(d), 2026 90%) + other", "rule_type": "calculation",
      "precedence": 6, "sort_order": 6,
      "formula": ("gambling_allowed = min(GAMBLING_LOSS_PCT[year] * scha_gambling_losses, scha_gambling_winnings); "
@@ -545,22 +681,42 @@ SCHA_DIAGNOSTICS: list[dict] = [
      "message": ("Charitable contributions exceed the AGI percentage limits; the allowed amount is on line 14 "
                  "and the excess carries forward up to 5 years (shown as the charitable carryover)."),
      "notes": "Decision 5."},
-    {"diagnostic_id": "D_SCHA_005", "title": "2026 charitable 0.5%-AGI floor applied", "severity": "info",
-     "condition": "tax_year == 2026 AND charitable contributions > 0",
-     "message": ("For 2026, itemized charitable deductions are reduced by 0.5% of AGI (a floor). Line 14 "
-                 "reflects the reduction."),
-     "notes": "Decision 5; 2026-only OBBBA change."},
+    {"diagnostic_id": "D_SCHA_005", "title": "Charitable 0.5%-of-AGI floor applied (§170(b)(1)(I))", "severity": "info",
+     "condition": "tax_year >= 2026 AND charitable contributions > 0",
+     "message": ("The §170(b)(1)(I) floor (0.5% of the contribution base) reduces the CONTRIBUTIONS taken "
+                 "into account, absorbed lowest-limitation-class first (20% -> 30% -> conservation -> 50% "
+                 "-> 60%). The floored amount is not lost — it is added to the carryover to next year "
+                 "(§170(d)(1)(C)). Line 14 and the carryover both reflect this."),
+     "notes": "s266 rewrite: was 'line 14 reduced by 0.5% of AGI', which described the old (wrong) deduction haircut."},
     {"diagnostic_id": "D_SCHA_006", "title": "2026 mortgage insurance premiums phaseout applied", "severity": "info",
      "condition": "tax_year == 2026 AND scha_mortgage_insurance_premiums > 0 AND AGI > 100000",
      "message": ("Mortgage insurance premiums (line 8d) are reduced 10% for each $1,000 (or part) of AGI over "
                  "$100,000 and are fully phased out at $110,000 AGI."),
      "notes": "Decision 4; 2026-only OBBBA restoration."},
-    {"diagnostic_id": "D_SCHA_007", "title": "Charitable 20% / special-50%-election tail — not modeled", "severity": "info",
-     "condition": "contributions to non-50%-limit orgs or capital-gain property to private non-operating foundations are present",
-     "message": ("The 20%-limit bucket (capital-gain property to private non-operating foundations / non-50%-"
-                 "limit organizations) and the special 50% election are not modeled in v1 — enter only "
-                 "60%/50%/30%-bucket contributions, or figure those amounts manually (Pub 526 Worksheet 2)."),
-     "notes": "Decision 5 tail RED-defer — Ken confirms at the walk whether to add it."},
+    # D_SCHA_007 RETIRED s266 (Ken Gate-1 2026-08-15): the 20% class, the 30% non-50%-org classes, and
+    # conservation are now modeled by R-SCHA-CHARITABLE — the "enter manually" instruction became wrong
+    # the moment the classes compute. The loader DELETES the deployed row (see handle()); the special-50%
+    # ELECTION alone remains out of scope and is now covered by D_SCHA_013's narrower text.
+    {"diagnostic_id": "D_SCHA_012", "title": "Unclassified aggregate charitable carryover — per-class ordering not applied", "severity": "warning",
+     "condition": "scha_charitable_carryover_in > 0 AND no per-class per-vintage carryover rows exist",
+     "message": ("A charitable carryover was entered as a single aggregate (line 13) with no per-class, "
+                 "per-vintage breakdown. The §170(b)(1) class ceilings, the §170(b)(1)(I) floor absorption "
+                 "order, and the 5-year vintage expiry cannot be applied to an unclassified total — it is "
+                 "allowed against the overall ceiling only. Enter the carryover as per-year, per-class rows "
+                 "(from the prior-year Pub 526 Worksheet 2) to compute it correctly."),
+     "notes": "Added s266 — the legacy-aggregate fallback is never silent."},
+    {"diagnostic_id": "D_SCHA_013", "title": "Special 50% capital-gain election — not modeled", "severity": "info",
+     "condition": "capital-gain property contributions are present and the preparer indicates a §170(b)(1)(C)(iii) election",
+     "message": ("The special election to apply the 50% limit to capital-gain property by reducing the "
+                 "contribution to basis (§170(b)(1)(C)(iii)) is not modeled — figure the election manually "
+                 "(Pub 526) and enter the elected amounts in the appropriate class."),
+     "notes": "Added s266 — the ONE remaining piece of the old D_SCHA_007 scope; election-only, narrower."},
+    {"diagnostic_id": "D_SCHA_014", "title": "Charitable carryover vintage in its final year", "severity": "warning",
+     "condition": "a charitable carryover vintage is in its 5th succeeding year and not fully used",
+     "message": ("A charitable contribution carryover is in its 5th and final carryover year "
+                 "(§170(d)(1)); any amount not used this year expires. Review whether income or election "
+                 "changes can absorb it."),
+     "notes": "Added s266 — the NOL-expiry-warning pattern applied to charitable vintages."},
     {"diagnostic_id": "D_SCHA_008", "title": "Itemizing less than the standard deduction", "severity": "info",
      "condition": "scha_line17 < the standard deduction AND scha_elect_itemize is True",
      "message": ("Total itemized deductions (line 17) are less than the standard deduction, and you elected to "
@@ -623,10 +779,13 @@ SCHA_SCENARIOS: list[dict] = [
      "inputs": {"tax_year": 2025, "filing_status": "single", "agi": 100000, "scha_charitable_capgain_50org": 40000},
      "expected_outputs": {"scha_line14": 30000, "scha_charitable_carryover_out": 10000},
      "notes": "capgain to 50%-org <= 30% x 100,000 = 30,000; 10,000 carries forward."},
-    {"scenario_name": "SCHA-T9 — 2026 charitable 0.5% floor", "scenario_type": "normal", "sort_order": 9,
+    {"scenario_name": "SCHA-T9 — 2026 floor, under every ceiling (floored amount CARRIES)", "scenario_type": "normal", "sort_order": 9,
      "inputs": {"tax_year": 2026, "filing_status": "single", "agi": 100000, "scha_charitable_cash": 50000},
-     "expected_outputs": {"scha_line14": 49500, "D_SCHA_005": True},
-     "notes": "50,000 within 60%; 2026 floor = 0.5% x 100,000 = 500; line 14 = 50,000 - 500 = 49,500."},
+     "expected_outputs": {"scha_line14": 49500, "scha_charitable_carryover_out": 500, "D_SCHA_005": True},
+     "notes": ("s266 AMENDED: floor 500 reduces the CONTRIBUTIONS (cash 50,000 -> 49,500 taken, within 60%); "
+               "line 14 = 49,500 — same as the old haircut HERE because no ceiling binds — but the 500 now "
+               "lands in carryover-out per §170(d)(1)(C) (was destroyed). Contrast T20, where a ceiling "
+               "binds and the two methods DIVERGE. 2025 twin: T6 (no floor — the year gate).")},
     {"scenario_name": "SCHA-T10 — gambling 2026 90% limit", "scenario_type": "normal", "sort_order": 10,
      "inputs": {"tax_year": 2026, "filing_status": "single", "scha_gambling_winnings": 10000,
                 "scha_gambling_losses": 8000},
@@ -652,6 +811,83 @@ SCHA_SCENARIOS: list[dict] = [
                                    {"amount": 900, "date_paid": "2025-04-15", "kind": "prior_year_balance"}]},
      "expected_outputs": {"scha_line5a_state_income_total": 7900},
      "notes": "4,000 WH + 3,000 estimates + 900 prior-year balance = 7,900 (all paid in 2025)."},
+    # ── s266 charitable-amendment scenarios (Ken Gate-1 2026-08-15) ──
+    {"scenario_name": "SCHA-T15 — capgain to a private foundation (20% class, previously REFUSED)", "scenario_type": "normal", "sort_order": 16,
+     "inputs": {"tax_year": 2025, "filing_status": "single", "agi": 100000, "scha_charitable_capgain_20": 25000},
+     "expected_outputs": {"scha_line14": 20000, "scha_charitable_carryover_out": 5000},
+     "notes": ("THE HEADLINE FIX: K-1 code F / preparer-keyed 20%-class gifts now compute instead of being "
+               "refused. §170(b)(1)(D): min(25,000, min(0.20 x 100k, 0.30 x 100k - 0)) = 20,000; 5,000 "
+               "carries in-class.")},
+    {"scenario_name": "SCHA-T16 — conservation, qualified farmer (100% ceiling)", "scenario_type": "normal", "sort_order": 17,
+     "inputs": {"tax_year": 2025, "filing_status": "single", "agi": 100000,
+                "scha_charitable_conservation": 80000, "scha_qualified_farmer_rancher": True},
+     "expected_outputs": {"scha_line14": 80000, "scha_charitable_carryover_out": 0},
+     "notes": ("§170(b)(1)(E)(iv): farmer -> 100% x base - other contributions (0) = 100,000 ceiling; all "
+               "80,000 allowed. Farmer FALSE would cap at 50,000 (the default = less-deduction direction).")},
+    {"scenario_name": "SCHA-T17 — the (B)-class residual ceiling (30% capped by 50% minus (A))", "scenario_type": "normal", "sort_order": 18,
+     "inputs": {"tax_year": 2025, "filing_status": "single", "agi": 100000,
+                "scha_charitable_noncash_fmv": 40000, "scha_charitable_cash_30_other": 20000},
+     "expected_outputs": {"scha_line14": 50000, "scha_charitable_carryover_out": 10000},
+     "notes": ("§170(b)(1)(B): (B) ceiling = min(0.30 x 100k, 0.50 x 100k - 40,000 (A)) = 10,000. Allowed "
+               "40,000 + 10,000 = 50,000; the (B) excess 10,000 carries IN ITS OWN CLASS. A flat 30% "
+               "ceiling (no residual) would wrongly allow 60,000.")},
+    {"scenario_name": "SCHA-T18 — the (D)-class residual ceiling (20% capped by 30% minus (C))", "scenario_type": "normal", "sort_order": 19,
+     "inputs": {"tax_year": 2025, "filing_status": "single", "agi": 100000,
+                "scha_charitable_capgain_50org": 25000, "scha_charitable_capgain_20": 15000},
+     "expected_outputs": {"scha_line14": 30000, "scha_charitable_carryover_out": 10000},
+     "notes": ("§170(b)(1)(D): (D) ceiling = min(0.20 x 100k, 0.30 x 100k - 25,000 (C)) = 5,000. Allowed "
+               "25,000 + 5,000 = 30,000; 10,000 carries in the 20% class.")},
+    {"scenario_name": "SCHA-T20 — 2026 floor AT a ceiling: the two methods DIVERGE (the Defect-2 proof)", "scenario_type": "normal", "sort_order": 20,
+     "inputs": {"tax_year": 2026, "filing_status": "single", "agi": 100000, "scha_charitable_cash": 70000},
+     "expected_outputs": {"scha_line14": 60000, "scha_charitable_carryover_out": 10000, "D_SCHA_005": True},
+     "notes": ("CORRECT (§170(b)(1)(I)): floor 500 reduces contributions (70,000 -> 69,500 taken); the 60% "
+               "ceiling then allows 60,000 — the floor is ABSORBED by the excess. Carryover = 9,500 excess "
+               "+ 500 floored = 10,000 (§170(d)(1)(C) — nothing destroyed). THE OLD RULE gave line14 = "
+               "59,500 (60,000 - 500) and still 10,000 carryover — 500 destroyed and the deduction "
+               "understated. T9 (no ceiling binding) agrees between methods; THIS scenario is the fork.")},
+    {"scenario_name": "SCHA-T21 — 2026 floor absorption ORDER (lowest class first)", "scenario_type": "normal", "sort_order": 21,
+     "inputs": {"tax_year": 2026, "filing_status": "single", "agi": 100000,
+                "scha_charitable_cash": 50000, "scha_charitable_capgain_20": 300},
+     "expected_outputs": {"scha_line14": 49800, "scha_charitable_carryover_out": 500, "D_SCHA_005": True},
+     "notes": ("Floor 500 absorbs (D) FIRST: capgain_20 300 -> 0 (fully absorbed); the remaining 200 walks "
+               "the order (C),(B),(E),(A) — all empty — to (G): cash 50,000 -> 49,800. Line 14 = 49,800. "
+               "Carryover: 300 in the 20% class + 200 in the 60% class = 500. A pro-rata or "
+               "highest-first absorption gives DIFFERENT per-class carryovers — the order is statutory "
+               "(§170(b)(1)(I); C-before-B tiebreak flagged requires_human_review).")},
+    {"scenario_name": "SCHA-T23 — carryover vintages: current-year first, then oldest first", "scenario_type": "normal", "sort_order": 22,
+     "inputs": {"tax_year": 2025, "filing_status": "single", "agi": 100000, "scha_charitable_cash": 55000,
+                "charitable_carryover_vintages": [
+                    {"source_tax_year": 2021, "limitation_class": "cash_60", "remaining": 5000},
+                    {"source_tax_year": 2023, "limitation_class": "cash_60", "remaining": 5000}]},
+     "expected_outputs": {"scha_line14": 60000, "scha_charitable_carryover_out": 5000},
+     "notes": ("Current-year 55,000 first (Pub 526: 'You deduct current year contributions before "
+               "carryovers'); room to the 60% ceiling = 5,000 -> the 2021 vintage (OLDEST, 'in order of "
+               "time') is used in full; the 2023 vintage is untouched -> carryover-out 5,000 (class "
+               "cash_60, vintage 2023).")},
+    {"scenario_name": "SCHA-T24 — a vintage past its 5th year EXPIRES", "scenario_type": "normal", "sort_order": 23,
+     "inputs": {"tax_year": 2025, "filing_status": "single", "agi": 100000, "scha_charitable_cash": 10000,
+                "charitable_carryover_vintages": [
+                    {"source_tax_year": 2019, "limitation_class": "cash_60", "remaining": 8000}]},
+     "expected_outputs": {"scha_line14": 10000, "scha_charitable_carryover_out": 0},
+     "notes": ("§170(d)(1): 5 succeeding years — a 2019 vintage's last usable year was 2024. In 2025 it "
+               "contributes NOTHING and does not carry (expired, not preserved). D_SCHA_014 warns in the "
+               "5th year itself, BEFORE expiry.")},
+    {"scenario_name": "SCHA-T25 — negative AGI: no ceiling, no deduction, no phantom carryover", "scenario_type": "boundary", "sort_order": 24,
+     "inputs": {"tax_year": 2025, "filing_status": "single", "agi": -2302},
+     "expected_outputs": {"scha_line14": 0, "scha_charitable_carryover_out": 0},
+     "notes": ("base = max(0, AGI) — now STATED by the rule (§170(b)(1)(H) contribution base; a negative "
+               "base yields no ceiling and no deduction). Pins the historical defect where negative bucket "
+               "ceilings put -3,223 on line 14 with a phantom carryover of contributions never made.")},
+    {"scenario_name": "SCHA-T26 — a floored-at-source vintage is not re-floored (PROVISIONAL)", "scenario_type": "normal", "sort_order": 25,
+     "inputs": {"tax_year": 2027, "filing_status": "single", "agi": 100000,
+                "charitable_carryover_vintages": [
+                    {"source_tax_year": 2026, "limitation_class": "cash_60", "remaining": 1000,
+                     "floored_at_source": True}]},
+     "expected_outputs": {"scha_line14": 1000, "scha_charitable_carryover_out": 0},
+     "notes": ("PROVISIONAL (requires_human_review; re-verify against Pub 526 (2026) when published): a "
+               "vintage that already absorbed the §170(b)(1)(I) floor in its contribution year is not "
+               "floored again when used — with no unmarked contributions present, the floor has nothing "
+               "to absorb and the full 1,000 deducts.")},
     {"scenario_name": "SCHA-T14 — 4th-quarter estimate paid in January is excluded (date filter)", "scenario_type": "normal", "sort_order": 15,
      "inputs": {"tax_year": 2025, "filing_status": "single", "state_withholding": 2000,
                 "state_payments": [{"amount": 1000, "date_paid": "2025-09-15", "kind": "estimate"},
@@ -678,8 +914,9 @@ SCHA_RULE_LINKS: list[tuple[str, str, str, str]] = [
     ("R-SCHA-SALT", "OBBBA_2025_SCHA", "primary", "The SALT cap + 30% phasedown (year-keyed)"),
     ("R-SCHA-INTEREST", "IRS_2025_SCHA_FORM", "primary", "Lines 8-10: mortgage interest"),
     ("R-SCHA-INTEREST", "OBBBA_2025_SCHA", "secondary", "2026 PMI restoration + phaseout"),
-    ("R-SCHA-CHARITABLE", "IRS_PUB526_2025", "primary", "The AGI-bucket limits + carryover (Pub 526)"),
-    ("R-SCHA-CHARITABLE", "OBBBA_2025_SCHA", "secondary", "The 2026 0.5%-AGI charitable floor"),
+    ("R-SCHA-CHARITABLE", "IRC_170", "primary", "§170(b)(1)(A)-(I) class ceilings + the 0.5% floor + (d)(1) carryover — the statute itself (added s266; the missing citation WAS the defect)"),
+    ("R-SCHA-CHARITABLE", "IRS_PUB526_2025", "primary", "Worksheet 2 ordering: current-year first, oldest first (Pub 526)"),
+    ("R-SCHA-CHARITABLE", "OBBBA_2025_SCHA", "secondary", "P.L. 119-21 §70425 enacts the (b)(1)(I) floor, TY2026+"),
     ("R-SCHA-OTHER", "OBBBA_2025_SCHA", "primary", "Gambling 90% (2026) + misc-2% suspension"),
     ("R-SCHA-TOTAL", "IRS_2025_SCHA_FORM", "primary", "Line 17 total -> 1040 line 12"),
     ("R-SCHA-68-DEFER", "OBBBA_2025_SCHA", "primary", "The 2026 §68 overall 35% limitation (RED-defer)"),
@@ -706,11 +943,16 @@ FLOW_ASSERTIONS: list[dict] = [
                                   "threshold_2026": 505000, "floor": 10000, "rate": 0.30}},
      "sort_order": 2},
     {"assertion_id": "FA-1040-SCHA-03", "assertion_type": "flow_assertion", "entity_types": ["1040"],
-     "title": "Charitable line 14 = bucket limits, then the 2026 0.5%-AGI floor",
-     "description": ("Validates R-SCHA-CHARITABLE. Bug it catches: a cash gift over 60% AGI not limited, or the "
-                     "2026 floor missing/applied in 2025."),
+     "title": "Charitable line 14: floor reduces CONTRIBUTIONS (statutory order), 7 class ceilings, floored amount carries",
+     "description": ("Validates the s266 R-SCHA-CHARITABLE. Bugs it catches: the floor applied to the "
+                     "deduction instead of the contributions (they diverge when a ceiling binds — SCHA-T20), "
+                     "the floored amount destroyed instead of carried (§170(d)(1)(C)), a missing class "
+                     "residual ((B) vs 50%-(A); (D) vs 30%-(C)), or the floor firing in 2025."),
      "definition": {"kind": "formula_check", "form": "SCHEDULE_A",
-                    "formula": "line_14 == bucket_limited(cash<=0.60*agi, fmv<=0.50*agi, capgain<=0.30*agi) - floor_2026(0.005*agi)"},
+                    "formula": ("taken = floor_reduce_2026plus(contribs, 0.005*base, order=[capgain_20, capgain_30, "
+                                "cash_30_other+noncash_30_other, conservation, noncash_50, cash_60]); "
+                                "line_14 == class_ceilings(taken, base=max(0,agi)); "
+                                "carryover_out == contribs + carryover_in - line_14 (floored included, never destroyed)")},
      "sort_order": 3},
     {"assertion_id": "FA-1040-SCHA-04", "assertion_type": "flow_assertion", "entity_types": ["1040"],
      "title": "Line 17 total → Form 1040 line 12",
@@ -881,6 +1123,12 @@ class Command(BaseCommand):
         self.stdout.write(f"  {len(lines)} lines")
 
     def _upsert_diagnostics(self, form, diagnostics):
+        # s266: D_SCHA_007 RETIRED (the 20%/30%/conservation classes now compute; its "enter manually"
+        # instruction became wrong). Upsert leaves stale rows behind, so delete explicitly — the
+        # spine-loader stub-retirement pattern.
+        gone, _ = FormDiagnostic.objects.filter(tax_form=form, diagnostic_id="D_SCHA_007").delete()
+        if gone:
+            self.stdout.write("  D_SCHA_007 RETIRED (deleted from the deployed spec — s266)")
         for d in diagnostics:
             d = dict(d)
             FormDiagnostic.objects.update_or_create(tax_form=form, diagnostic_id=d.pop("diagnostic_id"), defaults=d)
