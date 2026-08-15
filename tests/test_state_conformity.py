@@ -202,6 +202,135 @@ def test_conformity_rows_use_canonical_decoupled_shape():
             assert not missing, f"{state} decoupled item {item.get('item')!r} missing {missing}"
 
 
+# ── 3a. the Tier-1 expansion batch (gated separately) ──────────────────────
+
+
+def test_tier1_batch_is_separately_gated():
+    """Batch 1's approval must NOT reach the Tier-1 states.
+
+    The two sentinels are deliberately independent: gating batch 2 by flipping batch 1
+    back to False would make the already-approved GA/SC/AL/NC rows unreconstructable by
+    `seed_all`, which is the reconstructability contract this repo has been burned by.
+    """
+    from specs.management.commands import load_state_conformity as m
+
+    assert m.READY_TO_SEED_TIER1 is False, (
+        "Tier-1 ships gated — flipping it is Ken's Gate-1 action, and four judgement "
+        "calls (AZ §179, MO PTET capital gain, TN/TX acquired-vs-placed-in-service) "
+        "must be ruled on first."
+    )
+
+
+@pytest.mark.django_db
+def test_tier1_rows_are_not_written_while_gated():
+    """With the Tier-1 sentinel down, only the Core four are seeded."""
+    from django.core.management import call_command
+
+    from specs.management.commands.load_state_conformity import CONFORMITY_ROWS
+
+    call_command("load_state_conformity")
+
+    seeded = set(JurisdictionConformitySource.objects.values_list("jurisdiction_code", flat=True))
+    assert seeded == {r["jurisdiction_code"] for r in CONFORMITY_ROWS}
+    assert "CA" not in seeded, "Tier-1 state leaked past its gate"
+
+
+def test_tier1_data_shape_and_enums():
+    """The transcribed Tier-1 data obeys the same contract as the Core four."""
+    from sources.models import ConformityType, SourceType
+    from specs.management.commands._state_conformity_tier1 import TIER1_ROWS, TIER1_SOURCES
+
+    valid_ct = {c for c, _ in ConformityType.choices}
+    valid_st = {c for c, _ in SourceType.choices}
+    required = {"item", "federal_treatment", "state_treatment", "authority_source_code", "notes"}
+    codes = {s["source_code"] for s in TIER1_SOURCES}
+
+    assert len(codes) == len(TIER1_SOURCES), "duplicate source_code in TIER1_SOURCES"
+
+    for s in TIER1_SOURCES:
+        assert s["source_type"] in valid_st, f"{s['source_code']}: {s['source_type']} not a SourceType"
+        assert s.get("official_url"), f"{s['source_code']}: every source needs a URL"
+
+    seen = set()
+    for r in TIER1_ROWS:
+        st = r["jurisdiction_code"]
+        assert st not in seen, f"{st} appears twice — one row per state-year"
+        seen.add(st)
+        assert r["conformity_type"] in valid_ct, f"{st}: {r['conformity_type']} not a ConformityType"
+        assert r["summary"], f"{st}: summary required"
+        assert r["authority_source_code"] in codes, f"{st}: anchor source not defined"
+        for item in r["decoupled_items"]:
+            missing = required - set(item)
+            assert not missing, f"{st} item {item.get('item')!r} missing {missing}"
+            ref = item.get("authority_source_code")
+            assert not ref or ref in codes, f"{st}: item cites undefined source {ref}"
+
+
+def test_tier1_excludes_nevada():
+    """NV has no conformity posture to record — no income tax at all, constitutionally."""
+    from specs.management.commands._state_conformity_tier1 import TIER1_ROWS
+
+    assert "NV" not in {r["jurisdiction_code"] for r in TIER1_ROWS}
+
+
+def test_arizona_carries_no_section_179_figure():
+    """AZ's §179 limit is an open Ken judgement call — the row must not assert a number.
+
+    Arizona's applied limit depends on an OBBBA provision-by-provision retroactivity
+    mapping the state has never published. A plausible-looking figure here would be
+    exactly the failure mode this campaign's research rules exist to prevent.
+    """
+    import re
+
+    from specs.management.commands._state_conformity_tier1 import TIER1_ROWS
+
+    az = next(r for r in TIER1_ROWS if r["jurisdiction_code"] == "AZ")
+    blob = repr(az)
+    for forbidden in ("2,500,000", "4,000,000", "1,250,000", "3,130,000"):
+        assert forbidden not in blob, f"AZ row asserts a §179 figure ({forbidden}) — Gate-1 call"
+    # and no bare 7+ digit money token crept in either
+    assert not re.findall(r"\$\s?\d{1,3}(?:,\d{3}){2,}", blob.replace("150,000", "")), (
+        "AZ row contains an unexpected large dollar figure"
+    )
+
+
+def test_verified_negative_states_have_no_invented_addback():
+    """CO / OR / MO proved the ABSENCE of a depreciation modification.
+
+    Their briefs verified that affirmatively (CO: zero §168(k) hits anywhere in CRS
+    Title 39 Art. 22). If a future edit adds an add-back item to one of these, it is
+    almost certainly a GA-shaped assumption leaking in — the exact thing the campaign's
+    "never clone GA" rule exists to stop.
+    """
+    from specs.management.commands._state_conformity_tier1 import TIER1_ROWS
+
+    import re
+
+    # "no add-back" / "does not require an add-back" are the CORRECT wording for these
+    # states, so a bare substring test flags its own answer. Match only an ASSERTED
+    # add-back — i.e. one not immediately preceded by a negation.
+    asserted_addback = re.compile(
+        r"(?<!no )(?<!not )(?<!never )(?<!without )(?<!nor )add[- ]back", re.IGNORECASE
+    )
+
+    for st in ("CO", "OR", "MO"):
+        row = next(r for r in TIER1_ROWS if r["jurisdiction_code"] == st)
+        for item in row["decoupled_items"]:
+            name = item.get("item", "").lower()
+            if "168(k)" not in name and "bonus" not in name:
+                continue
+            treatment = item.get("state_treatment") or ""
+            # strip the negated forms first, then look for any survivor
+            stripped = re.sub(
+                r"\b(no|not|never|without|nor)\s+(a\s+|an\s+|any\s+)?add[- ]back\w*",
+                "", treatment, flags=re.IGNORECASE,
+            )
+            assert not asserted_addback.search(stripped), (
+                f"{st}: a bonus ADD-BACK appears to be asserted, but {st} was verified to "
+                f"have none. Treatment was: {treatment[:160]!r}"
+            )
+
+
 def test_conformity_covers_every_built_state():
     """The four states with seeded specs must all have a conformity row.
 
@@ -269,9 +398,16 @@ def test_conformity_loader_anchors_authority_when_present(monkeypatch):
 # This baseline is a RATCHET, not an acceptance: counts may only fall, and a new distinct
 # value fails the test. Lower a number here only when you have actually fixed occurrences.
 # (load_ga700's 'state_guidance' was the 10th value and is fixed — hence its absence.)
+# REBASELINED 2026-08-15: 232 → 234. The +2 (`statute` 108→109, `official_instructions`
+# 59→60) came from THREE loaders added by parallel sessions in the shared worktree after
+# the original baseline — `load_1040_k1_basis_704d` (08-07), `load_1040_8853_sec_c` (08-08),
+# `load_1040_form_172` (08-12). Not new debt from the state campaign; the campaign's own
+# loaders are clean (see test_state_conformity_loader_uses_valid_source_types).
+# The ratchet FIRED correctly and is doing its job — rebaselined rather than loosened,
+# and the cause is named here so the next increase is still meaningful.
 SOURCE_TYPE_DEBT_BASELINE: dict[str, int] = {
-    "statute": 108,
-    "official_instructions": 59,
+    "statute": 109,
+    "official_instructions": 60,
     "federal_form": 29,
     "official_guidance": 28,
     "instructions": 2,

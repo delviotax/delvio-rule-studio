@@ -65,14 +65,30 @@ DO NOT relax the guard to silence the error.
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
-from sources.models import AuthoritySource, JurisdictionConformitySource
+from sources.models import AuthorityExcerpt, AuthoritySource, JurisdictionConformitySource
+
+from ._state_conformity_tier1 import TIER1_ROWS, TIER1_SOURCES
 
 # ═══════════════════════════════════════════════════════════════════════════
-# SAFETY GUARD
+# SAFETY GUARDS — one per approval batch
 # ═══════════════════════════════════════════════════════════════════════════
+# Batch 1 — the Core four (GA/SC/AL/NC).
 # FLIPPED 2026-08-05 — Ken's Gate-1 walk (WO-CONF-SPINE), in-session, verbatim:
 # W1 "Approve — flip, seed, verify"; W4 "Separate WO, ratchet holds meanwhile".
 READY_TO_SEED = True
+
+# Batch 2 — the 14 Tier-1 expansion states from the Phase 3 scan (CA FL TX TN VA CO
+# OH MA NY MD AZ OR MO MS). NEW SCOPE — needs its OWN Gate-1 approval; batch 1's
+# approval does not reach it. Kept as a separate sentinel deliberately: flipping
+# batch 1 back to False to gate batch 2 would make the already-approved rows
+# unreconstructable by `seed_all`.
+#
+# ⚠ Before flipping, Ken must rule on the four open judgement calls the scan left
+#   (see conformity/SYNTHESIS.md and the per-state briefs):
+#     • AZ §179 — the row deliberately carries NO dollar figure.
+#     • MO PTET capital-gain — statute-vs-form conflict; election may be worse than none.
+#     • TN and TX — acquired-vs-placed-in-service, each DOR contradicting itself.
+READY_TO_SEED_TIER1 = False
 
 TAX_YEAR = 2025
 
@@ -280,6 +296,34 @@ class Command(BaseCommand):
             help="Report what would be written without touching the DB (bypasses the seed guard).",
         )
 
+    def _load_tier1_sources(self, dry_run: bool) -> int:
+        """Create the Tier-1 states' conformity AuthoritySource rows + their excerpts.
+
+        These states have no form loaders yet, so nothing else in the repo creates their
+        authority. Per campaign D-8 the conformity row is authored FIRST and the state's
+        later form loaders reuse these via EXISTING_SOURCES_TO_REFERENCE.
+        """
+        n = 0
+        for src_data in TIER1_SOURCES:
+            src_data = dict(src_data)
+            label = src_data.pop("excerpt_label", None)
+            text = src_data.pop("excerpt_text", None)
+            summary_text = src_data.pop("summary_text", None)
+            if dry_run:
+                n += 1
+                continue
+            source, _ = AuthoritySource.objects.update_or_create(
+                source_code=src_data["source_code"], defaults=src_data,
+            )
+            if label:
+                AuthorityExcerpt.objects.update_or_create(
+                    authority_source=source, excerpt_label=label,
+                    defaults={"excerpt_label": label, "excerpt_text": text or "",
+                              "summary_text": summary_text or ""},
+                )
+            n += 1
+        return n
+
     @transaction.atomic
     def handle(self, *_args, **opts):
         dry_run = opts["dry_run"]
@@ -291,11 +335,33 @@ class Command(BaseCommand):
                 "Use --dry-run to inspect the planned rows. DO NOT relax the guard to silence this."
             )
 
+        rows = list(CONFORMITY_ROWS)
+        if READY_TO_SEED_TIER1 or dry_run:
+            n_src = self._load_tier1_sources(dry_run)
+            rows += TIER1_ROWS
+            verb = "would create" if dry_run else "ready"
+            self.stdout.write(f"Tier-1 authority sources {verb}: {n_src}")
+            if dry_run and not READY_TO_SEED_TIER1:
+                self.stdout.write(self.style.WARNING(
+                    "  [dry-run] Tier-1 rows shown for inspection but are GATED — "
+                    "READY_TO_SEED_TIER1 is False (needs its own Gate-1 approval)."
+                ))
+        else:
+            self.stdout.write(self.style.WARNING(
+                f"Tier-1 batch SKIPPED — READY_TO_SEED_TIER1 is False "
+                f"({len(TIER1_ROWS)} states awaiting Gate 1)."
+            ))
+
+        # Codes this run creates itself. In --dry-run nothing is written, so a plain DB
+        # lookup would report every Tier-1 source as "not found" and bury the real
+        # warnings — which is exactly the output Ken reads at the gate.
+        pending = {s["source_code"] for s in TIER1_SOURCES} if (READY_TO_SEED_TIER1 or dry_run) else set()
+
         written = 0
-        for row in CONFORMITY_ROWS:
+        for row in rows:
             code = row["authority_source_code"]
             src = AuthoritySource.objects.filter(source_code=code).first()
-            if src is None:
+            if src is None and code not in pending:
                 # A missing anchor means the state's own loader has not run — on a fresh
                 # rebuild that is an ordering fault worth surfacing, not swallowing.
                 self.stdout.write(self.style.WARNING(
@@ -306,7 +372,10 @@ class Command(BaseCommand):
             # Every cited source_code inside decoupled_items should also resolve.
             for item in row["decoupled_items"]:
                 item_code = item.get("authority_source_code")
-                if item_code and not AuthoritySource.objects.filter(source_code=item_code).exists():
+                if (
+                    item_code and item_code not in pending
+                    and not AuthoritySource.objects.filter(source_code=item_code).exists()
+                ):
                     self.stdout.write(self.style.WARNING(
                         f"  {row['jurisdiction_code']}: decoupled item cites unknown source {item_code}"
                     ))
@@ -338,7 +407,7 @@ class Command(BaseCommand):
 
         if dry_run:
             self.stdout.write(self.style.WARNING(
-                f"Dry run — {len(CONFORMITY_ROWS)} rows planned, nothing written."
+                f"Dry run — {len(rows)} rows planned, nothing written."
             ))
         else:
             self.stdout.write(self.style.SUCCESS(
