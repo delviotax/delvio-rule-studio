@@ -268,7 +268,7 @@ AUTHORITY_SOURCES: list[dict] = [
         "is_filing_authority": False,
         "trust_score": 9.30,
         "requires_human_review": True,
-        "notes": "The AGI-bucket limits + ordering + carryover. s266: all seven classes now modeled (D_SCHA_007 retired); only the special-50% ELECTION remains out (D_SCHA_013). REQUIRES HUMAN REVIEW: the Worksheet 2 line-by-line correspondence, and re-verify the floor against Pub 526 (2026) when it publishes.",
+        "notes": "The AGI-bucket limits + ordering + carryover. s266: all seven classes now modeled (D_SCHA_007 retired); only the special-50% ELECTION remains out (D_SCHA_016). REQUIRES HUMAN REVIEW: the Worksheet 2 line-by-line correspondence, and re-verify the floor against Pub 526 (2026) when it publishes.",
         "topics": ["itemized_deductions"],
         "excerpts": [
             {
@@ -483,7 +483,7 @@ SCHA_FACTS: list[dict] = [
                "fallback — when per-class per-vintage carryover rows exist (the app's "
                "CarryforwardAttribute, kind=charitable), THEY govern and this aggregate must reconcile "
                "(D_CFWD_002). An unclassified aggregate cannot receive per-class ordering, the floor "
-               "absorption order, or the 5-year vintage drop — D_SCHA_012 warns when it is the only source.")},
+               "absorption order, or the 5-year vintage drop — D_SCHA_015 warns when it is the only source.")},
     # ── Casualty / Other ──
     {"fact_key": "scha_casualty_loss", "label": "Line 15 — casualty/theft loss (Form 4684 result)",
      "data_type": "decimal", "default_value": "0", "sort_order": 20, "notes": "INPUT (the already-computed Form 4684 result — federally declared disaster only; D_SCHA_002)."},
@@ -595,7 +595,7 @@ SCHA_RULES: list[dict] = [
          "first ['in order of time']; a vintage expires after its 5th succeeding year; a carryover NEVER "
          "changes class. Per-class carryover-out = contributions + carryover-in - allowed + floored "
          "amounts. LEGACY: if no per-vintage rows exist, scha_charitable_carryover_in keeps its prior "
-         "documented behavior (added subject to the overall ceiling) + D_SCHA_012 warns. "
+         "documented behavior (added subject to the overall ceiling) + D_SCHA_015 warns. "
          "scha_line14 = total allowed."),
      "inputs": ["scha_charitable_cash", "scha_charitable_noncash_fmv", "scha_charitable_capgain_50org",
                 "scha_charitable_cash_30_other", "scha_charitable_noncash_30_other",
@@ -696,8 +696,14 @@ SCHA_DIAGNOSTICS: list[dict] = [
     # D_SCHA_007 RETIRED s266 (Ken Gate-1 2026-08-15): the 20% class, the 30% non-50%-org classes, and
     # conservation are now modeled by R-SCHA-CHARITABLE — the "enter manually" instruction became wrong
     # the moment the classes compute. The loader DELETES the deployed row (see handle()); the special-50%
-    # ELECTION alone remains out of scope and is now covered by D_SCHA_013's narrower text.
-    {"diagnostic_id": "D_SCHA_012", "title": "Unclassified aggregate charitable carryover — per-class ordering not applied", "severity": "warning",
+    # ELECTION alone remains out of scope and is now covered by D_SCHA_016's narrower text.
+    {"diagnostic_id": "D_SCHA_012", "title": "Charitable contributions from BOTH a K-1 and a direct entry", "severity": "info",
+     "condition": "a K-1 pass-through charitable amount and a directly-entered amount exist in the same §170(b) class",
+     "message": ("A K-1 pass-through amount and a directly-entered amount in the same §170(b) bucket ADD "
+                 "— verify the direct entry does not already include the pass-through amount "
+                 "(double-count hazard)."),
+     "notes": "Backfilled to the spec s266 — live in the app since s236 (the transition hazard when the K-1 fields landed); RS never carried it."},
+    {"diagnostic_id": "D_SCHA_015", "title": "Unclassified aggregate charitable carryover — per-class ordering not applied", "severity": "warning",
      "condition": "scha_charitable_carryover_in > 0 AND no per-class per-vintage carryover rows exist",
      "message": ("A charitable carryover was entered as a single aggregate (line 13) with no per-class, "
                  "per-vintage breakdown. The §170(b)(1) class ceilings, the §170(b)(1)(I) floor absorption "
@@ -705,13 +711,13 @@ SCHA_DIAGNOSTICS: list[dict] = [
                  "allowed against the overall ceiling only. Enter the carryover as per-year, per-class rows "
                  "(from the prior-year Pub 526 Worksheet 2) to compute it correctly."),
      "notes": "Added s266 — the legacy-aggregate fallback is never silent."},
-    {"diagnostic_id": "D_SCHA_013", "title": "Special 50% capital-gain election — not modeled", "severity": "info",
+    {"diagnostic_id": "D_SCHA_016", "title": "Special 50% capital-gain election — not modeled", "severity": "info",
      "condition": "capital-gain property contributions are present and the preparer indicates a §170(b)(1)(C)(iii) election",
      "message": ("The special election to apply the 50% limit to capital-gain property by reducing the "
                  "contribution to basis (§170(b)(1)(C)(iii)) is not modeled — figure the election manually "
                  "(Pub 526) and enter the elected amounts in the appropriate class."),
      "notes": "Added s266 — the ONE remaining piece of the old D_SCHA_007 scope; election-only, narrower."},
-    {"diagnostic_id": "D_SCHA_014", "title": "Charitable carryover vintage in its final year", "severity": "warning",
+    {"diagnostic_id": "D_SCHA_017", "title": "Charitable carryover vintage in its final year", "severity": "warning",
      "condition": "a charitable carryover vintage is in its 5th succeeding year and not fully used",
      "message": ("A charitable contribution carryover is in its 5th and final carryover year "
                  "(§170(d)(1)); any amount not used this year expires. Review whether income or election "
@@ -870,7 +876,7 @@ SCHA_SCENARIOS: list[dict] = [
                     {"source_tax_year": 2019, "limitation_class": "cash_60", "remaining": 8000}]},
      "expected_outputs": {"scha_line14": 10000, "scha_charitable_carryover_out": 0},
      "notes": ("§170(d)(1): 5 succeeding years — a 2019 vintage's last usable year was 2024. In 2025 it "
-               "contributes NOTHING and does not carry (expired, not preserved). D_SCHA_014 warns in the "
+               "contributes NOTHING and does not carry (expired, not preserved). D_SCHA_017 warns in the "
                "5th year itself, BEFORE expiry.")},
     {"scenario_name": "SCHA-T25 — negative AGI: no ceiling, no deduction, no phantom carryover", "scenario_type": "boundary", "sort_order": 24,
      "inputs": {"tax_year": 2025, "filing_status": "single", "agi": -2302},
