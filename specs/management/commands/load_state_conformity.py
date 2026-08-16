@@ -83,12 +83,20 @@ READY_TO_SEED = True
 # batch 1 back to False to gate batch 2 would make the already-approved rows
 # unreconstructable by `seed_all`.
 #
-# ⚠ Before flipping, Ken must rule on the four open judgement calls the scan left
-#   (see conformity/SYNTHESIS.md and the per-state briefs):
-#     • AZ §179 — the row deliberately carries NO dollar figure.
-#     • MO PTET capital-gain — statute-vs-form conflict; election may be worse than none.
-#     • TN and TX — acquired-vs-placed-in-service, each DOR contradicting itself.
-READY_TO_SEED_TIER1 = False
+# FLIPPED 2026-08-16 — Ken approved the Tier-1 Gate-1 walk
+# (delvio-states/GATE1_WALK.md) as recommended. The four rulings:
+#   1. AZ §179 — BROAD reading of §43-105(B) → $2,500,000 / $4,000,000 for TY2025.
+#      ⚠ A RULING on an interpretive question, not a published Arizona figure; AZDOR has
+#      never published its OBBBA retroactivity mapping. Basis recorded in the AZ row's notes.
+#   2. MO PTET capital gain — BUILD TO THE FORM (no entity-level subtraction). The statutory
+#      reading is arguable but the Department's own form cannot express it. ⚠ The client-advice
+#      consequence is separate and live: for gain-heavy owners the PTET election can be WORSE
+#      than not electing. Settling it needs one call to DOR PTE staff, not a spec change.
+#   3. TN acquired-vs-placed-in-service — PLACED IN SERVICE, flagged.
+#   4. TX asset-level bonus date gate — PLACED IN SERVICE, flagged. (Same ruling as 3; the
+#      report-year gate was never in dispute.)
+# Rulings 3 and 4 bind the Wave 2 form loaders, which deliberately encode no date key.
+READY_TO_SEED_TIER1 = True
 
 TAX_YEAR = 2025
 

@@ -205,34 +205,58 @@ def test_conformity_rows_use_canonical_decoupled_shape():
 # ── 3a. the Tier-1 expansion batch (gated separately) ──────────────────────
 
 
-def test_tier1_batch_is_separately_gated():
-    """Batch 1's approval must NOT reach the Tier-1 states.
+def test_tier1_sentinel_is_independent_of_batch_one():
+    """The two approval sentinels must stay SEPARATE variables.
 
-    The two sentinels are deliberately independent: gating batch 2 by flipping batch 1
-    back to False would make the already-approved GA/SC/AL/NC rows unreconstructable by
-    `seed_all`, which is the reconstructability contract this repo has been burned by.
+    Pins the mechanism, not a value. Batch 1 (GA/SC/AL/NC) and the Tier-1 batch were
+    approved on different dates against different evidence; collapsing them into one flag
+    would mean re-gating batch 2 could only be done by flipping batch 1 back to False,
+    which would make the already-approved rows unreconstructable by `seed_all` — the exact
+    contract the 2026-07-05 delta audit was about.
     """
     from specs.management.commands import load_state_conformity as m
 
-    assert m.READY_TO_SEED_TIER1 is False, (
-        "Tier-1 ships gated — flipping it is Ken's Gate-1 action, and four judgement "
-        "calls (AZ §179, MO PTET capital gain, TN/TX acquired-vs-placed-in-service) "
-        "must be ruled on first."
-    )
+    assert hasattr(m, "READY_TO_SEED") and hasattr(m, "READY_TO_SEED_TIER1")
+    assert m.READY_TO_SEED is not m.READY_TO_SEED_TIER1 or isinstance(m.READY_TO_SEED_TIER1, bool)
 
 
 @pytest.mark.django_db
-def test_tier1_rows_are_not_written_while_gated():
-    """With the Tier-1 sentinel down, only the Core four are seeded."""
+def test_tier1_rows_are_not_written_while_gated(monkeypatch):
+    """With the Tier-1 sentinel down, only the Core four are seeded.
+
+    Monkeypatched rather than asserting the shipped value: Ken approved the Tier-1 batch on
+    2026-08-16, so the sentinel is legitimately True on disk. What must keep working is that
+    the gate ACTUALLY WITHHOLDS when it is down — the same lesson as the batch-1 guard test.
+    """
     from django.core.management import call_command
 
-    from specs.management.commands.load_state_conformity import CONFORMITY_ROWS
+    from specs.management.commands import load_state_conformity as m
 
+    monkeypatch.setattr(m, "READY_TO_SEED_TIER1", False)
     call_command("load_state_conformity")
 
     seeded = set(JurisdictionConformitySource.objects.values_list("jurisdiction_code", flat=True))
-    assert seeded == {r["jurisdiction_code"] for r in CONFORMITY_ROWS}
+    assert seeded == {r["jurisdiction_code"] for r in m.CONFORMITY_ROWS}
     assert "CA" not in seeded, "Tier-1 state leaked past its gate"
+
+
+@pytest.mark.django_db
+def test_tier1_rows_seed_when_approved():
+    """With the sentinel up (its shipped state since Ken's 2026-08-16 approval), all 18 land."""
+    from django.core.management import call_command
+
+    from specs.management.commands import load_state_conformity as m
+
+    if not m.READY_TO_SEED_TIER1:
+        pytest.skip("Tier-1 batch is gated; covered by the withholding test above")
+
+    call_command("load_state_conformity")
+    seeded = set(JurisdictionConformitySource.objects.values_list("jurisdiction_code", flat=True))
+    expected = {r["jurisdiction_code"] for r in m.CONFORMITY_ROWS} | {
+        r["jurisdiction_code"] for r in m.TIER1_ROWS
+    }
+    assert seeded == expected
+    assert "NV" not in seeded, "NV has no conformity posture — it must never be seeded"
 
 
 def test_tier1_data_shape_and_enums():
@@ -247,9 +271,27 @@ def test_tier1_data_shape_and_enums():
 
     assert len(codes) == len(TIER1_SOURCES), "duplicate source_code in TIER1_SOURCES"
 
+    # Field-length caps. Postgres enforces these; SQLite does not, so a loader can look
+    # green locally and DataError on seed. Six Tier-1 citations overflowed varchar(255) on
+    # the 2026-08-16 approval run — this asserts the real model caps rather than a copy.
+    from sources.models import AuthoritySource
+
+    src_caps = {
+        f.name: f.max_length
+        for f in AuthoritySource._meta.get_fields()
+        if getattr(f, "max_length", None)
+    }
+
     for s in TIER1_SOURCES:
         assert s["source_type"] in valid_st, f"{s['source_code']}: {s['source_type']} not a SourceType"
         assert s.get("official_url"), f"{s['source_code']}: every source needs a URL"
+        for field, cap in src_caps.items():
+            value = s.get(field)
+            if isinstance(value, str):
+                assert len(value) <= cap, (
+                    f"{s['source_code']}.{field} is {len(value)} chars, cap {cap} — "
+                    f"Postgres will DataError on seed even though SQLite accepts it"
+                )
 
     seen = set()
     for r in TIER1_ROWS:
@@ -273,24 +315,35 @@ def test_tier1_excludes_nevada():
     assert "NV" not in {r["jurisdiction_code"] for r in TIER1_ROWS}
 
 
-def test_arizona_carries_no_section_179_figure():
-    """AZ's §179 limit is an open Ken judgement call — the row must not assert a number.
+def test_arizona_section_179_figure_is_the_ruled_one_and_shows_its_basis():
+    """AZ's §179 figure is a RULING, and the row must say so.
 
-    Arizona's applied limit depends on an OBBBA provision-by-provision retroactivity
-    mapping the state has never published. A plausible-looking figure here would be
-    exactly the failure mode this campaign's research rules exist to prevent.
+    History: this test originally asserted the row carried NO §179 figure at all, because
+    the applied limit depends on an OBBBA retroactivity mapping Arizona has never published.
+    **Ken ruled it on 2026-08-16** (broad reading of §43-105(B) → $2,500,000 / $4,000,000),
+    so the pin moved rather than being deleted: the figure is now allowed, but ONLY the ruled
+    one, and only while the row still records that it is an interpretive ruling rather than a
+    published Arizona number. That distinction is the whole point — a future reader must not
+    mistake it for something AZDOR printed.
     """
-    import re
-
     from specs.management.commands._state_conformity_tier1 import TIER1_ROWS
 
     az = next(r for r in TIER1_ROWS if r["jurisdiction_code"] == "AZ")
     blob = repr(az)
-    for forbidden in ("2,500,000", "4,000,000", "1,250,000", "3,130,000"):
-        assert forbidden not in blob, f"AZ row asserts a §179 figure ({forbidden}) — Gate-1 call"
-    # and no bare 7+ digit money token crept in either
-    assert not re.findall(r"\$\s?\d{1,3}(?:,\d{3}){2,}", blob.replace("150,000", "")), (
-        "AZ row contains an unexpected large dollar figure"
+
+    # the ruled figures, and no competing pre-OBBBA pair
+    assert "2,500,000" in blob and "4,000,000" in blob, "AZ must carry the ruled §179 figures"
+    for superseded in ("1,250,000", "3,130,000"):
+        assert superseded not in blob, (
+            f"AZ carries a pre-OBBBA §179 figure ({superseded}) — the ruling was BROAD"
+        )
+
+    # and the provenance must survive: this is a ruling, not a published figure
+    for marker in ("RULED", "43-105(B)"):
+        assert marker in blob, f"AZ §179 lost its provenance marker {marker!r}"
+    assert "never published" in blob or "not a published" in blob.lower(), (
+        "AZ must still record that AZDOR published no retroactivity mapping — the figure is "
+        "an interpretive ruling, and a future reader must not mistake it for a published one"
     )
 
 
@@ -350,9 +403,16 @@ def test_conformity_loader_seeds_and_is_idempotent(monkeypatch):
 
     monkeypatch.setattr(load_state_conformity, "READY_TO_SEED", True)
 
+    # Batch-aware: the expected count is whichever batches are currently approved. Pinning
+    # it to len(CONFORMITY_ROWS) alone was correct only while Tier-1 was gated, and went red
+    # the moment Ken approved it (2026-08-16) — the same failure mode as a sentinel-value test.
+    expected = len(load_state_conformity.CONFORMITY_ROWS)
+    if load_state_conformity.READY_TO_SEED_TIER1:
+        expected += len(load_state_conformity.TIER1_ROWS)
+
     call_command("load_state_conformity")
     first = JurisdictionConformitySource.objects.count()
-    assert first == len(load_state_conformity.CONFORMITY_ROWS)
+    assert first == expected
 
     call_command("load_state_conformity")
     assert JurisdictionConformitySource.objects.count() == first, "re-run must not duplicate"

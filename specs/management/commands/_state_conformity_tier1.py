@@ -16,9 +16,11 @@ SCOPE NOTES carried from the scan:
   • NV is deliberately ABSENT — no individual, corporate or fiduciary income tax and
     no PTET (constitutional), so it has no conformity posture to record. Out of
     campaign scope; see conformity/nv_conformity.md.
-  • AZ carries NO §179 dollar figure. The applied limit rides on an OBBBA
-    provision-by-provision retroactivity mapping Arizona has never published — an
-    explicit Gate-1 judgement call for Ken. DO NOT fill it in without his ruling.
+  • AZ's §179 figure was RULED by Ken on 2026-08-16 (broad reading of §43-105(B)):
+    $2,500,000 / $4,000,000. It is a RULING on an interpretive question, not a
+    published Arizona figure — AZDOR has never published its OBBBA retroactivity
+    mapping, and that [UNVERIFIED] item stands open as a matter of fact. The basis
+    is recorded in the row's notes and in delvio-states/GATE1_WALK.md item 1.
   • NY holds the STATE posture only. NYC decoupled differently (S.9009-C amending the
     NYC Admin. Code) and the model's one-row-per-(jurisdiction, tax_year) shape cannot
     express it; the divergence is recorded as a decoupled item + in notes.
@@ -90,9 +92,7 @@ TIER1_SOURCES: list[dict] = [{'source_code': 'CA_SB711_2025_CONFORMITY',
   'jurisdiction_code': 'TX',
   'title': 'STAR memo 202603002M — Conformity of Texas Franchise Tax to the Internal Revenue Code',
   'citation': 'TX Comptroller STAR Doc. 202603002M, Tax Policy Division (Jenny Burleson), March '
-              '12, 2026 — updates and replaces STAR 202512012M (Dec. 19, 2025); interpreting Tex. '
-              'Tax Code §171.0001(9) (IRC of 1986 as in effect for the federal tax year beginning '
-              'January 1, 2007)',
+              '12, 2026 — updates and replaces STAR 202512012M (Dec. 19, 2025).',
   'issuer': 'Texas Comptroller of Public Accounts, Tax Policy Division',
   'official_url': 'https://star.comptroller.texas.gov/view/202603002M',
   'excerpt_label': 'TX 2007-IRC departure beginning with the 2026 report + bonus placed-in-service '
@@ -115,7 +115,11 @@ TIER1_SOURCES: list[dict] = [{'source_code': 'CA_SB711_2025_CONFORMITY',
                   'only a definitional IRC tie. Beginning with the 2026 report (= Delvio TY2025), '
                   'federal-return amounts follow then-current federal law except where the Texas '
                   'statute or rule cites the IRC, in which case the 2007 IRC governs. '
-                  'Administrative reinterpretation, not a repeal of §171.0001(9).'},
+                  'Administrative reinterpretation, not a repeal of §171.0001(9). FULL CITATION '
+                  '(trimmed to the 255-char field cap): TX Comptroller STAR Doc. 202603002M, Tax '
+                  'Policy Division (Jenny Burleson), March 12, 2026 — updates and replaces STAR '
+                  '202512012M (Dec. 19, 2025); interpreting Tex. Tax Code §171.0001(9) (IRC of '
+                  '1986 as in effect for the federal tax year beginning January 1, 2007)'},
  {'source_code': 'TN_TCA_67_4_2004_IRC_DEF',
   'source_type': 'state_statute',
   'source_rank': 'controlling',
@@ -125,7 +129,7 @@ TIER1_SOURCES: list[dict] = [{'source_code': 'CA_SB711_2025_CONFORMITY',
   'citation': 'Tenn. Code Ann. § 67-4-2004 (IRC definition at subdivision (27) per the FindLaw '
               "reprint; 'person or taxpayer' at (36)); read together with § 67-4-2006(a)(10) "
               '(pre-TCJA §163(j)), (a)(11) (§174), (a)(12) (§168(k) TCJA lock, Public Chapter 377 '
-              '(2023)), and (b)(1)(P) / (b)(2)(T) (5% NCTI)',
+              '(2023)).',
   'issuer': 'Tennessee General Assembly (statute); Tennessee Department of Revenue (F&E Tax '
             'Manual, Dec. 2025)',
   'official_url': 'https://codes.findlaw.com/tn/title-67-taxes-and-licenses/tn-code-sect-67-4-2004/',
@@ -150,7 +154,11 @@ TIER1_SOURCES: list[dict] = [{'source_code': 'CA_SB711_2025_CONFORMITY',
                   "corroborated by the DOR manual's own footnotes. The substance (rolling) is "
                   'verified directly from the DOR manual. The exact subdivision number for the IRC '
                   'definition was originally flagged [UNVERIFIED] (§10 item 1); no figure depends '
-                  'on it.'},
+                  'on it. FULL CITATION (trimmed to the 255-char field cap): Tenn. Code Ann. § '
+                  "67-4-2004 (IRC definition at subdivision (27) per the FindLaw reprint; 'person "
+                  "or taxpayer' at (36)); read together with § 67-4-2006(a)(10) (pre-TCJA "
+                  '§163(j)), (a)(11) (§174), (a)(12) (§168(k) TCJA lock, Public Chapter 377 '
+                  '(2023)), and (b)(1)(P) / (b)(2)(T) (5% NCTI)'},
  {'source_code': 'VA_CODE_58_1_301',
   'source_type': 'state_statute',
   'source_rank': 'controlling',
@@ -321,7 +329,7 @@ TIER1_SOURCES: list[dict] = [{'source_code': 'CA_SB711_2025_CONFORMITY',
   'citation': 'Ohio Rev. Code § 5747.01(A)(17) (add-back) and (A)(18) (recovery); post-S.B. 9 '
               'version, header "Effective: March 5, 2026 · Latest Legislation: Senate Bill 9 - '
               '136th General Assembly". Transcribed with the FINAL TY2025 Ohio IT 1040 instruction '
-              'booklet, pp. 20, 22–23.',
+              'booklet.',
   'issuer': 'Ohio General Assembly (Ohio Revised Code, via codes.ohio.gov)',
   'official_url': 'https://codes.ohio.gov/ohio-revised-code/section-5747.01',
   'excerpt_label': 'Ohio Schedule of Adjustments lines 9 and 27 — add-back and recovery (booklet '
@@ -358,7 +366,12 @@ TIER1_SOURCES: list[dict] = [{'source_code': 'CA_SB711_2025_CONFORMITY',
                   'booklet, ODT FAQ). Also the source of the §168(n) NEGATIVE: every reference to '
                   "section 168 in the post-S.B. 9 section is qualified as 'subsection (k)' — in "
                   '(A)(17)(a)(i), (a)(iv), (a)(v) and (A)(18)(a)(i), (c) — with NO reference to '
-                  'subsection (n) or to qualified production property anywhere in the section.'},
+                  'subsection (n) or to qualified production property anywhere in the section. '
+                  'FULL CITATION (trimmed to the 255-char field cap): Ohio Rev. Code § '
+                  '5747.01(A)(17) (add-back) and (A)(18) (recovery); post-S.B. 9 version, header '
+                  '"Effective: March 5, 2026 · Latest Legislation: Senate Bill 9 - 136th General '
+                  'Assembly". Transcribed with the FINAL TY2025 Ohio IT 1040 instruction booklet, '
+                  'pp. 20, 22–23.'},
  {'source_code': 'OH_FAQ_INCOME_BONUS_DEPR',
   'source_type': 'state_instruction',
   'source_rank': 'primary_official',
@@ -524,8 +537,7 @@ TIER1_SOURCES: list[dict] = [{'source_code': 'CA_SB711_2025_CONFORMITY',
   'title': 'NY Tax Law §612 — New York adjusted gross income of a resident individual',
   'citation': 'N.Y. Tax Law §612(b)(8) (§168(k) add-back, tax years beginning after 12/31/2002); '
               '§612(b)(36) (SUV §179 add-back); §612(b)(44) & §612(c)(48) (§168(n)); §612(b)(45), '
-              '§612(c)(49), §612(c)(50) (R&E); cf. §208.9(c-4)(2) (institutional real estate '
-              'investor covered property)',
+              '§612(c)(49), §612(c)(50) (R&E).',
   'issuer': 'New York State Legislature (via NY Senate)',
   'official_url': 'https://www.nysenate.gov/legislation/laws/TAX/612',
   'excerpt_label': '§612(b)(8) — the legacy §168(k) add-back',
@@ -541,7 +553,11 @@ TIER1_SOURCES: list[dict] = [{'source_code': 'CA_SB711_2025_CONFORMITY',
   'summary_text': "The statutory home of New York's decades-old §168(k) bonus add-back "
                   '(independent of OBBBA), the SUV §179 exception, and the codified §168(n)/R&E '
                   'modifications. Exceptions to the bonus add-back: qualified resurgence zone and '
-                  'NY Liberty Zone property.'},
+                  'NY Liberty Zone property. FULL CITATION (trimmed to the 255-char field cap): '
+                  'N.Y. Tax Law §612(b)(8) (§168(k) add-back, tax years beginning after '
+                  '12/31/2002); §612(b)(36) (SUV §179 add-back); §612(b)(44) & §612(c)(48) '
+                  '(§168(n)); §612(b)(45), §612(c)(49), §612(c)(50) (R&E); cf. §208.9(c-4)(2) '
+                  '(institutional real estate investor covered property)'},
  {'source_code': 'NY_S9009C_PART_G_NYC',
   'source_type': 'state_statute',
   'source_rank': 'controlling',
@@ -550,8 +566,7 @@ TIER1_SOURCES: list[dict] = [{'source_code': 'CA_SB711_2025_CONFORMITY',
            'Administrative Code decoupling NYC from certain OBBBA provisions',
   'citation': 'N.Y. S.B. 9009-C (2026), Part G, signed by Gov. Hochul May 28, 2026, amending NYC '
               'Admin. Code §§11-506(b)&(c) (UBT), 11-602.8(a)&(b) (GCT), 11-641(b)&(e) (Bank Tax), '
-              '11-651(e) and 11-652.8(a)&(b) (Business Corporation Tax), for tax years beginning '
-              'on or after 1/1/2025',
+              '11-651(e) and 11-652.8(a)&(b) (Business Corporation Tax).',
   'issuer': 'New York State Legislature (NYC Administrative Code sections identified via EY Tax '
             'News)',
   'official_url': 'https://taxnews.ey.com/news/2026-0294-new-york-fy2026-27-proposed-executive-budget-includes-retroactive-business-and-individual-tax-changes-would-decouple-from-certain-obbba-provisions',
@@ -569,7 +584,11 @@ TIER1_SOURCES: list[dict] = [{'source_code': 'CA_SB711_2025_CONFORMITY',
                   'the substance of the State posture is in N-26-1 and Tax Law §612 / §208(9). The '
                   'enacted NYC Admin. Code text itself was NOT retrievable — it is what would '
                   'settle open item U-5 (NYC §179 limits), which blocks any NYC business-tax '
-                  'module.'},
+                  'module. FULL CITATION (trimmed to the 255-char field cap): N.Y. S.B. 9009-C '
+                  '(2026), Part G, signed by Gov. Hochul May 28, 2026, amending NYC Admin. Code '
+                  '§§11-506(b)&(c) (UBT), 11-602.8(a)&(b) (GCT), 11-641(b)&(e) (Bank Tax), '
+                  '11-651(e) and 11-652.8(a)&(b) (Business Corporation Tax), for tax years '
+                  'beginning on or after 1/1/2025'},
  {'source_code': 'MD_TG_10_108',
   'source_type': 'state_statute',
   'source_rank': 'controlling',
@@ -695,9 +714,7 @@ TIER1_SOURCES: list[dict] = [{'source_code': 'CA_SB711_2025_CONFORMITY',
            '§43-105 (IRC conformity) and Title 43 modifications',
   'citation': 'H.B. 4168, 57th Leg., 2nd Reg. Sess. (2026), Chapter 140; approved by the Governor '
               'June 13, 2026 and filed with the Secretary of State June 13, 2026. Sec. 12 (§43-105 '
-              'conformity); Sec. 14 (§43-1021 ¶17 §168(n), TY2026); Sec. 15 (§43-1022 '
-              '¶¶31/32/35/36, TY2025); Sec. 16 (§43-1041 standard deduction); Sec. 22 (§43-1121 '
-              '¶25 §168(n), TY2026); Sec. 23 (§43-1122); Sec. 35 (retroactivity split)',
+              'conformity); Sec. 14 (§43-1021 ¶17 §168(n), TY2026).',
   'issuer': 'Arizona Legislature',
   'official_url': 'https://www.azleg.gov/legtext/57leg/2R/laws/0140.pdf',
   'excerpt_label': '§43-105(B) as amended — the TY2025 hybrid conformity rule',
@@ -721,7 +738,13 @@ TIER1_SOURCES: list[dict] = [{'source_code': 'CA_SB711_2025_CONFORMITY',
                   "practitioner headline 'Arizona conformed to January 1, 2026' describes "
                   'subsection (A) only. The carve is BY CATEGORY, NOT BY ENUMERATED LIST — neither '
                   'AZDOR nor the Senate Fact Sheet publishes a provision mapping, which is why the '
-                  'applied §179 figure is an open Gate-1 ruling.'},
+                  'applied §179 figure is an open Gate-1 ruling. FULL CITATION (trimmed to the '
+                  '255-char field cap): H.B. 4168, 57th Leg., 2nd Reg. Sess. (2026), Chapter 140; '
+                  'approved by the Governor June 13, 2026 and filed with the Secretary of State '
+                  'June 13, 2026. Sec. 12 (§43-105 conformity); Sec. 14 (§43-1021 ¶17 §168(n), '
+                  'TY2026); Sec. 15 (§43-1022 ¶¶31/32/35/36, TY2025); Sec. 16 (§43-1041 standard '
+                  'deduction); Sec. 22 (§43-1121 ¶25 §168(n), TY2026); Sec. 23 (§43-1122); Sec. 35 '
+                  '(retroactivity split)'},
  {'source_code': 'AZ_ARS_43_1022',
   'source_type': 'state_statute',
   'source_rank': 'controlling',
@@ -3089,9 +3112,9 @@ TIER1_ROWS: list[dict] = [{'jurisdiction_code': 'CA',
                                 'TY2026 retroactive date under Sec. 35(B), while §43-1121 is Sec. '
                                 '35(A) (TY2025) but its paragraph 25 is self-limited to TY2026 — '
                                 'same outcome, different route.'},
-                      {'item': 'IRC §179 expensing — NO Arizona modification exists; the APPLIED '
-                               'TY2025 FIGURE IS AN OPEN GATE-1 ITEM (deliberately no dollar '
-                               'figure recorded)',
+                      {'item': 'IRC §179 expensing — no Arizona modification exists; the TY2025 '
+                               'figure was RULED by Ken 2026-08-16 (broad reading of §43-105(B)): '
+                               '$2,500,000 / $4,000,000',
                        'federal_treatment': 'OBBBA increased the §179 dollar limitation and '
                                             'phase-out threshold for property placed in service in '
                                             'taxable years beginning after December 31, 2024. '
@@ -3106,23 +3129,33 @@ TIER1_ROWS: list[dict] = [{'jurisdiction_code': 'CA',
                                           'exhaustively in these sections and §179 is absent. '
                                           "Therefore Arizona's §179 limit and phaseout EQUAL THE "
                                           'FEDERAL FIGURES UNDER WHATEVER IRC VERSION APPLIES FOR '
-                                          'THE YEAR, which for TY2025 routes through §43-105(B). '
-                                          'Arizona is NOT frozen at a pre-OBBBA §179 level by its '
-                                          'own statute — any freeze would come only from the '
-                                          'conformity date, not from a §179-specific decoupling. ⚠ '
-                                          'THE RESULTING NUMBER IS NOT RECORDED IN THIS ROW: it '
-                                          'depends entirely on the unresolved OBBBA '
-                                          'provision-by-provision retroactivity mapping (open item '
-                                          '2), which the brief flags as a KEN GATE-1 JUDGEMENT '
-                                          'CALL.',
+                                          'THE YEAR, which for TY2025 routes through §43-105(B). ✅ '
+                                          'RULED 2026-08-16: under the BROAD reading of §43-105(B) '
+                                          "the OBBBA §179 amendments are 'retroactively effective "
+                                          "during TY2025', so Arizona applies LIMIT $2,500,000 / "
+                                          'PHASEOUT $4,000,000 for TY2025. Arizona is NOT frozen '
+                                          'at a pre-OBBBA §179 level by its own statute — any '
+                                          'freeze could only come from the conformity date, not '
+                                          'from a §179-specific decoupling.',
                        'authority_source_code': 'AZ_HB4168_2026_CH140',
-                       'notes': '⚠⚠ NO §179 DOLLAR FIGURE IS SEEDED HERE, BY DESIGN. Brief §12, '
-                                'verbatim: \'Confidence raised from "inference" to "well-supported '
-                                'inference," but it CANNOT BE CLOSED without Ken\'s Gate-1 ruling '
-                                "on item 2. DO NOT SEED A §179 FIGURE BEFORE THAT RULING.' The "
-                                'MECHANISM (no Arizona §179 modification) is VERIFIED; the '
-                                'RESULTING NUMBER is an inference flagged [UNVERIFIED] at §10 '
-                                'items 2 and 4.'}],
+                       'notes': '✅ RULED BY KEN 2026-08-16 at the Tier-1 Gate-1 walk '
+                                '(delvio-states/GATE1_WALK.md item 1): the BROAD reading governs → '
+                                '$2,500,000 / $4,000,000 for TY2025. ⚠ THIS IS A RULING ON AN '
+                                'INTERPRETIVE QUESTION, NOT A PUBLISHED ARIZONA FIGURE. AZDOR has '
+                                'never published its provision-by-provision OBBBA retroactivity '
+                                'mapping, and [UNVERIFIED] item 2 stands OPEN as a matter of fact. '
+                                'The ruling rests on three structural arguments recorded in the '
+                                "walk: (i) the legislature used the identical 'retroactively "
+                                "effective' formula in §43-105(C)/(D) for TY2023/TY2024, where it "
+                                'can only mean provisions reaching back before enactment; (ii) '
+                                'H.B. 4168 separately hard-coded the OBBBA items that do NOT flow '
+                                'through federal AGI, implying the conformity clause was expected '
+                                "to carry the AGI-affecting ones; (iii) AZDOR's own 2026-01-22 "
+                                "release says the forms conform 'with parts of H.R. 1 — "
+                                "specifically federal adjusted gross income'. The MECHANISM (no "
+                                'Arizona §179 modification) was verified independently and is not '
+                                'part of the ruling. ⚠ RE-VERIFY if AZDOR ever publishes the '
+                                'mapping.'}],
   'notes': "⚠⚠ THE 'ARIZONA CONFORMED TO JANUARY 1, 2026' HEADLINE THAT APPEARS IN EVERY "
            'PRACTITIONER ALERT DESCRIBES TY2026, NOT TY2025. It is §43-105(A). The TY2025 rule is '
            'the REDESIGNATED §43-105(B) hybrid — Jan 1 2025 code PLUS only those OBBBA provisions '
