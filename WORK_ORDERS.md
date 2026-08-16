@@ -99,6 +99,42 @@ and namespace everything new. ⚠ Also note the app-side wart this feeds: delvio
 *No independent backlog here (see header). Sequence = BUILD_ORDER.md SPINE; statuses seeded
 from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 
+> **[WO-W02-ENT] 45-state campaign Wave 2 — TN + FL + TX entity lane (BUILD_ORDER S-27;
+> campaign `delvio-states` WAVE_PLAN.md) · GAP-CHECKED → DRAFTING**
+> · **The wave:** the three ENTITY-ONLY states — no individual income tax in any of them, so
+> this is a pure entity lane. Chosen as the first unblocked wave because it is cheap (6 forms
+> across 3 states), covers ~54 returns of firm demand, and does not wait on the CA pilot's
+> blocked Lacerte re-export.
+> · **GAP-CHECK ✅ 2026-08-15 — all 6 forms are gaps.** Twelve candidate codes probed against
+> RS prod via `lookup/<FORM>/export/` (both the `<ST>_<FORM>` convention per campaign D-9 and
+> the bare state form numbers): **every one 404.** RS holds 136 TaxForms, of which the only
+> state forms are the Core four's 18 — no Tier-1 state form exists anywhere.
+>
+> | State | Forms | Note |
+> |---|---|---|
+> | **TN** | `TN_FAE170` | ⚠ **ONE form serves all three entity types** — 1065 / 1120S / 1120 via Schedules **J1 / J3 / J4**. Filing test is LIMITED LIABILITY, not federal classification. No fiduciary return exists. |
+> | **FL** | `FL_F1065` · `FL_F1120` | F-1065 is information-only, filed only if a partner is subject to ch. 220. **F-1120 covers C-corps AND the S-corps that must file** (only when federal tax is owed at entity level, §1374/§1375). No fiduciary return exists. |
+> | **TX** | `TX_05_158` (long, +`05-169` EZ) · `TX_05_102` PIR · `TX_05_167` OIR | ⚠ Margin tax, **not** an income tax. Below the $2,650,000 no-tax-due threshold **no franchise report is filed at all** — but PIR/OIR still is. **Delvio TY2025 = the Texas 2026 report.** |
+>
+> · **Conformity prerequisite ✅ satisfied** — all three states' `JurisdictionConformitySource`
+> rows are authored (campaign D-8 requires the row before the form specs). They sit in the
+> gated Tier-1 batch (`READY_TO_SEED_TIER1`), so the seed order is: Ken's Tier-1 Gate 1 →
+> conformity rows → these form specs.
+> · **Verified conformity briefs already exist** for all three (`delvio-states/conformity/`,
+> adversarial pass complete) — the research below is FORM STRUCTURE only, which the conformity
+> briefs deliberately did not cover.
+> · **⚠ TWO OPEN KEN JUDGEMENT CALLS fold into this wave's Gate-1 scope walk**
+> (`delvio-states/GATE1_WALK.md` items 3 and 4): **TN** bonus keyed to *acquired* (manual p.225)
+> vs *placed in service* (p.267) — the DOR contradicts itself; **TX** three official sources
+> state three different scopes (STAR memo 202603002M says PIS on/after 1/19/2025, the news
+> release says acquired, adopted Rule 3.588 gives no date). Recommendation in both: build to
+> placed-in-service, flagged. **Neither can be guessed at** per the Authoritative-Source Rule.
+> · **Scoping question for the walk:** whether the TX EZ computation (`05-169`) is a separate
+> spec or a computation path inside `TX_05_158`.
+> · **Next:** research fan-out → 3 source briefs (one per state) → adversarial verification →
+> ONE batched Gate-1 scope walk → author loaders `READY_TO_SEED=False` + SQLite harnesses →
+> ONE batched Gate-1 seed approval.
+
 > **[WO-SCHA-CHARITABLE-AMEND] ✅ DONE (same day — entered, approved, seeded, dispatched, BUILT).**
 > Ken approved at Gate 1 in-session 2026-08-15 ("Approved", full unit incl. the migration).
 > Seeded/exported/cached (RS `ee4dece`+; 36 facts / 8 rules / 14 diagnostics / 27 scenarios;
