@@ -149,9 +149,20 @@ from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 > **regex-prove no computed rule picks a bonus date key**; TX hard-codes no federal line number
 > (05-915 cites **2024** federal lines for a **2025** federal return — W6, blocking); FL invents
 > no recompute line and ships a hard no-silent-recompute rule on Line 1 with blocking diagnostics.
-> · **NEXT — Ken's ONE batched Gate-1 scope walk covering all three states**, folding in
-> `delvio-states/GATE1_WALK.md` items 3 (TN) and 4 (TX). Then the batched seed approval →
-> flip → seed → exports 200 → `seed_all --dry-run` → explicit-path commits → dispatch note.
+> · ✅ **APPROVED + SEEDED 2026-08-16.** Ken approved `delvio-states/dispatch/WAVE2_WALK.md` as
+> recommended — 28 walk items batched by decision type into 4 blocking rulings, 6 scope levers,
+> 11 ratifications and 3 routing notes. **A1 (bonus keying) had already been closed for BOTH
+> states by the Tier-1 walk**, so the wave carried three blocking items, not four.
+> **All 6 exports 200, each carrying its state's conformity block** (only true because the
+> Tier-1 conformity rows seeded first — campaign D-8). Prod 136 → 142 TaxForms. Full suite
+> **234 passed**. Dispatch note: `delvio-states/dispatch/w02_dispatch.md`.
+> · ⚠ **Carried forward, not closed:** TX's federal line map is BLOCKING until re-verified
+> against FINAL 2025 federal forms; FL's ruled recompute presentation (Sch I L25 + Sch II L12
+> + explanatory schedule) is unimplemented app-side; neither TN nor TX can be e-filed yet.
+> · **Harness note worth keeping:** all three harnesses asserted `READY_TO_SEED` ships False —
+> the expiry-dated-test pattern (campaign D-10). Re-pinned to the MECHANISM (force the sentinel
+> down, assert the guard refuses) BEFORE flipping. A prior session solved this identically in
+> `validate_8879_8878.py`, so it is a repo idiom now, not a one-off.
 
 > **[WO-SCHA-CHARITABLE-AMEND] ✅ DONE (same day — entered, approved, seeded, dispatched, BUILT).**
 > Ken approved at Gate 1 in-session 2026-08-15 ("Approved", full unit incl. the migration).
