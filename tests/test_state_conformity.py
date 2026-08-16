@@ -402,6 +402,11 @@ def test_conformity_loader_seeds_and_is_idempotent(monkeypatch):
     from specs.management.commands import load_state_conformity
 
     monkeypatch.setattr(load_state_conformity, "READY_TO_SEED", True)
+    # Scope to batch 1. This test is about IDEMPOTENCY, not volume — seeding the full
+    # 18-row Tier-1 batch twice pushed it past the shared pooler's statement timeout once
+    # Ken approved it (2026-08-16). Full-batch coverage lives in
+    # test_tier1_rows_seed_when_approved, which seeds it exactly once.
+    monkeypatch.setattr(load_state_conformity, "READY_TO_SEED_TIER1", False)
 
     # Batch-aware: the expected count is whichever batches are currently approved. Pinning
     # it to len(CONFORMITY_ROWS) alone was correct only while Tier-1 was gated, and went red
@@ -424,7 +429,11 @@ def test_conformity_loader_seeds_and_is_idempotent(monkeypatch):
 
 @pytest.mark.django_db
 def test_conformity_loader_anchors_authority_when_present(monkeypatch):
-    """When the state's own loader has run, the row binds its controlling authority."""
+    """When the state's own loader has run, the row binds its controlling authority.
+
+    Scoped to batch 1: this is about FK anchoring, and seeding the Tier-1 batch as well
+    only adds pooler time.
+    """
     from django.core.management import call_command
 
     from specs.management.commands import load_state_conformity
@@ -438,6 +447,7 @@ def test_conformity_loader_anchors_authority_when_present(monkeypatch):
         citation="SC Code §12-6-40(A)(1)",
     )
     monkeypatch.setattr(load_state_conformity, "READY_TO_SEED", True)
+    monkeypatch.setattr(load_state_conformity, "READY_TO_SEED_TIER1", False)
     call_command("load_state_conformity")
 
     sc = JurisdictionConformitySource.objects.get(jurisdiction_code="SC", tax_year=2025)
