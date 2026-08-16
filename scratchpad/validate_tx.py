@@ -3,7 +3,7 @@
 TX_05_158 (long form + EZ branch) / TX_05_102 PIR / TX_05_167 OIR — the TEXAS 2026
 REPORT, due 05/15/2026, which is Delvio TY2025. (A "2025 Texas report" is TY2024.)
 
-Checks: READY_TO_SEED ships False; ALL CharField caps (rule_id 20, line_number 20,
+Checks: the guard refuses while down; ALL CharField caps (rule_id 20, line_number 20,
 assertion_id 20, diagnostic_id 40, fact_key 100, topic_name 255, form_number 50,
 source_code 100, form_title 255, label 255, scenario_name 255); every rule >= 1
 authority link; rule_link coverage both ways; no duplicate ids anywhere; and
@@ -53,18 +53,23 @@ def close(a, b, tol=0.01):
 
 
 # ══════════════════════════════════════════════════════════════════════════
-# 0. SAFETY GUARD — the shipped file must carry READY_TO_SEED = False
+# 0. SAFETY GUARD — exactly one module-level sentinel, and the guard refuses while down
 #    (read the SOURCE TEXT before importing, so nothing can mask it)
 # ══════════════════════════════════════════════════════════════════════════
 SRC = io.open(LOADER_PATH, encoding="utf-8").read()
-check(re.search(r"^READY_TO_SEED\s*=\s*False\s*$", SRC, re.M) is not None,
-      "SAFETY GUARD: loader ships READY_TO_SEED = False",
-      "SAFETY GUARD VIOLATION: loader does NOT ship READY_TO_SEED = False")
+# NOTE 2026-08-16: this pins the GUARD MECHANISM, not the sentinel's disk value.
+# Ken approved the Wave 2 walk on 2026-08-16, so the loader now legitimately ships True.
+# Asserting 'must ship False' would make this harness permanently red the moment the work
+# it validates was approved -- the expiry-dated-test pattern recorded as campaign D-10.
+# What must keep holding: the guard REFUSES while it is down.
+check(re.search(r"^READY_TO_SEED\s*=\s*(True|False)\s*$", SRC, re.M) is not None,
+      "SAFETY GUARD: the sentinel exists as a module-level bool",
+      "SAFETY GUARD VIOLATION: no module-level READY_TO_SEED found")
 # Only a MODULE-LEVEL assignment can flip the sentinel; the guard's own instructional
 # text ("then set READY_TO_SEED = True") is prose inside a string and is harmless.
 _assigns = re.findall(r"^READY_TO_SEED\s*=\s*(\w+)", SRC, re.M)
-check(_assigns == ["False"],
-      "SAFETY GUARD: exactly one module-level assignment, and it is False",
+check(_assigns in (["False"], ["True"]),
+      "SAFETY GUARD: exactly ONE module-level assignment (approval flips it, nothing else)",
       f"SAFETY GUARD VIOLATION: module-level READY_TO_SEED assignments = {_assigns}")
 
 # ── Year mapping must be stated in the docstring ──
@@ -85,7 +90,11 @@ from specs.models import (  # noqa: E402
 from sources.models import AuthorityTopic, RuleAuthorityLink  # noqa: E402
 from specs.management.commands import load_tx_franchise as TX  # noqa: E402
 
-# ── The guard must actually refuse while the sentinel is False ──
+# ── The guard must actually refuse while the sentinel is DOWN ──
+# Forced down here rather than relying on the disk value: Ken approved this loader on
+# 2026-08-16, so it legitimately ships True. The mechanism is what must keep holding.
+_shipped_ready = TX.READY_TO_SEED
+TX.READY_TO_SEED = False
 call_command("migrate", run_syncdb=True, verbosity=0)
 try:
     call_command("load_tx_franchise", verbosity=0)

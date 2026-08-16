@@ -14,7 +14,7 @@ Checks, in order:
      pick, the $100 minimum, 'major fraction thereof' rounding, 6.5% excise,
      the J1-vs-J3 CLONE TRAP difference, and the Schedule J ORDERING
      ($50k-then-apportion != apportion-then-$50k);
-  6. the safety guard: READY_TO_SEED must ship False, and no computed rule may
+  6. the safety guard: the loader refuses while the sentinel is down, and no computed rule may
      pick the W1 bonus key or compute the W2/U1 OBBBA differential.
 
 ASCII-only prints. Run:  poetry run python scratchpad/validate_tn.py
@@ -54,12 +54,18 @@ def near(a, b, tol=0.005):
 
 
 # ══════════════════════════════════════════════════════════════════════════
-# 0. SAFETY GUARD — must ship False, and must actually refuse
+# 0. SAFETY GUARD — the sentinel is real, and the guard refuses while it is down
 # ══════════════════════════════════════════════════════════════════════════
+# NOTE 2026-08-16: this pins the GUARD MECHANISM, not the sentinel's disk value.
+# Ken approved the Wave 2 walk on 2026-08-16, so the loader now legitimately ships True.
+# Asserting 'must ship False' would make this harness permanently red the moment the work
+# it validates was approved -- the expiry-dated-test pattern recorded as campaign D-10.
+# What must keep holding: the guard REFUSES while it is down.
 _shipped_ready = TN.READY_TO_SEED
-check(_shipped_ready is False,
-      "SAFETY GUARD: READY_TO_SEED ships False (W1-W10 not yet walked with Ken)",
-      f"SAFETY GUARD BREACH: READY_TO_SEED = {_shipped_ready} -- must ship False")
+TN.READY_TO_SEED = False  # force the guard down so the refusal below is a real test
+check(isinstance(_shipped_ready, bool),
+      "SAFETY GUARD: the sentinel is a real bool the harness can drive",
+      f"SAFETY GUARD BREACH: READY_TO_SEED = {_shipped_ready!r} is not a bool")
 
 call_command("migrate", run_syncdb=True, verbosity=0)
 

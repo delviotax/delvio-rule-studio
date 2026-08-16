@@ -367,7 +367,25 @@ from specs.models import (
 # SAFETY GUARD — flip ONLY after Ken's in-session review walk (W1-W9 above).
 # NOT FLIPPED. W1 is an escalated Ken judgement call and W6 is BLOCKING.
 # ═══════════════════════════════════════════════════════════════════════════
-READY_TO_SEED = False
+# ═══════════════════════════════════════════════════════════════════════════
+# FLIPPED 2026-08-16 — Ken approved the Wave 2 Gate-1 scope walk
+# (delvio-states/dispatch/WAVE2_WALK.md) as recommended. Rulings by group:
+#   GROUP A (blocking):
+#     A1 — bonus keyed to PLACED IN SERVICE (already ruled 2026-08-16 in the Tier-1
+#          walk as GATE1_WALK items 3/4; one decision covering TN and TX). Flagged;
+#          confirm with each DOR. NO COMPUTED RULE IN THIS FILE PICKS A DATE KEY.
+#     A2 — FL recompute presentation: option (b), Sch I L25 + Sch II L12 with an
+#          explanatory schedule. No line was invented.
+#     A3 — TX federal line map: ACCEPTED AS BLOCKING; re-verify against FINAL 2025
+#          federal forms before the app build.
+#     A4 — FL fiscal years straddling 1/1/2026: hard block retained for v1.
+#   GROUP B (scope): as recommended — TN depreciation DIRECT-ENTRY for v1 (engine at
+#     v1.1); Schedule G / F2 / N1 / credits RED-deferred; TX EZ as an internal branch.
+#   GROUP C (11 ratifications): approved as encoded.
+#   GROUP D: routing only, no spec change. ⚠ TN W10 (a TN individual owning an SMLLC
+#     owes FAE170) is an INDIVIDUAL-module obligation and must not be lost between lanes.
+# ═══════════════════════════════════════════════════════════════════════════
+READY_TO_SEED = True
 
 
 FORM_JURISDICTION = "TX"

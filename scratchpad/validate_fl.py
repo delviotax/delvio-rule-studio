@@ -55,9 +55,16 @@ def approx(a, b, tol=0.005):
 # ══════════════════════════════════════════════════════════════════════
 # 0. The loader must SHIP with READY_TO_SEED = False, and must REFUSE to run.
 # ══════════════════════════════════════════════════════════════════════
-check(FL.READY_TO_SEED is False,
-      "SAFETY GUARD: READY_TO_SEED ships False (W1 gates this loader)",
-      f"SAFETY GUARD BREACHED: READY_TO_SEED = {FL.READY_TO_SEED} — must ship False")
+# NOTE 2026-08-16: this pins the GUARD MECHANISM, not the sentinel's disk value.
+# Ken approved the Wave 2 walk on 2026-08-16, so the loader now legitimately ships True.
+# Asserting 'must ship False' would make this harness permanently red the moment the work
+# it validates was approved -- the expiry-dated-test pattern recorded as campaign D-10.
+# What must keep holding: the guard REFUSES while it is down.
+_shipped_ready = FL.READY_TO_SEED
+FL.READY_TO_SEED = False  # force the guard down so the refusal below is a real test
+check(isinstance(_shipped_ready, bool),
+      "SAFETY GUARD: the sentinel is a real bool the harness can drive",
+      f"SAFETY GUARD BREACHED: READY_TO_SEED = {_shipped_ready!r} is not a bool")
 
 call_command("migrate", run_syncdb=True, verbosity=0)
 
@@ -451,7 +458,7 @@ for f in FAILURES:
 print("=" * 72)
 print(f"RESULT: {len(PASSES)} pass / {len(FAILURES)} fail - "
       f"{'ALL PASS' if not FAILURES else 'FAILURES PRESENT'}")
-print("REMINDER: READY_TO_SEED was flipped IN MEMORY ONLY. The file on disk must ship False.")
+print(f"NOTE: READY_TO_SEED flipped IN MEMORY ONLY; on disk it ships {_shipped_ready}.")
 
 from django.db import connections  # noqa: E402
 connections.close_all()
