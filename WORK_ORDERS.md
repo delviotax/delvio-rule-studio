@@ -131,9 +131,27 @@ from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 > placed-in-service, flagged. **Neither can be guessed at** per the Authoritative-Source Rule.
 > · **Scoping question for the walk:** whether the TX EZ computation (`05-169`) is a separate
 > spec or a computation path inside `TX_05_158`.
-> · **Next:** research fan-out → 3 source briefs (one per state) → adversarial verification →
-> ONE batched Gate-1 scope walk → author loaders `READY_TO_SEED=False` + SQLite harnesses →
-> ONE batched Gate-1 seed approval.
+> · ✅ **RESEARCH DONE** — 3 form-structure source briefs in `delvio-states/research/`, each
+> adversarially verified. **Zero wrong line numbers in any of the three.** Notable corrections
+> the pass produced: FL's apportionment statute was misquoted (insignificance is the
+> **Department's** determination, not the preparer's — the software must never auto-reweight a
+> nonzero denominator); TN's "Schedule G absent from MeF ⇒ e-file gap" inference was refuted;
+> TX's dispute was narrowed to **asset-level** dating (the report-year gate was never in doubt).
+> · ✅ **LOADERS DRAFTED, ALL GATED** (`READY_TO_SEED=False`, all three guards confirmed to refuse):
+> `load_tn_fae170.py` · `load_fl_entity.py` (two forms) · `load_tx_franchise.py` (three forms).
+> **Harnesses: TN 137/0 · FL 136/0 · TX 169/0 — 442 assertions, zero failures.** Full RS suite
+> **233 passed**; `seed_all --dry-run` discovers all three; source_type ratchet clean; prod
+> unchanged at 136 TaxForms with zero TN/FL/TX rows.
+> · **The FL harness caught a real defect on first run** — two `topic_name` values at 324/385
+> chars against the 255 cap, invisible in SQLite and fatal in Postgres. Exactly what the harness
+> exists for.
+> · **Open calls stay open BY CONSTRUCTION, not by promise:** the TN and TX harnesses
+> **regex-prove no computed rule picks a bonus date key**; TX hard-codes no federal line number
+> (05-915 cites **2024** federal lines for a **2025** federal return — W6, blocking); FL invents
+> no recompute line and ships a hard no-silent-recompute rule on Line 1 with blocking diagnostics.
+> · **NEXT — Ken's ONE batched Gate-1 scope walk covering all three states**, folding in
+> `delvio-states/GATE1_WALK.md` items 3 (TN) and 4 (TX). Then the batched seed approval →
+> flip → seed → exports 200 → `seed_all --dry-run` → explicit-path commits → dispatch note.
 
 > **[WO-SCHA-CHARITABLE-AMEND] ✅ DONE (same day — entered, approved, seeded, dispatched, BUILT).**
 > Ken approved at Gate 1 in-session 2026-08-15 ("Approved", full unit incl. the migration).
