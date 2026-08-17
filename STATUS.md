@@ -1,7 +1,7 @@
 ---
 type: project-status
 project: delvio-rule-studio
-last_updated: 2026-08-05
+last_updated: 2026-08-17
 ---
 
 # STATUS — delvio-rule-studio (renamed from sherpa-tax-rule-studio 2026-08-05; GitHub + local folder renamed, Render service name unchanged — see render.yaml note)
@@ -11,6 +11,48 @@ last_updated: 2026-08-05
 ---
 
 ## Current state
+
+**NEW 2026-08-17 (latest) — WAVE 3 OF THE 45-STATE CAMPAIGN IS LIVE ✅ (`WO-W03-PTE`, Gate-1
+APPROVED by Ken in-session; campaign D-11).** Six pass-through forms seeded to prod —
+`VA_502` · `VA_502PTET` · `CO_DR0106` · `MS_84_105` · `MD_510` · `MD_511` — **prod 142 → 148
+TaxForms**, all six exports **200** carrying a non-null `state_conformity` block (VA static ·
+CO rolling · MS partial · MD rolling). `seed_all --dry-run` lists **108 loaders** and discovers
+all four. **Full suite 234 passed.** Harnesses after the rulings: **VA 243 · CO 144 · MS 109 ·
+MD 182 = 678 assertions, 0 fail.**
+
+**All four walk rulings went as recommended, and the two blocking ones resolved in opposite
+directions.** **CO §174A** — ruled that rolling conformity DOES reach retroactively-effective
+federal amendments, so DR 0106 line 1 transcribes federal ordinary income as filed. The walk had
+billed this as the one item in the campaign with *no safe default*; that was wrong in a way worth
+keeping, because the DR 0106 **has no modification line anywhere on its face** and therefore
+cannot express a divergence at all — the absence of the line *is* the answer. `R-CO-174A-BLOCK`
+became `R-CO-174A-CONFORM`, and the blocking diagnostic dropped **error → info** while keeping
+its `diagnostic_id` so nothing downstream re-keys. **MS composite rate** — ruled to DOR's 0/4/5
+purely because DOR administers the approval gate an approved product must clear; the statutory
+and regulatory positions it beat are **unrefuted and still recorded in code**, and one DOR call
+is owed before the module ships.
+
+⚠ **Both are rulings, not findings.** CO's `[UNV-7]` stays open as a matter of fact — the
+repealed rule text, the unpublished *Anschutz* opinion and CDOR §174A guidance are all still
+unpulled. Nothing published confirms either position.
+
+**The MS tripwire was re-armed rather than removed.** Before the ruling it refused to seed if the
+composite-rate resolved-flag was flipped at all. It now refuses unless a written ruling, a
+TY-keyed rate table, **and** the intact three-position conflict record all stand beside the flag —
+so the invariant it was built to protect (*you cannot ship a composite rate by editing one
+constant*) survived the decision that resolved it. The rate table is deliberately **separate from
+the electing-PTE schedule despite holding identical TY2025 values**, so a DOR answer on composite
+cannot silently move the settled statutory rate.
+
+⚠ **Four harness assertions pinned to the pre-approval world went red the moment the gate opened**
+(CO/MS/MD "ships False", CO "severity=error", MS "returns None") and were re-pinned to the
+mechanism. **This is the fourth occurrence** — Phase 2's `READY_TO_SEED` test, D-10's Tier-1
+conformity tests, Wave 2, and now here. A test that encodes a pre-approval state has an expiry
+date; pin the guard's behaviour, never the value the guard happens to hold today.
+
+Dispatched to the builder sessions as `delvio-states/dispatch/w03_dispatch.md`.
+
+---
 
 **NEW 2026-08-05 (latest) — THE STATE CONFORMITY SPINE IS LIVE ✅ (`WO-CONF-SPINE`, Gate-1
 APPROVED by Ken in-session: W1 "Approve — flip, seed, verify" / W4 "Separate WO, ratchet holds

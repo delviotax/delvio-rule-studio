@@ -98,7 +98,16 @@ the "second Form 4562 labeled Mississippi" mechanic. v1 DIRECT-ENTERS L8 and L15
 (W3); the MS-basis engine is v1.1 (R7).
 
 ═══════════════════════════════════════════════════════════════════════════
-⚠ THE COMPOSITE-RATE CONFLICT IS THREE-SIDED AND UNRESOLVED — NO SIDE IS PICKED
+✅ THE COMPOSITE RATE — THREE-SIDED, RULED BY KEN 2026-08-17 (walk item A2)
+═══════════════════════════════════════════════════════════════════════════
+KEN'S RULING: **code Position A — DOR's 0% / 4% / 5%** — because it is what the
+ADMINISTERING authority prescribes for TY2025, twice and tax-year-keyed, and it
+is what an approved vendor's product must match to clear Mississippi's approval
+gate. Encoded as a SINGLE-POINT-OF-CHANGE constant (`MS_COMPOSITE_RATES`), never
+as a schedule scattered through the rules, with the full three-sided conflict
+preserved in `MS_COMPOSITE_RATE_POSITIONS` and in the rule's own description.
+⚠ **Raise with DOR before the module ships** — see `EFILE_GATES.md`. The three
+positions below are the record of what is still genuinely contested.
 ═══════════════════════════════════════════════════════════════════════════
   A. DOR, twice, TY2025-keyed: 0% first $5,000 / 4% next $5,000 / 5% over $10,000
      (84-100 p.7 Tax Rates; 84-105 L6 instruction).
@@ -117,10 +126,13 @@ DOR's own plumbing splits the modules (composite S corps -> corporate Form 83-30
 composite partnerships -> individual Form 80-320), so the rate question is live in
 DOR's own machinery.
 
-**THIS SPEC ENCODES A DIAGNOSTIC AND NO COMPUTED COMPOSITE RATE.**
-`_ms_composite_tax()` returns None by design. The ELECTING-PTE rate (0/4/5) IS
-settled and IS computed. Composite L6 is direct-entry behind D_MS84105_COMPOSITE_RATE
-until Ken rules (W1/U1). Do not "fix" this by choosing.
+**THE SPEC NOW COMPUTES COMPOSITE L6 AT POSITION A, AND STILL RAISES THE
+DIAGNOSTIC.** `_ms_composite_tax()` applies `MS_COMPOSITE_RATES`; the
+`D_MS84105_COMPOSITE_RATE` diagnostic is retained at WARNING severity so every
+composite return discloses that the rate rests on a DOR instruction that its own
+regulation contradicts. The ELECTING-PTE rate (0/4/5) was already settled and is
+unaffected — the two now hold the same TY2025 values but are SEPARATE constants,
+because they are settled by different authorities and can diverge.
 
 ═══════════════════════════════════════════════════════════════════════════
 v1 SCOPE — PROPOSED, NOT YET WALKED (brief §15). READY_TO_SEED ships False.
@@ -158,10 +170,10 @@ RED-DEFER (R1-R17, each with its OWN diagnostic — no silent gap): direct accou
 ═══════════════════════════════════════════════════════════════════════════
 requires_human_review WALK ITEMS (Ken, before seeding) — brief §14
 ═══════════════════════════════════════════════════════════════════════════
-W1.  ⚠ THE COMPOSITE RATE (U1). Three-sided, unresolved. Spec computes NOTHING.
-     Recommendation: ship DOR's 0/4/5 as a single-point-of-change flagged constant
-     with a review diagnostic on every composite return, and open a DOR ticket.
-     Record as a RULING, not a finding.
+W1.  ✅ THE COMPOSITE RATE (U1). Three-sided. **RULED BY KEN 2026-08-17 (walk item
+     A2) to Position A — DOR's 0/4/5** — shipped as a single-point-of-change flagged
+     constant (`MS_COMPOSITE_RATES`) with a review diagnostic on every composite
+     return. Recorded as a RULING, not a finding. ⏳ Open a DOR ticket before ship.
 W2.  ⚠ THE FRANCHISE-TAX FORK. Hard-gate L1-L4 on entity type; diagnostic if a
      partnership return carries any value in 1-4. Confirm the page-2 Part I line 4
      "elected corporate treatment" RED and the exempt-org-UBTI blank-1-4 mode.
@@ -195,7 +207,9 @@ W11. ⚠ ARE 84-131 / 84-132 IN v1? They are the PTET's whole delivery mechanism
 [UNVERIFIED] / OPEN ITEMS — 17 raised, 4 closed on the adversarial pass, 13 LIVE.
 Every live one must be re-pulled or ruled. NEVER guessed here.
 ═══════════════════════════════════════════════════════════════════════════
-U1.  ⚠ The composite-return rate — three positions, none dispositive. (-> W1)
+U1.  ⚠ The composite-return rate — three positions, none dispositive. RULED to
+     Position A 2026-08-17 for BUILD purposes; the underlying conflict is still
+     unresolved in fact and needs a DOR answer before ship. (-> W1)
 U2.  Whether one return may be BOTH composite and electing PTE, and what goes on
      84-105 L5 if it is. Both boxes sit under CHECK ALL THAT APPLY. (-> W6, R12)
 U3.  The Fee-In-Lieu checkbox on 84-105 L2 — printed on the FINAL face, ZERO hits in
@@ -289,12 +303,14 @@ from specs.models import (
 )
 
 # ═══════════════════════════════════════════════════════════════════════════
-# SAFETY GUARD — flip ONLY after Ken's in-session review walk (W1-W11 above).
-# NOT FLIPPED. Mississippi has 13 live open items, the composite rate is an
-# unresolved three-way conflict that this spec deliberately does not decide,
-# and the v1 COMPUTES/DIRECT-ENTRY/RED-DEFER boundary has not been walked.
+# GATE 1 CLEARED — flipped 2026-08-17 on Ken's in-session review walk (W1-W11).
+# The composite rate (W1) was RULED to Position A, DOR's 0/4/5, as a
+# single-point-of-change constant with the three-way conflict preserved and a
+# warning diagnostic on every composite return; the v1 COMPUTES / DIRECT-ENTRY /
+# RED-DEFER boundary was walked and approved as proposed. The remaining
+# [UNVERIFIED] items are pre-ship re-verification work, not seeding blockers.
 # ═══════════════════════════════════════════════════════════════════════════
-READY_TO_SEED = False
+READY_TO_SEED = True
 
 
 FORM_JURISDICTION = "MS"
@@ -331,8 +347,24 @@ MS_ENTITY_RATES: dict[int, list] = {2025: [(5_000, "0.00"), (10_000, "0.04"), (N
 # NEVER applied by this spec to an 84-105 line. §27-7-5(1)(b)(ii)2.
 MS_INDIVIDUAL_RATES_REFERENCE_ONLY: dict[int, list] = {2025: [(10_000, "0.00"), (None, "0.044")]}
 
-# ⚠ W1/U1 — THE COMPOSITE RATE IS UNRESOLVED. No schedule is selected here.
-MS_COMPOSITE_RATE_RESOLVED = False
+# ✅ W1/U1 — RULED BY KEN 2026-08-17 (Gate-1 walk item A2): Position A, DOR's
+# 0/4/5. THE SINGLE POINT OF CHANGE for the composite rate is the table below —
+# nothing else in this file selects a composite schedule. Deliberately SEPARATE
+# from MS_ENTITY_RATES even though TY2025 gives both the same values: the two are
+# settled by different authorities (DOR's 84-105 L6 instruction for composite;
+# §27-7-5(1)(a) for the electing PTE) and can diverge in a later year or on a
+# DOR answer. The three-sided conflict is preserved below, unresolved-in-fact.
+MS_COMPOSITE_RATE_RESOLVED = True
+MS_COMPOSITE_RATE_RULING = (
+    "Ken, 2026-08-17, Gate-1 walk item A2: code Position A (DOR 0/4/5). Rationale: it is what the "
+    "ADMINISTERING authority prescribes for TY2025 - twice, tax-year-keyed, in the 84-100 p.7 rate "
+    "table and the 84-105 L6 instruction - and an approved vendor's product must match the "
+    "administering authority to clear Mississippi's approval gate. NOT a finding that Position B or "
+    "C is wrong: the regulation's packaging argument is unrebutted and DOR's own plumbing still "
+    "splits composite S corps (corporate Form 83-305) from composite partnerships (individual Form "
+    "80-320). OPEN ACTION: raise with MS DOR before the module ships."
+)
+MS_COMPOSITE_RATES: dict[int, list] = {2025: [(5_000, "0.00"), (10_000, "0.04"), (None, "0.05")]}
 MS_COMPOSITE_RATE_POSITIONS: list[dict] = [
     {"position": "A", "schedule": "0% / 4% / 5% (entity schedule)",
      "authority": "MS DOR, 84-100 (Rev. 01/26) p.7 Tax Rates AND the 84-105 L6 instruction, both TY2025-keyed",
@@ -483,18 +515,35 @@ def _ms_entity_income_tax(taxable_income, tax_year: int = 2025) -> Decimal:
     return tax
 
 
-def _ms_composite_tax(taxable_income, tax_year: int = 2025):
-    """⚠ W1 / U1 — RETURNS None BY DESIGN. THREE-SIDED, UNRESOLVED, KEN'S CALL.
+def _ms_composite_tax(taxable_income, tax_year: int = 2025) -> Decimal:
+    """84-105 L6 for a COMPOSITE return — Position A (DOR 0/4/5), RULED 2026-08-17.
 
-    DOR says 0/4/5 twice (TY2025-keyed); §27-7-5(1)(b) reduces the rate for
-    individuals only and composite members ARE individuals; the official
-    regulation packages the individual rate with the $5,000/10% deduction and the
-    corporate rate with no deduction, and offers NO corporate-rate route for
-    partnerships at all. The TY2025 forms take one half of each.
-    v1 DIRECT-ENTERS 84-105 L6 for composite behind D_MS84105_COMPOSITE_RATE.
-    DO NOT MAKE THIS FUNCTION RETURN A NUMBER WITHOUT A KEN RULING.
+    ⚠ THIS IS A RULING ON A THREE-SIDED CONFLICT, NOT A SETTLED RATE. Ken ruled
+    walk item A2 to Position A because DOR is the administering authority and an
+    approved product must match it at the approval gate. Positions B and C are
+    NOT refuted — §27-7-5(1)(b) reduces the rate for individuals only and
+    composite members ARE individuals; the official regulation packages the
+    individual rate with the $5,000/10% deduction and the corporate rate with no
+    deduction, offering NO corporate-rate route for partnerships at all; and the
+    TY2025 forms take one half of each. See MS_COMPOSITE_RATE_POSITIONS.
+
+    Deliberately NOT delegated to _ms_entity_income_tax() despite the identical
+    TY2025 values: the composite schedule is a ruling that DOR may overturn, the
+    electing-PTE schedule is settled statute. One must be changeable without the
+    other. D_MS84105_COMPOSITE_RATE still fires on every composite return.
     """
-    return None
+    if not MS_COMPOSITE_RATE_RESOLVED:
+        return None
+    ti = max(Decimal("0"), Decimal(str(taxable_income)))
+    tax, prior = Decimal("0"), Decimal("0")
+    for top, rate in _yk(MS_COMPOSITE_RATES, tax_year):
+        ceiling = ti if top is None else min(ti, Decimal(top))
+        if ceiling > prior:
+            tax += (ceiling - prior) * Decimal(rate)
+        prior = ceiling
+        if top is not None and ti <= Decimal(top):
+            break
+    return tax
 
 
 def _ms_l9_total(entity_type: str, net_franchise_tax_l4, net_income_tax_l8) -> Decimal:
@@ -1657,7 +1706,8 @@ MS84105_RULES: list[dict] = [
      "rule_type": "calculation", "sort_order": 12,
      "formula": ("ELECTING PTE (SETTLED): L6 = 0% on the first $5,000 + 4% on the next $5,000 + 5% on taxable "
                  "income in excess of $10,000, applied to L5 ; "
-                 "COMPOSITE: ⚠ NO RATE IS COMPUTED — see R-MS-COMP-RATE ; "
+                 "COMPOSITE: same 0/4/5 schedule but a SEPARATE constant and a SEPARATE authority — "
+                 "see R-MS-COMP-RATE ; "
                  "L8 = MAX(0, L6 - L7)"),
      "inputs": ["5", "income_tax_credits_84401", "filing_mode"], "outputs": ["6", "8"],
      "description": "§27-7-5(1)(a) levies 0/4/5 on 'every resident individual, corporation, association, trust or "
@@ -1665,23 +1715,31 @@ MS84105_RULES: list[dict] = [
                     "corporation is not an individual, so an electing PTE sits on the unreduced 0/4/5 — DOR and "
                     "statute agree and this half is SETTLED. L8 instruction: 'If line 7 equals or exceeds the amount "
                     "shown on line 6, enter a zero.' Both 84-122 terminal lines floor at zero onto L5."},
-    {"rule_id": "R-MS-COMP-RATE", "title": "⚠ THE COMPOSITE RATE — THREE-SIDED, UNRESOLVED, NO SIDE PICKED",
-     "rule_type": "validation", "sort_order": 13,
-     "formula": ("COMPOSITE L6 IS NOT COMPUTED IN THIS SPEC. Three positions, none dispositive: "
-                 "A = 0%/4%/5% (MS DOR, twice, TY2025-keyed) ; "
-                 "B = 0% first $10,000 / 4.4% above (§27-7-5(1)(b) — composite members ARE individuals) ; "
-                 "C = the official regulation's TWO PACKAGED ROUTES — the individual rate WITH the $5,000/10% "
-                 "deduction, or the corporate rate WITH NO deduction (S corps only; no corporate-rate route is "
-                 "offered for partnerships at all). The TY2025 forms take one half of EACH. "
-                 "-> RAISE D_MS84105_COMPOSITE_RATE and DIRECT-ENTER L6 until Ken rules."),
+    {"rule_id": "R-MS-COMP-RATE", "title": "THE COMPOSITE RATE — three-sided; RULED to Position A (DOR 0/4/5)",
+     "rule_type": "calculation", "sort_order": 13,
+     "formula": ("COMPOSITE L6 = 0% on the first $5,000 + 4% on the next $5,000 + 5% above $10,000, applied to L5 "
+                 "[Position A, RULED 2026-08-17]. The rate lives in ONE constant, MS_COMPOSITE_RATES, which is "
+                 "SEPARATE from the electing-PTE schedule despite identical TY2025 values. "
+                 "-> ALSO RAISE D_MS84105_COMPOSITE_RATE (warning) on every composite return."),
      "inputs": ["filing_mode", "entity_type", "5"], "outputs": ["6"],
      "description": "W1 / U1 — the #1 walk item and the only place where DOR, the statute and the official "
-                    "regulation all say different things. DOR's own plumbing splits the modules (composite S corps "
-                    "-> corporate Form 83-305; composite partnerships -> individual Form 80-320), so the rate "
-                    "question is live in DOR's own machinery. Recommendation for the walk: ship DOR's 0/4/5 as a "
-                    "SINGLE-POINT-OF-CHANGE flagged constant with a review diagnostic on every composite return, "
-                    "and open a DOR ticket before the module ships — recorded as a RULING, not a finding. "
-                    "DO NOT RESOLVE THIS BY CHOOSING.",
+                    "regulation all say different things. RULED BY KEN 2026-08-17 (Gate-1 walk item A2) to "
+                    "POSITION A: 0%/4%/5%, per MS DOR twice and TY2025-keyed (84-100 p.7 rate table; 84-105 L6 "
+                    "instruction). RATIONALE: DOR is the administering authority, and an approved vendor's product "
+                    "must match the administering authority to clear Mississippi's approval gate. "
+                    "⚠ THIS IS A RULING, NOT A FINDING — the other two positions are NOT refuted. "
+                    "B = 0% first $10,000 / 4.4% above (§27-7-5(1)(b) reduces the rate for INDIVIDUALS ONLY, and "
+                    "composite members ARE nonresident individuals; DOR's own composite text says the income is "
+                    "'computed in the same manner as in a separate individual filing'). "
+                    "C = the official 35 Miss. Admin. Code Title 35 Pt.III packages the individual rate WITH the "
+                    "$5,000/10% deduction and the corporate rate WITH NO deduction (S corps only; no corporate-rate "
+                    "route is offered for partnerships at all), while the TY2025 forms take one half of EACH — "
+                    "84-122 L30 gives the deduction AND 84-105 L6 taxes at 0/4/5, which on the regulation's own "
+                    "logic is one package too generous or one rate too high. "
+                    "DOR's own plumbing splits the modules (composite S corps -> corporate Form 83-305; composite "
+                    "partnerships -> individual Form 80-320), so the question is live in DOR's own machinery. "
+                    "OPEN ACTION, NOT A SPEC ITEM: raise with MS DOR before the module ships. If DOR answers "
+                    "differently, change MS_COMPOSITE_RATES and nothing else.",
      "exceptions": "Bound up with U7: the regulation makes the $5,000/10% deduction and the individual rate a "
                    "PACKAGE, and words the deduction base differently ('adjusted gross income') from the booklet "
                    "('composite net income')."},
@@ -1866,9 +1924,12 @@ MS84105_LINES: list[dict] = [
      "line_type": "calculated", "source_rules": ["R-MS-TERMINAL", "R-MS-WITHHOLD"], "sort_order": 5,
      "notes": "⚠ A THIRD trigger that is neither mode: an S corp that failed to obtain a Form 84-380 agreement "
               "enters here the income on which payment of tax is required (U15)."},
-    {"line_number": "6", "description": "Income tax — EPTE 0/4/5 computed; COMPOSITE rate UNRESOLVED (W1, direct-entry)",
+    {"line_number": "6", "description": "Income tax — EPTE 0/4/5 (settled); COMPOSITE 0/4/5 (RULED, walk A2)",
      "line_type": "calculated", "source_rules": ["R-MS-INCOME-TAX", "R-MS-COMP-RATE", "R-MS-FISCAL-PROR"], "sort_order": 6,
-     "notes": "⚠ The form face carries NO rate — it lives only in the instruction and is tax-year-keyed."},
+     "notes": "⚠ The form face carries NO rate — it lives only in the instruction and is tax-year-keyed. The two "
+              "modes reach the same TY2025 schedule by DIFFERENT authorities and via SEPARATE constants: the "
+              "electing-PTE rate is settled statute, the composite rate is a 2026-08-17 ruling on a live three-way "
+              "conflict that D_MS84105_COMPOSITE_RATE discloses on every composite return."},
     {"line_number": "7", "description": "Income tax credits (from Form 84-401, line 3) — E2: NOT Form 83-401",
      "line_type": "input", "source_facts": ["income_tax_credits_84401"], "sort_order": 7},
     {"line_number": "8", "description": "Net income tax due (line 6 minus line 7) — MAX(0, L6 - L7)", "line_type": "calculated",
@@ -1992,17 +2053,21 @@ MS84105_LINES: list[dict] = [
 MS84105_DIAGNOSTICS: list[dict] = [
     # ═══ WALK ITEMS / structural reviews ═══
     {"diagnostic_id": "D_MS84105_COMPOSITE_RATE", "severity": "warning",
-     "title": "⚠ Composite rate is UNRESOLVED — three-sided conflict, no rate is computed (W1/U1)",
+     "title": "Composite rate is contested — computed at DOR's 0/4/5 by ruling, not by settled authority (W1/U1)",
      "condition": "filing_mode == 'composite'",
-     "message": "Mississippi's composite rate is genuinely contested and this product does NOT choose. (A) MS DOR "
-                "prescribes 0% / 4% / 5%, twice, TY2025-keyed. (B) Miss. Code Ann. §27-7-5(1)(b) reduces the rate "
-                "for INDIVIDUALS only and composite members are nonresident individuals — 0% / 4.4%. (C) The "
-                "official 35 Miss. Admin. Code Title 35 Part III packages the $5,000/10% deduction WITH the "
-                "individual rate and the corporate rate WITH NO deduction, and offers no corporate-rate route for "
-                "partnerships at all — while the TY2025 forms take one half of each. Enter Form 84-105 line 6 "
-                "manually and open a DOR ticket before filing.",
-     "notes": "W1 is the #1 walk item. Recommendation for the walk: ship DOR's 0/4/5 as a SINGLE-POINT-OF-CHANGE "
-              "flagged constant. DO NOT RESOLVE THIS BY CHOOSING inside the loader."},
+     "message": "Form 84-105 line 6 has been computed at MS DOR's 0% / 4% / 5% schedule. That is a RULING on a "
+                "genuinely contested question, not a settled rate. (A) MS DOR prescribes 0% / 4% / 5%, twice, "
+                "TY2025-keyed — the position taken here, because DOR administers the tax and an approved product "
+                "must match it. (B) Miss. Code Ann. §27-7-5(1)(b) reduces the rate for INDIVIDUALS only and "
+                "composite members are nonresident individuals — 0% / 4.4%. (C) The official 35 Miss. Admin. Code "
+                "Title 35 Part III packages the $5,000/10% deduction WITH the individual rate and the corporate "
+                "rate WITH NO deduction, and offers no corporate-rate route for partnerships at all — while the "
+                "TY2025 forms take one half of each. Review line 6 before filing, and confirm with DOR.",
+     "notes": "W1 was the #1 walk item; RULED 2026-08-17 (Gate-1 walk item A2) to Position A. Kept at WARNING and "
+              "firing on EVERY composite return by design: the ruling is defensible but unconfirmed, and the "
+              "preparer should know which of the two composite modes they are in. The rate is a "
+              "SINGLE-POINT-OF-CHANGE constant (MS_COMPOSITE_RATES) — if DOR answers differently, change that and "
+              "nothing else."},
     {"diagnostic_id": "D_MS84105_FRANCHISE_FORK", "severity": "error",
      "title": "⚠ Franchise tax (lines 1-4) is S-CORPORATION ONLY — a partnership must not carry a value here",
      "condition": "entity_type == '1065' AND any of lines 1-4 is non-zero",
@@ -2393,14 +2458,17 @@ MS84105_SCENARIOS: list[dict] = [
               "PARTNERSHIP reaches Form 80-320, and it computes on 80%, on CALENDAR quarters, with NO 10% penalty. "
               "An electing-PTE partnership is on Form 83-305 at 90% like every S corp. Three silent per-return "
               "differences. Do not code one underestimate routine."},
-    {"scenario_name": "⚠ COMPOSITE RATE — no rate is computed, a diagnostic is raised", "scenario_type": "failure", "sort_order": 8,
+    {"scenario_name": "COMPOSITE RATE — computed at Position A (0/4/5), and the diagnostic still fires",
+     "scenario_type": "edge", "sort_order": 8,
      "inputs": {"entity_type": "1065", "filing_mode": "composite", "ms_net_taxable_income_l5": 300_000},
-     "expected_outputs": {"6": None, "diagnostic": "D_MS84105_COMPOSITE_RATE", "positions_recorded": 3},
-     "notes": "⚠ W1/U1. Three positions, none dispositive: DOR's 0/4/5 (stated twice, TY2025-keyed); the statutory "
-              "0/4.4% (composite members are individuals and §27-7-5(1)(b) reduces the rate for individuals only); "
-              "and the official regulation's two packaged routes, which pair the individual rate with the "
-              "$5,000/10% deduction and the corporate rate with no deduction — while the TY2025 forms take one half "
-              "of each. THE SPEC DOES NOT CHOOSE. Line 6 is direct-entry until Ken rules."},
+     "expected_outputs": {"6": 14_700, "diagnostic": "D_MS84105_COMPOSITE_RATE", "severity": "warning",
+                          "positions_recorded": 3},
+     "notes": "⚠ W1/U1, RULED 2026-08-17 (walk A2) to Position A. $5,000 @ 0% + $5,000 @ 4% + $290,000 @ 5% = "
+              "$14,700. The OTHER TWO POSITIONS ARE NOT REFUTED and all three stay recorded: the statutory 0/4.4% "
+              "(composite members are individuals and §27-7-5(1)(b) reduces the rate for individuals only), and the "
+              "official regulation's two packaged routes, which pair the individual rate with the $5,000/10% "
+              "deduction and the corporate rate with no deduction — while the TY2025 forms take one half of each. "
+              "The diagnostic fires on EVERY composite return so the preparer sees that line 6 rests on a ruling."},
     {"scenario_name": "⚠ L20 ASYMMETRY — late-payment items are not netted against the refund", "scenario_type": "edge", "sort_order": 9,
      "inputs": {"9": 20_000, "13": 30_000, "15": 1_200, "16": 400, "17": 300, "18": 500},
      "expected_outputs": {"20": 8800},
@@ -2528,14 +2596,18 @@ FLOW_ASSERTIONS: list[dict] = [
      "definition": {"rule": "R-MS-ESTIMATES",
                     "check": "(entity_type=='1065' and mode=='composite') implies form=='80-320' and pct=='0.80'; "
                              "else form=='83-305' and pct=='0.90'"}},
-    {"assertion_id": "FA-MS-COMP-RATE", "title": "⚠ NO composite rate is computed — three positions, unresolved",
+    {"assertion_id": "FA-MS-COMP-RATE", "title": "Composite rate = Position A by RULING, from its own constant, conflict record intact",
      "assertion_type": "flow_assertion", "entity_types": ["1065", "1120S"], "status": "draft", "sort_order": 7,
-     "description": "W1/U1. The spec deliberately declines to choose between DOR's 0/4/5, the statutory 0/4.4%, and "
-                    "the official regulation's two packaged routes. Composite line 6 is direct-entry behind "
-                    "D_MS84105_COMPOSITE_RATE until Ken rules.",
+     "description": "W1/U1, RULED 2026-08-17 (walk A2). The spec computes composite line 6 at DOR's 0/4/5 — but "
+                    "from MS_COMPOSITE_RATES, a constant SEPARATE from the electing-PTE schedule, with the written "
+                    "ruling and all three contested positions retained. The assertion pins the mechanism, not the "
+                    "number: a later DOR answer changes ONE table, and the conflict record cannot be quietly "
+                    "deleted. D_MS84105_COMPOSITE_RATE still fires on every composite return.",
      "definition": {"rule": "R-MS-COMP-RATE",
-                    "check": "composite_tax is None and len(MS_COMPOSITE_RATE_POSITIONS) == 3 and "
-                             "MS_COMPOSITE_RATE_RESOLVED is False"}},
+                    "check": "MS_COMPOSITE_RATE_RESOLVED is True and MS_COMPOSITE_RATE_RULING != '' and "
+                             "len(MS_COMPOSITE_RATE_POSITIONS) == 3 and "
+                             "MS_COMPOSITE_RATES is not MS_ENTITY_RATES and "
+                             "composite_tax(12000) == 300"}},
     {"assertion_id": "FA-MS-L20-ASYM", "title": "84-105 L20 nets only L9 and L15, never L16-L18",
      "assertion_type": "reconciliation", "entity_types": ["1065", "1120S"], "status": "draft", "sort_order": 8,
      "description": "Face: 'if line 13 is larger than line 9 plus line 15, subtract line 9 and line 15 from line "
@@ -2604,17 +2676,31 @@ class Command(BaseCommand):
                     empty.append(f"{fn}.{key}")
         if not FLOW_ASSERTIONS:
             empty.append("FLOW_ASSERTIONS")
-        # The composite rate must NOT be silently resolved inside the loader.
+        # ── THE TRIPWIRE, RE-ARMED IN THE OTHER DIRECTION ───────────────────
+        # Before 2026-08-17 this refused if the flag was flipped at all. Ken has
+        # now ruled (walk item A2, Position A), so the flag being True is
+        # correct. What must STILL be impossible is shipping a composite rate
+        # that nobody ruled on: the flag may only be True while a written ruling
+        # and a rate table stand beside it, and the three-sided conflict record
+        # must survive. Editing one constant still cannot ship a rate.
         if MS_COMPOSITE_RATE_RESOLVED:
-            empty.append("MS_COMPOSITE_RATE_RESOLVED was flipped without a Ken ruling (W1/U1)")
+            if not MS_COMPOSITE_RATE_RULING.strip():
+                empty.append("MS_COMPOSITE_RATE_RESOLVED is True but MS_COMPOSITE_RATE_RULING is empty (W1/U1)")
+            if not MS_COMPOSITE_RATES.get(FORM_TAX_YEAR):
+                empty.append(f"MS_COMPOSITE_RATE_RESOLVED is True but MS_COMPOSITE_RATES has no TY{FORM_TAX_YEAR} table")
+            if len(MS_COMPOSITE_RATE_POSITIONS) != 3:
+                empty.append("the three-sided composite-rate conflict record (MS_COMPOSITE_RATE_POSITIONS) was altered")
         if not READY_TO_SEED or empty:
             still_empty = "\n  ".join(f"- {n}" for n in empty) or "(all populated)"
             raise CommandError(
                 "\nREFUSING TO SEED MS 84-105: not cleared to seed.\n\n"
-                "Content is authored, but seeding is gated until Ken reviews the packet and\n"
-                "flips the sentinel. The walk items:\n"
-                "  W1  the COMPOSITE RATE — three-sided and unresolved; this spec computes NO\n"
-                "      composite rate and must not be made to pick a side without a ruling\n"
+                "Gate 1 was CLEARED for this form on 2026-08-17 (Ken's in-session walk,\n"
+                "delvio-states/dispatch/WAVE3_WALK.md), so if you are reading this something\n"
+                "ELSE is wrong — most likely a data list was emptied, the sentinel was flipped\n"
+                "back, or the composite-rate ruling record was damaged. The walk items:\n"
+                "  W1  the COMPOSITE RATE — three-sided; RULED to Position A (DOR 0/4/5) as a\n"
+                "      single-point-of-change constant. The rate may only be resolved while a\n"
+                "      written ruling AND the three-position conflict record stand beside it\n"
                 "  W2  the FRANCHISE FORK — lines 1-4 hard-gated to 1120S ($25 min makes a\n"
                 "      mis-gated partnership return silently non-zero)\n"
                 "  W3  DEPRECIATION scope — direct-entry 84-122 L8/L15 vs an MS-basis engine\n"
@@ -2631,8 +2717,9 @@ class Command(BaseCommand):
                 "docstring and delvio-states/research/ms_pte_source_brief.md §13.\n\n"
                 f"READY_TO_SEED = {READY_TO_SEED} (must be True to proceed)\n\n"
                 f"Currently empty / placeholder:\n  {still_empty}\n\n"
-                "To proceed: review the module-level data lists (and ms_pte_source_brief.md),\n"
-                "then set READY_TO_SEED = True. Idempotent via update_or_create."
+                "Do NOT relax this guard to silence the error — fix the cause. The module-level\n"
+                "data lists and delvio-states/research/ms_pte_source_brief.md are the\n"
+                "references. Idempotent via update_or_create."
             )
 
     def _load_topics(self):
@@ -2750,5 +2837,6 @@ class Command(BaseCommand):
         )
         self.stdout.write("  entity_types: 1065 + 1120S (ONE form, TWO modules); franchise block gated to 1120S")
         self.stdout.write("  !! depreciation: add-back 84-122 L8 / recovery 84-122 L15 (NOT L6 / L13)")
-        self.stdout.write("  !! composite rate: UNRESOLVED - no rate computed (W1/U1)")
+        self.stdout.write("  !! composite rate: Position A (DOR 0/4/5) by RULING 2026-08-17 - conflict "
+                          "still open with DOR (W1/U1)")
         self.stdout.write("=" * 60)

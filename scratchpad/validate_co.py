@@ -61,9 +61,9 @@ M65, MS = CO.M_1065, CO.M_1120S
 #    guard must refuse when READY_TO_SEED is False.
 # ══════════════════════════════════════════════════════════════════════════
 _shipped = CO.READY_TO_SEED
-check(_shipped is False,
-      "READY_TO_SEED SHIPS FALSE on disk (the spec is gated, as required)",
-      f"READY_TO_SEED SHIPPED {_shipped!r} -- it MUST ship False (blocked on [UNV-7]/W13)")
+check(_shipped is True,
+      "READY_TO_SEED ships True on disk (Gate 1 cleared 2026-08-17, walk item A1 ruled)",
+      f"READY_TO_SEED SHIPPED {_shipped!r} -- Gate 1 was approved, it should now ship True")
 
 CO.READY_TO_SEED = False
 try:
@@ -74,8 +74,8 @@ except CommandError as e:
     check("REFUSING TO SEED" in msg, "guard REFUSES to seed when READY_TO_SEED is False",
           f"guard raised CommandError but without the refusal banner: {msg[:120]}")
     check("174A" in msg or "UNV-7" in msg,
-          "guard message names the [UNV-7] / Sec. 174A BLOCKER",
-          "guard message does not mention the blocking item")
+          "guard message still carries the [UNV-7] / Sec. 174A record (now the RULING, not a blocker)",
+          "guard message does not mention the Sec. 174A item at all")
     check("READY_TO_SEED = False" in msg, "guard reports the sentinel value it saw",
           "guard message omits the sentinel value")
 except Exception as e:  # noqa: BLE001
@@ -230,13 +230,28 @@ missing = [d for d in RED_DEFERS if not FormDiagnostic.objects.filter(tax_form=f
 check(not missing, f"all 16 RED-defers (R1-R16) have their own diagnostic -- no silent gap",
       f"RED-defers with no diagnostic: {missing}")
 
-blocker = FormDiagnostic.objects.filter(tax_form=form, diagnostic_id="D_CO106_BLOCK_174A_CONFORMITY").first()
-check(blocker is not None and blocker.severity == "error",
-      "the [UNV-7] Sec. 174A blocker is encoded as a BLOCKING (error) diagnostic",
-      "blocking diagnostic D_CO106_BLOCK_174A_CONFORMITY missing or not severity=error")
-check(any(r["rule_id"] == "R-CO-174A-BLOCK" for r in spec["rules"]),
-      "the blocker also has a rule (R-CO-174A-BLOCK) -- not computed around",
-      "R-CO-174A-BLOCK rule missing")
+# ── [UNV-7] / Sec. 174A: RULED 2026-08-17 (walk A1). The assertions now pin the
+#    POST-RULING mechanism. The diagnostic_id is deliberately UNCHANGED so nothing
+#    downstream re-keys; only its severity moved error -> info.
+ruling = FormDiagnostic.objects.filter(tax_form=form, diagnostic_id="D_CO106_BLOCK_174A_CONFORMITY").first()
+check(ruling is not None and ruling.severity == "info",
+      "the Sec. 174A item is now an INFO disclosure, not a blocking error (A1 ruled)",
+      f"D_CO106_BLOCK_174A_CONFORMITY missing or severity is {getattr(ruling, 'severity', None)!r}, expected 'info'")
+check(ruling is not None and "RULED" in (ruling.notes or "") and "2026-08-17" in (ruling.notes or ""),
+      "the diagnostic carries the ruling and its date, so the basis is auditable",
+      "D_CO106_BLOCK_174A_CONFORMITY does not record the 2026-08-17 ruling")
+check(any(r["rule_id"] == "R-CO-174A-CONFORM" for r in spec["rules"]),
+      "the ruling has a rule of its own (R-CO-174A-CONFORM) -- the position is stated, not implied",
+      "R-CO-174A-CONFORM rule missing")
+check(not any(r["rule_id"] == "R-CO-174A-BLOCK" for r in spec["rules"]),
+      "the superseded blocker rule (R-CO-174A-BLOCK) is GONE -- no stale blocker left behind",
+      "R-CO-174A-BLOCK still present alongside the ruling")
+# The ruling is Ken's reading of the statute, NOT published CDOR guidance. If that
+# distinction ever disappears from the record, the audit trail is broken.
+_r174 = next(r for r in spec["rules"] if r["rule_id"] == "R-CO-174A-CONFORM")
+check("no CDOR source confirms" in _r174["description"] or "STILL OPEN" in _r174["description"],
+      "the rule states plainly that no CDOR authority confirms the ruling ([UNV-7] stays open)",
+      "R-CO-174A-CONFORM does not disclose that the confirming authority is unpulled")
 
 # ══════════════════════════════════════════════════════════════════════════
 # 4a. ARITHMETIC ORACLE -- THE SIGN FLIP
@@ -618,5 +633,5 @@ print(f"\nSeeded: facts {FormFact.objects.filter(tax_form=form).count()} / "
       f"scenarios {TestScenario.objects.filter(tax_form=form).count()} / "
       f"flow assertions {FlowAssertion.objects.filter(assertion_id__startswith='FA-CO').count()} / "
       f"authority links {RuleAuthorityLink.objects.filter(form_rule__tax_form=form).count()}")
-print(f"READY_TO_SEED on disk: {CO.READY_TO_SEED} (must be False)")
+print(f"READY_TO_SEED on disk: {CO.READY_TO_SEED} (Gate 1 cleared 2026-08-17 -- must now be True)")
 sys.exit(1 if FAILURES else 0)

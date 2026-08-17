@@ -22,25 +22,31 @@ NO prior RS spec exists (lookup/CO_DR0106/export/ -> 404, confirmed 2026-08-16).
 NEW form. Form code per campaign D-9 / the `<ST>_<FORM>` namespace.
 
 ═══════════════════════════════════════════════════════════════════════════
-🔴 BLOCKER — THIS SPEC IS NOT COMPLETE UNTIL [UNV-7] IS RULED
+✅ [UNV-7] RULED BY KEN 2026-08-17 — Gate-1 walk item A1 (was W13)
 ═══════════════════════════════════════════════════════════════════════════
-`[UNV-7]` — whether Colorado's rolling conformity (§ 39-22-103(5.3), C.R.S.)
-picks up RETROACTIVELY-EFFECTIVE federal amendments. The verifier's own words:
-"NOT RESOLVED — remains the one genuinely blocking item. Still `Must be resolved
-before this spec is authored`."
+QUESTION: does Colorado's rolling conformity (§ 39-22-103(5.3), C.R.S.) pick up
+RETROACTIVELY-EFFECTIVE federal amendments — specifically OBBBA's retroactive
+small-business § 174A R&D expensing election, which changes federal ordinary
+income and therefore **DR 0106 line 1**, the first number on the return?
 
-Why it blocks THIS form specifically: OBBBA's retroactive small-business § 174A
-R&D expensing election changes federal ordinary income, which is **DR 0106
-line 1** — the very first number on the return. If Colorado does not pick up the
-retroactive amendment, line 1 diverges from the federal return and there is NO
-Colorado modification line anywhere on the DR 0106 to carry the difference.
-CDOR's Rule 39-22-103(5.3) (which read conformity as prospective-only) now shows
-as `[Repealed]`; the *Anschutz* Court of Appeals decision is known only from
-secondary reporting.
+KEN'S RULING: **YES — it does.** § 39-22-103(5.3) takes the IRC "as the same may
+become effective at any time or from time to time, for the taxable year," and
+the DR 0106 has **no modification line anywhere** to express a divergence. The
+form face can therefore only carry the federal figure. **DR 0106 line 1 is a
+straight transcription of federal ordinary income as filed. No § 174A adjustment
+is computed in either direction** — which is what the draft already built; the
+ruling makes that affirmatively correct rather than a deferral.
 
-It is encoded as a BLOCKING diagnostic (`D_CO106_BLOCK_174A_CONFORMITY`,
-severity=error) and rule `R-CO-174A-BLOCKER`. **We do not compute around it.**
-No § 174A path is built in either direction. Ken must rule W13 before seeding.
+The reasoning is recorded in rule `R-CO-174A-CONFORM` and in the informational
+diagnostic `D_CO106_BLOCK_174A_CONFORMITY` (severity downgraded error -> info;
+the diagnostic_id is kept stable so nothing downstream re-keys).
+
+⚠ **[UNV-7] STAYS OPEN as a confirmation item, and is NO LONGER BLOCKING.** The
+authority that would confirm the ruling — the published *Anschutz* opinion, the
+current 1 CCR 201-2 text showing the repealed rule's date, or CDOR guidance on
+§ 174A for TY2025 — is still unpulled. The ruling is Ken's reading of the
+rolling-conformity statute, not a published CDOR position. Re-verify before the
+module ships. See campaign DECISIONS D-11 A1.
 
 ═══════════════════════════════════════════════════════════════════════════
 v1 SCOPE — PROPOSED (brief §15; NOT yet walked with Ken)
@@ -130,7 +136,8 @@ THE FOUR THINGS MOST LIKELY TO BE BUILT WRONG (all encoded as real branches)
    and 4.29% (TY2028) — the constant moves. See W7.
 
 ═══════════════════════════════════════════════════════════════════════════
-requires_human_review WALK ITEMS — W1-W13 (brief §14 W1-W12 + the blocker)
+requires_human_review WALK ITEMS — W1-W13 (brief §14 W1-W12 + W13), ALL CLEARED
+AT GATE 1 ON 2026-08-17. Retained as the authoring record, not as open items.
 ═══════════════════════════════════════════════════════════════════════════
 W1.  Does v1 COMPUTE partnership direct sourcing, or DIRECT-ENTER Column B?
      Direct sourcing (§ 39-22-109; Rule 39-22-109(3)(a)/(b)/(e)) is the DEFAULT
@@ -172,8 +179,10 @@ W9.  Estimated tax: PTE rules != C-corp rules. 70%/100% with the first-year-
      DR 0233 instr. + DR 0106EP + SALT pub say "exceeds"; DR 0106 L31 AND the
      Corporate Income Tax Guide (incorporated by reference by the DR 0106 for
      this exact rule) say ">= / less than $5,000". Exposure is the single point
-     net tax == $5,000. PROPOSED: strictly greater than $5,000, on the DR 0233
-     Part 1 arithmetic. **This is a Ken RULING, not a settled correction.**
+     net tax == $5,000. ✅ **RULED BY KEN 2026-08-17 (walk item B2): strictly
+     greater than $5,000**, on the DR 0233 Part 1 arithmetic and on the
+     Corporate Income Tax Guide's incorporation by reference. Recorded as a
+     ruling on a source split, NOT as a silent correction of an erratum.
 W10. Credit depth. PROPOSED: DIRECT-ENTER all DR 0106CR amounts; COMPUTE only
      the column arithmetic + the L14/L15 cap; RED-defer every sub-schedule.
 W11. DR 1079 real-estate withholding on L25 — direct-enter + diagnostic.
@@ -181,8 +190,9 @@ W12. DR 0107 is a ONE-TIME filing that PERSISTS across years ("the timely first
      filing of this agreement as applicable to all future filing periods unless
      notified otherwise"). Where does the persistent per-owner flag live? It is a
      CLIENT-RECORD question, not just a form question.
-W13. 🔴 **THE BLOCKER — [UNV-7] § 174A / retroactive federal amendments under
-     rolling conformity.** See the blocker block above. MUST be ruled first.
+W13. ✅ **RULED 2026-08-17 (walk item A1) — [UNV-7] § 174A / retroactive federal
+     amendments under rolling conformity. Colorado DOES pick them up; line 1
+     transcribes federal.** See the ruling block above. No longer blocking.
 
 ═══════════════════════════════════════════════════════════════════════════
 [UNVERIFIED] ITEMS CARRIED FORWARD — all 9 (brief §13, audited §17.3)
@@ -208,8 +218,13 @@ W13. 🔴 **THE BLOCKER — [UNV-7] § 174A / retroactive federal amendments und
 [UNV-6] Colorado MeF program: schema, business rules, calendar, submission model
         all LOI-gated (DOR_IncomeTaxMeF2D@state.co.us). Longest-lead Ken action.
         -> W8, R15.
-[UNV-7] 🔴 **BLOCKING** — § 174A / retroactive federal amendments under rolling
-        conformity. -> W13, R-CO-174A-BLOCKER, D_CO106_BLOCK_174A_CONFORMITY.
+[UNV-7] ✅ **RULED 2026-08-17, NO LONGER BLOCKING** — § 174A / retroactive
+        federal amendments under rolling conformity. Ken ruled Colorado DOES
+        pick them up (walk A1); line 1 transcribes federal as filed. The
+        CONFIRMING AUTHORITY is still unpulled (published Anschutz opinion,
+        current 1 CCR 201-2, or CDOR § 174A guidance for TY2025), so the item
+        stays open as a pre-ship re-verification. -> W13, R-CO-174A-CONFORM,
+        D_CO106_BLOCK_174A_CONFORMITY (now severity=info).
 [UNV-8] DR 0106 line 22 in-lieu-of amount has NO published computation anywhere
         — the instruction gives filing mechanics only. -> R7.
 [UNV-9] Part V line 9 percentage: no stated decimal precision, no rounding rule,
@@ -230,10 +245,10 @@ never memory, never training data):
 Full source brief: delvio-states/research/co_pte_source_brief.md.
 
 ═══════════════════════════════════════════════════════════════════════════
-SAFETY GUARD — READY_TO_SEED stays False. The command REFUSES to write to the
-DB. Do NOT relax the guard to silence the error. In addition to Ken's walk
-(W1-W12), **W13 / [UNV-7] is a hard blocker** — this spec is not complete and
-must not be seeded until the § 174A rolling-conformity question is ruled.
+GATE 1 — APPROVED BY KEN 2026-08-17. The walk (dispatch/WAVE3_WALK.md) was taken
+in full: A1 ruled (§ 174A, above), B2 ratified (the $5,000 threshold), and the
+six scope levers and ~30 ratifications approved as proposed. READY_TO_SEED was
+flipped to True on that approval and on nothing else.
 ═══════════════════════════════════════════════════════════════════════════
 """
 from django.core.management.base import BaseCommand, CommandError
@@ -258,16 +273,15 @@ from specs.models import (
 )
 
 # ═══════════════════════════════════════════════════════════════════════════
-# SAFETY GUARD — DO NOT FLIP.
+# GATE 1 CLEARED — flipped 2026-08-17 on Ken's in-session approval.
 #
-# Two independent gates stand between this file and the database:
-#   (1) Ken's Gate-1 walk over W1-W12, and
-#   (2) 🔴 W13 / [UNV-7] — the § 174A rolling-conformity BLOCKER, which the
-#       verifier left explicitly unresolved with the instruction "Must be
-#       resolved before this spec is authored."
-# READY_TO_SEED ships False and MUST ship False.
+# Both gates that stood between this file and the database are now cleared:
+#   (1) Ken's Gate-1 walk over W1-W12 — taken, approved as proposed; and
+#   (2) W13 / [UNV-7] — the § 174A rolling-conformity question — RULED
+#       (walk item A1: Colorado DOES pick up retroactive federal amendments;
+#       DR 0106 line 1 transcribes federal as filed).
 # ═══════════════════════════════════════════════════════════════════════════
-READY_TO_SEED = False
+READY_TO_SEED = True
 
 
 FORM_JURISDICTION = "CO"
@@ -339,9 +353,11 @@ CO_PENALTY_MAX_PCT: dict[int, str] = {2025: "0.12"}
 # DR 0106EP, SALT Parity pub. ">= / less than $5,000": DR 0106 line 31 AND the
 # Colorado Corporate Income Tax Guide (which the DR 0106 EXPRESSLY incorporates
 # by reference for this exact rule). Exposure is the single point net tax ==
-# $5,000. PROPOSED (Ken RULING, not a correction): strictly greater than $5,000,
-# because DR 0233 Part 1 computes "line 1 - $5,000; If line 2 is larger, enter
-# zero and no penalty is due" — the form's own arithmetic is the tiebreak.
+# $5,000. RULED BY KEN 2026-08-17, walk item B2 (a ruling on a source split, not
+# a correction): STRICTLY GREATER THAN $5,000, because DR 0233 Part 1 computes
+# "line 1 - $5,000; If line 2 is larger, enter zero and no penalty is due" — the
+# form's own arithmetic is the tiebreak, and the Corporate Income Tax Guide is
+# the source the DR 0106 expressly incorporates for this rule.
 CO_EST_TAX_THRESHOLD: dict[int, int] = {2025: 5000}
 CO_EST_THRESHOLD_STRICTLY_GREATER: dict[int, bool] = {2025: True}
 CO_EST_REQUIRED_CURRENT_PCT: dict[int, str] = {2025: "0.70"}   # 70% of actual net CO tax
@@ -2313,12 +2329,14 @@ CO_FACTS: list[dict] = [
     {"fact_key": "federal_changes_last_four_years", "label": "Box G - federal changes in the last four years",
      "data_type": "boolean", "required": False, "sort_order": 93,
      "notes": "Requires a date and a written explanation on the face. Also a trigger for R7 (line 22)."},
-    {"fact_key": "claims_retroactive_sec174a_election", "label": "BLOCKER - return relies on a RETROACTIVE federal amendment (e.g. OBBBA Sec. 174A)",
+    {"fact_key": "claims_retroactive_sec174a_election", "label": "Return relies on a RETROACTIVE federal amendment (e.g. OBBBA Sec. 174A)",
      "data_type": "boolean", "required": False, "sort_order": 94,
-     "notes": "[UNV-7] / W13. THE ONE GENUINELY BLOCKING ITEM. Whether Colorado's rolling conformity picks up "
-              "retroactively-effective federal amendments is UNRESOLVED. Sec. 174A changes federal ordinary income = "
-              "DR 0106 LINE 1, and there is no Colorado modification line anywhere on the form to carry a divergence. "
-              "Blocking diagnostic; NOT computed around."},
+     "notes": "[UNV-7] / W13, RULED BY KEN 2026-08-17 (walk A1): Colorado's rolling conformity DOES reach "
+              "retroactively-effective federal amendments, so DR 0106 line 1 transcribes federal ordinary income as "
+              "filed and NO Sec. 174A adjustment is computed in either direction. The flag is retained as an "
+              "INFORMATIONAL marker only - it drives D_CO106_BLOCK_174A_CONFORMITY (severity=info), which tells the "
+              "preparer the position rests on Ken's reading of Sec. 39-22-103(5.3) and not on published CDOR "
+              "guidance. It no longer blocks. Re-verify before the module ships."},
 ]
 
 
@@ -2819,7 +2837,8 @@ CO_RULES: list[dict] = [
                      "INCORPORATES BY REFERENCE for exactly this rule. Exposure is the single point net tax == "
                      "$5,000. Built STRICTLY GREATER THAN, because DR 0233 Part 1 computes 'line 1 - $5,000; If line "
                      "2 is larger, enter zero and no penalty is due' - the form's own arithmetic is the tiebreak. "
-                     "RECORD AS A KEN RULING, NOT A CORRECTION."),
+                     "RULED BY KEN 2026-08-17 (Gate-1 walk item B2). Recorded AS A RULING ON A SOURCE SPLIT, "
+                     "NOT as a correction of an erratum."),
      "exceptions": ("No estimated tax penalty is due 'if the Department determines that the underpayment was due to "
                     "good cause shown by the taxpayer'. Short/fiscal periods -> R13 RED-defer.")},
 
@@ -2877,26 +2896,29 @@ CO_RULES: list[dict] = [
      "exceptions": ("Mailing-address conflict, recorded so nobody treats it as a transcription slip: the DR 0106K-I "
                     "says Denver, CO 80261-0006; the DR 1706 face says 80261-0005. Resolve with CDOR if v1 ever "
                     "prints the paper path.")},
-    {"rule_id": "R-CO-174A-BLOCK", "title": "BLOCKER - retroactive federal amendments under rolling conformity ([UNV-7])",
+    {"rule_id": "R-CO-174A-CONFORM", "title": "Retroactive federal amendments ARE picked up under rolling conformity (RULED, [UNV-7])",
      "rule_type": "validation", "sort_order": 99,
-     "formula": ("UNRESOLVED. Do NOT compute a Sec. 174A adjustment in either direction. "
-                 "Raise a BLOCKING diagnostic and stop."),
+     "formula": ("DR 0106 line 1 = federal ordinary income AS FILED. Do NOT compute a Sec. 174A adjustment in "
+                 "either direction. Raise D_CO106_BLOCK_174A_CONFORMITY (info) to disclose the basis."),
      "inputs": ["claims_retroactive_sec174a_election"], "outputs": [],
-     "description": ("W13 - THE ONE GENUINELY BLOCKING OPEN ITEM. This spec is NOT COMPLETE until Ken rules it. "
-                     "Colorado's conformity is ROLLING (Sec. 39-22-103(5.3), C.R.S.: the IRC 'as the same may become "
-                     "effective at any time or from time to time, for the taxable year'). Whether that reaches "
-                     "RETROACTIVELY-EFFECTIVE federal amendments is UNRESOLVED: CDOR's Rule 39-22-103(5.3) - the rule "
-                     "that read conformity as prospective-only - now shows as '[Repealed]' with no substantive text "
-                     "retained, and the Colorado Court of Appeals decision said to hold the opposite (the Anschutz "
-                     "CARES Act excess-business-loss litigation) is known only from SECONDARY REPORTING. "
-                     "WHY IT BLOCKS THIS FORM SPECIFICALLY: OBBBA's retroactive small-business Sec. 174A R&D "
-                     "expensing election changes FEDERAL ORDINARY INCOME, which is DR 0106 LINE 1 - the first number "
-                     "on the return. If Colorado does not pick up the retroactive amendment, line 1 diverges from the "
-                     "federal return and THERE IS NO COLORADO MODIFICATION LINE ANYWHERE ON THE DR 0106 to carry the "
-                     "difference. There is no safe default: computing it either way is a guess. "
-                     "WOULD SETTLE IT: the published Anschutz opinion(s) from coloradojudicial.gov; the current "
-                     "1 CCR 201-2 text showing the rule's repeal date; or CDOR guidance on Sec. 174A for TY2025."),
-     "exceptions": "None. Do not fill the gap with a plausible guess (Authoritative-Source Rule item 4)."},
+     "description": ("W13 / walk item A1 - RULED BY KEN 2026-08-17. Colorado's conformity is ROLLING "
+                     "(Sec. 39-22-103(5.3), C.R.S.: the IRC 'as the same may become effective at any time or from "
+                     "time to time, for the taxable year'). THE RULING: that language reaches RETROACTIVELY-EFFECTIVE "
+                     "federal amendments, so OBBBA's retroactive small-business Sec. 174A R&D expensing election "
+                     "flows through to DR 0106 line 1 exactly as it appears on the federal return. "
+                     "THE DECIDING STRUCTURAL FACT: the DR 0106 has NO Colorado modification line anywhere on its "
+                     "face. The form is physically incapable of carrying a divergence between Colorado and federal "
+                     "ordinary income, so the only position the form can express is the one ruled here. "
+                     "WHAT IS STILL OPEN, AND IT IS NOT A COMPUTATION QUESTION: no CDOR source confirms the ruling. "
+                     "CDOR's Rule 39-22-103(5.3) - the rule that read conformity as prospective-only - now shows as "
+                     "'[Repealed]' with no substantive text retained, and the Colorado Court of Appeals decision said "
+                     "to hold the opposite (the Anschutz CARES Act excess-business-loss litigation) is known only "
+                     "from SECONDARY REPORTING. The ruling is Ken's reading of the statute. "
+                     "WOULD CONFIRM IT: the published Anschutz opinion(s) from coloradojudicial.gov; the current "
+                     "1 CCR 201-2 text showing the rule's repeal date; or CDOR guidance on Sec. 174A for TY2025. "
+                     "Re-verify before the delvio-tax module ships. [UNV-7] stays open."),
+     "exceptions": ("If CDOR later confirms Colorado does NOT pick up retroactive amendments, this form cannot "
+                    "express the result and the divergence must be escalated - there is no line to put it on.")},
 ]
 
 CO_RULE_LINKS: list[tuple[str, str, str, str]] = [
@@ -2966,12 +2988,13 @@ CO_RULE_LINKS: list[tuple[str, str, str, str]] = [
     ("R-CO-OWNER-SIDE", "CO_ITT_SALT_PARITY_2025", "primary", "forced full Sec. 199A add-back on every owner"),
     ("R-CO-OWNER-SIDE", "CO_2025_INDIV_TAX_GUIDE", "secondary", "the owner-side add-back stack (DR 0104 L2/L3/L5)"),
     ("R-CO-K1-TRANSMIT", "CO_2025_DR0106K_I", "primary", "the five channels and the 'not an attachment' rule"),
-    ("R-CO-174A-BLOCK", "CO_CRS_39_22_103", "primary", "Sec. 39-22-103(5.3) rolling conformity - the unresolved reach"),
-    # The blocker's own-file link: DR 0106 LINE 1 is the affected line, and the
-    # DR 0106 carries NO modification line anywhere to absorb a divergence. Kept
-    # so the rule still has an authority link when CO_CRS_39_22_103 (a prod-seeded
-    # conformity source) is absent, e.g. in a throwaway validation DB.
-    ("R-CO-174A-BLOCK", "CO_2025_DR0106", "secondary", "line 1 is the affected line; no modification line exists to carry a divergence"),
+    ("R-CO-174A-CONFORM", "CO_CRS_39_22_103", "primary", "Sec. 39-22-103(5.3) rolling conformity - the ruled reach (A1)"),
+    # The ruling's own-file link: DR 0106 LINE 1 is the affected line, and the
+    # DR 0106 carries NO modification line anywhere to absorb a divergence -- the
+    # structural fact the A1 ruling turns on. Kept so the rule still has an
+    # authority link when CO_CRS_39_22_103 (a prod-seeded conformity source) is
+    # absent, e.g. in a throwaway validation DB.
+    ("R-CO-174A-CONFORM", "CO_2025_DR0106", "secondary", "line 1 is the affected line; no modification line exists to carry a divergence"),
 ]
 
 
@@ -3227,24 +3250,28 @@ CO_LINES: list[dict] = [
 
 # ═══════════════════════════════════════════════════════════════════════════
 # FORM — CO_DR0106 : DIAGNOSTICS
-# The BLOCKER, the structural hard REDs, and ALL SIXTEEN RED-defers (R1-R16),
-# each with its OWN diagnostic. No silent gap.
+# The A1 disclosure, the structural hard REDs, and ALL SIXTEEN RED-defers
+# (R1-R16), each with its OWN diagnostic. No silent gap.
 # ═══════════════════════════════════════════════════════════════════════════
 
 CO_DIAGNOSTICS: list[dict] = [
-    # ---- THE BLOCKER -----------------------------------------------------
-    {"diagnostic_id": "D_CO106_BLOCK_174A_CONFORMITY", "severity": "error",
-     "title": "BLOCKING - retroactive federal amendments under Colorado rolling conformity are UNRESOLVED",
+    # ---- THE A1 RULING'S DISCLOSURE (was the blocker; now informational) ----
+    {"diagnostic_id": "D_CO106_BLOCK_174A_CONFORMITY", "severity": "info",
+     "title": "Retroactive federal amendments flow through to line 1 (RULED; confirming authority still unpulled)",
      "condition": "claims_retroactive_sec174a_election, or any return relying on a retroactively-effective federal amendment",
-     "message": ("BLOCKED. Whether Colorado's rolling conformity (Sec. 39-22-103(5.3), C.R.S.) picks up "
-                 "RETROACTIVELY-EFFECTIVE federal amendments is unresolved. OBBBA's retroactive small-business "
-                 "Sec. 174A R&D expensing election changes federal ordinary income - which is DR 0106 LINE 1 - and "
-                 "there is NO Colorado modification line anywhere on the DR 0106 to carry a divergence. CDOR's Rule "
-                 "39-22-103(5.3) now shows as '[Repealed]'; the contrary Court of Appeals holding (Anschutz) is known "
-                 "only from secondary reporting. Do NOT compute an adjustment in either direction. Resolve with CDOR "
-                 "guidance, the published Anschutz opinion, or the current 1 CCR 201-2 text before filing."),
-     "notes": "[UNV-7] / W13. THE ONE GENUINELY BLOCKING ITEM. The verifier: 'Must be resolved before this spec is "
-              "authored.' READY_TO_SEED must stay False until Ken rules it. Rule R-CO-174A-BLOCK."},
+     "message": ("This return relies on a retroactively-effective federal amendment (e.g. OBBBA's small-business "
+                 "Sec. 174A R&D expensing election), which changes federal ordinary income - DR 0106 LINE 1. "
+                 "POSITION TAKEN: Colorado's rolling conformity (Sec. 39-22-103(5.3), C.R.S.) picks it up, so line 1 "
+                 "carries the federal figure as filed and no Colorado adjustment is computed in either direction. "
+                 "The DR 0106 has no modification line anywhere, so this is the only position the form can express. "
+                 "BASIS: a reading of the rolling-conformity statute, ruled 2026-08-17 - NOT published CDOR guidance. "
+                 "CDOR's Rule 39-22-103(5.3) now shows as '[Repealed]'; the contrary Court of Appeals holding "
+                 "(Anschutz) is known only from secondary reporting. Confirm with CDOR guidance, the published "
+                 "Anschutz opinion, or the current 1 CCR 201-2 text before relying on it for a filed return."),
+     "notes": "[UNV-7] / W13, RULED 2026-08-17 (walk item A1). Severity downgraded error -> info on the ruling; the "
+              "diagnostic_id is DELIBERATELY UNCHANGED so nothing downstream re-keys. [UNV-7] stays open as a "
+              "pre-ship confirmation item - the ruling has no published CDOR authority behind it. "
+              "Rule R-CO-174A-CONFORM."},
 
     # ---- structural hard REDs -------------------------------------------
     {"diagnostic_id": "D_CO106_MODE_CONFLICT", "severity": "error",
@@ -3645,13 +3672,17 @@ CO_SCENARIOS: list[dict] = [
      "expected_outputs": {"L38": 12000},
      "notes": "Lines 1-4 (recapture and the other-state-tax block) are EXCLUDED. 5000 + 7000 = 12000, not 22000. "
               "Verifier addition - absent from the research brief."},
-    {"scenario_name": "BLOCKER - a return relying on retroactive Sec. 174A cannot be computed", "scenario_type": "failure",
-     "sort_order": 20,
-     "inputs": {"claims_retroactive_sec174a_election": True},
-     "expected_outputs": {"diagnostic": "D_CO106_BLOCK_174A_CONFORMITY", "severity": "error", "computed": False},
-     "notes": ("[UNV-7] / W13. Sec. 174A changes federal ordinary income = DR 0106 LINE 1, and the DR 0106 has NO "
-               "modification line to carry a Colorado/federal divergence. No safe default exists: computing it either "
-               "way is a guess. This spec must not be seeded until Ken rules it.")},
+    {"scenario_name": "RULED (A1) - a return relying on retroactive Sec. 174A computes, carrying the federal figure",
+     "scenario_type": "edge", "sort_order": 20,
+     "inputs": {"claims_retroactive_sec174a_election": True, "federal_ordinary_income": 300000},
+     "expected_outputs": {"L1": 300000, "sec174a_adjustment": None,
+                          "diagnostic": "D_CO106_BLOCK_174A_CONFORMITY", "severity": "info", "computed": True},
+     "notes": ("[UNV-7] / W13, RULED BY KEN 2026-08-17 (walk A1). Colorado's rolling conformity picks up "
+               "retroactively-effective federal amendments, so line 1 transcribes federal ordinary income AS FILED "
+               "and no adjustment is computed in either direction. The DR 0106 has NO modification line to carry a "
+               "divergence, which is the structural fact the ruling turns on - the form can express no other answer. "
+               "The diagnostic still fires, at INFO, to disclose that the position rests on a statutory reading "
+               "rather than published CDOR guidance.")},
 ]
 
 
@@ -3670,8 +3701,9 @@ FORMS: list[dict] = [
                       "(zero tax, still mandatory), B composite nonresident (MANDATORY absent an election), C SALT "
                       "Parity Act PTET - B and C mutually exclusive. Colorado has NO depreciation modification of any "
                       "kind; Sec. 179 reaches the return by TWO aggregation paths, neither a modification. Two "
-                      "SEPARATE 4.4% rate statutes. BLOCKED on [UNV-7] (Sec. 174A / retroactive federal amendments "
-                      "under rolling conformity) - READY_TO_SEED must stay False until Ken rules W13."),
+                      "SEPARATE 4.4% rate statutes. [UNV-7] (Sec. 174A / retroactive federal amendments under "
+                      "rolling conformity) RULED BY KEN 2026-08-17: Colorado picks them up, line 1 transcribes "
+                      "federal as filed. The confirming CDOR authority is still unpulled - re-verify before ship."),
         },
         "facts": CO_FACTS, "rules": CO_RULES, "rule_links": CO_RULE_LINKS,
         "lines": CO_LINES, "diagnostics": CO_DIAGNOSTICS, "scenarios": CO_SCENARIOS,
@@ -3774,8 +3806,9 @@ FLOW_ASSERTIONS: list[dict] = [
 class Command(BaseCommand):
     help = (
         "Load the CO DR 0106 spec (Colorado Partnership and S Corporation Income Tax Return, TY2025). "
-        "ONE form, TWO modules (1065 + 1120S), 16 forks. REFUSES to seed: READY_TO_SEED is False and must "
-        "stay False until Ken clears the walk (W1-W12) AND rules the [UNV-7] Sec. 174A blocker (W13)."
+        "ONE form, TWO modules (1065 + 1120S), 16 forks. Gate 1 cleared 2026-08-17: the walk (W1-W12) was "
+        "approved and the [UNV-7] Sec. 174A rolling-conformity question (W13) was RULED - Colorado picks up "
+        "retroactive federal amendments, so line 1 transcribes federal as filed."
     )
 
     @transaction.atomic
@@ -3810,29 +3843,29 @@ class Command(BaseCommand):
             still_empty = "\n  ".join(f"- {n}" for n in empty) or "(all populated)"
             raise CommandError(
                 "\nREFUSING TO SEED CO DR 0106: not cleared to seed.\n\n"
-                "Content is authored, but seeding is gated on TWO things:\n\n"
-                "  (1) Ken's Gate-1 walk over W1-W12 - in particular W1 (compute partnership\n"
-                "      direct sourcing vs direct-enter Column B: the largest scope lever),\n"
-                "      W2 (the module-fork key), W3 (the three-mode machine, amended per C1 so\n"
-                "      the all-owners-excluded carve-out is honoured for S CORPS TOO), W6\n"
-                "      (bless the depreciation NEGATIVE as a ruling), W7 (two rate constants),\n"
-                "      W9 (the >$5,000 threshold - a ruling on a live 3-2 source split), and\n"
-                "      the four forks the verifier added, F13-F16.\n\n"
-                "  (2) *** THE BLOCKER *** W13 / [UNV-7] - whether Colorado's ROLLING\n"
-                "      CONFORMITY (Sec. 39-22-103(5.3), C.R.S.) reaches RETROACTIVELY-EFFECTIVE\n"
-                "      federal amendments. OBBBA's retroactive small-business Sec. 174A R&D\n"
-                "      election changes federal ordinary income = DR 0106 LINE 1, and there is\n"
-                "      NO Colorado modification line anywhere on this form to carry a\n"
-                "      divergence. CDOR's Rule 39-22-103(5.3) now reads '[Repealed]'; the\n"
-                "      contrary Anschutz holding is known only from secondary reporting.\n"
-                "      The adversarial verifier left this explicitly unresolved with the\n"
-                "      instruction: 'Must be resolved before this spec is authored.'\n"
-                "      There is NO safe default - computing it either way is a guess.\n\n"
+                "Gate 1 was CLEARED for this form on 2026-08-17 (Ken's in-session walk,\n"
+                "delvio-states/dispatch/WAVE3_WALK.md). Both original gates are satisfied:\n\n"
+                "  (1) The Gate-1 walk over W1-W12 - approved as proposed, including W1\n"
+                "      (direct-enter Column B), W3 (the three-mode machine), W6 (the\n"
+                "      depreciation NEGATIVE blessed as a ruling), W7 (two rate constants),\n"
+                "      and W9 / walk item B2 (the >$5,000 threshold, ruled strictly-greater\n"
+                "      on the Corporate Income Tax Guide side of a live 3-2 source split).\n\n"
+                "  (2) W13 / [UNV-7] - whether Colorado's ROLLING CONFORMITY\n"
+                "      (Sec. 39-22-103(5.3), C.R.S.) reaches RETROACTIVELY-EFFECTIVE federal\n"
+                "      amendments such as OBBBA's small-business Sec. 174A R&D election.\n"
+                "      RULED (walk item A1): it DOES. DR 0106 LINE 1 transcribes federal\n"
+                "      ordinary income as filed; no adjustment is computed in either\n"
+                "      direction. The deciding fact is structural - this form has NO\n"
+                "      modification line anywhere to carry a divergence, so no other\n"
+                "      position is expressible on its face. [UNV-7] remains OPEN as a\n"
+                "      pre-ship confirmation item (no published CDOR authority backs it).\n\n"
+                "So if you are reading this, something ELSE is wrong - most likely a data\n"
+                "list was emptied, or READY_TO_SEED was flipped back deliberately.\n\n"
                 f"READY_TO_SEED = {READY_TO_SEED} (must be True to proceed)\n\n"
                 f"Currently empty / placeholder:\n  {still_empty}\n\n"
-                "To proceed: resolve the blocker, review the module-level data lists (and\n"
-                "delvio-states/research/co_pte_source_brief.md - its Sec. 17 Verification\n"
-                "section GOVERNS over the body), then set READY_TO_SEED = True.\n"
+                "Do NOT relax this guard to silence the error - fix the cause. The module-\n"
+                "level data lists and delvio-states/research/co_pte_source_brief.md (its\n"
+                "Sec. 17 Verification section GOVERNS over the body) are the references.\n"
                 "Idempotent via update_or_create."
             )
 

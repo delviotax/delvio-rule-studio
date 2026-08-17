@@ -210,9 +210,14 @@ Package **Rev. 08/26, RE-ISSUED 2026-08-10** · Tax Bulletin 26-1 · Va. Code
 ═══════════════════════════════════════════════════════════════════════════
 
 ═══════════════════════════════════════════════════════════════════════════
-SAFETY GUARD — READY_TO_SEED ships False and STAYS False until Ken approves the
-Gate-1 walk (W1–W11) in-session. Until then the command refuses to write to the DB.
-DO NOT relax the guard to silence the error. DO NOT COMMIT. DO NOT SEED.
+GATE 1 — APPROVED BY KEN 2026-08-17 (delvio-states/dispatch/WAVE3_WALK.md).
+The walk (W1–W11) was taken in full and approved as proposed: W1 → TWO form codes
+sharing a Page-1 rule block; W5 → v1 DIRECT-ENTRY of the conformity lines, with
+the full Virginia depreciation shadow book deferred to v1.1; W8 → direct-enter
+credit amounts, compute only the allocation arithmetic. Walk item **B1 — the
+Schedule 502A line 2(f) divisor — was ratified as the weight-sum of existing
+factors (4 / 3 / 3 / 2)**, the only reading that reconciles the form face with
+the instruction. READY_TO_SEED was flipped on that approval and nothing else.
 ═══════════════════════════════════════════════════════════════════════════
 """
 import math
@@ -239,10 +244,10 @@ from specs.models import (
 )
 
 # ═══════════════════════════════════════════════════════════════════════════
-# SAFETY GUARD — flip ONLY after Ken's in-session Gate-1 walk (W1-W11 above).
-# NOT YET WALKED. NOT APPROVED. Ships False by design.
+# GATE 1 CLEARED — flipped 2026-08-17 on Ken's in-session walk (W1-W11 above),
+# including the B1 ratification of the Schedule 502A line 2(f) divisor.
 # ═══════════════════════════════════════════════════════════════════════════
-READY_TO_SEED = False
+READY_TO_SEED = True
 
 
 FORM_JURISDICTION = "VA"
@@ -567,12 +572,15 @@ def _va_apportionment_pct(prop, pay, sales, year: int = FORM_TAX_YEAR):
         2(e) = 2(a) + 2(b) + 2(d)
         2(f) = 2(e) / 4, "reduced by the number of factors, if any, having no denominator"
 
-    RECONCILIATION NOTE (not in the brief; recorded here so it is auditable). The form
+    RECONCILIATION NOTE — RATIFIED BY KEN 2026-08-17 (Gate-1 walk item B1). Not in the
+    brief; surfaced during authoring and recorded here so it is auditable. The form
     FACE says "divide Line 2e by 4, reduced by the number of factors having no
     denominator"; the INSTRUCTION says the denominator "must be the number of existing
     factors". Those readings agree only if the sales factor is counted at its DOUBLE
-    weight. The divisor implemented is therefore the SUM OF THE WEIGHTS of the factors
-    that exist (property 1 + payroll 1 + sales 2 = 4):
+    weight. ⚠ THIS IS AN INTERPRETATION, NOT A TRANSCRIPTION — neither source states
+    the weight-sum rule; it is the unique reading that makes both true at once, and
+    Ken blessed it on that basis. The divisor implemented is therefore the SUM OF THE
+    WEIGHTS of the factors that exist (property 1 + payroll 1 + sales 2 = 4):
         all three exist  -> 4        sales missing    -> 2
         property missing -> 3        payroll missing  -> 3
     Returns None when no factor has a denominator.
@@ -3572,7 +3580,11 @@ FLOW_ASSERTIONS: list[dict] = [
      "description": ("2(d) = 2(c) x 2; 2(e) = 2(a) + 2(b) + 2(d); 2(f) = 2(e) divided by four, reduced when a "
                      "factor has no denominator - the divisor being the sum of the weights of the factors that "
                      "exist (property 1, payroll 1, sales 2). Virginia is NOT a single sales factor state for "
-                     "PTEs, and the PTE rule does not differ from the corporate rule."),
+                     "PTEs, and the PTE rule does not differ from the corporate rule. "
+                     "THE WEIGHT-SUM DIVISOR IS AN INTERPRETATION RATIFIED BY KEN 2026-08-17 (Gate-1 walk item "
+                     "B1), not a transcription: the form face ('4 reduced by the number of factors having no "
+                     "denominator') and the instruction ('the number of existing factors') reconcile ONLY if the "
+                     "sales factor is counted at its double weight. Neither source states the rule outright."),
      "definition": {"rule": "R-VA-502AB", "check": "L7 == (P + Y + 2S) / weight_sum_of_existing_factors"}},
     {"assertion_id": "FA-VA-502A-NO-PCT", "title": "Schedule 502A Section C has NO percentage-application line",
      "assertion_type": "flow_assertion", "entity_types": ["1065", "1120S"], "status": "draft", "sort_order": 10,

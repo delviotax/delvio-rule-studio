@@ -278,9 +278,13 @@ Full source brief: delvio-states/research/md_pte_source_brief.md
 ═══════════════════════════════════════════════════════════════════════════
 
 ═══════════════════════════════════════════════════════════════════════════
-SAFETY GUARD — READY_TO_SEED ships **False** and stays False until Ken
-approves the walk (W1, W2, W4–W11) in-session. Until then the command refuses
-to write to the DB. DO NOT relax the guard to silence the error.
+GATE 1 — APPROVED BY KEN 2026-08-17 (delvio-states/dispatch/WAVE3_WALK.md).
+The walk (W1, W2, W4–W11) was taken and approved as proposed — all of Maryland's
+items fell in Group D (ratifications) and Group E (routing), with no blocking
+ruling required. W9 in particular stands as authored: **never auto-reweight an
+insignificant apportionment denominator** — Maryland has no such rule, that is
+Florida's, and both the code and the harness guard it. READY_TO_SEED was flipped
+on that approval and nothing else.
 ═══════════════════════════════════════════════════════════════════════════
 """
 from django.core.management.base import BaseCommand, CommandError
@@ -305,11 +309,12 @@ from specs.models import (
 )
 
 # ═══════════════════════════════════════════════════════════════════════════
-# SAFETY GUARD — flip ONLY after Ken's in-session Gate-1 review walk.
-# Ships False. Nine [UNVERIFIED] items remain open (U1, U3, U4, U5, U7, U8,
-# U9, U10, U12) and ten walk items are unblessed (W1, W2, W4-W11).
+# GATE 1 CLEARED — flipped 2026-08-17 on Ken's in-session review walk. The ten
+# walk items (W1, W2, W4-W11) were blessed as authored. The nine [UNVERIFIED]
+# items (U1, U3, U4, U5, U7, U8, U9, U10, U12) stay OPEN as pre-ship
+# re-verification work — they were never seeding blockers.
 # ═══════════════════════════════════════════════════════════════════════════
-READY_TO_SEED = False
+READY_TO_SEED = True
 
 
 FORM_JURISDICTION = "MD"

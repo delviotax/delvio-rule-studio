@@ -100,8 +100,8 @@ and namespace everything new. ⚠ Also note the app-side wart this feeds: delvio
 from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 
 > **[WO-W03-PTE] 45-state campaign Wave 3 — VA + CO + MS + MD pass-through lane
-> (BUILD_ORDER S-27; campaign `delvio-states` WAVE_PLAN.md wave 3) · ⏳ **AWAITING KEN**
-> — DRAFTED TO GATE-1 2026-08-17, RS `992c49e`**
+> (BUILD_ORDER S-27; campaign `delvio-states` WAVE_PLAN.md wave 3) · ✅ **APPROVED + SEEDED
+> 2026-08-17** (campaign D-11) — 6 forms live, prod 142 → 148, all exports 200**
 > · **Why this wave:** the highest efficiency in the whole plan. **VA, CO and MS each serve BOTH
 > PTE modules (1065 + 1120S) from a SINGLE form**, and MD splits electing/non-electing across
 > 510/511 — so **5 forms deliver 8 module-lanes**. Unblocked; CA remains blocked on its Lacerte
@@ -153,10 +153,36 @@ from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 > · **Two agents exceeded instruction, correctly:** MS's guard carries a **tripwire** that refuses
 > to seed if the composite-rate resolved-flag is flipped without a ruling; CO names its blocker in
 > the guard's own refusal message.
-> · **NEXT — Ken's ONE batched Gate-1 scope walk:** `delvio-states/dispatch/WAVE3_WALK.md`,
-> 45 items grouped into 2 blocking · 2 new judgement calls · 6 scope levers · ~30 ratifications ·
-> 5 routing notes. ⚠ **CO §174A is the only item in the campaign with NO safe default** — it lands
-> on DR 0106 line 1 and the form has no modification line to carry a divergence.
+> · ✅ **GATE 1 APPROVED AND SEEDED 2026-08-17.** Ken took `delvio-states/dispatch/WAVE3_WALK.md`
+> in one session and ruled **all four items as recommended** (campaign D-11). Six forms seeded,
+> **prod 142 → 148**, all six exports **200** with a non-null conformity block (VA static · CO
+> rolling · MS partial · MD rolling — the D-8 conformity-first ordering earning its keep again).
+> `seed_all` lists **108 loaders** and discovers all four. Full RS suite **234 passed**.
+> Harnesses after the rulings: **VA 243 · CO 144 · MS 109 · MD 182 = 678 assertions, 0 fail.**
+> · **A1 · CO §174A — RULED: rolling conformity DOES reach retroactive federal amendments.**
+> DR 0106 line 1 transcribes federal ordinary income as filed. ⚠ **The WO called this "the only
+> item in the campaign with NO safe default." That framing was wrong in an instructive way:** the
+> DR 0106 having no modification line anywhere is not merely the reason a divergence cannot be
+> carried — it is the reason no divergence can be *expressed*, which makes the ruled position the
+> only one the form can hold. The rule is now `R-CO-174A-CONFORM`; the blocking diagnostic became
+> **severity=info** with its `diagnostic_id` deliberately unchanged so nothing downstream re-keys.
+> ⚠ `[UNV-7]` **stays open as a matter of fact** — no CDOR authority confirms the ruling.
+> · **A2 · MS composite rate — RULED to Position A (DOR 0/4/5)**, on the ground that DOR
+> administers the approval gate an approved product must clear. **A ruling, not a finding:** the
+> statutory and regulatory positions are unrefuted and all three stay recorded in code. Shipped as
+> `MS_COMPOSITE_RATES`, kept **separate from the electing-PTE schedule despite identical TY2025
+> values** so a DOR answer cannot silently move the settled rate. ⏳ **One DOR call owed before ship.**
+> · **B1 · VA Schedule 502A line 2(f) divisor RATIFIED** as the weight-sum of existing factors
+> (4/3/3/2) — an interpretation, not a transcription. **B2 · CO's $5,000 threshold RULED**
+> strictly-greater-than, recorded as a ruling on a 3-2 source split rather than a silent correction.
+> · **The MS tripwire was RE-ARMED, not removed.** It previously refused if the resolved-flag was
+> flipped at all; it now refuses unless a written ruling, a TY-keyed rate table and the intact
+> three-position conflict record all stand beside the flag. **The invariant it protects — you
+> cannot ship a composite rate by editing one constant — survived the decision that resolved it.**
+> · ⚠ **Four harness assertions pinned to the pre-approval world went red on approval** (CO/MS/MD
+> "ships False", CO "severity=error", MS "returns None") and were re-pinned to the mechanism.
+> **Fourth occurrence of this pattern** — Phase 2, D-10, Wave 2, here.
+> · **Dispatched:** `delvio-states/dispatch/w03_dispatch.md` written for the builder sessions.
 
 > **[WO-W02-ENT] 45-state campaign Wave 2 — TN + FL + TX entity lane (BUILD_ORDER S-27;
 > campaign `delvio-states` WAVE_PLAN.md) · GAP-CHECKED → DRAFTING**

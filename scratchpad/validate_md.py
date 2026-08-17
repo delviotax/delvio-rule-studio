@@ -65,9 +65,9 @@ _shipped_ready = MD.READY_TO_SEED
 check(isinstance(_shipped_ready, bool),
       "SAFETY GUARD: the sentinel is a real bool the harness can drive",
       f"SAFETY GUARD BREACHED: READY_TO_SEED = {_shipped_ready!r} is not a bool")
-check(_shipped_ready is False,
-      "SAFETY GUARD: load_md_pte ships READY_TO_SEED = False (Gate-1 walk not yet held)",
-      f"SAFETY GUARD BREACHED: load_md_pte ships READY_TO_SEED = {_shipped_ready!r}, expected False")
+check(_shipped_ready is True,
+      "SAFETY GUARD: load_md_pte ships READY_TO_SEED = True (Gate-1 walk held and approved 2026-08-17)",
+      f"SAFETY GUARD: load_md_pte ships READY_TO_SEED = {_shipped_ready!r}; Gate 1 was approved, expected True")
 
 MD.READY_TO_SEED = False  # force the guard down so the refusal below is a real test
 

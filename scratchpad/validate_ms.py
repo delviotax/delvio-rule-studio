@@ -84,9 +84,9 @@ for code in ("MS_CODE_27_7_17", "MS_2025_84_100_INSTR", "MS_2025_83_100_INSTR"):
 # ══════════════════════════════════════════════════════════════════════════
 # 1. THE GUARD — pin the MECHANISM, not the disk value
 # ══════════════════════════════════════════════════════════════════════════
-check(MS.READY_TO_SEED is False,
-      "READY_TO_SEED ships False on disk (spec is NOT cleared to seed)",
-      f"READY_TO_SEED must ship False; found {MS.READY_TO_SEED!r}")
+check(MS.READY_TO_SEED is True,
+      "READY_TO_SEED ships True on disk (Gate 1 cleared 2026-08-17, walk item A2 ruled)",
+      f"Gate 1 was approved; READY_TO_SEED should ship True, found {MS.READY_TO_SEED!r}")
 
 MS.READY_TO_SEED = False          # force it DOWN regardless of what disk said
 try:
@@ -104,19 +104,52 @@ except CommandError as e:
 except Exception as e:  # noqa: BLE001
     FAILURES.append(f"guard raised the wrong exception type: {e!r}")
 
-# the composite-rate tripwire inside the guard
+# ── THE COMPOSITE-RATE TRIPWIRE, RE-ARMED IN THE OTHER DIRECTION ───────────
+# Before the 2026-08-17 ruling this refused if the resolved-flag was flipped at
+# all. Ken has now ruled (walk A2 -> Position A), so True is the correct value.
+# What must STILL be impossible is shipping a composite rate nobody ruled on:
+# the flag may only stand while a WRITTEN RULING, a RATE TABLE and the
+# THREE-POSITION conflict record stand beside it. Each is tested by removing it.
 MS.READY_TO_SEED = True
-MS.MS_COMPOSITE_RATE_RESOLVED = True
+
+_saved_ruling = MS.MS_COMPOSITE_RATE_RULING
+MS.MS_COMPOSITE_RATE_RULING = "   "
 try:
     call_command("load_ms_84105", verbosity=0)
-    FAILURES.append("TRIPWIRE DID NOT FIRE: seeded with MS_COMPOSITE_RATE_RESOLVED flipped")
+    FAILURES.append("TRIPWIRE DID NOT FIRE: seeded with the composite rate resolved but NO written ruling")
 except CommandError as e:
-    check("COMPOSITE_RATE_RESOLVED" in str(e),
-          "guard also refuses if MS_COMPOSITE_RATE_RESOLVED is flipped without a Ken ruling",
-          f"composite-rate tripwire fired but with an unexpected message: {str(e)[:120]}")
+    check("MS_COMPOSITE_RATE_RULING" in str(e),
+          "guard refuses a resolved composite rate with no written ruling behind it",
+          f"tripwire fired but with an unexpected message: {str(e)[:140]}")
 except Exception as e:  # noqa: BLE001
-    FAILURES.append(f"composite tripwire raised the wrong exception: {e!r}")
-MS.MS_COMPOSITE_RATE_RESOLVED = False
+    FAILURES.append(f"composite ruling tripwire raised the wrong exception: {e!r}")
+MS.MS_COMPOSITE_RATE_RULING = _saved_ruling
+
+_saved_positions = MS.MS_COMPOSITE_RATE_POSITIONS
+MS.MS_COMPOSITE_RATE_POSITIONS = _saved_positions[:1]
+try:
+    call_command("load_ms_84105", verbosity=0)
+    FAILURES.append("TRIPWIRE DID NOT FIRE: seeded after the three-position conflict record was gutted")
+except CommandError as e:
+    check("MS_COMPOSITE_RATE_POSITIONS" in str(e),
+          "guard refuses if the three-sided conflict record is quietly deleted",
+          f"conflict-record tripwire fired but with an unexpected message: {str(e)[:140]}")
+except Exception as e:  # noqa: BLE001
+    FAILURES.append(f"conflict-record tripwire raised the wrong exception: {e!r}")
+MS.MS_COMPOSITE_RATE_POSITIONS = _saved_positions
+
+_saved_rates = MS.MS_COMPOSITE_RATES
+MS.MS_COMPOSITE_RATES = {}
+try:
+    call_command("load_ms_84105", verbosity=0)
+    FAILURES.append("TRIPWIRE DID NOT FIRE: seeded with a resolved rate and no TY-keyed rate table")
+except CommandError as e:
+    check("MS_COMPOSITE_RATES" in str(e),
+          "guard refuses a resolved composite rate with no TY-keyed rate table",
+          f"rate-table tripwire fired but with an unexpected message: {str(e)[:140]}")
+except Exception as e:  # noqa: BLE001
+    FAILURES.append(f"rate-table tripwire raised the wrong exception: {e!r}")
+MS.MS_COMPOSITE_RATES = _saved_rates
 
 # now seed for real (in memory only — disk still says False)
 try:
@@ -367,13 +400,32 @@ check(MS.MS_ESTIMATE_THRESHOLD == 200 and MS.MS_LARGE_ENTITY_THRESHOLD == 1_000_
       "ESTIMATES: >$200 threshold and the $1,000,000 large-entity bar", "estimate constants wrong")
 
 # ══════════════════════════════════════════════════════════════════════════
-# 4e. ORACLE — ⚠ THE COMPOSITE RATE COMPUTES NOTHING (no side is picked)
+# 4e. ORACLE — THE COMPOSITE RATE: Position A by RULING (walk A2, 2026-08-17)
+# These pin the MECHANISM, not just the number: the rate must come from its OWN
+# constant, the ruling must be written down, and the losing positions must survive.
 # ══════════════════════════════════════════════════════════════════════════
-check(MS._ms_composite_tax(300_000) is None,
-      "⚠ COMPOSITE RATE: _ms_composite_tax() returns None BY DESIGN — no rate is computed",
-      "⚠⚠ the loader picked a side on the unresolved composite rate")
-check(MS.MS_COMPOSITE_RATE_RESOLVED is False,
-      "⚠ COMPOSITE RATE: MS_COMPOSITE_RATE_RESOLVED is False", "composite rate marked resolved")
+check(MS._ms_composite_tax(300_000) == Decimal("14700"),
+      "COMPOSITE RATE: $300,000 -> $14,700 (5k@0% + 5k@4% + 290k@5%), Position A as ruled",
+      f"composite tax wrong: {MS._ms_composite_tax(300_000)!r}, expected 14700")
+check(MS._ms_composite_tax(0) == Decimal("0") and MS._ms_composite_tax(5_000) == Decimal("0"),
+      "COMPOSITE RATE: the 0% first bracket holds at both ends ($0 and exactly $5,000)",
+      "composite tax nonzero inside the 0% bracket")
+check(MS._ms_composite_tax(10_000) == Decimal("200"),
+      "COMPOSITE RATE: exactly $10,000 -> $200, the 5% bracket has not started",
+      f"composite tax at 10,000 wrong: {MS._ms_composite_tax(10_000)!r}")
+check(MS.MS_COMPOSITE_RATE_RESOLVED is True,
+      "COMPOSITE RATE: MS_COMPOSITE_RATE_RESOLVED is True (Ken ruled A2 on 2026-08-17)",
+      "composite rate not marked resolved after the ruling")
+check("2026-08-17" in MS.MS_COMPOSITE_RATE_RULING and "Position A" in MS.MS_COMPOSITE_RATE_RULING,
+      "COMPOSITE RATE: the ruling is WRITTEN DOWN with its date and its rationale",
+      "MS_COMPOSITE_RATE_RULING does not record the dated ruling")
+# The composite schedule and the electing-PTE schedule hold the same TY2025 values
+# but are settled by DIFFERENT authorities. If they are ever merged into one table,
+# a DOR answer on composite would silently move the electing-PTE rate too.
+check(MS.MS_COMPOSITE_RATES is not MS.MS_ENTITY_RATES,
+      "COMPOSITE RATE: composite and electing-PTE schedules are SEPARATE constants, "
+      "despite identical TY2025 values (different authorities, can diverge)",
+      "the composite rate was merged into MS_ENTITY_RATES -- one DOR answer would move both")
 check(len(MS.MS_COMPOSITE_RATE_POSITIONS) == 3
       and {p["position"] for p in MS.MS_COMPOSITE_RATE_POSITIONS} == {"A", "B", "C"},
       "⚠ COMPOSITE RATE: all THREE positions (DOR / statute / official regulation) are recorded",
@@ -479,7 +531,8 @@ for fbad in FAILURES:
     print(f"  FAIL  {fbad}")
 print("=" * 74)
 print(f"RESULT: {len(PASSES)} pass / {len(FAILURES)} fail - {'ALL PASS' if not FAILURES else 'FAILURES PRESENT'}")
-print("NOTE: READY_TO_SEED was flipped IN MEMORY ONLY. The file on disk still ships False.")
+print("NOTE: Gate 1 cleared 2026-08-17 - READY_TO_SEED now ships True on disk. This harness still")
+print("      forces it DOWN first to prove the guard mechanism, then back up to seed the throwaway DB.")
 
 from django.db import connections  # noqa: E402
 connections.close_all()
