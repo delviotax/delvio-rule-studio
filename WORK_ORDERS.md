@@ -100,7 +100,8 @@ and namespace everything new. ⚠ Also note the app-side wart this feeds: delvio
 from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 
 > **[WO-W03-PTE] 45-state campaign Wave 3 — VA + CO + MS + MD pass-through lane
-> (BUILD_ORDER S-27; campaign `delvio-states` WAVE_PLAN.md wave 3) · GAP-CHECKED → DRAFTING**
+> (BUILD_ORDER S-27; campaign `delvio-states` WAVE_PLAN.md wave 3) · ⏳ **AWAITING KEN**
+> — DRAFTED TO GATE-1 2026-08-17, RS `992c49e`**
 > · **Why this wave:** the highest efficiency in the whole plan. **VA, CO and MS each serve BOTH
 > PTE modules (1065 + 1120S) from a SINGLE form**, and MD splits electing/non-electing across
 > 510/511 — so **5 forms deliver 8 module-lanes**. Unblocked; CA remains blocked on its Lacerte
@@ -129,8 +130,33 @@ from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 > is the one this wave would need.
 > · **Open Ken item riding along:** MO's PTET capital-gain question is NOT in this wave, but the
 > same statute-vs-form shape should be watched for in MS and MD.
-> · **Next:** research fan-out → 4 source briefs → adversarial verification → ONE batched Gate-1
-> scope walk → author loaders `READY_TO_SEED=False` + SQLite harnesses → ONE batched seed approval.
+> · ✅ **RESEARCH + VERIFICATION DONE** — 4 form-structure briefs, all adversarially verified.
+> The pass caught **two errors the orchestrator had written into the research prompts**: the MS
+> depreciation lines (the corporate form's L6/L13 were given; the PTE form's are L8/L15, and L6
+> is muni-bond interest — it would have booked bonus depreciation as municipal interest on every
+> return) and an MD "insignificant denominator" rule that is in fact **Florida's**. It also
+> **WITHDREW** an MD walk item as a false conflict: the research pass had quoted *current* statute
+> text carrying a 2025 amendment never effective for TY2025. Standing lesson now in the campaign
+> template: **vintage-check every statute cite — legislature sites serve today's code.**
+> · ✅ **LOADERS DRAFTED, ALL GATED.** `load_va_pte.py` (2 forms) · `load_co_dr0106.py` ·
+> `load_ms_84105.py` · `load_md_pte.py` (2 forms). Harnesses **VA 243 · CO 141 · MS 103 ·
+> MD 182 = 669 assertions, 0 fail**; full suite **234 passed**; `seed_all` discovers all four;
+> prod unchanged at 142 forms with zero VA/CO/MS/MD rows.
+> · **The harnesses caught six real defects during authoring** — four `topic_name` over the 255
+> cap, a rule with zero resolving authority links, a false line-text check. All Postgres-only or
+> silent in SQLite. Every harness now introspects caps from the live model `_meta`, so a
+> migration that moves a column is caught too.
+> · **Both prompt errors are now guarded in CODE, not prose:** MS proves the add-back never lands
+> on `122-L6`/`122-L13` (five ways — helper, constants, and the seeded `FormLine.source_rules`);
+> MD carries a named flow assertion for the FL contamination and an apportionment function
+> provably invariant to zero denominators.
+> · **Two agents exceeded instruction, correctly:** MS's guard carries a **tripwire** that refuses
+> to seed if the composite-rate resolved-flag is flipped without a ruling; CO names its blocker in
+> the guard's own refusal message.
+> · **NEXT — Ken's ONE batched Gate-1 scope walk:** `delvio-states/dispatch/WAVE3_WALK.md`,
+> 45 items grouped into 2 blocking · 2 new judgement calls · 6 scope levers · ~30 ratifications ·
+> 5 routing notes. ⚠ **CO §174A is the only item in the campaign with NO safe default** — it lands
+> on DR 0106 line 1 and the form has no modification line to carry a divergence.
 
 > **[WO-W02-ENT] 45-state campaign Wave 2 — TN + FL + TX entity lane (BUILD_ORDER S-27;
 > campaign `delvio-states` WAVE_PLAN.md) · GAP-CHECKED → DRAFTING**
