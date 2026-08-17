@@ -99,6 +99,39 @@ and namespace everything new. ⚠ Also note the app-side wart this feeds: delvio
 *No independent backlog here (see header). Sequence = BUILD_ORDER.md SPINE; statuses seeded
 from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 
+> **[WO-W03-PTE] 45-state campaign Wave 3 — VA + CO + MS + MD pass-through lane
+> (BUILD_ORDER S-27; campaign `delvio-states` WAVE_PLAN.md wave 3) · GAP-CHECKED → DRAFTING**
+> · **Why this wave:** the highest efficiency in the whole plan. **VA, CO and MS each serve BOTH
+> PTE modules (1065 + 1120S) from a SINGLE form**, and MD splits electing/non-electing across
+> 510/511 — so **5 forms deliver 8 module-lanes**. Unblocked; CA remains blocked on its Lacerte
+> re-export.
+> · **GAP-CHECK ✅ 2026-08-16 — all 5 forms are gaps.** Twelve candidate codes probed against RS
+> prod (`<ST>_<FORM>` per D-9 and the bare state numbers): **every one 404.**
+>
+> | State | Form(s) | Serves | Note |
+> |---|---|---|---|
+> | **VA** | `VA_502` | 1065 + 1120S | One form; S corps are PTEs for VA purposes. PTET permanent, 5.75%, owner-side **refundable credit**. ⚠ General corps are still **three-factor double-weighted sales**, contradicting widespread commentary. |
+> | **CO** | `CO_DR0106` | 1065 + 1120S | One form; Part II is the composite nonresident return. PTET = **refundable credit + a §199A add-back on EVERY owner**. ⚠ Partnership apportionment DEFAULTS TO DIRECT SOURCING, not formulary. |
+> | **MS** | `MS_84_105` | 1065 + 1120S | One form. ⚠ **PTET election is BINDING for all later years**; owner-side is a credit in the payments block. Franchise tax applies to S corps but not partnerships. |
+> | **MD** | `MD_510` / `MD_511` | 1065 + 1120S | **Mutually exclusive** — 511 is the electing PTE, 510 the non-electing. PTET rate is statutorily DERIVED (8.75%/8.25% for TY2025). Owner-side is a credit **PLUS** a mandatory add-back — both legs. |
+>
+> · **Conformity prerequisite ✅ SATISFIED** — all four states' `JurisdictionConformitySource` rows
+> are **already seeded** (2026-08-16, campaign D-10). Unlike Wave 2, these loaders' authority
+> anchors resolve immediately; no "NOT FOUND" warning expected.
+> · **Verified conformity briefs exist** for all four (`delvio-states/conformity/`, adversarial
+> pass complete). The research below is FORM STRUCTURE only.
+> · ⚠ **Carried constraints from the verified briefs:** MD's insignificant-denominator rule is the
+> **Department's** determination (never auto-reweight a nonzero denominator); MD's manufacturing
+> carve-out (NAICS 31–33) appears on **no TY2025 form** and must be built from statute; MS has a
+> **throwback rule** (the research pass originally missed it); CO has **no depreciation
+> modification at all** — a verified negative, do not invent an add-back.
+> · ⚠ **MD runs THREE separate MeF developer tracks** (business ≠ individual) — the business track
+> is the one this wave would need.
+> · **Open Ken item riding along:** MO's PTET capital-gain question is NOT in this wave, but the
+> same statute-vs-form shape should be watched for in MS and MD.
+> · **Next:** research fan-out → 4 source briefs → adversarial verification → ONE batched Gate-1
+> scope walk → author loaders `READY_TO_SEED=False` + SQLite harnesses → ONE batched seed approval.
+
 > **[WO-W02-ENT] 45-state campaign Wave 2 — TN + FL + TX entity lane (BUILD_ORDER S-27;
 > campaign `delvio-states` WAVE_PLAN.md) · GAP-CHECKED → DRAFTING**
 > · **The wave:** the three ENTITY-ONLY states — no individual income tax in any of them, so
