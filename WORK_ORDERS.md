@@ -99,6 +99,47 @@ and namespace everything new. ⚠ Also note the app-side wart this feeds: delvio
 *No independent backlog here (see header). Sequence = BUILD_ORDER.md SPINE; statuses seeded
 from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 
+> **[WO-W04-PTE] 45-state campaign Wave 4 — MO + OR + MA + AZ pass-through lane
+> (BUILD_ORDER S-27; campaign `delvio-states` WAVE_PLAN.md wave 4) · **GAP-CHECKED — opened
+> 2026-08-17**
+> · **The wave:** the remaining Tier-1 PTE states, per WAVE_PLAN §5 order (Wave 3 → 4 → 5).
+> **9 forms across 4 states** — MO-1065 / MO-1120S / MO-PTE · OR-65 / OR-20-S · Form 3 / 355S ·
+> AZ 165 / 120S. Less efficient than Wave 3 (no state here serves both PTE modules from one
+> form), which is exactly why Wave 3 went first.
+> · **GAP-CHECK ✅ 2026-08-17 — all 9 forms are gaps.** Sixteen candidate codes probed against RS
+> prod (`<ST>_<FORM>` per D-9 plus the bare state form numbers and plausible variants):
+> **every one 404.** Prod holds 148 TaxForms; the only state forms are the Core four's 18 plus
+> Waves 2 and 3.
+>
+> | State | Form(s) | Serves | Note |
+> |---|---|---|---|
+> | **MO** | `MO_1065` · `MO_1120S` · `MO_PTE` | 1065 + 1120S | ⚠ **Three forms, not two** — the PTET lives on its own return. Rolling conformity, federal AGI start, **no §168(k) add-back and no §179 modification** (a verified negative — do not invent one). |
+> | **OR** | `OR_65` · `OR_20_S` | 1065 + 1120S | ⚠ Conformity is a **hybrid and the hybrid is the whole story**: rolling for the federal definition of taxable income, fixed-date 12/31/2023 for everything else. Do not encode one posture. |
+> | **MA** | `MA_3` · `MA_355S` | 1065 + 1120S | ⚠ **Split conformity** — c.62 static 1/1/2024, c.63 rolling, and **both retroactively decoupled from OBBBA** by St. 2026 c.101. Part A/B/C multi-rate, federal-gross-income start. |
+> | **AZ** | `AZ_165` · `AZ_120S` | 1065 + 1120S | ⚠ Static conformity whose TY2025 date is **neither 1/1/2025 nor 1/1/2026** (HB 4168). Individuals conform to §168(k), corporations decouple — the split runs through this wave. |
+>
+> · **Conformity prerequisite ✅ SATISFIED** — all four `JurisdictionConformitySource` rows are
+> **already live** (2026-08-16, campaign D-10): MO rolling (4 decoupled items) · OR partial (6) ·
+> MA partial (7) · AZ static (4). Authority anchors will resolve immediately, as in Wave 3.
+> · **Both of this wave's previously-open Ken calls are ALREADY RULED** (campaign D-10), which is
+> what unblocked it: **MO's PTET capital-gain question → BUILD TO THE FORM** (no entity-level
+> subtraction; the statutory reading is arguable but encoding it would have Delvio computing a
+> return the Department's own form cannot express), and **AZ's §179 → $2,500,000 / $4,000,000 by
+> RULING, not by publication.** ⚠ AZ's underlying `[UNVERIFIED]` OBBBA-retroactivity mapping
+> **stays open as a matter of fact** — AZDOR has never published it. Carry the ruling, not a
+> claim of authority.
+> · ⚠ **MO's client-advice consequence is live and is NOT a spec item:** for gain-heavy Missouri
+> owners the PTET election can be **worse** than not electing. One call to DOR PTE staff
+> (`pteincome@dor.mo.gov`) settles it. Watch for the same statute-vs-form shape in OR and AZ.
+> · ⚠ **E-file reality, and it is worse here than in any prior wave.** **MA's TY2025 window closed
+> 12/1/2025 and AZ's closed 11/28/2025** — both already past. This wave is **authoring-only for
+> TY2025 e-file purposes**; the specs remain worth having for print/compute and for TY2026.
+> See `delvio-states/EFILE_GATES.md`.
+> · **NEXT — research fan-out**, then ONE batched Gate-1 scope walk per the wave process.
+> ⚠ **Not started** — the per-state form-structure briefs (`delvio-states/research/`) do not exist
+> for these four states yet. Nothing may be authored until each brief exists AND has been
+> adversarially verified.
+
 > **[WO-W03-PTE] 45-state campaign Wave 3 — VA + CO + MS + MD pass-through lane
 > (BUILD_ORDER S-27; campaign `delvio-states` WAVE_PLAN.md wave 3) · ✅ **APPROVED + SEEDED
 > 2026-08-17** (campaign D-11) — 6 forms live, prod 142 → 148, all exports 200**
