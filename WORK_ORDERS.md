@@ -100,12 +100,24 @@ and namespace everything new. ⚠ Also note the app-side wart this feeds: delvio
 from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 
 > **[WO-W04-PTE] 45-state campaign Wave 4 — MO + OR + MA + AZ pass-through lane
-> (BUILD_ORDER S-27; campaign `delvio-states` WAVE_PLAN.md wave 4) · **GAP-CHECKED — opened
-> 2026-08-17**
+> (BUILD_ORDER S-27; campaign `delvio-states` WAVE_PLAN.md wave 4) · **RESEARCHED 2026-08-18 —
+> awaiting adversarial verification.** ⚠ **FORM COUNT CORRECTED 9 → 11 by the research.**
 > · **The wave:** the remaining Tier-1 PTE states, per WAVE_PLAN §5 order (Wave 3 → 4 → 5).
-> **9 forms across 4 states** — MO-1065 / MO-1120S / MO-PTE · OR-65 / OR-20-S · Form 3 / 355S ·
-> AZ 165 / 120S. Less efficient than Wave 3 (no state here serves both PTE modules from one
-> form), which is exactly why Wave 3 went first.
+> ⚠ **11 forms across 4 states, NOT the 9 this WO opened with.** The research corrected the
+> count in two states, and the correction is structural rather than clerical: **three of the four
+> states put their elective PTE tax on its OWN separate return.** Only Arizona rides it on the
+> existing forms — which makes AZ the odd one out, not the norm the naive count assumed.
+>
+> | State | Primary forms | Elective PTE tax lives | Count |
+> |---|---|---|---|
+> | **MO** | MO-1065 · MO-1120S · **MO-PTE** | separate return | 3 |
+> | **OR** | OR-65 · OR-20-S · **OR-21** | separate return | 3 |
+> | **MA** | Form 3 · 355S · **63D-ELT** | separate return | 3 |
+> | **AZ** | 165 · 120S | ON both returns (Part 2 of each) | 2 |
+>
+> **All eleven gap-checked 404**, including the three new codes (`OR_21`, `MA_63D_ELT`,
+> `MO_PTE`) probed after the research surfaced them. Less efficient than Wave 3 (no state here
+> serves both PTE modules from one form), which is exactly why Wave 3 went first.
 > · **GAP-CHECK ✅ 2026-08-17 — all 9 forms are gaps.** Sixteen candidate codes probed against RS
 > prod (`<ST>_<FORM>` per D-9 plus the bare state form numbers and plausible variants):
 > **every one 404.** Prod holds 148 TaxForms; the only state forms are the Core four's 18 plus
@@ -135,10 +147,40 @@ from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 > 12/1/2025 and AZ's closed 11/28/2025** — both already past. This wave is **authoring-only for
 > TY2025 e-file purposes**; the specs remain worth having for print/compute and for TY2026.
 > See `delvio-states/EFILE_GATES.md`.
-> · **NEXT — research fan-out**, then ONE batched Gate-1 scope walk per the wave process.
-> ⚠ **Not started** — the per-state form-structure briefs (`delvio-states/research/`) do not exist
-> for these four states yet. Nothing may be authored until each brief exists AND has been
-> adversarially verified.
+> · ✅ **RESEARCH FAN-OUT DONE 2026-08-18 — 4 briefs, 17,066 lines** (`delvio-states/research/`):
+> `mo_pte_source_brief.md` 2,787 · `or_pte_source_brief.md` 5,917 · `ma_pte_source_brief.md` 4,395 ·
+> `az_pte_source_brief.md` 3,967. **97 `[UNVERIFIED]` items and 68 walk items** between them —
+> roughly double Wave 3, concentrated in MA and AZ.
+> · ⏳ **ADVERSARIAL VERIFICATION IN FLIGHT — nothing here is usable until it lands.** In Wave 3
+> this pass corrected ~100 items and left no brief unchanged.
+> · **Findings that already change the build plan** (all pending verification):
+>   - **MO:** the return that actually COMPUTES the tax (MO-PTE) **cannot be e-filed** — post or
+>     email, payment by cheque — while MO-1065/MO-1120S are MeF-eligible. Inverts the usual PTET
+>     build plan. MO-PTE is filed **IN ADDITION TO** the base returns, not instead of (the
+>     opposite of Virginia's 502/502PTET fork — cloning VA would leave every electing client's
+>     filing incomplete). Per 12 CSR 10-2.436(8) the election **does not relieve nonresident
+>     withholding**: 4.7% entity tax AND 4.7% withholding on the same income.
+>   - **OR:** ⚠ **the item not to ship without** — two disjoint modification code sets collide
+>     numerically. Code **158** = gain/loss on disposition of depreciable property (corporate) but
+>     interest on other states' bonds (individual). OR-65 uses individual codes, OR-20-S uses
+>     corporate, and the crossing happens **inside** OR-20-S at Schedule SM → Schedule OR-K-1.
+>     Mixing them posts a depreciation-basis difference onto a municipal-interest line — the same
+>     failure shape as the MS prompt error caught in Wave 3, found independently.
+>     Also: DOR publishes **no fillable Form OR-21 at all**, only a "do not file" worksheet.
+>   - **MA:** DOR reissued all four instruction books **after** St. 2026 c.101 but did **not**
+>     reissue the forms — so the OBBBA back-outs route through pre-existing general adjustment
+>     lines with no new line or box, and **Form 3 line 19 has two keyed slots where TY2025 needs
+>     at least three.** MA publishes §179 figures that contradict each other inside one booklet.
+>   - **AZ:** Forms 165 and 120S are **not parallel and cannot share a modification engine** —
+>     165 carries a full federal→AZ stack, 120S carries none at all. The research also **overruled
+>     a prior verification pass** on the $150,000 PTE-W threshold ("exceeds", not "or more").
+> · ⚠ **PROCESS DEFECT FOUND AND FIXED:** all four research agents shared one scratchpad with
+> generic part-file names (`p1.md`…`p7.md`); the AZ agent overwrote the OR agent's `p2`. The OR
+> agent detected it, quarantined the file and rebuilt from its own PDF extracts. **Both final
+> briefs verified clean in both directions (zero cross-state markers).** The verification round
+> gives every agent its own scratchpad subdirectory. **Cross-state contamination is this
+> campaign's worst failure mode — this was a near miss, not a non-event.**
+> · **NEXT after verification:** ONE batched Gate-1 scope walk, then authoring.
 
 > **[WO-W03-PTE] 45-state campaign Wave 3 — VA + CO + MS + MD pass-through lane
 > (BUILD_ORDER S-27; campaign `delvio-states` WAVE_PLAN.md wave 3) · ✅ **APPROVED + SEEDED
