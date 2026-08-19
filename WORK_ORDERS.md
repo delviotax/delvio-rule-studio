@@ -99,9 +99,10 @@ and namespace everything new. ⚠ Also note the app-side wart this feeds: delvio
 *No independent backlog here (see header). Sequence = BUILD_ORDER.md SPINE; statuses seeded
 from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 
-> **[WO-W04-PTE] 45-state campaign Wave 4 — MO + OR + MA + AZ pass-through lane
-> (BUILD_ORDER S-27; campaign `delvio-states` WAVE_PLAN.md wave 4) · **RESEARCHED 2026-08-18 —
-> awaiting adversarial verification.** ⚠ **FORM COUNT CORRECTED 9 → 11 by the research.**
+> **[WO-W04-PTE] 45-state campaign Wave 4 — MO + OR + AZ pass-through lane
+> (BUILD_ORDER S-27; campaign `delvio-states` WAVE_PLAN.md wave 4) · ✅ **GATE-1 RULED 2026-08-19
+> (campaign D-12) — RE-SCOPED TO MO · OR · AZ, 8 forms; MA SPLIT TO ITS OWN WAVE. AUTHORING NEXT.**
+> ⚠ **FORM COUNT CORRECTED 9 → 11 by the research** (8 remain in this WO after the MA split).
 > · **The wave:** the remaining Tier-1 PTE states, per WAVE_PLAN §5 order (Wave 3 → 4 → 5).
 > ⚠ **11 forms across 4 states, NOT the 9 this WO opened with.** The research corrected the
 > count in two states, and the correction is structural rather than clerical: **three of the four
@@ -180,7 +181,57 @@ from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 > briefs verified clean in both directions (zero cross-state markers).** The verification round
 > gives every agent its own scratchpad subdirectory. **Cross-state contamination is this
 > campaign's worst failure mode — this was a near miss, not a non-event.**
-> · **NEXT after verification:** ONE batched Gate-1 scope walk, then authoring.
+> · ✅ **ALL FOUR BRIEFS ADVERSARIALLY VERIFIED 2026-08-19** — MO 3,220 · OR 7,018 · MA 4,602 ·
+> AZ 4,572 = **19,412 lines.** Transcription was near-perfect (OR 0 errors in ~350 positional
+> checks; AZ 0/48; MA 0/~40; MO no wrong line number in 60+); **every real error was in
+> interpretation, vintage or mechanism** — OR's Portland/Metro claims ran ~11% wrong against 0% for
+> its form transcription.
+> · ✅ **GATE 1 TAKEN AND RULED 2026-08-19 (campaign D-12): "split MA out, approve everything as
+> recommended."** ⚠ **THIS WO IS NOW MO · OR · AZ = 8 FORMS.** Massachusetts (3 forms) moves to
+> WAVE_PLAN "Wave 4b" — two independent passes recommended it and **MA has no TY2025 filing path at
+> all** either way (LOI deadline 12/1/2025 passed; DOR accepts no paper).
+> · **Rulings that bind the loaders:** AZ's `$150,000` test measured on the **statute's bare
+> "taxable income"** — AZDOR prints **four** bases and **four of six documents contradict
+> themselves**; ruled, with U19 left **open as a matter of fact**. **Form 165PA RED-DEFERRED**
+> rather than choosing between its printed 4.5% and the statute's 2.5% (both negatives verified —
+> S.B. 1274 §8 amended only subsection (A), H.B. 4168 does not touch §43-1414). AZ §43-1021(15)
+> add-back **built to the form, owner level only** — same shape as D-10 (MO) and D-11 (CO §174A).
+> **Delvio does NOT automate Missouri's unencrypted e-mail submission channel** (it carries member
+> SSNs) — a privacy ruling, not a tax one.
+> · **Depreciation shadow books settled:** **MO none** — closed at §143.121.2(3), whose §168
+> add-back is window-limited to Jul 2002–Jun 2003, so there is nothing open-ended in Missouri law to
+> find. **AZ Form 165 only** — Form 120S's four adjustment statutes are cited **zero times** in its
+> entire 28-page instruction book. **MA's is the one genuinely open lever and travels with MA.**
+> · ⚠ **THE MOST IMPORTANT BUILD INSTRUCTION IN THE WAVE (C1):** namespace Oregon's **two**
+> modification code sets with a hard cross-use guard. **12 codes collide** (118 and 132 added on
+> verification). Code **158** = *gain/loss on disposition of depreciable property* corporate vs
+> *interest on other states' bonds* individual; the crossing point is the **OR-K-1 overflow
+> attachment**, which must carry individual codes **even when issued by an S corp using corporate
+> ones**. ⚠ **The two DOR "don't use these codes" notes are a DECOY — they guard Schedule SM, not
+> the attachment** (a verification pass was fooled by exactly this and retracted). 158's semantic
+> twin individual-side is **154**, so a label-driven mapper survives and a number-driven one fails
+> silently.
+> · ⚠ **Two live CLIENT-HARM paths, both MO, both stated ONLY in regulations:** an entity-level
+> MO-TC credit **destroys the members' credit** (the engine has no field for tax actually paid), and
+> **the election does NOT switch off nonresident withholding** (12 CSR 10-2.436(8)) — clients pay
+> twice on the same income. Both get hard diagnostics; both to be confirmed with the Department.
+> · **Other build inversions:** **MO-PTE cannot be e-filed** (mail or emailed PDF, cheque payment —
+> six independent legs) while MO-1065/MO-1120S **are** MeF-eligible, so the tax-computing return is
+> the manual one and MeF scope halves; **MO has no estimated-tax subsystem at all** (keep interest
+> and the 5% late-pay addition); **OR needs THREE code tables**, the corporate one seeded from the
+> **full** OR-ASC-CORP universe (Appendix A is an S-corp subset).
+> · ⚠ **STILL OPEN — A4 was NOT covered by the blanket approval** (the walk offered no
+> recommendation for it): an AZ **corporate** partner receiving an **individual-basis** Arizona
+> adjustment, where individuals conform to §168(k) and corporations decouple.
+> · ⚠ **Two Ken-only EXTERNAL actions decided but NOT YET TAKEN:** the **Oregon DOR developers'
+> handbook** request (`electronic.filing@dor.oregon.gov` / 503-945-8415 — unlocks U1, U19 and U23 at
+> once; **Form OR-21 has no published face at all**, so every OR-21 line number rests on a "do not
+> file" worksheet), and the **MA TY2026 LOI** (~1 Dec 2026).
+> · ⚠ **A TY2026 staleness tripwire already exists:** Oregon's SB 1507 (2026 Or. Laws ch.142 §35)
+> moves its conformity date to 12/31/2025 for TY2026, **invalidating the OR brief's §7.2 by
+> statute.** The sooner Oregon is authored, the less rework.
+> · **NEXT — author the loaders** (`READY_TO_SEED=False`) + SQLite validation harnesses, then ONE
+> batched Gate-1 seed approval.
 
 > **[WO-W03-PTE] 45-state campaign Wave 3 — VA + CO + MS + MD pass-through lane
 > (BUILD_ORDER S-27; campaign `delvio-states` WAVE_PLAN.md wave 3) · ✅ **APPROVED + SEEDED
