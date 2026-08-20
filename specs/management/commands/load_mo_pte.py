@@ -548,8 +548,25 @@ MO_DOR_DEFECTS). Twenty-one catalogued at brief §16; the load-bearing ones:
 * **MO-NRP prints, ON A FINAL FORM:** *"Note: At the time the Department
   finalized their tax booklets, the Internal Revenue Service had not finalized
   the federal income tax forms."* — the DOR DISCLAIMING federal-line alignment.
-  **Every federal line reference in this spec is `[UNVERIFIED]` against the
-  FINAL TY2025 IRS forms (U8) and each carries the stamp.**
+  ⭐ **THE CROSS-CHECK HAS NOW BEEN DONE AND THE DISCLAIMER PROVED EMPTY (U8
+  CLOSED, 2026-08-19): 53 references checked, 51 confirmed exactly, ZERO stale.**
+  Every federal line reference in this spec carries a VERIFICATION stamp.
+* ⚠⚠ **BUT THE CROSS-CHECK FOUND TWO DEFECTS, AND THEY ARE MISSOURI\'S, NOT
+  STALE LINE NUMBERS: the SCHEDULE K-1 COLUMN (d) MAPPINGS (U29).** Both
+  nonresident forms instruct that Column (d) be copied from the K-1 using the
+  same line numbers as Schedule K. **It cannot be.** The FINAL TY2025 Schedule
+  K-1 (Form 1065) has a **single box 13** (no `3c`, no `13a`, no `13b`, no
+  `13e`) and the Schedule K-1 (Form 1120-S) a **single box 12** (no `12a`–`12e`).
+  **Both are LETTER-CODED and Missouri names no codes anywhere.** A numeric
+  lookup targets a box that does not exist, **returns nothing, and the return
+  still foots** — the exact silent-failure shape this campaign keeps hunting.
+  `mo_nrp_column_d()` / `mo_nrs_column_d()` resolve **by code**;
+  `mo_k1_assert_not_numeric()` **refuses** the numeric references, the seed
+  guard refuses a spec whose guard has stopped refusing them, and the harness
+  pins that no rule can reintroduce one. ⭐ Missouri **already concedes the
+  pattern once** — MO-NRS annotates its own Line 3 *"(Federal Schedule K-1, Line
+  3)"* because Schedule K calls the same item `3c` — so building to substance is
+  the Department\'s own established style, not an invention.
 
 ═══════════════════════════════════════════════════════════════════════════
 """
@@ -1852,6 +1869,287 @@ MO_NRS_WH_BASE_LINES = ("1", "2", "3", "4", "5a", "6", "7", "8a", "9", "10")
 # ⚠ SUBSETS, SUPPRESSED. 5b subset of 5a; 8b and 8c subsets of 8a.
 MO_NRS_SUBSET_LINES = {"5b": "5a", "8b": "8a", "8c": "8a"}
 
+# ⚠⚠ THE SAME DEFECT CLASS IS ON MO-NRP TOO, AND THE FIRST PASS MISSED IT.
+# MO-NRP Part 1 Line 5 is a ROLL-UP of federal Schedule K "Lines 5-9a", which on
+# the FINAL TY2025 Form 1065 spans `5 Interest income`, `6a Ordinary dividends`,
+# **`6b Qualified dividends`**, `6c Dividend equivalents`, `7 Royalties`,
+# `8 Net short-term capital gain (loss)`, `9a Net long-term capital gain (loss)`.
+# **`6b` IS A SUBSET OF `6a`**, so a naive summation of the printed range
+# DOUBLE-COUNTS QUALIFIED DIVIDENDS -- exactly the 5b/8b/8c defect already
+# flagged for MO-NRS at U9, present on BOTH forms. (Brief 22.12 / 4.2.)
+MO_NRP_L5_ROLLUP_LINES = ("5", "6a", "6b", "6c", "7", "8", "9a")
+MO_NRP_L5_SUM_LINES = ("5", "6a", "6c", "7", "8", "9a")
+MO_NRP_L5_SUBSET_LINES = {"6b": "6a"}
+
+
+def mo_nrp_line5_rollup(sch_k: dict) -> dict:
+    """MO-NRP Part 1 Line 5 -- the Schedule K 5-9a roll-up, with 6b SUPPRESSED.
+
+    Verbatim: 'Total portfolio income (loss) total of Federal Form 1065,
+    Schedules K & K-1, Lines 5-9a'. ⚠ IT IS A SUMMATION WORKSHEET, NOT A COPY --
+    and the printed range spans `6b Qualified dividends`, which is a SUBSET of
+    `6a Ordinary dividends`. Build with the subset suppressed and raise
+    requires_human_review whenever it is non-zero, exactly as on MO-NRS. (U9)
+    """
+    included = {k: float(sch_k.get(k, 0.0) or 0.0) for k in MO_NRP_L5_SUM_LINES}
+    subsets = {k: float(sch_k.get(k, 0.0) or 0.0) for k in MO_NRP_L5_SUBSET_LINES}
+    literal = sum(included.values()) + sum(subsets.values())
+    return {
+        "L5": sum(included.values()),
+        "literal_sum_would_be": literal,
+        "overstatement_avoided": literal - sum(included.values()),
+        "lines_included": MO_NRP_L5_SUM_LINES,
+        "subset_lines_suppressed": MO_NRP_L5_SUBSET_LINES,
+        "subset_amounts": subsets,
+        "requires_human_review": any(v for v in subsets.values()),
+        "defect": ("MO-NRP Part 1 Line 5's printed 'Lines 5-9a' range spans 6b Qualified dividends, "
+                   "a SUBSET of 6a Ordinary dividends. Summed literally it double-counts. The same "
+                   "defect class as MO-NRS's 5b/8b/8c (U9), found on MO-NRP by the U8 cross-check "
+                   "and NOT flagged by the first pass. IRC 1231 is broken out separately at Line 10."),
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ⚠⚠ U29 -- THE COLUMN (d) DEFECT. MISSOURI CLAIMS THE SCHEDULE K-1 CARRIES
+#    SUB-LINE NUMBERS IT HAS NEVER HAD, AND A NUMERIC LOOKUP RETURNS NOTHING.
+#
+# Both nonresident forms instruct that COLUMN (d) be copied from the federal
+# SCHEDULE K-1 using the SAME LINE NUMBERS as Schedule K:
+#   MO-NRP, verbatim: "Form MO-NRP, Part 1, Lines 1 - 13e correspond to Federal
+#     Form 1065, Federal Schedule(s) K AND K-1" / "Column (d) - Copy amounts from
+#     Federal Form 1065, Schedule K-1 for each nonresident partner."
+#   MO-NRS, verbatim: "the Form MO-NRS, Part 1, line numbers and items MATCH the
+#     Federal Form 1120S, Schedules K AND K-1."
+#
+# ⚠ IT CANNOT BE. On the FINAL TY2025 forms (re-pulled and read positionally):
+#   Schedule K-1 (Form 1065) Part III boxes run
+#       1, 2, 3, 4a, 4b, 4c, 5, 6a, 6b, 6c, 7, 8, 9a, 9b, 9c, 10, 11, 12,
+#       **13 Other deductions**, 14...23
+#     -- there is NO box 3c, NO 13a, NO 13b, NO 13e.
+#   Schedule K-1 (Form 1120-S) Part III boxes run
+#       ..., 11, **12 Other deductions**, 13...19
+#     -- there is NO box 12a, 12b, 12c, 12d or 12e.
+#
+# BOTH ARE LETTER-CODED, AND **MISSOURI NAMES NO CODES ANYWHERE** -- not on
+# MO-NRP, not on MO-NRS, not in the MO-1120S instructions. That silence is U29.
+#
+# ⭐ MISSOURI ALREADY CONCEDES THE PATTERN ONCE, on MO-NRS itself: it annotates
+# Line 3 "(Federal Schedule K-1, Line 3)" precisely because Schedule K calls that
+# same item `3c`. It simply did not carry the concession through to the `12x`
+# block. So the fix builds to SUBSTANCE in the Department's own established
+# style -- it is not an invention.
+#
+# ⚠⚠ THE FAILURE MODE THIS PREVENTS IS SILENT. A rule that reads a partner's or
+# shareholder's Schedule K-1 at `13a` / `13b` / `13e` / `12a`-`12e` targets a box
+# THAT DOES NOT EXIST, returns nothing, and the return still foots -- the exact
+# shape this campaign keeps hunting. `mo_k1_assert_not_numeric()` REFUSES those
+# references and the harness pins that no rule can reintroduce one.
+#
+# ⚠ THE DEFECT IS MISSOURI'S, NOT THE BRIEF'S: MO-NRP_2025.pdf, MO-NRS_2025.pdf
+# and the MO-1120S instructions were re-pulled to confirm the transcription is
+# exact. RECORD THE DEFECT; DO NOT "FIX" IT SILENTLY.
+# ═══════════════════════════════════════════════════════════════════════════
+K1_1065 = "sch_k1_1065"
+K1_1120S = "sch_k1_1120s"
+
+# 2025 Partner's Instructions for Schedule K-1 (Form 1065), box 13.
+MO_K1_BOX13_CODES: dict[str, str] = {
+    "A": "Cash contributions (60%)",
+    "B": "Cash contributions (30%)",
+    "C": "Noncash contributions (50%)",
+    "D": "Noncash contributions (30%)",
+    "E": "Capital gain property to a 50% organization (30%)",
+    "F": "Capital gain property (20%)",
+    "G": "Contributions (100%)",
+    "H": "Investment interest expense",
+    "I": "Deductions - royalty income",
+    "J": "Section 59(e)(2) expenditures",
+    "K": "Excess business interest expense",
+    "L": "Deductions - portfolio income",
+}
+MO_K1_BOX13_CONTRIBUTION_CODES = ("A", "B", "C", "D", "E", "F", "G")
+
+# 2025 Shareholder's Instructions for Schedule K-1 (Form 1120-S), box 12.
+MO_K1_BOX12_CODES: dict[str, str] = {
+    "A": "Cash contributions (60%)",
+    "B": "Cash contributions (30%)",
+    "C": "Noncash contributions (50%)",
+    "D": "Noncash contributions (30%)",
+    "E": "Capital gain property to a 50% organization (30%)",
+    "F": "Capital gain property (20%)",
+    "G": "Contributions (100%)",
+    "H": "Investment interest expense",
+    "J": "Section 59(e)(2) expenditures",
+}
+MO_K1_BOX12_CONTRIBUTION_CODES = ("A", "B", "C", "D", "E", "F", "G")
+MO_K1_BOX12_CASH_CODES = ("A", "B")
+MO_K1_BOX12_NONCASH_CODES = ("C", "D", "E", "F", "G")
+
+# ⚠ REFERENCES THAT DO NOT EXIST ON ANY SCHEDULE K-1. A numeric lookup at any of
+# these silently returns nothing.
+MO_K1_NONEXISTENT_SUBLINES: dict[str, tuple] = {
+    K1_1065: ("3c", "13a", "13b", "13e"),
+    K1_1120S: ("12a", "12b", "12c", "12d", "12e"),
+}
+MO_K1_NUMERIC_REFS_FORBIDDEN = tuple(
+    sorted(set(MO_K1_NONEXISTENT_SUBLINES[K1_1065]) | set(MO_K1_NONEXISTENT_SUBLINES[K1_1120S]))
+)
+
+
+class MissouriK1BoxError(ValueError):
+    """Raised when a Schedule K-1 item is resolved by a box number that does not exist."""
+
+
+def mo_k1_assert_not_numeric(module_k1: str, reference: str) -> str:
+    """REFUSE any Schedule K-1 lookup by a sub-line number the K-1 does not have.
+
+    ⚠ THE GUARD EXISTS BECAUSE THE FAILURE IS SILENT: a numeric lookup at `13a`,
+    `13b`, `13e` (1065) or `12a`-`12e` (1120-S) hits nothing and the return still
+    foots. Missouri's own instruction is what points there, so the guard must
+    refuse THE DEPARTMENT'S WORDING, not merely a careless one.
+    """
+    if module_k1 not in MO_K1_NONEXISTENT_SUBLINES:
+        raise ValueError(f"unknown Schedule K-1 module {module_k1!r}")
+    ref = str(reference).strip()
+    if ref in MO_K1_NONEXISTENT_SUBLINES[module_k1]:
+        box = "13" if module_k1 == K1_1065 else "12"
+        form = ("Schedule K-1 (Form 1065)" if module_k1 == K1_1065
+                else "Schedule K-1 (Form 1120-S)")
+        codes = sorted(MO_K1_BOX13_CODES if module_k1 == K1_1065 else MO_K1_BOX12_CODES)
+        raise MissouriK1BoxError(
+            f"SCHEDULE K-1 BOX {ref!r} DOES NOT EXIST on the FINAL TY2025 {form}. Missouri instructs "
+            f"that Column (d) be copied from the Schedule K-1 using the same line numbers as Schedule "
+            f"K, but the K-1 carries a SINGLE box {box} 'Other deductions', LETTER-CODED. A numeric "
+            f"lookup here returns NOTHING and the return still foots. Resolve BY BOX CODE via "
+            f"mo_nrp_column_d() / mo_nrs_column_d(). This is MISSOURI'S defect (U29), confirmed "
+            f"against the re-pulled Missouri form face; RECORD IT, do not silently 'fix' it. "
+            f"Box {box} codes: {codes}"
+        )
+    return ref
+
+
+def mo_nrp_column_d(mo_nrp_line: str) -> dict:
+    """MO-NRP Part 1 Column (d) -- the Schedule K-1 (Form 1065) source, CODE-KEYED.
+
+    ⚠ U29 INTERIM MAPPING, NOT A PUBLISHED DOR POSITION. Missouri names no codes
+    anywhere. This mirrors Column (a)'s Schedule K semantics exactly, which is
+    the only reading under which Column (c) x Column (d) can reconcile.
+    """
+    numeric_same_box = ("1", "2", "4a", "5", "10", "11", "12")
+    if mo_nrp_line in numeric_same_box:
+        return {"mo_line": mo_nrp_line, "k1_box": mo_nrp_line, "by_code": False,
+                "codes": None, "exists_on_k1": True,
+                "note": "Same box number on Schedule K and Schedule K-1."}
+    if mo_nrp_line == "3c":
+        return {"mo_line": "3c", "k1_box": "3", "by_code": False, "codes": None,
+                "exists_on_k1": True,
+                "note": ("⚠ SAME ITEM, DIFFERENT PRINTED NUMBER: Schedule K calls it `3c Other net "
+                         "rental income (loss)`; the Schedule K-1 prints it as bare `box 3`. ⭐ "
+                         "MO-NRS annotates its own Line 3 '(Federal Schedule K-1, Line 3)' for "
+                         "exactly this reason -- the Department already concedes the pattern once.")}
+    if mo_nrp_line == "13":
+        return {"mo_line": "13", "k1_box": "13", "by_code": True,
+                "codes": MO_K1_BOX13_CONTRIBUTION_CODES, "exists_on_k1": True,
+                "note": ("⚠ THERE IS NO K-1 BOX 13a OR 13b. Total contributions are box 13 CODES A-G "
+                         "(A/B cash, C-G noncash and capital-gain property). U29 interim mapping.")}
+    if mo_nrp_line == "13e":
+        remaining = tuple(c for c in MO_K1_BOX13_CODES
+                          if c not in MO_K1_BOX13_CONTRIBUTION_CODES)
+        return {"mo_line": "13e", "k1_box": "13", "by_code": True, "codes": remaining,
+                "exists_on_k1": True,
+                "note": ("⚠ THERE IS NO K-1 BOX 13e. `Other deductions` is box 13's REMAINING codes "
+                         "-- H investment interest expense, I deductions-royalty income, J section "
+                         "59(e)(2) expenditures, K excess business interest expense, L "
+                         "deductions-portfolio income. U29 interim mapping.")}
+    raise ValueError(f"MO-NRP Part 1 has no line {mo_nrp_line!r}")
+
+
+def mo_nrs_column_d(mo_nrs_line: str) -> dict:
+    """MO-NRS Part 1 Column (d) -- the Schedule K-1 (Form 1120-S) source, CODE-KEYED.
+
+    ⚠ U29 INTERIM MAPPING, NOT A PUBLISHED DOR POSITION.
+    """
+    if mo_nrs_line in ("1", "2", "3", "4", "5a", "5b", "6", "7", "8a", "8b", "8c", "9", "10", "11"):
+        return {"mo_line": mo_nrs_line, "k1_box": mo_nrs_line, "by_code": False, "codes": None,
+                "exists_on_k1": True,
+                "note": ("Same box number on Schedule K and Schedule K-1. ⭐ Note Missouri's own "
+                         "annotation at Line 3 -- '(Federal Schedule K-1, Line 3)' -- because "
+                         "Schedule K calls the same item `3c`.")}
+    mapping = {
+        "12a": (MO_K1_BOX12_CASH_CODES, "Cash charitable contributions -- box 12 codes A and B"),
+        "12b": (MO_K1_BOX12_NONCASH_CODES,
+                "Noncash charitable contributions -- box 12 codes C, D, E, F and G"),
+        "12c": (("H",), "Investment interest expense -- box 12 code H"),
+        "12d": (("J",), "Section 59(e)(2) expenditures -- box 12 code J"),
+    }
+    if mo_nrs_line in mapping:
+        codes, desc = mapping[mo_nrs_line]
+        return {"mo_line": mo_nrs_line, "k1_box": "12", "by_code": True, "codes": codes,
+                "exists_on_k1": True,
+                "note": f"⚠ THERE IS NO K-1 BOX {mo_nrs_line}. {desc}. U29 interim mapping."}
+    if mo_nrs_line == "12e":
+        assigned = set(MO_K1_BOX12_CONTRIBUTION_CODES) | {"H", "J"}
+        remaining = tuple(c for c in MO_K1_BOX12_CODES if c not in assigned)
+        return {"mo_line": "12e", "k1_box": "12", "by_code": True, "codes": remaining,
+                "exists_on_k1": True,
+                "note": ("⚠ THERE IS NO K-1 BOX 12e. `Other deductions` is box 12's REMAINING codes. "
+                         "⚠ On the FINAL TY2025 Schedule K-1 (Form 1120-S) that residue is EMPTY -- "
+                         "every published box-12 code is already assigned to 12a-12d -- so a "
+                         "non-zero MO-NRS Line 12e Column (d) needs the preparer's explanation. "
+                         "U29 interim mapping.")}
+    raise ValueError(f"MO-NRS Part 1 has no line {mo_nrs_line!r}")
+
+
+MO_K1_COLUMN_D_STATUS = "U29 INTERIM MAPPING - GATE-1 QUESTION, NOT A PUBLISHED DOR POSITION"
+MO_K1_COLUMN_D_QUESTION = (
+    "Which Schedule K-1 box-code letters feed MO-NRP Part 1 Lines 13 and 13e, and MO-NRS Part 1 Lines "
+    "12a-12e, in Column (d)? Missouri instructs that Column (d) be copied from the Schedule K-1 using "
+    "the same line numbers as Schedule K, but the FINAL TY2025 Schedule K-1 (Form 1065) has a SINGLE "
+    "box 13 and the Schedule K-1 (Form 1120-S) a SINGLE box 12, both LETTER-CODED, and MISSOURI NAMES "
+    "NO CODES ANYWHERE. The federal side is settled; the Missouri side is silent. This build uses the "
+    "mapping that mirrors Column (a)'s Schedule K semantics exactly -- the only reading under which "
+    "Column (c) x Column (d) reconciles -- and flags it. Settle by a DOR statement or a Gate-1 ruling."
+)
+
+# ⚠ MO-NRP Part 3 Line 12's SECOND tie-out points at the WRONG guaranteed-payment
+# figure. Part 1 carries `4a Guaranteed payments: Services`, but Form 1065 page 1
+# Line 10 and Schedule K Line 4 are the `4c` TOTAL (4a services + 4b capital).
+# So the tie-out foots ONLY when `4b` is zero. (Brief 22.12; Missouri's defect.)
+MO_NRP_P3_L12_TIEOUT_TARGET = "4c"
+MO_NRP_P3_L12_TIEOUT_NOTE = (
+    "MO-NRP Part 3 Line 12 prints a double tie-out: '[Line 12 equals total of Federal Form 1065, "
+    "Schedule K, Lines 1 AND 4 and Form MO-NRP, Part 1, Column (a)]'. The Schedule K half is correct "
+    "-- Schedule K Line 4 IS `4c Total. Add lines 4a and 4b`, and the arithmetic foots. ⚠ THE SECOND "
+    "HALF DOES NOT: MO-NRP Part 1 carries `4a Guaranteed payments: SERVICES` only, so it agrees with "
+    "the federal figure ONLY WHEN `4b Guaranteed payments: Capital` IS ZERO. Compare against "
+    "Schedule K `4c`, not `4a`, and diagnose whenever `4b` is non-zero. The printed footnote 'Line 12 "
+    "may not equal other lines in initial years of partnership due to organizational costs' is a "
+    "DIFFERENT caveat and does not cover this."
+)
+
+
+def mo_nrp_p3_l12_tieout(part3_l8: float, part3_l11: float,
+                         sch_k_l1: float, sch_k_4a: float, sch_k_4b: float = 0.0) -> dict:
+    """MO-NRP Part 3 Line 12 -- tie out against Schedule K `4c`, NOT `4a`.
+
+    Line 12 = Column (a) Line 8 - Line 11, and it should equal Schedule K
+    Line 1 + Line `4c` (the TOTAL guaranteed payments). ⚠ The form's second
+    tie-out, to Part 1 Column (a), only foots when `4b` is zero, because Part 1
+    carries `4a` services alone.
+    """
+    l12 = float(part3_l8) - float(part3_l11)
+    sch_k_4c = float(sch_k_4a) + float(sch_k_4b)
+    return {
+        "L12": l12,
+        "sch_k_target": float(sch_k_l1) + sch_k_4c,
+        "sch_k_4c": sch_k_4c,
+        "tieout_target_line": MO_NRP_P3_L12_TIEOUT_TARGET,
+        "part1_col_a_target": float(sch_k_l1) + float(sch_k_4a),
+        "part1_tieout_foots": float(sch_k_4b) == 0.0,
+        "requires_human_review": float(sch_k_4b) != 0.0,
+        "note": MO_NRP_P3_L12_TIEOUT_NOTE,
+    }
+
 
 def mo_nrp_withholding_base(part1_column_e: dict) -> dict:
     """Partnership withholding base -- MO-NRP Part 1 Lines 1 through 11.
@@ -2314,6 +2612,36 @@ MO_DOR_DEFECTS: list[dict] = [
      "actual": "Three (143.455.14) is GROSS EARNINGS and Five (143.455.16) is a FLAT ONE-HALF. Only "
                "Four and Six are mileage-driven.",
      "spec_impact": "⚠ C11 - restate before propagating"},
+    {"id": 23, "where": "Form MO-NRP -- the Column (d) / Schedule K-1 instruction",
+     "printed": ("'Form MO-NRP, Part 1, Lines 1 - 13e correspond to Federal Form 1065, Federal "
+                 "Schedule(s) K AND K-1' / 'Column (d) - Copy amounts from Federal Form 1065, "
+                 "Schedule K-1 for each nonresident partner.'"),
+     "actual": ("THE SCHEDULE K-1 HAS NO SUCH LINES. The FINAL TY2025 Schedule K-1 (Form 1065) Part "
+                "III runs 1, 2, 3, 4a, 4b, 4c, 5, 6a, 6b, 6c, 7, 8, 9a, 9b, 9c, 10, 11, 12, "
+                "13 Other deductions, 14-23 -- there is no box 3c, no 13a, no 13b and no 13e. "
+                "Contributions and other deductions live in the SINGLE box 13 BY LETTER CODE "
+                "(A-G contributions, H investment interest expense, I deductions-royalty income, "
+                "J section 59(e)(2) expenditures, K excess business interest expense, L "
+                "deductions-portfolio income). Missouri names NO CODES anywhere."),
+     "spec_impact": ("⚠⚠ REAL, LOADER-AFFECTING, AND MISSOURI'S -- found by the U8 cross-check of "
+                     "2026-08-19, and NOT a stale line number: the K-1 has NEVER carried these "
+                     "sub-lines. A numeric lookup targets a box that does not exist, RETURNS "
+                     "NOTHING, AND THE RETURN STILL FOOTS. Column (d) is resolved BY BOX CODE "
+                     "(mo_nrp_column_d) and mo_k1_assert_not_numeric() refuses the numeric form. "
+                     "U29.")},
+    {"id": 24, "where": "Form MO-NRS -- the 'line numbers and items match ... K and K-1' sentence",
+     "printed": ("'the Form MO-NRS, Part 1, line numbers and items MATCH the Federal Form 1120S, "
+                 "Schedules K AND K-1.'"),
+     "actual": ("FALSE FOR THE 12x BLOCK. The FINAL TY2025 Schedule K-1 (Form 1120-S) Part III runs "
+                "..., 11, 12 Other deductions, 13-19 -- there is no box 12a, 12b, 12c, 12d or 12e. "
+                "Box 12 is LETTER-CODED (A-G contributions, H investment interest expense, J "
+                "section 59(e)(2) expenditures). ⭐ Missouri ALREADY CONCEDES THE PATTERN ON THIS "
+                "VERY FORM, annotating Line 3 '(Federal Schedule K-1, Line 3)' because Schedule K "
+                "calls the same item 3c -- it simply did not carry the concession through."),
+     "spec_impact": ("⚠⚠ REAL, LOADER-AFFECTING, AND MISSOURI'S -- the same silent-failure shape as "
+                     "#23. Column (d) is resolved BY BOX CODE (mo_nrs_column_d). ⚠ Box 12's residue "
+                     "after 12a-12d is EMPTY, so a non-zero Line 12e Column (d) needs the "
+                     "preparer's explanation. U29.")},
     {"id": 22, "where": "MO-PTE Part B Column 5 instruction (opt-out re-gross-up example)",
      "printed": "'that non-opt-out member's new credit percentage is 14% (10% divided by 70%)'",
      "actual": ("10 / 70 = 14.285714...%, which is 14.29% at the TWO DECIMAL PLACES the SAME COLUMN "
@@ -2332,19 +2660,91 @@ MO_DOR_DEFECTS: list[dict] = [
      "spec_impact": "⚠ REAL - a PERSISTED defect through a full revision cycle, not a lag"},
 ]
 
-# U8 -- the stamp every federal line reference in this spec carries.
+# ═══════════════════════════════════════════════════════════════════════════
+# ⭐ U8 IS CLOSED. The stamp every federal line reference in this spec carries
+#    is now a VERIFICATION stamp, not an [UNVERIFIED] one.
+#
+# The cross-check §21.4 named as outstanding was performed on 2026-08-19
+# (brief §22.12, which GOVERNS over §§4.2, 4.4, 6.1, 17, 18, 20 and 21.4).
+# Ten FINAL TY2025 IRS PDFs were pulled from irs.gov/pub/irs-pdf/, revision-
+# stamped, and read LINE BY LINE with PyMuPDF -- no DRAFT watermark in any file.
+#
+#   53 REFERENCES CHECKED · 51 CONFIRMED EXACTLY · 0 STALE · 0 UNRESOLVABLE
+#
+# ⭐ NOT ONE MISSOURI FEDERAL LINE NUMBER IS STALE, and the DOR's own
+# "the IRS had not finalized the federal income tax forms" note -- printed on a
+# FINAL Form MO-NRP -- proved to be BOILERPLATE CAUTION, not a real defect.
+# Missouri is on the POST-2022 Form 1065 Schedule K numbering (13a cash / 13b
+# noncash contributions / 13c investment interest / 13d §59(e)(2) / 13e other)
+# and the POST-2023 Form 1120-S page-1 numbering (22 = ordinary business income,
+# tax at 23a-23c).
+#
+# ⭐⭐ BOTH OF THE REFERENCES THAT WERE STALE IN MASSACHUSETTS ARE CORRECT HERE:
+#   * `1120-S Line 22` really IS ordinary business income under the 2023+
+#     renumbering (Form 7205 was inserted at L19 and the TAX lines moved to
+#     23a/23b/23c) -- so Missouri's broadband cap points at the right line, and
+#     the MA trap does not apply.
+#   * `Schedule E Part II Line 32` has NOT moved (the analogous MA reference had
+#     shifted 30 -> 33).
+#
+# ⚠ THE TWO DEFECTS FOUND ARE NEITHER STALE NOR OURS -- they are MISSOURI'S, and
+# they are the COLUMN (d) mappings. See MO_K1_BOX13_CODES / MO_K1_BOX12_CODES,
+# mo_nrp_column_d() / mo_nrs_column_d(), and U29.
+#
+# ⚠ STALENESS: a new tax year invalidates this cross-check. Re-pull the ten PDFs.
+# ═══════════════════════════════════════════════════════════════════════════
 MO_FEDERAL_LINE_STAMP = (
-    "⚠ [UNVERIFIED - U8] Transcribed from the Missouri DOR's own TY2025 instructions and NOT "
-    "cross-checked against the FINAL TY2025 IRS forms. The DOR ITSELF DISCLAIMS THE ALIGNMENT, "
-    "printing on the FINAL Form MO-NRP: 'At the time the Department finalized their tax booklets, "
-    "the Internal Revenue Service had not finalized the federal income tax forms.' Re-pull the FINAL "
-    "IRS Forms 1065, 1120-S, Schedules K-1, 4797 and 1125-A before the app build."
+    "⭐ [VERIFIED - U8 CLOSED 2026-08-19] Cross-checked LINE BY LINE against the FINAL TY2025 IRS "
+    "forms pulled from irs.gov/pub/irs-pdf/ (no DRAFT watermark in any file): 53 references checked, "
+    "51 confirmed exactly, ZERO stale, ZERO unresolvable. Revision stamps: Form 1065 and Form 1120-S "
+    "both ModDate 2026-01-08; Schedule K-1 (1065) 2026-01-06; Schedule K-1 (1120-S) 2026-01-13; Form "
+    "4797 2025-12-17; Schedule E (1040) 2025-12-18; Form 4835 2026-01-09; Form 1125-A Rev. 11-2024 "
+    "(a CONTINUOUS-USE form -- the Nov-2024 stamp IS the operative TY2025 revision); Partner's "
+    "Instructions for Sch K-1 2025-12-29; Shareholder's Instructions for Sch K-1 2026-01-12. The "
+    "DOR's 'the IRS had not finalized the federal income tax forms' note proved to be BOILERPLATE. "
+    "⚠ A NEW TAX YEAR STALENESS-INVALIDATES THIS CROSS-CHECK -- re-pull the ten PDFs."
 )
 
-MO_OPEN_ITEMS_GENUINELY_OPEN = 22        # 28 raised, 4 closed and 2 strengthened by the 22 pass
-MO_OPEN_ITEMS_CLOSED = ("U1", "U2", "U5", "U6")
+# The revision stamps, machine-readable, so the staleness re-check is mechanical.
+MO_FEDERAL_FORM_REVISIONS: dict[str, str] = {
+    "f1065.pdf (2025 Form 1065)": "ModDate 2026-01-08; face 'Form 1065 (2025) Created 11/25/25'",
+    "f1120s.pdf (2025 Form 1120-S)": "ModDate 2026-01-08; face 'Form 1120-S (2025) Created 4/7/25'",
+    "f1065sk1.pdf (2025 Schedule K-1 (Form 1065))": "ModDate 2026-01-06",
+    "f1120ssk.pdf (2025 Schedule K-1 (Form 1120-S))": "ModDate 2026-01-13",
+    "f4797.pdf (2025 Form 4797)": "ModDate 2025-12-17",
+    "f1040se.pdf (2025 Schedule E (Form 1040))": "ModDate 2025-12-18",
+    "f4835.pdf (2025 Form 4835)": "ModDate 2026-01-09",
+    "f1125a.pdf (Form 1125-A)": ("ModDate 2024-12-18; Rev. 11-2024. ⚠ CONTINUOUS-USE FORM -- there is "
+                                 "NO '2025 Form 1125-A'; the Nov-2024 stamp IS the TY2025 revision. "
+                                 "Not a staleness failure."),
+    "i1065sk1.pdf (2025 Partner's Instructions for Sch K-1)": "ModDate 2025-12-29",
+    "i1120ssk.pdf (2025 Shareholder's Instructions for Sch K-1)": "ModDate 2026-01-12",
+}
+MO_FEDERAL_REFS_CHECKED = 53
+MO_FEDERAL_REFS_CONFIRMED = 51
+MO_FEDERAL_REFS_STALE = 0
+MO_FEDERAL_PAGE_MOVES = (
+    "FINAL TY2025 Form 1065: Schedule K is on PAGE 5 and the Analysis of Net Income (Loss) per "
+    "Return is on PAGE 6 -- so the MO-PTE Line 1 partnership feed ('Page 6, Analysis of Net Income "
+    "(Loss), Line 1') is correct INCLUDING its page number.",
+    "FINAL TY2025 Form 1120-S: Schedule K spans PAGES 3 AND 4, with LINE 18 on PAGE 4 -- the MO-PTE "
+    "Line 1 S-corporation feed.",
+)
+# ⭐ The two references that bit Massachusetts and did NOT bite Missouri.
+MO_FEDERAL_MA_TRAPS_AVOIDED = (
+    ("Form 1120-S Line 22", "'Ordinary business income (loss). Subtract line 21 from line 6' (p.1). "
+     "Under the 2023+ renumbering (Form 7205 inserted at L19) the TAX lines moved to 23a/23b/23c. "
+     "Missouri's broadband cap means ORDINARY BUSINESS INCOME, which is exactly what L22 now is."),
+    ("Form 1040 Schedule E Part II Line 32", "'Total partnership and S corporation income or (loss). "
+     "Combine lines 30 and 31' (p.2). The analogous Massachusetts reference had moved 30 -> 33; "
+     "MISSOURI'S HAS NOT MOVED."),
+)
+
+MO_OPEN_ITEMS_GENUINELY_OPEN = 22        # U8 closed by the 2026-08-19 cross-check; U29 opened by it
+MO_OPEN_ITEMS_CLOSED = ("U1", "U2", "U5", "U6", "U8")
 MO_OPEN_ITEMS_STRENGTHENED = ("U3", "U18", "U19")
 MO_OPEN_ITEMS_NARROWED = ("U4",)
+MO_OPEN_ITEMS_NEW = ("U29",)             # the Column (d) Schedule K-1 code mappings
 MO_WALK_ITEMS_LIVE = 15                  # 17 raised, W2 closed, W4 downgraded
 
 
@@ -3400,6 +3800,58 @@ AUTHORITY_SOURCES: list[dict] = [
         ],
     },
     {
+        "source_code": "MO_IRS_2025_K1_BOXES",
+        "source_type": "official_form", "source_rank": "controlling", "jurisdiction_code": "FED",
+        "tax_year_start": 2025, "tax_year_end": 2025,
+        "title": ("FINAL TY2025 Schedule K-1 (Form 1065) and Schedule K-1 (Form 1120-S), with their "
+                  "Partner's / Shareholder's Instructions -- the box lists and LETTER CODES that "
+                  "prove Missouri's Column (d) mapping cannot be done by line number (U29)"),
+        "citation": ("IRS f1065sk1.pdf (ModDate 2026-01-06), f1120ssk.pdf (2026-01-13), i1065sk1.pdf "
+                     "(2025-12-29), i1120ssk.pdf (2026-01-12); irs.gov/pub/irs-pdf/"),
+        "issuer": "Internal Revenue Service",
+        "official_url": "https://www.irs.gov/pub/irs-pdf/f1065sk1.pdf",
+        "current_status": "active", "is_substantive_authority": True, "trust_score": 9.9,
+        "topics": ["mo_pte_entity_returns", "mo_nonresident_withholding"],
+        "notes": ("⚠ Pulled 2026-08-19 for the U8 cross-check and read POSITIONALLY with PyMuPDF; no "
+                  "DRAFT watermark in either file. This source exists to pin a NEGATIVE: the boxes "
+                  "Missouri names DO NOT EXIST. ⚠ A NEW TAX YEAR STALENESS-INVALIDATES IT."),
+        "excerpts": [
+            {"excerpt_label": "Schedule K-1 (Form 1065) Part III box list - there is no 3c/13a/13b/13e",
+             "location_reference": "FINAL TY2025 Schedule K-1 (Form 1065), Part III",
+             "excerpt_text": ("1, 2, 3, 4a, 4b, 4c, 5, 6a, 6b, 6c, 7, 8, 9a, 9b, 9c, 10, 11, 12, "
+                              "13 Other deductions, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23"),
+             "is_key_excerpt": True, "effective_year_start": 2025, "effective_year_end": 2025,
+             "summary_text": ("⚠⚠ MISSOURI'S DEFECT, NOT A STALE LINE NUMBER: the K-1 HAS NEVER "
+                              "carried 3c, 13a, 13b or 13e. Contributions and other deductions are "
+                              "box 13 LETTER CODES -- A-G contributions, H investment interest "
+                              "expense, I deductions-royalty income, J section 59(e)(2) "
+                              "expenditures, K excess business interest expense, L "
+                              "deductions-portfolio income. A numeric lookup returns NOTHING.")},
+            {"excerpt_label": "Schedule K-1 (Form 1120-S) Part III box list - there is no 12a-12e",
+             "location_reference": "FINAL TY2025 Schedule K-1 (Form 1120-S), Part III",
+             "excerpt_text": ("1, 2, 3, 4, 5a, 5b, 6, 7, 8a, 8b, 8c, 9, 10, 11, 12 Other deductions, "
+                              "13, 14, 15, 16, 17, 18, 19"),
+             "is_key_excerpt": True, "effective_year_start": 2025, "effective_year_end": 2025,
+             "summary_text": ("⚠⚠ MO-NRS's 'line numbers and items MATCH ... Schedules K AND K-1' is "
+                              "FALSE for the 12x block. Box 12 codes: A-G contributions, H "
+                              "investment interest expense, J section 59(e)(2) expenditures. ⭐ "
+                              "Missouri already concedes the pattern at MO-NRS Line 3, annotated "
+                              "'(Federal Schedule K-1, Line 3)' because Schedule K calls it 3c.")},
+            {"excerpt_label": "⭐ The two references that were STALE in Massachusetts and are CORRECT here",
+             "location_reference": "FINAL TY2025 Form 1120-S p.1 L22; Schedule E (Form 1040) p.2 L32",
+             "excerpt_text": ("[1120-S L22] Ordinary business income (loss). Subtract line 21 from "
+                              "line 6. || [Sch E Part II L32] Total partnership and S corporation "
+                              "income or (loss). Combine lines 30 and 31."),
+             "is_key_excerpt": True, "effective_year_start": 2025, "effective_year_end": 2025,
+             "summary_text": ("Under the 2023+ renumbering (Form 7205 inserted at L19) the 1120-S "
+                              "TAX lines moved to 23a/23b/23c and L22 became ORDINARY BUSINESS "
+                              "INCOME -- which is exactly what Missouri's broadband cap means. And "
+                              "Schedule E Part II Line 32 has NOT moved, though the analogous "
+                              "Massachusetts reference had shifted 30 -> 33. 53 references checked, "
+                              "51 confirmed, ZERO stale.")},
+        ],
+    },
+    {
         "source_code": "MO_2025_FORM_MOTC",
         "source_type": "state_form", "source_rank": "primary_official", "jurisdiction_code": "MO",
         "tax_year_start": 2025, "tax_year_end": 2025,
@@ -3861,6 +4313,7 @@ AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
     # MO_1065
     ("MO_2025_FORM_MO1065", FORM_CODE_MO1065, "governs"),
     ("MO_2025_FORM_MONRP", FORM_CODE_MO1065, "governs"),
+    ("MO_IRS_2025_K1_BOXES", FORM_CODE_MO1065, "mapping_only"),
     ("MO_2025_FORM_MOMSS", FORM_CODE_MO1065, "informs"),
     ("MO_2025_FORM_MO1NR_2NR_3NR", FORM_CODE_MO1065, "governs"),
     ("MO_RSMO_143_581_421", FORM_CODE_MO1065, "governs"),
@@ -3874,6 +4327,7 @@ AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
     # MO_1120S
     ("MO_2025_FORM_MO1120S", FORM_CODE_MO1120S, "governs"),
     ("MO_2025_FORM_MONRS", FORM_CODE_MO1120S, "governs"),
+    ("MO_IRS_2025_K1_BOXES", FORM_CODE_MO1120S, "mapping_only"),
     ("MO_2025_FORM_MOMSS", FORM_CODE_MO1120S, "governs"),
     ("MO_2025_FORM_MO1NR_2NR_3NR", FORM_CODE_MO1120S, "governs"),
     ("MO_RSMO_143_411_471", FORM_CODE_MO1120S, "governs"),
@@ -3902,6 +4356,7 @@ AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
     ("MO_2025_EXTENSION_FORMS", FORM_CODE_MOPTE, "governs"),
     ("MO_2025_FORM_MO1NR_2NR_3NR", FORM_CODE_MOPTE, "governs"),
     ("MO_2025_TAX_LEG_CHANGES", FORM_CODE_MOPTE, "informs"),
+    ("MO_IRS_2025_K1_BOXES", FORM_CODE_MOPTE, "mapping_only"),
     # the "both returns are filed" linkage, in both directions
     ("MO_DOR_PTE_FAQ", FORM_CODE_MO1065, "informs"),
     ("MO_DOR_PTE_FAQ", FORM_CODE_MO1120S, "informs"),
@@ -4250,6 +4705,34 @@ MO1065_RULES: list[dict] = [
                      "build it as a SUMMATION WORKSHEET, not a copy. THIS DETERMINES CASH WITHHELD."),
      "notes": ("requires_human_review whenever any excluded line is non-zero. Get a DOR worked "
                "example before season. " + MO_FEDERAL_LINE_STAMP)},
+    {"rule_id": "R-MO65-K1COLD", "title": "⚠⚠ MO-NRP Column (d) is CODE-KEYED - the K-1 has no 13a/13b/13e",
+     "rule_type": "validation", "sort_order": 20,
+     "inputs": ["mo1065_nrp_required"], "outputs": ["MO_NRP_COLUMN_D"],
+     "formula": ("mo_nrp_column_d(line): 1/2/4a/5/10/11/12 -> same K-1 box; 3c -> K-1 bare box 3; "
+                 "13 -> box 13 CODES A-G; 13e -> box 13 remaining codes. "
+                 "mo_k1_assert_not_numeric() REFUSES 3c/13a/13b/13e as K-1 box numbers."),
+     "description": ("Form MO-NRP instructs, verbatim, that 'Form MO-NRP, Part 1, Lines 1 - 13e "
+                     "correspond to Federal Form 1065, Federal Schedule(s) K AND K-1' and that "
+                     "'Column (d) - Copy amounts from Federal Form 1065, Schedule K-1 for each "
+                     "nonresident partner.' ⚠⚠ IT CANNOT BE DONE BY NUMBER. The FINAL TY2025 "
+                     "Schedule K-1 (Form 1065) Part III runs 1, 2, 3, 4a, 4b, 4c, 5, 6a, 6b, 6c, 7, "
+                     "8, 9a, 9b, 9c, 10, 11, 12, 13 Other deductions, 14-23 -- THERE IS NO BOX 3c, "
+                     "NO 13a, NO 13b AND NO 13e. Contributions and other deductions live in the "
+                     "SINGLE box 13 BY LETTER CODE (2025 Partner's Instructions: A-G contributions, "
+                     "H investment interest expense, I deductions-royalty income, J section 59(e)(2) "
+                     "expenditures, K excess business interest expense, L deductions-portfolio "
+                     "income). A NUMERIC LOOKUP TARGETS A BOX THAT DOES NOT EXIST, RETURNS NOTHING, "
+                     "AND THE RETURN STILL FOOTS -- the exact silent-failure shape this campaign "
+                     "keeps hunting. ⚠ THE DEFECT IS MISSOURI'S, not the brief's: MO-NRP was "
+                     "re-pulled and the transcription confirmed exact. RECORD IT; DO NOT SILENTLY "
+                     "'FIX' IT."),
+     "exceptions": MO_K1_COLUMN_D_QUESTION,
+     "notes": ("⭐ Column (a) is UNAFFECTED -- every Schedule K line number Missouri cites is CORRECT "
+               "against the FINAL TY2025 Form 1065 (the post-2022 numbering: 13a cash / 13b noncash "
+               "contributions / 13c investment interest / 13d section 59(e)(2) / 13e other). U8 is "
+               "CLOSED: 53 references checked, 51 confirmed, ZERO stale. ⚠ This rule also carries "
+               "the MO-NRP Part 3 Line 12 tie-out correction -- compare against Schedule K `4c`, the "
+               "TOTAL guaranteed payments, not `4a` services.")},
     {"rule_id": "R-MO65-DUE", "title": "Due date and extension - federal Form 7004 only",
      "rule_type": "conditional", "sort_order": 12,
      "inputs": ["mo1065_box_federal_extension"], "outputs": ["due_date"],
@@ -4303,6 +4786,8 @@ MO1065_RULE_LINKS: list[tuple] = [
     ("R-MO65-WH", "MO_RSMO_143_411_471", "primary", "143.411.5 - the five exceptions"),
     ("R-MO65-WHBASE", "MO_2025_FORM_MO1NR_2NR_3NR", "primary", "the defective base definition"),
     ("R-MO65-WHBASE", "MO_2025_FORM_MONRP", "primary", "the non-contiguous Part 1 line set"),
+    ("R-MO65-K1COLD", "MO_2025_FORM_MONRP", "primary", "the Column (d) instruction and the 'Lines 1 - 13e correspond' sentence"),
+    ("R-MO65-K1COLD", "MO_IRS_2025_K1_BOXES", "primary", "the FINAL TY2025 Schedule K-1 box list and its letter codes"),
     ("R-MO65-DUE", "MO_2025_FORM_MO1065", "primary", "April 15, 2026 stated in the embedded instructions"),
     ("R-MO65-DUE", "MO_2025_EXTENSION_FORMS", "secondary", "MO-1065 appears on neither extension form"),
     ("R-MO65-SIGN", "MO_2025_FORM_MO1065", "primary", "the signature, notification and credit sentences"),
@@ -4425,17 +4910,36 @@ MO1065_LINES: list[dict] = [
      "source_rules": ["R-MO65-SOURCE"],
      "notes": ("DOR worked example: (a) $20,000, (b) $16,000, (c) 80%, (d) $12,000, (e) $9,600. "
                "'Attach a detailed explanation if any other method is used.'")},
+    {"line_number": "NRP-P1-D", "line_type": "input", "sort_order": 40,
+     "description": ("MO-NRP Part 1 Column (d) - Federal Schedule K-1, per nonresident partner "
+                     "(RESOLVED BY BOX CODE, never by a Schedule K sub-line number)"),
+     "calculation": ("mo_nrp_column_d(line) -- boxes 1/2/4a/5/10/11/12 by number; `3c` -> K-1 bare "
+                     "box 3; `13` -> box 13 CODES A-G; `13e` -> box 13 remaining codes"),
+     "source_rules": ["R-MO65-K1COLD"],
+     "notes": ("⚠⚠ U29. Missouri instructs 'Copy amounts from Federal Form 1065, Schedule K-1 for "
+               "each nonresident partner' and that 'Lines 1 - 13e correspond to Federal Form 1065, "
+               "Federal Schedule(s) K AND K-1'. THE K-1 HAS NO 3c, NO 13a, NO 13b AND NO 13e -- its "
+               "Part III runs 1, 2, 3, 4a, 4b, 4c, 5, 6a, 6b, 6c, 7, 8, 9a, 9b, 9c, 10, 11, 12, "
+               "13 Other deductions, 14-23, and box 13 is LETTER-CODED. A NUMERIC LOOKUP RETURNS "
+               "NOTHING AND THE RETURN STILL FOOTS. Resolve by code.")},
     {"line_number": "NRP-P1-E", "line_type": "calculated", "sort_order": 41,
      "description": "MO-NRP Part 1 Column (e) - the partner's Missouri-source share",
-     "calculation": "(e) = (d) x (c)", "source_rules": ["R-MO65-SOURCE"],
-     "destination_form": "Form MO-NRI (Missouri Income Percentage)"},
+     "calculation": "(e) = (d) x (c)", "source_rules": ["R-MO65-SOURCE", "R-MO65-K1COLD"],
+     "destination_form": "Form MO-NRI (Missouri Income Percentage)",
+     "notes": ("⚠ Column (d) is resolved BY BOX CODE for the contribution and other-deduction rows "
+               "(U29), so (e) inherits the code-keyed source there.")},
     {"line_number": "NRP-P1-5", "line_type": "calculated", "sort_order": 42,
      "description": ("MO-NRP Part 1 Line 5 - Total portfolio income (loss), total of Federal Form "
                      "1065 Schedules K and K-1, Lines 5-9a"),
-     "calculation": "a SUMMATION WORKSHEET over federal Schedule K Lines 5 through 9a",
+     "calculation": ("mo_nrp_line5_rollup() -- Schedule K 5 + 6a + 6c + 7 + 8 + 9a, WITH `6b` "
+                     "SUPPRESSED because 6b is a SUBSET of 6a"),
      "source_rules": ["R-MO65-WHBASE"],
      "notes": ("⚠ A ROLL-UP, NOT A COPY -- it already contains interest, dividends, royalties and "
-               "capital gains. IRC 1231 is broken out separately at Line 10. " + MO_FEDERAL_LINE_STAMP)},
+               "capital gains. IRC 1231 is broken out separately at Line 10. ⚠⚠ AND THE PRINTED "
+               "RANGE DOUBLE-COUNTS: 'Lines 5-9a' spans `6b Qualified dividends`, a SUBSET of `6a "
+               "Ordinary dividends`. Same defect class as MO-NRS's 5b/8b/8c (U9) -- found on MO-NRP "
+               "by the U8 cross-check and NOT flagged by the first pass. Build with 6b suppressed "
+               "and flag any return where it is non-zero. " + MO_FEDERAL_LINE_STAMP)},
     {"line_number": "NRP-P1-12", "line_type": "input", "sort_order": 43,
      "description": "MO-NRP Part 1 Line 12 - Section 179 deduction (attach schedule)",
      "source_rules": ["R-MO65-DEPR-NEG"],
@@ -4451,7 +4955,15 @@ MO1065_LINES: list[dict] = [
                "GATE-1 SEED QUESTION, NOT A FREE PREPARER ELECTION. ⚠ Lines 12 and 13 both read "
                "'subtract Line 11 from Line 8'; the difference is that Line 12 works COLUMN (a) "
                "(everywhere) and Line 13 COLUMN (b) (Missouri). Printed footnote: 'Line 12 may not "
-               "equal other lines in initial years of partnership due to organizational costs.'")},
+               "equal other lines in initial years of partnership due to organizational costs.' "
+               "⚠⚠ AND LINE 12'S SECOND TIE-OUT POINTS AT THE WRONG FIGURE -- see NRP-P3-12.")},
+    {"line_number": "NRP-P3-12", "line_type": "calculated", "sort_order": 45,
+     "description": ("MO-NRP Part 3 Line 12 - Guaranteed payments and ordinary income (loss), "
+                     "Column (a): subtract Line 11 from Line 8"),
+     "calculation": ("mo_nrp_p3_l12_tieout() -- ties to Schedule K Line 1 + Line **4c** (the TOTAL "
+                     "guaranteed payments), NOT Line 4a"),
+     "source_rules": ["R-MO65-K1COLD"],
+     "notes": MO_NRP_P3_L12_TIEOUT_NOTE},
     {"line_number": "NR-1NR-2", "line_type": "total", "sort_order": 50,
      "description": "Form MO-1NR Line 2 - Total Missouri income tax withheld (total of all MO-2NRs)",
      "calculation": "sum of Form MO-2NR Line 2 across all in-scope owners",
@@ -4679,6 +5191,57 @@ MO1065_SCENARIOS: list[dict] = [
                "11, 12, 13, 13e), so IRC 179, contributions and other deductions never enter the "
                "base. THIS DETERMINES CASH WITHHELD. (U9)"),
      "sort_order": 14},
+    {"scenario_name": "⚠⚠ MO-NRP Column (d) - K-1 box 13a does NOT exist, so the lookup REFUSES",
+     "scenario_type": "failure",
+     "inputs": {"module_k1": "sch_k1_1065", "reference": "13a"},
+     "expected_outputs": {"raises": "MissouriK1BoxError",
+                          "correct_route": "box 13 codes A-G via mo_nrp_column_d('13')"},
+     "notes": ("⚠⚠ U29 AND THE FAILURE IS SILENT. The FINAL TY2025 Schedule K-1 (Form 1065) Part III "
+               "runs 1, 2, 3, 4a, 4b, 4c, 5, 6a, 6b, 6c, 7, 8, 9a, 9b, 9c, 10, 11, 12, 13 Other "
+               "deductions, 14-23. A numeric lookup at 13a returns NOTHING and the return still "
+               "foots. Missouri's own instruction is what points there, so the guard must refuse "
+               "THE DEPARTMENT'S WORDING."),
+     "sort_order": 17},
+    {"scenario_name": "MO-NRP Column (d) - Line 13 resolves to K-1 box 13 CODES A-G",
+     "scenario_type": "normal",
+     "inputs": {"mo_nrp_line": "13"},
+     "expected_outputs": {"k1_box": "13", "by_code": True,
+                          "codes": ["A", "B", "C", "D", "E", "F", "G"]},
+     "notes": ("U29 interim mapping -- THIS BUILD'S, NOT THE DEPARTMENT'S. Schedule K splits "
+               "contributions into 13a cash and 13b noncash; the K-1 carries them as box 13 codes "
+               "A-G. Mirrors Column (a)'s Schedule K semantics, the only reading under which Column "
+               "(c) x Column (d) reconciles."),
+     "sort_order": 18},
+    {"scenario_name": "MO-NRP Column (d) - Line 3c resolves to the K-1's BARE box 3",
+     "scenario_type": "edge",
+     "inputs": {"mo_nrp_line": "3c"},
+     "expected_outputs": {"k1_box": "3", "by_code": False},
+     "notes": ("⭐ Same item, different printed number -- and MO-NRS ALREADY ANNOTATES ITS OWN LINE 3 "
+               "'(Federal Schedule K-1, Line 3)' for exactly this reason. The Department concedes "
+               "the pattern once and then does not carry it through."),
+     "sort_order": 19},
+    {"scenario_name": "⚠ MO-NRP Part 3 Line 12 tie-out uses Schedule K 4c, and 4b breaks the Part 1 half",
+     "scenario_type": "failure",
+     "inputs": {"part3_l8": 500000, "part3_l11": 380000, "sch_k_l1": 100000,
+                "sch_k_4a": 15000, "sch_k_4b": 5000},
+     "expected_outputs": {"L12": 120000.0, "sch_k_4c": 20000.0, "sch_k_target": 120000.0,
+                          "part1_col_a_target": 115000.0, "part1_tieout_foots": False,
+                          "requires_human_review": True},
+     "notes": ("The Schedule K half FOOTS against Line 1 + 4c. ⚠ The SECOND tie-out, to Part 1 "
+               "Column (a), does NOT -- Part 1 carries 4a services only, so it agrees only when 4b "
+               "is zero. Found by the U8 cross-check; Missouri's defect, not a stale line number."),
+     "sort_order": 20},
+    {"scenario_name": "⚠ MO-NRP Part 1 Line 5 roll-up SUPPRESSES 6b (6b is a subset of 6a)",
+     "scenario_type": "failure",
+     "inputs": {"sch_k": {"5": 12000, "6a": 30000, "6b": 22000, "6c": 0, "7": 4000,
+                          "8": 6000, "9a": 50000}},
+     "expected_outputs": {"L5": 102000.0, "literal_sum_would_be": 124000.0,
+                          "overstatement_avoided": 22000.0, "requires_human_review": True},
+     "notes": ("The printed 'Lines 5-9a' range spans 6b Qualified dividends, a SUBSET of 6a. A "
+               "literal sum overstates the portfolio roll-up by $22,000, which at 4.7% is $1,034 of "
+               "over-withholding on ONE partner. Same defect class as MO-NRS's 5b/8b/8c (U9), found "
+               "on MO-NRP by the U8 cross-check and NOT flagged by the first pass."),
+     "sort_order": 21},
     {"scenario_name": "MO-1065 NAME CONTROL - the six DOR examples, including LEE (not padded)",
      "scenario_type": "normal",
      "inputs": {"last_names": ["Brown", "DeJesus", "Lee", "Torres-Lopes", "McCarty", "O'Neill"]},
@@ -5052,6 +5615,29 @@ MO1120S_RULES: list[dict] = [
                     "exists. Do not port Virginia's derived state 179 figure and do not add a "
                     "nullable 'state depreciation adjustment' field for symmetry."),
      "notes": "RED-DEFER R5 covers the live 2002-03 residual."},
+    {"rule_id": "R-MO20S-K1COLD", "title": "⚠⚠ MO-NRS Column (d) is CODE-KEYED - the K-1 has no 12a-12e",
+     "rule_type": "validation", "sort_order": 20,
+     "inputs": ["mo1120s_q2_has_nonresident_shareholders"], "outputs": ["MO_NRS_COLUMN_D"],
+     "formula": ("mo_nrs_column_d(line): 1-11 -> same K-1 box; 12a -> box 12 codes A/B; 12b -> codes "
+                 "C-G; 12c -> code H; 12d -> code J; 12e -> remaining codes. "
+                 "mo_k1_assert_not_numeric() REFUSES 12a-12e as K-1 box numbers."),
+     "description": ("Form MO-NRS prints, verbatim, that 'the Form MO-NRS, Part 1, line numbers and "
+                     "items MATCH the Federal Form 1120S, Schedules K AND K-1.' ⚠⚠ THE SENTENCE IS "
+                     "FALSE FOR THE 12x BLOCK. The FINAL TY2025 Schedule K-1 (Form 1120-S) Part III "
+                     "runs ..., 11, 12 Other deductions, 13-19 -- THERE IS NO BOX 12a, 12b, 12c, 12d "
+                     "OR 12e. Those five MO-NRS lines have NO Column (d) source by number; they live "
+                     "in the SINGLE box 12 BY LETTER CODE (2025 Shareholder's Instructions: A-G "
+                     "contributions, H investment interest expense, J section 59(e)(2) "
+                     "expenditures). ⭐ MISSOURI ALREADY CONCEDES THE PATTERN ON THIS VERY FORM: it "
+                     "annotates Line 3 '(Federal Schedule K-1, Line 3)' precisely because Schedule K "
+                     "calls that same item `3c` -- it simply did not carry the concession through to "
+                     "the 12x block. Building to substance is therefore the Department's OWN "
+                     "established style, not an invention."),
+     "exceptions": MO_K1_COLUMN_D_QUESTION,
+     "notes": ("⭐ Column (a) is UNAFFECTED -- all nineteen MO-NRS Schedule K references were "
+               "confirmed against the FINAL TY2025 Form 1120-S. ⚠ On that K-1, box 12's residue "
+               "after 12a-12d is EMPTY (every published code is assigned), so a non-zero Line 12e "
+               "Column (d) needs the preparer's explanation.")},
     {"rule_id": "R-MO20S-DUE", "title": "Due date, extension routing, and the mandatory Form 8886",
      "rule_type": "conditional", "sort_order": 14,
      "inputs": ["mo1120s_box_federal_extension", "mo1120s_form_8886_attached"],
@@ -5096,6 +5682,8 @@ MO1120S_RULE_LINKS: list[tuple] = [
     ("R-MO20S-WH", "MO_12CSR_10_2_436", "primary", "(8) - the election does NOT relieve withholding"),
     ("R-MO20S-DEPR", "MO_RSMO_143_121", "primary", "143.121.2(3) - the ADD-BACK ITSELF is window-limited"),
     ("R-MO20S-DEPR", "MO_2025_FORM_MO1120S", "implementation", "the only instructions stating the window in words"),
+    ("R-MO20S-K1COLD", "MO_2025_FORM_MONRS", "primary", "the 'line numbers and items match ... K and K-1' sentence"),
+    ("R-MO20S-K1COLD", "MO_IRS_2025_K1_BOXES", "primary", "the FINAL TY2025 Schedule K-1 box list and its letter codes"),
     ("R-MO20S-DUE", "MO_2025_FORM_MO1120S", "primary", "April 15, 2026, the officer signature and Form 8886"),
     ("R-MO20S-DUE", "MO_2025_EXTENSION_FORMS", "secondary", "the MO-7004 / MO-60 contradiction (U24)"),
 ]
@@ -5241,9 +5829,22 @@ MO1120S_LINES: list[dict] = [
      "description": "MO-NRS Part 1 Column (b) - Missouri Source",
      "calculation": "(b) = (a) x (c)   ⚠⚠ THE REVERSE of MO-NRP's (c) = (b) / (a)",
      "source_rules": ["R-MO20S-NRS"]},
+    {"line_number": "NRS-P1-D", "line_type": "input", "sort_order": 50,
+     "description": ("MO-NRS Part 1 Column (d) - Federal Schedule K-1, per nonresident shareholder "
+                     "(RESOLVED BY BOX CODE for the 12x block, never by number)"),
+     "calculation": ("mo_nrs_column_d(line) -- boxes 1-11 by number; `12a` -> box 12 codes A/B; "
+                     "`12b` -> codes C-G; `12c` -> code H; `12d` -> code J; `12e` -> remaining"),
+     "source_rules": ["R-MO20S-K1COLD"],
+     "notes": ("⚠⚠ U29. MO-NRS prints 'the Form MO-NRS, Part 1, line numbers and items MATCH the "
+               "Federal Form 1120S, Schedules K AND K-1'. THE SENTENCE IS FALSE FOR THE 12x BLOCK: "
+               "the K-1's Part III runs ..., 11, 12 Other deductions, 13-19 -- THERE IS NO BOX 12a, "
+               "12b, 12c, 12d OR 12e, and box 12 is LETTER-CODED. ⭐ Missouri ALREADY CONCEDES THE "
+               "PATTERN ON THIS VERY FORM at Line 3, which it annotates '(Federal Schedule K-1, "
+               "Line 3)' because Schedule K calls the same item `3c` -- it simply did not carry the "
+               "concession through to 12x.")},
     {"line_number": "NRS-P1-E", "line_type": "calculated", "sort_order": 51,
      "description": "MO-NRS Part 1 Column (e) - the shareholder's Missouri-source share",
-     "calculation": "(e) = (d) x (c)", "source_rules": ["R-MO20S-NRS"],
+     "calculation": "(e) = (d) x (c)", "source_rules": ["R-MO20S-NRS", "R-MO20S-K1COLD"],
      "destination_form": "Form MO-NRI",
      "notes": ("⚠ 'These amounts must be adjusted by any capital gain or passive loss limitation as "
                "required' -- an unstated IRC 1211 / 469 step inherited by the individual module.")},
@@ -5458,6 +6059,27 @@ MO1120S_SCENARIOS: list[dict] = [
      "notes": ("Same substance on all three faces, but TRANSCRIBE EACH FACE'S OWN WORDING -- MO-1120S "
                "prints 'if less than $500, enter zero' where MO-PTE prints 'enter $0'."),
      "sort_order": 10},
+    {"scenario_name": "⚠⚠ MO-NRS Column (d) - K-1 boxes 12a-12e do NOT exist, so the lookup REFUSES",
+     "scenario_type": "failure",
+     "inputs": {"module_k1": "sch_k1_1120s", "references": ["12a", "12b", "12c", "12d", "12e"]},
+     "expected_outputs": {"raises": "MissouriK1BoxError (all five)",
+                          "correct_route": "box 12 codes via mo_nrs_column_d()"},
+     "notes": ("⚠⚠ U29. MO-NRS prints 'line numbers and items MATCH the Federal Form 1120S, Schedules "
+               "K AND K-1'. THE SENTENCE IS FALSE for the 12x block -- the K-1 Part III runs ..., "
+               "11, 12 Other deductions, 13-19. A numeric lookup returns NOTHING and the return "
+               "still foots."),
+     "sort_order": 14},
+    {"scenario_name": "MO-NRS Column (d) - 12a/12b/12c/12d resolve to box 12 codes A-B / C-G / H / J",
+     "scenario_type": "normal",
+     "inputs": {"mo_nrs_lines": ["12a", "12b", "12c", "12d"]},
+     "expected_outputs": {"12a": ["A", "B"], "12b": ["C", "D", "E", "F", "G"],
+                          "12c": ["H"], "12d": ["J"], "k1_box": "12", "by_code": True},
+     "notes": ("U29 interim mapping -- THIS BUILD'S, NOT THE DEPARTMENT'S. It mirrors Column (a)'s "
+               "Schedule K semantics: 12a cash contributions, 12b noncash, 12c investment interest "
+               "expense, 12d section 59(e)(2) expenditures. ⚠ Line 12e's residue is EMPTY on the "
+               "FINAL TY2025 K-1 -- every published box-12 code is already assigned -- so a non-zero "
+               "12e Column (d) needs the preparer's explanation."),
+     "sort_order": 15},
     {"scenario_name": "MO-1120S THROWBACK-STYLE allocation - rules (d)(2) and (g)(2) survive",
      "scenario_type": "edge",
      "inputs": {"allocation_rules": ["a", "b", "c", "d", "e", "f", "g"]},
@@ -7345,22 +7967,80 @@ MO_SHARED_DIAGNOSTICS: list[dict] = [
                "AUTOMATICALLY AND SILENTLY, with no Missouri line that would surface it. A TY-rollover "
                "pass must re-read 143.121.2 and .3 IN FULL for newly inserted subdivisions, not "
                "merely re-read the forms.")},
-    {"diagnostic_id": "D_MO_FEDERAL_LINES_UNVERIFIED", "severity": "warning",
-     "title": "⚠ Every federal line reference in this spec is UNVERIFIED against the FINAL IRS forms",
+    {"diagnostic_id": "D_MO_FEDERAL_LINES_VERIFIED", "severity": "info",
+     "title": "⭐ U8 CLOSED: every federal line reference verified against the FINAL TY2025 IRS forms",
      "condition": "any federal line reference is relied on",
-     "message": ("Every federal line reference in the Missouri pass-through lane was transcribed from "
-                 "the Missouri Department of Revenue's own TY2025 instructions and HAS NOT been "
-                 "cross-checked against the FINAL TY2025 IRS forms. THE DEPARTMENT ITSELF DISCLAIMS "
-                 "THE ALIGNMENT, printing on the FINAL Form MO-NRP: 'Note: At the time the Department "
-                 "finalized their tax booklets, the Internal Revenue Service had not finalized the "
-                 "federal income tax forms.' Affected references include Federal Form 1120S Schedule "
-                 "K Line 18; Federal Form 1065 Page 6 Analysis of Net Income (Loss) Line 1; Federal "
-                 "Form 1120-S Lines 5 and 22; Federal Form 1065 Page 1 Lines 10 and 22; Federal Form "
-                 "4797 Part II Line 17; Federal Form 1065 Schedule K Lines 13c and 13d; Form 1040 "
-                 "Schedule E Part II Line 32; and the whole MO-NRP / MO-NRS Schedule K line maps. "
-                 "RE-PULL THE FINAL IRS FORMS BEFORE THE APP BUILD."),
-     "notes": ("U8. The source brief says to do this cross-check BEFORE authoring, and it was not "
-               "done. It is one of the reasons the seed guard refuses.")},
+     "message": ("Every federal reference in the Missouri pass-through lane was cross-checked LINE BY "
+                 "LINE against the FINAL TY2025 IRS forms on 2026-08-19: 53 REFERENCES CHECKED, 51 "
+                 "CONFIRMED EXACTLY, ZERO STALE, ZERO UNRESOLVABLE. The Department's own note on the "
+                 "FINAL Form MO-NRP -- 'At the time the Department finalized their tax booklets, the "
+                 "Internal Revenue Service had not finalized the federal income tax forms' -- proved "
+                 "to be BOILERPLATE CAUTION, not a real defect. Missouri is on the POST-2022 Form "
+                 "1065 Schedule K numbering and the POST-2023 Form 1120-S page-1 numbering. ⭐ BOTH "
+                 "OF THE REFERENCES THAT WERE STALE IN MASSACHUSETTS ARE CORRECT HERE: Form 1120-S "
+                 "Line 22 really is 'Ordinary business income (loss)' under the 2023+ renumbering "
+                 "(the tax lines moved to 23a-23c), and Schedule E Part II Line 32 has not moved. "
+                 "⚠ THE TWO DEFECTS THE CROSS-CHECK DID FIND ARE MISSOURI'S AND ARE NOT STALE LINE "
+                 "NUMBERS -- they are the Schedule K-1 Column (d) mappings; see U29."),
+     "notes": ("Verified against ten IRS PDFs, no DRAFT watermark in any file: Form 1065 and Form "
+               "1120-S both ModDate 2026-01-08; Schedule K-1 (1065) 2026-01-06; Schedule K-1 "
+               "(1120-S) 2026-01-13; Form 4797 2025-12-17; Schedule E (1040) 2025-12-18; Form 4835 "
+               "2026-01-09; Form 1125-A Rev. 11-2024 (a CONTINUOUS-USE form -- that stamp IS the "
+               "TY2025 revision, not a staleness failure); the two K-1 instruction booklets "
+               "2025-12-29 and 2026-01-12. ⚠ A NEW TAX YEAR STALENESS-INVALIDATES THIS -- re-pull "
+               "the ten PDFs. Brief §22.12, which GOVERNS over §§4.2, 4.4, 6.1, 17, 18, 20 and 21.4.")},
+    {"diagnostic_id": "D_MO_K1_COLUMN_D_BY_CODE", "severity": "error",
+     "title": "⚠⚠ Schedule K-1 Column (d) must be resolved BY BOX CODE - the numbered boxes do not exist",
+     "condition": "Form MO-NRP or Form MO-NRS Column (d) is populated",
+     "message": ("Missouri instructs that Column (d) be copied from the federal Schedule K-1 using "
+                 "the same line numbers as Schedule K. IT CANNOT BE. On the FINAL TY2025 forms, "
+                 "Schedule K-1 (Form 1065) Part III runs 1, 2, 3, 4a, 4b, 4c, 5, 6a, 6b, 6c, 7, 8, "
+                 "9a, 9b, 9c, 10, 11, 12, 13 Other deductions, 14-23 -- THERE IS NO BOX 3c, 13a, 13b "
+                 "OR 13e -- and Schedule K-1 (Form 1120-S) Part III runs ..., 11, 12 Other "
+                 "deductions, 13-19 -- THERE IS NO BOX 12a, 12b, 12c, 12d OR 12e. Both are LETTER "
+                 "CODED, and MISSOURI NAMES NO CODES ANYWHERE. A lookup by number targets a box that "
+                 "does not exist, RETURNS NOTHING, AND THE RETURN STILL FOOTS. This product resolves "
+                 "Column (d) BY CODE: MO-NRP Line 13 from box 13 codes A-G and Line 13e from box "
+                 "13's remaining codes; MO-NRS Line 12a from box 12 codes A and B, 12b from C-G, 12c "
+                 "from H, 12d from J and 12e from the remainder. REVIEW THE COLUMN (d) AMOUNTS "
+                 "BEFORE FILING."),
+     "notes": ("⚠⚠ U29 -- AND THE MAPPING IS THIS BUILD'S, NOT THE DEPARTMENT'S. The federal side is "
+               "settled; the Missouri side is silent. The mapping mirrors Column (a)'s Schedule K "
+               "semantics exactly, which is the only reading under which Column (c) x Column (d) "
+               "reconciles. ⭐ MISSOURI ALREADY CONCEDES THE PATTERN ONCE, on MO-NRS itself, which "
+               "annotates Line 3 '(Federal Schedule K-1, Line 3)' because Schedule K calls the same "
+               "item 3c -- it simply did not carry the concession through to the 12x block, so "
+               "building to substance is the Department's OWN established style. ⚠ THE DEFECT IS "
+               "MISSOURI'S: MO-NRP, MO-NRS and the MO-1120S instructions were re-pulled and the "
+               "transcriptions confirmed exact. RECORD IT; DO NOT SILENTLY 'FIX' IT. Settle by a DOR "
+               "statement or a Gate-1 ruling.")},
+    {"diagnostic_id": "D_MO_NRP_P3_L12_TIEOUT", "severity": "warning",
+     "title": "⚠ MO-NRP Part 3 Line 12's second tie-out points at 4a but the federal figure is 4c",
+     "condition": "federal Schedule K Line 4b (guaranteed payments for capital) is non-zero",
+     "message": ("Form MO-NRP Part 3 Line 12 prints a double tie-out: '[Line 12 equals total of "
+                 "Federal Form 1065, Schedule K, Lines 1 and 4 and Form MO-NRP, Part 1, Column "
+                 "(a)]'. The Schedule K half is CORRECT -- Schedule K Line 4 is '4c Total. Add lines "
+                 "4a and 4b' -- and the arithmetic foots. THE SECOND HALF DOES NOT: MO-NRP Part 1 "
+                 "carries only '4a Guaranteed payments: Services', so it agrees with the federal "
+                 "figure ONLY WHEN LINE 4b (Guaranteed payments: Capital) IS ZERO. This return has a "
+                 "non-zero 4b, so the Part 1 tie-out will not foot and that is EXPECTED. Compare "
+                 "against Schedule K 4c."),
+     "notes": ("Found by the U8 cross-check; Missouri's defect, not a stale line number. ⚠ The "
+               "printed footnote 'Line 12 may not equal other lines in initial years of partnership "
+               "due to organizational costs' is a DIFFERENT caveat and does not cover this.")},
+    {"diagnostic_id": "D_MO_NRP_L5_QUALIFIED_DIV", "severity": "warning",
+     "title": "⚠ MO-NRP Part 1 Line 5's printed roll-up double-counts qualified dividends",
+     "condition": "federal Schedule K Line 6b (qualified dividends) is non-zero",
+     "message": ("Form MO-NRP Part 1 Line 5 is 'Total portfolio income (loss) total of Federal Form "
+                 "1065, Schedules K & K-1, Lines 5-9a'. On the FINAL TY2025 Schedule K that range "
+                 "spans 5 Interest income, 6a Ordinary dividends, 6b QUALIFIED DIVIDENDS, 6c "
+                 "Dividend equivalents, 7 Royalties, 8 Net short-term capital gain and 9a Net "
+                 "long-term capital gain -- AND 6b IS A SUBSET OF 6a. Summed literally the range "
+                 "DOUBLE-COUNTS qualified dividends. This return suppresses 6b and computes Line 5 "
+                 "without it. Because Line 5 feeds the nonresident withholding base, REVIEW THE "
+                 "WITHHELD AMOUNT BEFORE FILING."),
+     "notes": ("The same defect class as MO-NRS's 5b/8b/8c at U9 -- found on MO-NRP by the U8 "
+               "cross-check and NOT flagged by the first pass. It is present on BOTH forms.")},
     {"diagnostic_id": "D_MO_R15_CITY_EARNINGS_TAX", "severity": "info",
      "title": "Kansas City / St. Louis earnings taxes - out of scope, but they belong on Line 1b (R15)",
      "condition": "the entity has Kansas City or City of St. Louis activity",
@@ -7467,21 +8147,26 @@ MO_SHARED_DIAGNOSTICS: list[dict] = [
      "title": "⚠ 22 open [UNVERIFIED] items remain in the Missouri pass-through research",
      "condition": "this spec is relied on for an app build",
      "message": ("The Missouri source brief carries 22 genuinely open items after its adversarial "
-                 "verification pass and the U4 follow-up. The load-bearing ones are: U4 (narrowed -- "
-                 "the regulatory basis for MO-NRP Part 3 direct accounting); U8 (every federal line "
-                 "reference, uncross-checked against the FINAL IRS forms); U9 (the defective "
-                 "withholding base summations); U11 (the inverted mileage trigger); U14 (MO-MS PTE "
-                 "Line 9 with a zero or negative denominator); U15 (Schedule PTE-BD Line 8's "
-                 "ambiguity); U16 (Column (A)'s owner-exempt carve-out); U17 (the 'brains of the "
-                 "operation' test versus section 143.455); U20 (tax actually paid); U21 (withholding "
-                 "surviving the election); U22 (disjunctive statute versus conjunctive forms); U24 "
-                 "(extension routing and length); U25 (the interest rate); and U27 (the incorrect "
-                 "Form MO-PTE Opt-Out scanline). EACH IS ENCODED AS A DIAGNOSTIC OR A NOTE. NONE IS "
-                 "SILENTLY FILLED WITH A GUESS."),
-     "notes": ("Closed on verification: U1 (e-file, six-way corroborated), U2 (opt-out vintage), U5 "
-               "(the Method Two A default), U6 (the Form 5889 causation). Strengthened but open by "
-               "design: U3 (capital gain -- ruled at D-10), U18 and U19 (the depreciation residual's "
-               "routing; the STATUTE is closed, only the write-in destination is open). Narrowed: U4.")},
+                 "verification pass, the U4 follow-up and the U8 cross-check. The load-bearing ones "
+                 "are: U4 (narrowed -- the regulatory basis for MO-NRP Part 3 direct accounting); "
+                 "U9 (the defective withholding base summations, on BOTH nonresident forms); U11 "
+                 "(the inverted mileage trigger); U14 (MO-MS PTE Line 9 with a zero or negative "
+                 "denominator); U15 (Schedule PTE-BD Line 8's ambiguity); U16 (Column (A)'s "
+                 "owner-exempt carve-out); U17 (the 'brains of the operation' test versus section "
+                 "143.455); U20 (tax actually paid); U21 (withholding surviving the election); U22 "
+                 "(disjunctive statute versus conjunctive forms); U24 (extension routing and "
+                 "length); U25 (the interest rate); U27 (the incorrect Form MO-PTE Opt-Out "
+                 "scanline); and U29 (which Schedule K-1 box CODES feed Column (d), because the "
+                 "numbered boxes Missouri names DO NOT EXIST). EACH IS ENCODED AS A DIAGNOSTIC OR A "
+                 "NOTE. NONE IS SILENTLY FILLED WITH A GUESS."),
+     "notes": ("⭐ U8 IS CLOSED -- the federal line-reference cross-check was performed on 2026-08-19 "
+               "against ten FINAL TY2025 IRS PDFs: 53 references checked, 51 confirmed exactly, ZERO "
+               "stale. It found U29 instead, which is a MISSOURI MAPPING DEFECT, not a stale line "
+               "number, so the count stays at 22 (U8 out, U29 in). Also closed on verification: U1 "
+               "(e-file, six-way corroborated), U2 (opt-out vintage), U5 (the Method Two A default), "
+               "U6 (the Form 5889 causation). Strengthened but open by design: U3 (capital gain -- "
+               "ruled at D-10), U18 and U19 (the depreciation residual's routing; the STATUTE is "
+               "closed, only the write-in destination is open). Narrowed: U4.")},
 ]
 
 
@@ -7670,6 +8355,36 @@ FLOW_ASSERTIONS: list[dict] = [
                     "check": ("mo_withholding_required(..., pte_election_made=True)['required'] is "
                               "True and ['election_relieved_withholding'] is False")},
      "bug_reference": "Suspending withholding on election, as most PTET states do -- Missouri does not"},
+    {"assertion_id": "FA-MO-K1-BYCODE", "title": "⚠⚠ Schedule K-1 Column (d) is CODE-KEYED, never numeric",
+     "assertion_type": "table_invariant", "entity_types": ["1065", "1120S"], "status": "draft",
+     "sort_order": 23,
+     "description": ("Missouri instructs that Column (d) be copied from the Schedule K-1 using the "
+                     "same line numbers as Schedule K. The FINAL TY2025 Schedule K-1 (Form 1065) has "
+                     "a SINGLE box 13 (no 3c, 13a, 13b or 13e) and the Schedule K-1 (Form 1120-S) a "
+                     "SINGLE box 12 (no 12a-12e), both LETTER-CODED. A numeric lookup targets a box "
+                     "that DOES NOT EXIST, returns nothing, and the return still foots. No rule may "
+                     "resolve a Schedule K-1 item by any of those numbers."),
+     "definition": {"rule": "R-MO65-K1COLD + R-MO20S-K1COLD",
+                    "check": ("mo_k1_assert_not_numeric() RAISES MissouriK1BoxError on every entry in "
+                              "MO_K1_NUMERIC_REFS_FORBIDDEN; mo_nrp_column_d('13'/'13e') and "
+                              "mo_nrs_column_d('12a'..'12e') all return by_code=True with a non-empty "
+                              "code tuple")},
+     "bug_reference": "A K-1 lookup at 13a/13b/13e or 12a-12e silently returns nothing and the return still foots"},
+    {"assertion_id": "FA-MO-U8-CLOSED", "title": "⭐ U8 CLOSED - 53 federal references checked, ZERO stale",
+     "assertion_type": "table_invariant", "entity_types": ["1065", "1120S"], "status": "draft",
+     "sort_order": 24,
+     "description": ("Every federal reference was cross-checked line by line against ten FINAL TY2025 "
+                     "IRS PDFs on 2026-08-19 -- no DRAFT watermark in any file. 51 of 53 confirmed "
+                     "exactly; the two exceptions are MISSOURI'S Column (d) mapping defects, not "
+                     "stale line numbers. ⭐ Both references that were stale in Massachusetts are "
+                     "correct in Missouri: 1120-S Line 22 (ordinary business income under the 2023+ "
+                     "renumbering) and Schedule E Part II Line 32 (unmoved). ⚠ Form 1125-A is a "
+                     "CONTINUOUS-USE form at Rev. 11-2024 -- that IS the TY2025 revision. A new tax "
+                     "year staleness-invalidates the whole cross-check."),
+     "definition": {"rule": "R-MOPTE-PG1 + R-MO65-WHBASE + R-MO20S-WHBASE",
+                    "check": ("MO_FEDERAL_REFS_STALE == 0 AND '[UNVERIFIED - U8]' appears nowhere in "
+                              "the spec AND MO_FEDERAL_FORM_REVISIONS carries all ten IRS stamps")},
+     "bug_reference": "Wave 2 Texas cited 2024 IRS lines on a 2025 return; Wave 4 Massachusetts had three stale refs"},
     {"assertion_id": "FA-MO-WH-SUBSET", "title": "The withholding base suppresses MO-NRS 5b / 8b / 8c",
      "assertion_type": "reconciliation", "entity_types": ["1120S"], "status": "draft", "sort_order": 8,
      "description": ("MO-1NR defines the S-corporation base as 'the net total of the amounts listed on "
@@ -7919,6 +8634,18 @@ class Command(BaseCommand):
             empty.append("A MISSOURI DEPRECIATION FIGURE HAS BEEN INVENTED - see the N1 banner")
         if MO_AUTOMATE_EMAIL_SUBMISSION:
             empty.append("MO_AUTOMATE_EMAIL_SUBMISSION was flipped - campaign D-12 A6 forbids it")
+        # ⚠ U29. A Schedule K-1 lookup by a box number the K-1 does not have fails
+        # SILENTLY, so the guard refuses to seed a spec that contains one.
+        for _mod, _refs in MO_K1_NONEXISTENT_SUBLINES.items():
+            for _ref in _refs:
+                try:
+                    mo_k1_assert_not_numeric(_mod, _ref)
+                except MissouriK1BoxError:
+                    continue
+                empty.append(f"THE U29 K-1 GUARD DOES NOT REFUSE {_mod}/{_ref!r} - a numeric "
+                             f"Schedule K-1 lookup would fail SILENTLY")
+        if "[UNVERIFIED - U8]" in MO_FEDERAL_LINE_STAMP:
+            empty.append("THE U8 STAMP WAS NOT PROMOTED - the cross-check closed U8 on 2026-08-19")
 
         if not READY_TO_SEED or empty:
             still_empty = "\n  ".join(f"- {n}" for n in empty) or "(all populated)"
@@ -7931,16 +8658,20 @@ class Command(BaseCommand):
                 "      Missouri top-level codes, with Form MO-MS PTE and Schedule PTE-BD as\n"
                 "      computing sub-specs), the A6 privacy ruling, C3/C4/C5/C6/C11 and the Group D\n"
                 "      items. It is NOT a seed approval.\n\n"
-                "  (2) U8 IS UNCLOSED AND THE BRIEF SAYS TO CLOSE IT *BEFORE* AUTHORING.\n"
-                "      EVERY federal line reference in this lane was transcribed from the Missouri\n"
-                "      DOR's own instructions and has NEVER been cross-checked against the FINAL\n"
-                "      TY2025 IRS forms - and THE DEPARTMENT ITSELF DISCLAIMS THE ALIGNMENT,\n"
-                "      printing on the FINAL Form MO-NRP: 'At the time the Department finalized\n"
-                "      their tax booklets, the Internal Revenue Service had not finalized the\n"
-                "      federal income tax forms.' Affected: 1120S Sch K L18, 1065 p.6 Analysis L1,\n"
-                "      1120-S L5 and L22, 1065 p.1 L10 and L22, 4797 Pt II L17, 1065 Sch K L13c/13d,\n"
-                "      Sch E Pt II L32, and the whole MO-NRP / MO-NRS Schedule K line maps.\n"
-                "      Pull the FINAL IRS Forms 1065, 1120-S, Schedules K-1, 4797 and 1125-A first.\n\n"
+                "  (2) U29 IS OPEN, AND IT IS A SILENT-FAILURE MAPPING. Missouri instructs that\n"
+                "      Form MO-NRP and Form MO-NRS COLUMN (d) be copied from the federal SCHEDULE\n"
+                "      K-1 using the same line numbers as Schedule K. IT CANNOT BE: the FINAL\n"
+                "      TY2025 Schedule K-1 (Form 1065) has a SINGLE box 13 (there is no 3c, no 13a,\n"
+                "      no 13b, no 13e) and the Schedule K-1 (Form 1120-S) a SINGLE box 12 (there is\n"
+                "      no 12a-12e). BOTH ARE LETTER-CODED AND MISSOURI NAMES NO CODES ANYWHERE - not\n"
+                "      on MO-NRP, not on MO-NRS, not in the MO-1120S instructions. A numeric lookup\n"
+                "      targets a box that does not exist, returns NOTHING, and the return still\n"
+                "      foots. This file therefore resolves Column (d) BY BOX CODE, but THE MAPPING\n"
+                "      IS THIS BUILD'S AND NOT THE DEPARTMENT'S: it mirrors Column (a)'s Schedule K\n"
+                "      semantics, the only reading under which Column (c) x Column (d) reconciles.\n"
+                "      Ken must rule, or the Department must answer. (The defect is MISSOURI'S -\n"
+                "      MO-NRP, MO-NRS and the MO-1120S instructions were re-pulled and the\n"
+                "      transcriptions confirmed exact. Record it; do not silently 'fix' it.)\n\n"
                 "  (3) U4 IS NARROWED, NOT CLOSED, AND ITS RESIDUE IS A GATE-1 SEED QUESTION.\n"
                 "      12 CSR 10-2.190(2)(C) delegates to 12 CSR 10-2.255, whose (3) puts PARTNERSHIP\n"
                 "      nonresident sourcing on section 143.455 - identical to S corporations - so the\n"
@@ -7953,12 +8684,16 @@ class Command(BaseCommand):
                 "      Ken must rule, or the Department must answer (corporate@dor.mo.gov).\n\n"
                 "  (4) TWENTY-TWO OPEN [UNVERIFIED] ITEMS REMAIN, and several move cash on real\n"
                 "      returns rather than merely annotating them:\n"
-                "        U9  - the withholding base summations are DEFECTIVE AS PRINTED. MO-NRS\n"
-                "              'Lines 1 through 10' DOUBLE-COUNTS (5b is a subset of 5a; 8b and 8c\n"
-                "              are subsets of 8a); MO-NRP 'Lines 1 through 11' over a NON-CONTIGUOUS\n"
-                "              line set silently EXCLUDES IRC 179, contributions and other\n"
-                "              deductions. THIS DETERMINES CASH WITHHELD. A DOR worked example is\n"
-                "              needed before season.\n"
+                "        U9  - the withholding base summations are DEFECTIVE AS PRINTED, ON BOTH\n"
+                "              NONRESIDENT FORMS. MO-NRS 'Lines 1 through 10' DOUBLE-COUNTS (5b is\n"
+                "              a subset of 5a; 8b and 8c are subsets of 8a); MO-NRP 'Lines 1\n"
+                "              through 11' over a NON-CONTIGUOUS line set silently EXCLUDES IRC\n"
+                "              179, contributions and other deductions; AND MO-NRP Part 1 Line 5's\n"
+                "              own 'Lines 5-9a' roll-up double-counts qualified dividends (6b is a\n"
+                "              subset of 6a) - the federal cross-check found that one, and\n"
+                "              the first pass had flagged the class only for MO-NRS. THIS\n"
+                "              DETERMINES CASH WITHHELD. A DOR worked example is needed before\n"
+                "              season.\n"
                 "        U11 - the MO-MS PTE Lines 4-9 trigger is stated in OPPOSITE SENSES by the\n"
                 "              two instruction books ('applicable' vs 'inapplicable') and no source\n"
                 "              resolves which is inverted. mo_ms_pte_lines_4_9_required() RAISES\n"
@@ -7994,6 +8729,16 @@ class Command(BaseCommand):
                 "      itself carries NO SCANLINE while fourteen other forms in the lane do - which\n"
                 "      is consistent with it not being machine-processed but is UNCONFIRMED.\n\n"
                 "WHAT THIS FILE DOES *NOT* REFUSE OVER, so nobody re-opens them:\n"
+                "  - U8 IS CLOSED and is NO LONGER A REASON TO REFUSE. The cross-check was\n"
+                "    performed on 2026-08-19 against ten FINAL TY2025 IRS PDFs, read line by line:\n"
+                "    53 REFERENCES CHECKED, 51 CONFIRMED EXACTLY, ZERO STALE, ZERO UNRESOLVABLE.\n"
+                "    Not one Missouri federal line number is stale, and the DOR's 'the IRS had not\n"
+                "    finalized the federal income tax forms' note proved to be BOILERPLATE. Both\n"
+                "    references that were stale in Massachusetts are CORRECT in Missouri (1120-S\n"
+                "    Line 22 is ordinary business income under the 2023+ renumbering; Schedule E\n"
+                "    Part II Line 32 has not moved). Form 1125-A's Rev. 11-2024 stamp is a\n"
+                "    CONTINUOUS-USE form, not a staleness failure. What the cross-check DID find is\n"
+                "    U29, at (2) above - a Missouri mapping defect, not a stale line number.\n"
                 "  - The e-file inversion is SETTLED (six independent sources) and A6 is RULED:\n"
                 "    Delvio does NOT automate the Department's unencrypted e-mail channel.\n"
                 "  - 'MO-PTE is filed IN ADDITION TO MO-1065 / MO-1120S' is PUBLISHED DOR AUTHORITY,\n"

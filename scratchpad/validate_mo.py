@@ -110,9 +110,19 @@ except CommandError as e:
     check("Gate 1 has NOT been taken" in msg,
           "guard states plainly that the Gate-1 seed approval is open for Missouri",
           "guard message does not say Gate 1 is open")
-    check("U8" in msg and "IRS" in msg,
-          "guard names U8 -- the federal line references are uncross-checked against the FINAL IRS forms",
-          "guard message omits the U8 blocker")
+    check("U8 IS CLOSED" in msg and "NO LONGER A REASON TO REFUSE" in msg,
+          "⭐ the guard records U8 as CLOSED and expressly NOT a refusal reason",
+          "the guard does not record U8 as closed")
+    _reasons = msg.split("WHAT THIS FILE DOES *NOT* REFUSE OVER")[0]
+    check("U8" not in _reasons,
+          "⭐ U8 appears NOWHERE among the guard's stated REASONS to refuse",
+          "U8 is still cited as a reason the guard refuses")
+    check("U29" in _reasons and "DOES NOT EXIST" in _reasons.upper(),
+          "U29 has replaced U8 as a refusal reason, and the guard says the boxes do not exist",
+          "the guard does not cite U29 as a refusal reason")
+    check("returns NOTHING" in _reasons and "still" in _reasons,
+          "the guard names the SILENT-FAILURE shape of the U29 defect",
+          "the guard does not explain why the U29 mapping fails silently")
     check("U4" in msg and "143.421.4" in msg and "APPLICATION" in msg.upper(),
           "guard names the NARROWED U4 and the 143.421.4 'on application' problem",
           "guard message omits the narrowed U4")
@@ -447,6 +457,9 @@ check(len(set(fa_ids)) == len(fa_ids), f"no duplicate assertion_id ({len(fa_ids)
       f"DUPLICATE assertion_id: {[i for i in fa_ids if fa_ids.count(i) > 1]}")
 check(FlowAssertion.objects.filter(assertion_id__startswith="FA-MO").count() == len(fa_ids),
       f"all {len(fa_ids)} Missouri flow assertions seeded", "flow assertion count mismatch")
+check({"FA-MO-K1-BYCODE", "FA-MO-U8-CLOSED"} <= set(fa_ids),
+      "the U29 code-keying and U8-closure flow assertions are both present",
+      "a U8/U29 flow assertion is missing")
 
 src_codes = [s["source_code"] for s in MO.AUTHORITY_SOURCES]
 check(len(set(src_codes)) == len(src_codes),
@@ -474,6 +487,9 @@ recreated = [s["source_code"] for s in MO.AUTHORITY_SOURCES
              if s["source_code"] in MO.EXISTING_SOURCES_TO_REFERENCE]
 check(not recreated, "no already-seeded Missouri source is re-created by this loader",
       f"loader re-creates already-seeded sources: {recreated}")
+check(AuthoritySource.objects.filter(source_code="MO_IRS_2025_K1_BOXES").exists(),
+      "the FINAL TY2025 Schedule K-1 box lists are seeded as their own authority source",
+      "the IRS Schedule K-1 authority source is missing")
 check("MO_RSMO_143_091" in MO.EXISTING_SOURCES_TO_REFERENCE
       and "MO_RSMO_143_121" in MO.EXISTING_SOURCES_TO_REFERENCE
       and "MO_RSMO_143_436" in MO.EXISTING_SOURCES_TO_REFERENCE,
@@ -1127,28 +1143,214 @@ check(not missing_rd,
 
 # 7c. The shared diagnostics really are on all three specs.
 for did in ("D_MO_DEPR_ABSENCE_IS_A_RULING", "D_MO_CONFORMITY_ROLLING",
-            "D_MO_FEDERAL_LINES_UNVERIFIED", "D_MO_OPEN_ITEMS_OUTSTANDING",
+            "D_MO_FEDERAL_LINES_VERIFIED", "D_MO_K1_COLUMN_D_BY_CODE",
+            "D_MO_OPEN_ITEMS_OUTSTANDING",
             "D_MO_R15_CITY_EARNINGS_TAX", "D_MO_OWNER_EXTRACT_PACKAGE"):
     n = FormDiagnostic.objects.filter(tax_form__jurisdiction="MO", diagnostic_id=did).count()
     check(n == 3, f"shared diagnostic {did} is attached to all THREE Missouri specs",
           f"shared diagnostic {did} is on {n} spec(s), expected 3")
 
-# 7d. U8 is surfaced everywhere a federal line reference is made.
-u8 = FormDiagnostic.objects.filter(tax_form=fpte,
-                                   diagnostic_id="D_MO_FEDERAL_LINES_UNVERIFIED").first()
-check(u8 is not None and "had not finalized" in u8.message,
-      "U8 carries the DOR's own disclaimer verbatim -- printed on a FINAL form",
-      "the U8 diagnostic is missing or lacks the DOR disclaimer")
+# ==========================================================================
+# 7d. ⭐ U8 IS CLOSED -- the stamps are VERIFICATION stamps now.
+# ==========================================================================
+check("[UNVERIFIED - U8]" not in MO.MO_FEDERAL_LINE_STAMP
+      and "[VERIFIED - U8 CLOSED" in MO.MO_FEDERAL_LINE_STAMP,
+      "⭐ the federal-line stamp is a VERIFICATION stamp -- U8 CLOSED 2026-08-19",
+      "the federal-line stamp is still an [UNVERIFIED] stamp")
+_still_unverified = [f["fact_key"] for spec in MO.FORMS for f in spec["facts"]
+                     if "[UNVERIFIED - U8]" in (f.get("notes") or "")]
+_still_unverified += [ln["line_number"] for spec in MO.FORMS for ln in spec["lines"]
+                      if "[UNVERIFIED - U8]" in (ln.get("notes") or "")]
+check(not _still_unverified,
+      "NO fact or line anywhere in the three specs still carries an [UNVERIFIED - U8] stamp",
+      f"still carrying the U8 unverified stamp: {_still_unverified}")
 stamped = [f for spec in MO.FORMS for f in spec["facts"]
-           if "[UNVERIFIED - U8]" in (f.get("notes") or "")]
+           if "[VERIFIED - U8 CLOSED" in (f.get("notes") or "")]
 check(len(stamped) >= 6,
-      f"the U8 stamp rides on {len(stamped)} federal-line facts across the three specs",
-      "the U8 stamp is missing from the federal-line facts")
+      f"the U8 VERIFICATION stamp rides on {len(stamped)} federal-line facts across the three specs",
+      "the U8 verification stamp is missing from the federal-line facts")
+check(MO.MO_FEDERAL_REFS_CHECKED == 53 and MO.MO_FEDERAL_REFS_CONFIRMED == 51
+      and MO.MO_FEDERAL_REFS_STALE == 0,
+      "the cross-check result is pinned: 53 checked, 51 confirmed, ZERO stale",
+      f"the cross-check counters are wrong: {MO.MO_FEDERAL_REFS_CHECKED} / "
+      f"{MO.MO_FEDERAL_REFS_CONFIRMED} / {MO.MO_FEDERAL_REFS_STALE}")
+check(len(MO.MO_FEDERAL_FORM_REVISIONS) == 10,
+      "all TEN IRS revision stamps are recorded, so the staleness re-check is mechanical",
+      f"expected 10 IRS revision stamps, got {len(MO.MO_FEDERAL_FORM_REVISIONS)}")
+check(any("CONTINUOUS-USE" in v for v in MO.MO_FEDERAL_FORM_REVISIONS.values()),
+      "Form 1125-A's Rev. 11-2024 stamp is recorded as CONTINUOUS-USE, not a staleness failure",
+      "the Form 1125-A continuous-use exception is not recorded")
+check(len(MO.MO_FEDERAL_MA_TRAPS_AVOIDED) == 2
+      and any("1120-S Line 22" in t[0] for t in MO.MO_FEDERAL_MA_TRAPS_AVOIDED)
+      and any("Line 32" in t[0] for t in MO.MO_FEDERAL_MA_TRAPS_AVOIDED),
+      "⭐ both references that were STALE IN MASSACHUSETTS are recorded as CORRECT in Missouri",
+      "the two Massachusetts traps are not recorded as avoided")
+u8 = FormDiagnostic.objects.filter(tax_form=fpte,
+                                   diagnostic_id="D_MO_FEDERAL_LINES_VERIFIED").first()
+check(u8 is not None and u8.severity == "info" and "ZERO STALE" in u8.message,
+      "the federal-line diagnostic now reports the CLOSURE, at info severity",
+      "the federal-line verification diagnostic is missing or still a warning")
+check("STALENESS-INVALIDATES" in u8.notes.upper(),
+      "the closure carries its own staleness tripwire -- a new tax year voids the cross-check",
+      "the U8 closure has no staleness tripwire")
+check("U8" in MO.MO_OPEN_ITEMS_CLOSED and MO.MO_OPEN_ITEMS_NEW == ("U29",)
+      and MO.MO_OPEN_ITEMS_GENUINELY_OPEN == 22,
+      "the open-item ledger records U8 CLOSED and U29 NEW, holding the count at 22",
+      f"the open-item ledger is wrong: closed={MO.MO_OPEN_ITEMS_CLOSED} new={MO.MO_OPEN_ITEMS_NEW}")
+
+# ==========================================================================
+# 7d-bis. ⚠⚠ U29 -- THE SCHEDULE K-1 COLUMN (d) LOOKUPS ARE CODE-KEYED,
+#         AND NO NUMERIC K-1 SUB-LINE REFERENCE MAY EVER BE REINTRODUCED.
+# ==========================================================================
+check(set(MO.MO_K1_NONEXISTENT_SUBLINES[MO.K1_1065]) == {"3c", "13a", "13b", "13e"},
+      "the non-existent Schedule K-1 (1065) boxes are pinned: 3c, 13a, 13b, 13e",
+      f"the 1065 K-1 non-existent set is wrong: {MO.MO_K1_NONEXISTENT_SUBLINES[MO.K1_1065]}")
+check(set(MO.MO_K1_NONEXISTENT_SUBLINES[MO.K1_1120S]) == {"12a", "12b", "12c", "12d", "12e"},
+      "the non-existent Schedule K-1 (1120-S) boxes are pinned: 12a, 12b, 12c, 12d, 12e",
+      f"the 1120-S K-1 non-existent set is wrong: {MO.MO_K1_NONEXISTENT_SUBLINES[MO.K1_1120S]}")
+
+_unguarded = []
+for _mod, _refs in MO.MO_K1_NONEXISTENT_SUBLINES.items():
+    for _ref in _refs:
+        try:
+            MO.mo_k1_assert_not_numeric(_mod, _ref)
+            _unguarded.append(f"{_mod}/{_ref}")
+        except MO.MissouriK1BoxError:
+            pass
+check(not _unguarded,
+      "⚠⚠ THE GUARD FIRES on EVERY non-existent Schedule K-1 box number, on both K-1s",
+      f"a numeric K-1 lookup was allowed through (it would fail SILENTLY): {_unguarded}")
+try:
+    MO.mo_k1_assert_not_numeric(MO.K1_1065, "13a")
+except MO.MissouriK1BoxError as e:
+    check("DOES NOT EXIST" in str(e) and "LETTER-CODED" in str(e) and "U29" in str(e),
+          "the K-1 refusal explains itself: the box does not exist, box 13 is letter-coded, U29",
+          "the K-1 refusal message is incomplete")
+    check("MISSOURI'S defect" in str(e) or "MISSOURI" in str(e).upper(),
+          "the K-1 refusal attributes the defect to MISSOURI, not to the brief or the build",
+          "the K-1 refusal does not attribute the defect")
+check(MO.mo_k1_assert_not_numeric(MO.K1_1065, "12") == "12",
+      "a box number that DOES exist passes the guard untouched",
+      "the guard rejected a valid K-1 box")
+
+_nrp13 = MO.mo_nrp_column_d("13")
+check(_nrp13["by_code"] is True and _nrp13["k1_box"] == "13"
+      and tuple(_nrp13["codes"]) == ("A", "B", "C", "D", "E", "F", "G"),
+      "MO-NRP Line 13 Column (d) resolves to K-1 box 13 CODES A-G (contributions)",
+      f"the MO-NRP Line 13 mapping is wrong: {_nrp13}")
+_nrp13e = MO.mo_nrp_column_d("13e")
+check(_nrp13e["by_code"] is True and set(_nrp13e["codes"]) == {"H", "I", "J", "K", "L"},
+      "MO-NRP Line 13e Column (d) resolves to box 13's REMAINING codes H, I, J, K, L",
+      f"the MO-NRP Line 13e mapping is wrong: {_nrp13e}")
+_nrp3c = MO.mo_nrp_column_d("3c")
+check(_nrp3c["k1_box"] == "3" and _nrp3c["by_code"] is False,
+      "MO-NRP Line 3c Column (d) resolves to the K-1's BARE box 3 -- same item, different number",
+      f"the MO-NRP Line 3c mapping is wrong: {_nrp3c}")
+check("MO-NRS annotates its own Line 3" in _nrp3c["note"],
+      "the mapping records that MISSOURI ITSELF already concedes this pattern once, on MO-NRS Line 3",
+      "the Missouri concession is not recorded")
+
+_nrs_expected = {"12a": ("A", "B"), "12b": ("C", "D", "E", "F", "G"), "12c": ("H",), "12d": ("J",)}
+_nrs_bad = []
+for _line, _want in _nrs_expected.items():
+    _got = MO.mo_nrs_column_d(_line)
+    if not (_got["by_code"] and _got["k1_box"] == "12" and tuple(_got["codes"]) == _want):
+        _nrs_bad.append((_line, _got))
+check(not _nrs_bad,
+      "MO-NRS 12a/12b/12c/12d Column (d) resolve to box 12 codes A-B / C-G / H / J",
+      f"MO-NRS box-12 mappings wrong: {_nrs_bad}")
+_nrs12e = MO.mo_nrs_column_d("12e")
+check(_nrs12e["by_code"] is True and _nrs12e["k1_box"] == "12" and _nrs12e["codes"] == (),
+      "MO-NRS Line 12e's box-12 residue is EMPTY on the FINAL K-1, and that is recorded",
+      f"the MO-NRS 12e residue is wrong: {_nrs12e}")
+check("needs the preparer's explanation" in _nrs12e["note"],
+      "an empty 12e residue is surfaced to the preparer rather than silently zeroed",
+      "the empty 12e residue is not surfaced")
+check("NOT A PUBLISHED DOR POSITION" in MO.MO_K1_COLUMN_D_STATUS,
+      "⚠ the whole Column (d) mapping is labelled THIS BUILD'S, not the Department's",
+      "the Column (d) mapping is not labelled as an interim build position")
+check("MISSOURI NAMES NO CODES ANYWHERE" in MO.MO_K1_COLUMN_D_QUESTION,
+      "the U29 Gate-1 question records that the federal side is settled and Missouri is silent",
+      "the U29 Gate-1 question is incomplete")
+
+# ⚠ THE STRUCTURAL PIN: no rule, line or fact anywhere in the three specs may
+# claim a Schedule K-1 item at a box number that does not exist.
+_k1_ctx = ("schedule k-1", "sch k-1", "k-1 box", "federal schedule k-1")
+_offenders = []
+for spec in MO.FORMS:
+    _fn = spec["identity"]["form_number"]
+    for _r in spec["rules"]:
+        _txt = " ".join(str(_r.get(k) or "") for k in ("formula", "description", "notes",
+                                                       "exceptions"))
+        _low = _txt.lower()
+        if any(c in _low for c in _k1_ctx):
+            for _bad in MO.MO_K1_NUMERIC_REFS_FORBIDDEN:
+                # A bare "K-1 <bad>" claim is the failure; naming it as NOT existing is the fix.
+                if f"k-1 box {_bad}" in _low or f"k-1 {_bad}" in _low or f"k-1, line {_bad}" in _low:
+                    if "no box" in _low or "does not exist" in _low or "no k-1 box" in _low:
+                        continue
+                    _offenders.append(f"{_fn}/{_r['rule_id']} -> K-1 {_bad}")
+check(not _offenders,
+      "⚠⚠ PINNED: no Missouri rule resolves a Schedule K-1 item by a numeric sub-line "
+      "(13a / 13b / 13e / 12a-12e) -- only by box code",
+      f"rules claiming a non-existent K-1 box: {_offenders}")
+for _fc, _rid in ((F65, "R-MO65-K1COLD"), (F20S, "R-MO20S-K1COLD")):
+    check(FormRule.objects.filter(tax_form__form_number=_fc, tax_form__jurisdiction="MO",
+                                  rule_id=_rid).exists(),
+          f"{_fc} carries the code-keyed Column (d) rule {_rid}",
+          f"{_fc} is missing {_rid}")
+_k1d = FormDiagnostic.objects.filter(diagnostic_id="D_MO_K1_COLUMN_D_BY_CODE",
+                                     tax_form__jurisdiction="MO", severity="error")
+check(_k1d.count() == 3,
+      "the U29 Column (d) diagnostic is an ERROR on all THREE Missouri specs",
+      f"the U29 diagnostic is on {_k1d.count()} spec(s) at error severity, expected 3")
+
+# 7d-ter. The two further U8-cross-check findings.
+_tie = MO.mo_nrp_p3_l12_tieout(500000, 380000, 100000, 15000, 5000)
+check(approx(_tie["L12"], 120000.0) and approx(_tie["sch_k_4c"], 20000.0)
+      and approx(_tie["sch_k_target"], 120000.0),
+      "MO-NRP P3 L12 ORACLE: the tie-out FOOTS against Schedule K Line 1 + `4c`, not `4a`",
+      f"the P3 L12 tie-out is wrong: {_tie}")
+check(_tie["part1_tieout_foots"] is False and _tie["requires_human_review"] is True,
+      "⚠ the SECOND tie-out (to Part 1 Column (a)) is flagged as NOT footing when `4b` is non-zero",
+      "the 4a-vs-4c defect is not flagged")
+_tie0 = MO.mo_nrp_p3_l12_tieout(500000, 380000, 100000, 20000, 0.0)
+check(_tie0["part1_tieout_foots"] is True and _tie0["requires_human_review"] is False,
+      "with `4b` zero, BOTH printed tie-outs foot and nothing is raised",
+      f"the zero-4b case raised anyway: {_tie0}")
+check(MO.MO_NRP_P3_L12_TIEOUT_TARGET == "4c",
+      "the P3 L12 tie-out target is pinned at Schedule K `4c`",
+      "the P3 L12 tie-out still targets 4a")
+check(FormDiagnostic.objects.filter(tax_form=f65, diagnostic_id="D_MO_NRP_P3_L12_TIEOUT").exists(),
+      "the P3 L12 tie-out defect carries its own diagnostic",
+      "the P3 L12 tie-out defect has no diagnostic")
+
+_l5 = MO.mo_nrp_line5_rollup({"5": 12000, "6a": 30000, "6b": 22000, "6c": 0, "7": 4000,
+                              "8": 6000, "9a": 50000})
+check(approx(_l5["L5"], 102000.0) and approx(_l5["literal_sum_would_be"], 124000.0)
+      and approx(_l5["overstatement_avoided"], 22000.0),
+      "MO-NRP L5 ORACLE: `6b` is SUPPRESSED, avoiding a $22,000 portfolio overstatement",
+      f"the MO-NRP Line 5 roll-up is wrong: {_l5}")
+check(_l5["requires_human_review"] is True and MO.MO_NRP_L5_SUBSET_LINES == {"6b": "6a"},
+      "a non-zero `6b` raises requires_human_review, exactly as 5b/8b/8c do on MO-NRS",
+      "the MO-NRP 6b subset flag did not fire")
+check("6b" not in MO.MO_NRP_L5_SUM_LINES and "6b" in MO.MO_NRP_L5_ROLLUP_LINES,
+      "`6b` is inside the DOR's printed range but OUTSIDE the summation this build performs",
+      "the MO-NRP Line 5 line sets are wrong")
+check(FormDiagnostic.objects.filter(tax_form=f65,
+                                    diagnostic_id="D_MO_NRP_L5_QUALIFIED_DIV").exists(),
+      "the MO-NRP qualified-dividend double-count carries its own diagnostic",
+      "the MO-NRP 6b defect has no diagnostic")
 
 # 7e. The DOR defect ledger and the open-item counters.
-check(len(MO.MO_DOR_DEFECTS) == 22,
-      "22 DOR citation/label defects carried: the brief's 21, plus #22 found by THIS harness",
-      f"the DOR defect ledger holds {len(MO.MO_DOR_DEFECTS)} entries, expected 22")
+check(len(MO.MO_DOR_DEFECTS) == 24,
+      "24 DOR citation/label defects carried: the brief's 21, #22 found by THIS harness, and the "
+      "two Column (d) defects the U8 cross-check found (#23 and #24)",
+      f"the DOR defect ledger holds {len(MO.MO_DOR_DEFECTS)} entries, expected 24")
+_k1defects = [d for d in MO.MO_DOR_DEFECTS if d["id"] in (23, 24)]
+check(len(_k1defects) == 2 and all("MISSOURI'S" in d["spec_impact"].upper() for d in _k1defects),
+      "defects #23 and #24 record the Column (d) mappings and attribute them to MISSOURI",
+      "the two Column (d) defects are missing or unattributed")
 _optrnd = [d for d in MO.MO_DOR_DEFECTS if d["id"] == 22][0]
 check("NOT IN THE SOURCE BRIEF" in _optrnd["spec_impact"],
       "defect #22 is flagged as a NEW finding surfaced by the validation harness",
@@ -1160,10 +1362,12 @@ check("4.8%" in _faq["printed"] and "4.7%" in _faq["actual"],
 check(MO.MO_OPEN_ITEMS_GENUINELY_OPEN == 22 and MO.MO_WALK_ITEMS_LIVE == 15,
       "the open-item counters match the verification pass: 22 open [UNVERIFIED], 15 live walk items",
       f"the counters are wrong: {MO.MO_OPEN_ITEMS_GENUINELY_OPEN} / {MO.MO_WALK_ITEMS_LIVE}")
-check(set(MO.MO_OPEN_ITEMS_CLOSED) == {"U1", "U2", "U5", "U6"}
-      and MO.MO_OPEN_ITEMS_NARROWED == ("U4",),
-      "the closed (U1/U2/U5/U6) and narrowed (U4) items are recorded as the verification pass left them",
-      "the closed/narrowed item sets are wrong")
+check(set(MO.MO_OPEN_ITEMS_CLOSED) == {"U1", "U2", "U5", "U6", "U8"}
+      and MO.MO_OPEN_ITEMS_NARROWED == ("U4",) and MO.MO_OPEN_ITEMS_NEW == ("U29",),
+      "the closed (U1/U2/U5/U6/U8), narrowed (U4) and NEW (U29) items are recorded as the "
+      "verification pass and the U8 cross-check left them",
+      f"the closed/narrowed/new item sets are wrong: {MO.MO_OPEN_ITEMS_CLOSED} / "
+      f"{MO.MO_OPEN_ITEMS_NARROWED} / {MO.MO_OPEN_ITEMS_NEW}")
 
 # 7f. Rounding: three conventions, and the tie-break is NOT a DOR rule.
 check(MO.MO_ROUND_PAGE3_SHARE_DECIMALS == 0 and MO.MO_ROUND_PARTB_SHARE_DECIMALS == 2
