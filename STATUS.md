@@ -1,7 +1,7 @@
 ---
 type: project-status
 project: delvio-rule-studio
-last_updated: 2026-08-17
+last_updated: 2026-08-19
 ---
 
 # STATUS — delvio-rule-studio (renamed from sherpa-tax-rule-studio 2026-08-05; GitHub + local folder renamed, Render service name unchanged — see render.yaml note)
@@ -12,7 +12,47 @@ last_updated: 2026-08-17
 
 ## Current state
 
-**NEW 2026-08-17 (latest) — WAVE 3 OF THE 45-STATE CAMPAIGN IS LIVE ✅ (`WO-W03-PTE`, Gate-1
+**NEW 2026-08-19 (latest) — WAVE 4 AUTHORING: OREGON IS WRITTEN, GATED AND GREEN (`WO-W04-PTE`).**
+`specs/management/commands/load_or_pte.py` — **THREE specs, not two**: `OR_65` (Form OR-65),
+`OR_20_S` (Form OR-20-S) and **`OR_21` (Form OR-21, the PTE-E elective tax) AS ITS OWN SPEC** per
+campaign D-12, because its base is built entirely from federal Schedule K with **zero** inputs from
+the other two. `READY_TO_SEED = False` and the guard refuses in terms. **PROD IS UNTOUCHED.**
+Counts: OR_65 39 facts / 16 rules / 37 lines / 35 diagnostics / 7 scenarios; OR_20_S 37 / 20 / 44 /
+41 / 9; OR_21 27 / 16 / 44 / 41 / 14; plus **21 flow assertions**, 27 new authority sources, 7
+topics and 97 authority links. Harness `scratchpad/validate_or.py`: **229 assertions, 229 PASS /
+0 FAIL.**
+
+**The build instruction the wave turned on (D-12 C1) is in as THREE namespaced code tables** —
+individual (Publication OR-CODES, 24), corporate (the **full** OR-ASC-CORP universe, 25, with an
+Appendix-A eligibility filter on top) and corporate-credit (Section D 8xx/999, 26) — with a hard
+`OregonCodeNamespaceError` that keys off the **return context, not the form**, because one OR-20-S
+engagement runs **both** namespaces at once: corporate codes on its lines 2/3 and **individual**
+codes on the Schedule OR-K-1 overflow attachment it hands each shareholder. The harness proves the
+guard fires at that crossing point, proves no colliding code resolves without a namespace, and
+recomputes the collision ledger to **twelve** from the tables rather than trusting the declared
+number.
+
+⚠ **THE HARNESS CAUGHT FIVE DEFECTS, AND ONE IS IN THE VERIFIED BRIEF.** The brief's §3.3 claim
+that round-half-to-even "produces $12/$62/$112/$138 and is wrong on five of the twelve rows" of the
+OR-65 proration chart is wrong twice — $138 is the correct chart value and the divergence is
+**three** rows (months 1, 5, 9). The mandate to seed the literal 12-row table stands; the count is
+corrected in the loader. The other four were **RS-integrity defects invisible in SQLite**: two
+`AuthoritySource.source_type` values and three `RuleAuthorityLink.support_level` values that are
+**not declared model choices**. Django does not validate `choices` on `save()`, so they would have
+reached Postgres unnoticed and only surfaced as a broken export. **A choice-field validity check
+introspected from `_meta` is now part of the house harness pattern**, alongside the CharField-cap
+check Wave 3 added.
+
+⚠ **`OR_21` cannot be seeded yet and the guard names why:** the Oregon DOR has **never published a
+Form OR-21 face in any year**, so every OR-21 line number rests on a "do not file" worksheet and the
+campaign's "the printed face governs" convention has no subject; and the Schedule OR-21-MD
+allocation is **provably unclosable** whenever any member has a negative share. Both are unlocked by
+one decided-but-unsent Ken action — the DOR developers'-handbook request. **U24 (2025 Or. Laws ch.36
+§3) separately blocks OR-20-S line 15.**
+
+---
+
+**2026-08-17 — WAVE 3 OF THE 45-STATE CAMPAIGN IS LIVE ✅ (`WO-W03-PTE`, Gate-1
 APPROVED by Ken in-session; campaign D-11).** Six pass-through forms seeded to prod —
 `VA_502` · `VA_502PTET` · `CO_DR0106` · `MS_84_105` · `MD_510` · `MD_511` — **prod 142 → 148
 TaxForms**, all six exports **200** carrying a non-null `state_conformity` block (VA static ·

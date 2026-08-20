@@ -230,8 +230,37 @@ from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 > · ⚠ **A TY2026 staleness tripwire already exists:** Oregon's SB 1507 (2026 Or. Laws ch.142 §35)
 > moves its conformity date to 12/31/2025 for TY2026, **invalidating the OR brief's §7.2 by
 > statute.** The sooner Oregon is authored, the less rework.
-> · **NEXT — author the loaders** (`READY_TO_SEED=False`) + SQLite validation harnesses, then ONE
-> batched Gate-1 seed approval.
+> · ✅ **OREGON AUTHORED 2026-08-19 — `load_or_pte.py` (3 specs, 6,400 lines, `READY_TO_SEED=False`)
+> + `scratchpad/validate_or.py` (229 assertions, 229 PASS / 0 FAIL). PROD UNTOUCHED.**
+> **OR_65** facts 39 / rules 16 / lines 37 / diagnostics 35 / scenarios 7 · **OR_20_S** 37 / 20 / 44 /
+> 41 / 9 · **OR_21** 27 / 16 / 44 / 41 / 14 · **21 flow assertions**, 27 new authority sources, 7
+> topics, 97 authority links. **C1 built as THREE namespaced code tables** (individual 24 /
+> corporate 25 / corporate-credit 26) with a hard `OregonCodeNamespaceError` guard keyed off the
+> RETURN CONTEXT, not the form — the harness proves it fires on the OR-K-1 overflow attachment and
+> proves no colliding code resolves without a namespace. The corporate table is seeded from the
+> **full OR-ASC-CORP universe** with an Appendix-A eligibility filter (code 341 pins the subset
+> proof) and carries the checkbox-driven income-filers-only rule for 361/364.
+> · ⚠ **THE HARNESS CAUGHT FIVE REAL DEFECTS DURING AUTHORING, and one is a DEFECT IN THE VERIFIED
+> BRIEF ITSELF:** `or_pte_source_brief.md` §3.3 says round-half-to-even "produces $12/$62/$112/$138
+> and is wrong on five of the twelve rows" of the OR-65 proration chart. **Both halves are wrong:**
+> $138 is the CORRECT chart value (137.5 → 138 rounds to even) and the true divergence is **THREE
+> rows — months 1, 5, 9 → $12/$62/$112.** The substantive mandate (seed the literal 12-row table,
+> never a formula) is untouched; the count is corrected in the loader and pinned in the harness.
+> The other four were RS-integrity defects invisible to SQLite: two `AuthoritySource.source_type`
+> values (`state_publication`) and three `RuleAuthorityLink.support_level` values (`mapping_only`)
+> that are **not declared model choices** — Django does not validate `choices` on `save()`, so they
+> would have ridden into Postgres unnoticed; plus a missing DOR gate string and a rolling-prong
+> constant that never said "rolling". **A choice-field validity check is now part of the house
+> harness pattern.**
+> · ⚠ **`OR_21` IS BLOCKED TWICE AND THE SEED GUARD SAYS SO IN TERMS:** the MeF submission
+> type/schema family (U1/U19/U23) and the Schedule OR-21-MD allocation denominator (U5 — PROVEN
+> impossible with any NEGATIVE member share; the worked counterexample yields $18,000 of refundable
+> member credit against $13,500 of entity tax). **The obvious fix reasons from a tie-out Caution,
+> not from a cited rule, and is encoded as a labelled CANDIDATE, never as DOR guidance.**
+> **U24 (2025 Or. Laws ch.36 §3 amending ORS 314.772) separately blocks OR-20-S line 15.**
+> · **NEXT — author MO and AZ loaders** (`READY_TO_SEED=False`) + SQLite validation harnesses, then
+> ONE batched Gate-1 seed approval covering all 8 forms. ⚠ **Oregon's seed approval also needs the
+> DOR developers'-handbook answer, or an explicit ruling to ship OR_21 on worksheet provenance.**
 
 > **[WO-W03-PTE] 45-state campaign Wave 3 — VA + CO + MS + MD pass-through lane
 > (BUILD_ORDER S-27; campaign `delvio-states` WAVE_PLAN.md wave 3) · ✅ **APPROVED + SEEDED
