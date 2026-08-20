@@ -194,7 +194,7 @@ from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 > "taxable income"** — AZDOR prints **four** bases and **four of six documents contradict
 > themselves**; ruled, with U19 left **open as a matter of fact**. **Form 165PA RED-DEFERRED**
 > rather than choosing between its printed 4.5% and the statute's 2.5% (both negatives verified —
-> S.B. 1274 §8 amended only subsection (A), H.B. 4168 does not touch §43-1414). AZ §43-1021(15)
+> S.B. 1274 **Sec. 7** amended only subsection (A) ⚠ *[was "§8" — the chaptered act runs Sec.6 = §43-1014, Sec.7 = §43-1414, Sec.9 = Retroactivity; substance unaffected]*, H.B. 4168 does not touch §43-1414). AZ §43-1021(15)
 > add-back **built to the form, owner level only** — same shape as D-10 (MO) and D-11 (CO §174A).
 > **Delvio does NOT automate Missouri's unencrypted e-mail submission channel** (it carries member
 > SSNs) — a privacy ruling, not a tax one.
