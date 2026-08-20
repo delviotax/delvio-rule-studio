@@ -182,6 +182,15 @@ tripwire("AZ_EST_BOUNDARY_EXACTLY_AT_THRESHOLD_IS_IN", True,
          "exactly $150,000 is OUT", "exactly $150,000 is OUT")
 tripwire("AZ_EST_MEASUREMENT_BASIS", "pte_income_but_undeclared",
          "the ruled measurement basis must stay adjudicable (D-12 A1)", "four recorded candidates")
+tripwire("AZ_EST_MEASUREMENT_BASIS_RESOLVES_TO", "statutory_bare_taxable_income",
+         "the A1 REFINEMENT -- the ruled source must resolve to a computable NUMBER",
+         "named a SOURCE without naming a NUMBER")
+tripwire("AZ_EST_MEASUREMENT_DEFINITION", "A.R.S. 43-581(C)",
+         "the refinement's mechanism is that 43-1401(2) DEFINES the statute's term",
+         "43-1401(2)")
+tripwire("AZ_EST_MEASUREMENT_FIGURE_BY_FORM", {"AZ_165": "line 5"},
+         "43-581(C) reaches BOTH entity types, so both figures must resolve",
+         "BOTH forms")
 tripwire("AZ_165PA_STATUS", "COMPUTES",
          "Form 165PA is RED-DEFERRED (D-12 A2)", "over-taxes by 80%")
 tripwire("AZ_1021_15_ENTITY_ADDBACK_BUILT", True,
@@ -667,6 +676,86 @@ check(len(AZ.AZ_EST_INTERNAL_CONTRADICTIONS) == 4,
       "FOUR of the six AZDOR documents contradict themselves internally on the measurement base",
       f"the internal-contradiction record is wrong: {len(AZ.AZ_EST_INTERNAL_CONTRADICTIONS)}")
 
+# --- A1 AS REFINED: the ruled SOURCE must resolve to a computable NUMBER --
+check(AZ.AZ_EST_MEASUREMENT_BASIS_RESOLVES_TO == "arizona_taxable_income"
+      and "43-1401(2)" in AZ.AZ_EST_MEASUREMENT_DEFINITION,
+      "A1 REFINED: the ruled SOURCE resolves to ARIZONA TAXABLE INCOME as defined by "
+      "A.R.S. 43-1401(2) -- the ruling now names a NUMBER, not only a source",
+      f"the A1 refinement is missing: resolves_to={AZ.AZ_EST_MEASUREMENT_BASIS_RESOLVES_TO!r} "
+      f"definition={AZ.AZ_EST_MEASUREMENT_DEFINITION!r}")
+check(AZ.AZ_EST_MEASUREMENT_BASIS_RESOLVES_TO in AZ.AZ_EST_MEASUREMENT_BASIS_CANDIDATES,
+      "the RESOLVES_TO leg is itself one of the four recorded AZDOR candidates -- the refinement "
+      "follows the statutory definition INTO base 2 rather than inventing a fifth reading",
+      "the RESOLVES_TO leg is not a recorded candidate")
+check("WHICH SOURCE GOVERNS" in AZ.AZ_EST_MEASUREMENT_BASIS_REFINEMENT
+      and "WHICH NUMBER TO COMPUTE" in AZ.AZ_EST_MEASUREMENT_BASIS_REFINEMENT
+      and "43-1401(2)" in AZ.AZ_EST_MEASUREMENT_BASIS_REFINEMENT,
+      "the loader records WHY the refinement happened -- A1 named a source without naming a number "
+      "-- so a later reader sees reasoning rather than an unexplained change",
+      "the refinement rationale is missing from the loader")
+check("REFINED" in AZ.AZ_EST_MEASUREMENT_BASIS_RULING
+      and "NOT A PUBLISHED AZDOR POSITION" in AZ.AZ_EST_MEASUREMENT_BASIS_RULING.upper()
+      and "U19 STAYS OPEN" in AZ.AZ_EST_MEASUREMENT_BASIS_RULING.upper(),
+      "the REFINED ruling text STILL disclaims itself as not a published AZDOR position and STILL "
+      "says U19 stays open -- the refinement narrows what we compute, it does not close the question",
+      "the refinement weakened the ruling's self-disclaimer")
+
+# The PARTNERSHIP figure is exact and sourced: line 5, NOT line 10.
+_f165 = AZ.az_est_measurement_figure(F165, 1_000_000)
+check(_f165["figure"] == 1_000_000.0 and "line 5" in _f165["source_line"].lower()
+      and _f165["basis_resolves_to"] == "arizona_taxable_income"
+      and _f165["is_engineering_inference"] is False,
+      "PARTNERSHIP figure oracle: 43-1401(2) resolves to PRIOR-YEAR Form 165 LINE 5 -- 'Arizona "
+      "gross income adjusted by the modifications specified in sections 43-1021 and 43-1022 and "
+      "section 43-1414, subsection A'",
+      f"the Form 165 measurement figure is wrong: {_f165}")
+check("NOT line 10" in _f165["source_line"],
+      "the Form 165 figure pins that it is NOT line 10 -- line 8 (= line 5) PLUS line 9 "
+      "reconstructs 43-1014(B)(1)(a)(ii), so line 10 is the larger PTE BASE and would be a FIFTH "
+      "reading no AZDOR document prints",
+      "the line-5-not-line-10 distinction was dropped")
+check(_f165["provisional"] is True and _f165["unverified_item"] == "U19",
+      "the resolved PARTNERSHIP figure is still marked PROVISIONAL and still names U19",
+      "the resolved figure dropped its provisional flag")
+
+# The S-CORP figure is an ENGINEERING INFERENCE and says so.
+_f120s = AZ.az_est_measurement_figure(F120S, 800_000)
+check(_f120s["figure"] == 800_000.0 and "line 1" in _f120s["source_line"].lower()
+      and _f120s["is_engineering_inference"] is True
+      and _f120s["diagnostic"] == "D_AZ120S_EST_BASIS_NO_ANALOGUE",
+      "S-CORP figure oracle: resolves to PRIOR-YEAR Form 120S LINE 1 and is FLAGGED AS AN "
+      "ENGINEERING INFERENCE -- 43-1401 is a chapter-14 PARTNERSHIP definitions section with no "
+      "S-corp analogue",
+      f"the Form 120S measurement figure is wrong: {_f120s}")
+check("PARTNERSHIP" in AZ.AZ_EST_MEASUREMENT_SCORP_GAP.upper()
+      and "ENGINEERING INFERENCE" in AZ.AZ_EST_MEASUREMENT_SCORP_GAP.upper()
+      and "NOT A PUBLISHED" in AZ.AZ_EST_MEASUREMENT_SCORP_GAP.upper(),
+      "the second-order gap the refinement creates is RECORDED rather than papered -- and labelled "
+      "an inference rather than a published definition",
+      "the S-corp second-order gap record is missing or unlabelled")
+try:
+    AZ.az_est_measurement_figure("AZ_NONSENSE", 1)
+    FAILURES.append("az_est_measurement_figure() accepted an unknown form code instead of refusing")
+except AZ.ArizonaFormGovernsError:
+    PASSES.append("az_est_measurement_figure() REFUSES an unknown form code -- the figure lands on "
+                  "DIFFERENT lines on the two returns and it will not default")
+
+# The two halves stay separable: a RULED noun and a SETTLED verb.
+_r165 = AZ.az_estimated_payments_required_for(F165, 150_000)
+check(_r165["required"] is False and _r165["boundary"] == "exceeds"
+      and _r165["threshold"] == 150_000,
+      "az_estimated_payments_required_for() resolves the 43-1401(2) figure and THEN applies the "
+      "settled 'exceeds' boundary -- exactly $150,000 is still OUT after the refinement",
+      f"the combined resolve-then-compare step is wrong: {_r165}")
+check(AZ.az_estimated_payments_required_for(F165, 150_001)["required"] is True
+      and AZ.az_estimated_payments_required_for(F120S, 149_999)["required"] is False,
+      "the refinement did NOT move the boundary on either form ($150,001 IN / $149,999 OUT)",
+      "the boundary drifted when the measurement figure was resolved")
+check(AZ.az_estimated_payments_required_for(F120S, None)["required"] is None,
+      "an unknown prior-year figure yields None rather than a silent False -- the engine says 'I "
+      "do not know' instead of exempting the entity",
+      "a missing prior-year figure silently produced a determination")
+
 # --- the required annual payment, and the installment calendar ------------
 check(AZ.az_required_annual_payment(100_000, 80_000) == 80_000
       and AZ.az_required_annual_payment(100_000, 95_000) == 90_000
@@ -1021,6 +1110,34 @@ check("NOT A PUBLISHED AZDOR POSITION" in _basis.notes.upper() and "U19" in _bas
       "the U19 diagnostic states plainly that D-12 A1 is a ruling, not a published AZDOR position, "
       "and that the fact stays open",
       "the U19 diagnostic does not disclaim the ruling")
+check("PROVISIONAL" in _basis.message.upper(),
+      "the U19 diagnostic STILL tells the preparer the threshold determination is PROVISIONAL -- "
+      "the A1 refinement narrowed what we compute, it did not close the question",
+      "the U19 diagnostic no longer marks the determination provisional")
+check("43-1401(2)" in _basis.message and "REFINED" in _basis.message.upper(),
+      "the U19 diagnostic carries the refinement and its statutory basis, so the preparer sees WHICH "
+      "figure was computed and why",
+      "the U19 diagnostic does not carry the A1 refinement")
+check("NOT REFUTED" in _basis.notes.upper(),
+      "the U19 diagnostic records that the losing candidates stay NOT REFUTED",
+      "the U19 diagnostic no longer records the surviving conflict")
+_gap = FormDiagnostic.objects.get(tax_form=f120s, diagnostic_id="D_AZ120S_EST_BASIS_NO_ANALOGUE")
+check(_gap.severity == "warning" and "PARTNERSHIP" in _gap.message.upper()
+      and "NO S-CORPORATION ANALOGUE" in _gap.message.upper(),
+      "the second-order gap has its own 120S diagnostic naming 43-1401 as a chapter-14 PARTNERSHIP "
+      "definitions section with no S-corp analogue",
+      "the S-corp measurement-basis gap diagnostic is missing or incomplete")
+check("ENGINEERING INFERENCE" in _gap.notes.upper()
+      and "NOT A PUBLISHED" in _gap.notes.upper()
+      and "SECOND-ORDER" in _gap.notes.upper(),
+      "the S-corp gap diagnostic labels its own answer an ENGINEERING INFERENCE and a SECOND-ORDER "
+      "consequence -- never as DOR guidance",
+      "the S-corp gap diagnostic presents an inference as settled")
+check(not FormDiagnostic.objects.filter(tax_form=f165,
+                                        diagnostic_id="D_AZ120S_EST_BASIS_NO_ANALOGUE").exists(),
+      "the S-corp measurement-basis gap is NOT attached to AZ_165 -- the partnership figure is exact "
+      "and sourced, not an inference",
+      "the S-corp inference diagnostic leaked onto the partnership form")
 _a4d = FormDiagnostic.objects.get(tax_form=f165, diagnostic_id=AZ.AZ_A4_DIAGNOSTIC_ID)
 check("U2" in _a4d.notes and "C-CORP-WAVE" in _a4d.notes.upper(),
       "the A4 diagnostic records the open fact and routes it to the C-corp wave",

@@ -258,8 +258,8 @@ from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 > member credit against $13,500 of entity tax). **The obvious fix reasons from a tie-out Caution,
 > not from a cited rule, and is encoded as a labelled CANDIDATE, never as DOR guidance.**
 > **U24 (2025 Or. Laws ch.36 §3 amending ORS 314.772) separately blocks OR-20-S line 15.**
-> · ✅ **ARIZONA AUTHORED 2026-08-20 — `load_az_pte.py` (2 specs, 7,753 lines, `READY_TO_SEED=False`)
-> + `scratchpad/validate_az.py` (224 assertions, 224 PASS / 0 FAIL). PROD UNTOUCHED at 148 forms
+> · ✅ **ARIZONA AUTHORED 2026-08-20 — `load_az_pte.py` (2 specs, 8,075 lines, `READY_TO_SEED=False`)
+> + `scratchpad/validate_az.py` (246 assertions, 246 PASS / 0 FAIL). PROD UNTOUCHED at 148 forms
 > with ZERO AZ rows; `AZ_165` and `AZ_120S` both still 404.**
 > **AZ_165** facts 62 / rules 38 / lines 85 / diagnostics 58 / scenarios 16 · **AZ_120S** 54 / 31 /
 > 69 / 54 / 12 · **25 flow assertions**, 20 new authority sources (48 excerpts), 7 topics, 143
@@ -294,6 +294,36 @@ from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 > Fixed in the loader rather than by relaxing the pins, on the D-11 principle that a guard is
 > re-pinned to the mechanism, never retired. **No tax-content defect was found in the brief itself**
 > — Arizona's transcription had already come back 0/48 on the positional sample.
+> · ✅ **A1 REFINED AND RE-ENCODED 2026-08-20 (campaign D-12 amendment, `delvio-states` c6f0d60):
+> the authoring pass caught a defect in a RULING, not in a brief — the layer nobody was checking.**
+> A1 as first ruled named *the statute's bare "taxable income"*, which settles **which source
+> governs** but not **which number to compute**, and estimated-payment and Form 220/PTE penalty
+> logic need a figure rather than a citation. Since Title 43 chapter 14 **defines that very term**
+> at § 43-1401(2) as *"Arizona taxable income"* — AZDOR's **base 2** — **RULED: compute ARIZONA
+> TAXABLE INCOME.** The pass encoded A1 **as ruled**, refused to resolve the gap on its own
+> authority, and escalated it rather than discovering it at build time.
+> **Encoded as a SECOND LEG, not a replacement:** `AZ_EST_MEASUREMENT_BASIS` (source) +
+> `AZ_EST_MEASUREMENT_BASIS_RESOLVES_TO` (number) + `az_est_measurement_figure()` /
+> `az_estimated_payments_required_for()`. ⚠ **Everything that made this a ruling survives** — all
+> four candidates on the record, the three losers explicitly *not refuted*, the ruling still
+> disclaiming itself as **not a published AZDOR position**, **U19 still open as a matter of fact**,
+> and `D_AZ_U19_150K_BASIS` still marking the determination **PROVISIONAL**. The `$150,000`
+> boundary pins are untouched. Two new seed-guard tripwires and eleven new harness assertions
+> (**224 → 246**) pin the refinement to the mechanism.
+> · ⚠⚠ **THE REFINEMENT LANDS ON DIFFERENT LINES, AND CREATES ONE SECOND-ORDER GAP — RECORDED, NOT
+> PAPERED.** For a **partnership** it is exact and sourced: § 43-1401(2) is *"Arizona gross income
+> adjusted by the modifications specified in sections 43-1021 and 43-1022 and section 43-1414,
+> subsection A"* = **prior-year Form 165 line 5**. ⚠ **NOT line 10** — line 8 (= line 5) PLUS line 9
+> reconstructs § 43-1014(B)(1)(a)(ii), so line 10 is the larger **PTE base** and using it would be a
+> **FIFTH reading no AZDOR document prints**. For an **S corporation**, ⚠ **§ 43-1401 is a
+> chapter-14 PARTNERSHIP definitions section with NO S-corp analogue**, while § 43-581(C) reaches
+> both entity types and no corporate *"Arizona taxable income"* definition was ever pulled. Delvio
+> resolves to **prior-year Form 120S line 1** by **building to the form** — Form 120S carries no
+> Arizona modification apparatus, so applying the § 43-1401(2) shape changes nothing and line 1 =
+> line 37 is the only Arizona income figure the return produces. **That last step is an ENGINEERING
+> INFERENCE and is labelled one** (`AZ_EST_MEASUREMENT_SCORP_GAP`, diagnostic
+> `D_AZ120S_EST_BASIS_NO_ANALOGUE`, `is_engineering_inference=True`), never DOR guidance.
+> **⚠ FLAGGED FOR KEN as an open second-order question, not resolved on the loader's authority.**
 > · **NEXT — author the MO loaders** (`READY_TO_SEED=False`) + SQLite validation harness, then ONE
 > batched Gate-1 seed approval covering all 8 forms. ⚠ **Oregon's seed approval also needs the
 > DOR developers'-handbook answer, or an explicit ruling to ship OR_21 on worksheet provenance.**

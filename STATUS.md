@@ -21,9 +21,31 @@ lines 37-52, tax at line 52 carried to line 18), proved four ways including A.R.
 Arizona is the only Wave 4 state that works this way — MO, OR and MA each need a separate return.
 `READY_TO_SEED = False` and the guard refuses in terms. **PROD IS UNTOUCHED at 148 forms with ZERO
 AZ rows.** Counts: AZ_165 62 facts / 38 rules / 85 lines / 58 diagnostics / 16 scenarios;
-AZ_120S 54 / 31 / 69 / 54 / 12; plus **25 flow assertions**, 20 new authority sources (48 excerpts),
-7 topics, 143 authority links. Harness `scratchpad/validate_az.py`: **224 assertions, 224 PASS /
+AZ_120S 54 / 31 / 69 / 55 / 13; plus **25 flow assertions**, 20 new authority sources (48 excerpts),
+7 topics, 143 authority links. Harness `scratchpad/validate_az.py`: **246 assertions, 246 PASS /
 0 FAIL.** Full suite **234 passed**.
+
+⚠ **A1 REFINED AND RE-ENCODED THE SAME DAY (campaign D-12 amendment) — the authoring pass caught a
+defect in a RULING, not in a brief.** A1 as first ruled named *the statute's bare "taxable income"*,
+which settles **which source governs** but not **which number to compute** — and estimated-payment
+and Form 220/PTE penalty logic need a figure, not a citation. Title 43 chapter 14 **defines that
+very term** at § 43-1401(2) as *"Arizona taxable income"*, so **RULED: compute Arizona taxable
+income.** The pass encoded A1 **as ruled**, refused to resolve the gap on its own authority, and
+escalated it rather than discovering it at build time. Encoded as a **second leg, not a
+replacement** (`AZ_EST_MEASUREMENT_BASIS` → `..._RESOLVES_TO` → `az_est_measurement_figure()`), and
+**everything that made it a ruling survives**: four candidates on the record, three losers
+explicitly *not refuted*, the ruling still disclaiming itself as not a published AZDOR position,
+**U19 still open as a matter of fact**, and the preparer diagnostic still marking the determination
+**PROVISIONAL**. The `$150,000` boundary pins are untouched.
+
+⚠⚠ **The refinement lands on DIFFERENT lines and creates ONE second-order gap, recorded rather than
+papered.** Partnership: § 43-1401(2) = **prior-year Form 165 line 5** — ⚠ **not line 10**, which is
+the larger PTE base and would be a *fifth* reading no AZDOR document prints. S corporation:
+⚠ **§ 43-1401 is a chapter-14 PARTNERSHIP definitions section with no S-corp analogue**, while
+§ 43-581(C) reaches both entity types. Delvio resolves to **prior-year Form 120S line 1** by
+building to the form (no Arizona modification apparatus means nothing to adjust) — **an engineering
+inference, labelled one**, with its own diagnostic `D_AZ120S_EST_BASIS_NO_ANALOGUE`. **Flagged for
+Ken as an open second-order question.**
 
 ⚠ **THE FACT THE WHOLE ARIZONA BUILD TURNS ON: THE TWO RETURNS ARE NOT PARALLEL AND THERE IS NO
 SHARED MODIFICATION ENGINE (D-12 Group B).** Form 165 carries a full federal→Arizona stack on its

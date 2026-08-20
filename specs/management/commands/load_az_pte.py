@@ -120,9 +120,46 @@ penalty applies.
 **RULED: the statute's bare "taxable income"** — the only one of the four with
 controlling authority behind it. ⚠ **Recorded as a RULING ON A CONTESTED
 QUESTION, NOT a published AZDOR position**; `[UNVERIFIED]` **U19 stays OPEN as a
-matter of fact.** Estimated-payment and Form 220/PTE penalty logic may now be
-authored. **The basis is a SINGLE NAMED CONSTANT** (`AZ_EST_MEASUREMENT_BASIS`)
-so a DOR answer changes one thing.
+matter of fact.** **The basis is a SINGLE NAMED CONSTANT**
+(`AZ_EST_MEASUREMENT_BASIS`) so a DOR answer changes one thing.
+
+**⚠⚠ A1 REFINED, SAME SESSION — THE RULING NAMED A SOURCE; IT NOW ALSO NAMES A
+NUMBER. RULED: COMPUTE ARIZONA TAXABLE INCOME (A.R.S. § 43-1401(2)).**
+*Why the refinement happened, so a later reader sees reasoning rather than an
+unexplained change:* **A1 as first ruled settled WHICH SOURCE GOVERNS but not
+WHICH FIGURE TO COMPUTE** — and estimated-payment and Form 220/PTE penalty logic
+need a figure, not a citation. Title 43 chapter 14 **defines the statute's very
+term** at § 43-1401(2) as *"Arizona taxable income"* — i.e. AZDOR's **base 2** —
+so on its most natural reading the ruled source **RESOLVES INTO base 2** rather
+than standing apart from all four, and base 2 vs base 3 was the whole reason A1
+was blocking. The refinement follows the statutory definition where it leads,
+which is the same reasoning that produced A1 in the first place. The authoring
+pass encoded A1 **as ruled**, refused to resolve the gap on its own authority,
+and escalated it rather than discovering it at build time.
+
+**⚠ THE REFINEMENT NARROWS WHAT WE COMPUTE; IT DOES NOT CLOSE THE QUESTION.**
+All four candidate bases stay on the record, the three losers stay explicitly
+**not refuted**, the ruling still disclaims itself as **not a published AZDOR
+position**, `[UNVERIFIED]` **U19 stays OPEN as a matter of fact**, and
+`D_AZ_U19_150K_BASIS` still tells the preparer the threshold determination is
+**PROVISIONAL**. Second leg encoded as `AZ_EST_MEASUREMENT_BASIS_RESOLVES_TO`
+plus `az_est_measurement_figure()` / `az_estimated_payments_required_for()`.
+
+**⚠⚠ WHERE THE FIGURE LANDS — AND THE SECOND-ORDER GAP THE REFINEMENT CREATES.**
+For a **partnership** it is exact and sourced: § 43-1401(2) is *"Arizona gross
+income adjusted by the modifications specified in sections 43-1021 and 43-1022
+and section 43-1414, subsection A"*, which is precisely **Form 165 line 5** —
+**NOT line 10**, because line 8 (= line 5) PLUS line 9 reconstructs
+§ 43-1014(B)(1)(a)(ii); line 10 is the larger PTE BASE and using it would be a
+FIFTH reading no AZDOR document prints. For an **S corporation**, ⚠ **§ 43-1401
+is a chapter-14 PARTNERSHIP definitions section with NO S-corp analogue**, while
+§ 43-581(C) reaches both entity types. Because Form 120S carries **no Arizona
+modification apparatus at all**, applying the § 43-1401(2) *shape* to it changes
+nothing and the figure is **line 1 = line 37** — build-to-the-form, not a
+synthesised corporate definition, but **an ENGINEERING INFERENCE and labelled
+one** (`AZ_EST_MEASUREMENT_SCORP_GAP`, diagnostic
+`D_AZ120S_EST_BASIS_NO_ANALOGUE`). **Flagged for Ken, not resolved on this
+file's authority.**
 
 **⚠ THE SEPARATE BOUNDARY QUESTION IS SETTLED AND NEEDED NO RULING: "EXCEEDS",
 so an entity at EXACTLY $150,000 is OUT.** Seven sources say so, including the
@@ -949,15 +986,99 @@ AZ_EST_THRESHOLD: dict[int, int] = {2025: 150_000}
 # ⚠⚠ THE ONE THING TO CHANGE IF AZDOR EVER ANSWERS. Campaign D-12 A1 ruled the
 # statute's BARE "taxable income" — the only one of AZDOR's four printed bases
 # with controlling authority behind it. RECORDED AS A RULING ON A CONTESTED
-# QUESTION, NOT AS A PUBLISHED AZDOR POSITION. U19 STAYS OPEN AS A MATTER OF FACT.
-AZ_EST_MEASUREMENT_BASIS = "statutory_bare_taxable_income"
+# QUESTION, NOT A PUBLISHED AZDOR POSITION. U19 STAYS OPEN AS A MATTER OF FACT.
+#
+# ⚠⚠ A1 REFINED, SAME SESSION (2026-08-19) — THE RULING NAMED A **SOURCE**; IT NOW
+# ALSO NAMES A **NUMBER**. The Arizona authoring pass surfaced that A1 as first
+# ruled settled WHICH SOURCE GOVERNS but not WHICH FIGURE TO COMPUTE, and said so
+# rather than resolving it silently. For a partnership, Title 43 chapter 14
+# **defines that very term** at A.R.S. § 43-1401(2) as "ARIZONA TAXABLE INCOME"
+# — i.e. AZDOR's base 2 — so on its most natural reading the ruled source
+# RESOLVES INTO base 2 rather than standing apart from all four. And base 2 vs
+# base 3 was THE WHOLE REASON A1 WAS BLOCKING (the $1,000,000 / 10%-consenting
+# worked case turns on exactly that).
+#
+# ⚠ THE REFINEMENT NARROWS WHAT WE COMPUTE; IT DOES NOT CLOSE THE QUESTION. All
+# four candidate bases stay on the record, the three losers stay explicitly NOT
+# REFUTED, the ruling still disclaims itself as not a published AZDOR position,
+# and U19 STAYS OPEN AS A MATTER OF FACT. The preparer diagnostic continues to
+# mark the threshold determination PROVISIONAL.
+AZ_EST_MEASUREMENT_BASIS = "statutory_bare_taxable_income"          # the SOURCE leg
+AZ_EST_MEASUREMENT_BASIS_RESOLVES_TO = "arizona_taxable_income"     # the NUMBER leg (A1 REFINED)
+AZ_EST_MEASUREMENT_DEFINITION = "A.R.S. § 43-1401(2)"
 
 AZ_EST_MEASUREMENT_BASIS_RULING = (
     "CAMPAIGN RULING D-12 A1 (2026-08-19) — A RULING ON A CONTESTED QUESTION, NOT A PUBLISHED AZDOR "
     "POSITION. AZDOR prints FOUR different measurement bases and FOUR OF SIX DOCUMENTS CONTRADICT "
     "THEMSELVES INTERNALLY. Ken ruled the statutory reading (A.R.S. § 43-581(C)'s bare 'taxable "
-    "income') as the only one with controlling authority. [UNVERIFIED] U19 STAYS OPEN. Settled by: "
-    "an AZDOR ruling, procedure, or written Corporate Income Tax section response."
+    "income') as the only one with controlling authority. ⚠ REFINED THE SAME SESSION: that ruling "
+    "named a SOURCE without naming a NUMBER, and A.R.S. § 43-1401(2) DEFINES the statute's term as "
+    "'ARIZONA TAXABLE INCOME', so the ruled source RESOLVES TO base 2 — follow the statutory "
+    "definition where it leads, which is the same reasoning that produced A1 in the first place. "
+    "[UNVERIFIED] U19 STAYS OPEN AS A MATTER OF FACT. Settled by: an AZDOR ruling, procedure, or "
+    "written Corporate Income Tax section response."
+)
+
+AZ_EST_MEASUREMENT_BASIS_REFINEMENT = (
+    "WHY THE REFINEMENT HAPPENED, so a later reader sees reasoning rather than an unexplained "
+    "change: A1 as first ruled picked 'the statute's bare taxable income' as the measurement base. "
+    "That settles WHICH SOURCE GOVERNS but NOT WHICH NUMBER TO COMPUTE — and estimated-payment and "
+    "Form 220/PTE penalty logic need a figure, not a citation. A.R.S. § 43-1401(2) defines a "
+    "partnership's 'Arizona taxable income' as 'its Arizona gross income adjusted by the "
+    "modifications specified in sections 43-1021 and 43-1022 and section 43-1414, subsection A' — "
+    "which is precisely AZDOR's base 2. The authoring pass encoded A1 AS RULED, refused to resolve "
+    "the gap on its own authority, and escalated it rather than discovering it at build time. "
+    "RULED 2026-08-19: compute ARIZONA TAXABLE INCOME (§ 43-1401(2))."
+)
+
+# ⚠ WHERE § 43-1401(2) LANDS ON EACH FACE. For the PARTNERSHIP this is exact and
+# sourced: the brief's own statutory reconstruction is that Form 165 line 8 (= line
+# 5) PLUS line 9 (§ 43-1412 ¶1-16) equals § 43-1014(B)(1)(a)(ii) — therefore
+# § 43-1401(2) ALONE IS **LINE 5**, and NOT line 10.
+# ⚠⚠ THAT DISTINCTION MATTERS AND IS EASY TO MISS: line 10 is the PTE BASE, a
+# LARGER figure that adds the sixteen separately-stated categories back in. Using
+# line 10 for the § 43-581(C) test would be a FIFTH reading that no AZDOR document
+# prints at all.
+# ⚠ The test measures the **PRECEDING** taxable year, so it is the PRIOR-year line.
+AZ_EST_MEASUREMENT_FIGURE_BY_FORM: dict[str, str] = {
+    FORM_CODE_165: ("PRIOR-YEAR Form 165 LINE 5 — 'Partnership income adjusted to Arizona basis'. "
+                    "§ 43-1401(2) = Arizona gross income adjusted by §§ 43-1021 / 43-1022 and "
+                    "§ 43-1414(A), which is exactly what line 5 holds. ⚠ NOT line 10: line 8 + line "
+                    "9 = § 43-1014(B)(1)(a)(ii), so § 43-1401(2) alone is line 5."),
+    FORM_CODE_120S: ("PRIOR-YEAR Form 120S LINE 1 — 'TOTAL DISTRIBUTIVE INCOME (LOSS) from federal "
+                     "Form 1120-S, Schedule K'. ⚠ AN ENGINEERING CONSEQUENCE OF THE VERIFIED "
+                     "NEGATIVE, NOT A PUBLISHED DEFINITION — see AZ_EST_MEASUREMENT_SCORP_GAP."),
+}
+
+# ⚠⚠ THE SECOND-ORDER GAP THE REFINEMENT CREATES, RECORDED RATHER THAN PAPERED.
+# A.R.S. § 43-1401 is the DEFINITIONS section of Title 43 CHAPTER 14, the
+# PARTNERSHIP chapter. Its subsection (2) defines "Arizona taxable income" OF A
+# PARTNERSHIP. **There is no S-corporation analogue in it**, and the research pass
+# never pulled a corporate "Arizona taxable income" definition. So the
+# refinement's mechanism — "chapter 14 defines the term" — is a PARTNERSHIP
+# mechanism, while § 43-581(C) reaches "an entity that is treated as a partnership
+# OR S CORPORATION".
+#
+# WHAT THIS FILE DOES ABOUT IT, and why it is not an invention: Form 120S carries
+# NO Arizona modification apparatus at all (the verified negative at
+# AZ_120S_NEGATIVE_PROOF). So on the S-corp return there is NOTHING to adjust, and
+# the only Arizona income figure the form produces is line 1 = line 37. Applying
+# the § 43-1401(2) SHAPE — federal income as adjusted by Arizona's modifications —
+# to a return with zero modifications yields line 1 unchanged. That is
+# BUILD-TO-THE-FORM, the campaign's standing posture (D-10 ruling 2, D-11 A1,
+# D-12 A3 and A4), NOT a synthesised corporate definition.
+# ⚠ IT IS STILL AN ENGINEERING INFERENCE AND IS LABELLED ONE. It carries its own
+# diagnostic (D_AZ120S_EST_BASIS_NO_ANALOGUE) and is flagged for Ken.
+AZ_EST_MEASUREMENT_SCORP_GAP = (
+    "⚠ A.R.S. § 43-1401(2) IS A CHAPTER-14 **PARTNERSHIP** DEFINITION AND HAS NO S-CORPORATION "
+    "ANALOGUE, while § 43-581(C) reaches partnerships AND S corporations alike. No corporate "
+    "'Arizona taxable income' definition was pulled by the research pass. Delvio resolves the "
+    "S-corp figure to Form 120S line 1 BY BUILDING TO THE FORM: Form 120S carries no Arizona "
+    "modification apparatus at all, so applying the § 43-1401(2) shape to it changes nothing and "
+    "line 1 = line 37 is the only Arizona income figure the return produces. ⚠ THIS IS AN "
+    "ENGINEERING INFERENCE, NOT A PUBLISHED AZDOR OR STATUTORY DEFINITION, and it is a "
+    "SECOND-ORDER consequence of the A1 refinement rather than something the refinement ruled on. "
+    "Diagnostic: D_AZ120S_EST_BASIS_NO_ANALOGUE."
 )
 
 # All four candidates, kept on the record so a DOR answer can be adjudicated
@@ -967,13 +1088,18 @@ AZ_EST_MEASUREMENT_BASIS_CANDIDATES: dict[str, dict] = {
         "label": "bare 'taxable income'",
         "sources": ("A.R.S. § 43-581(C)", "Form 165 instructions", "Form 120S instructions",
                     "Form 120/PTE-W instructions (occurrence 1)", "Pub 713 narrative"),
-        "status": "RULED (D-12 A1)",
+        "status": ("RULED (D-12 A1) — THE SOURCE LEG. ⚠ REFINED the same session: § 43-1401(2) "
+                   "DEFINES this very term as 'Arizona taxable income', so the ruled source "
+                   "RESOLVES INTO base 2 rather than standing apart from it."),
     },
     "arizona_taxable_income": {
         "label": "'ARIZONA taxable income' (A.R.S. § 43-1401(2) for a partnership)",
         "sources": ("Form 220/PTE instructions ×2", "Form 120/PTE-W instructions (occurrence 2)",
                     "Pub 713 FAQ"),
-        "status": "not refuted — recorded",
+        "status": ("not refuted — recorded; ⚠ AND THIS IS THE FIGURE THE RULED STATUTORY SOURCE "
+                   "RESOLVES TO (D-12 A1 REFINED, 2026-08-19). It reaches the engine through the "
+                   "STATUTORY DEFINITION, not because AZDOR's base-2 documents were preferred over "
+                   "its base-1 documents."),
     },
     "pte_income": {
         "label": "'PTE income' — only the CONSENTING owners' share",
@@ -1027,16 +1153,88 @@ AZ_581C_VERBATIM = (
 )
 
 
+def az_est_measurement_figure(form_code: str, prior_year_line: float | None) -> dict:
+    """THE SECOND STEP A1 ORIGINALLY LACKED: turn the ruled SOURCE into a NUMBER.
+
+    A1 as first ruled named the statute's bare "taxable income" — which settles
+    WHICH SOURCE GOVERNS but not WHICH FIGURE TO COMPUTE. A1 AS REFINED
+    (2026-08-19) follows the statutory definition where it leads: A.R.S.
+    § 43-1401(2) DEFINES that term as **ARIZONA TAXABLE INCOME**, so that is the
+    figure the engine computes.
+
+    PARTNERSHIP — exact and sourced. § 43-1401(2) is "Arizona gross income adjusted
+    by the modifications specified in sections 43-1021 and 43-1022 and section
+    43-1414, subsection A", which is precisely **Form 165 LINE 5**.
+    ⚠⚠ NOT LINE 10. Line 8 (= line 5) PLUS line 9 reconstructs
+    § 43-1014(B)(1)(a)(ii), so § 43-1401(2) ALONE is line 5; line 10 is the larger
+    PTE BASE and using it here would be a FIFTH reading no AZDOR document prints.
+
+    S CORPORATION — ⚠ AN ENGINEERING INFERENCE, AND LABELLED ONE. § 43-1401 is a
+    chapter-14 PARTNERSHIP definitions section with no S-corp analogue, while
+    § 43-581(C) reaches both entity types. Because Form 120S carries NO Arizona
+    modification apparatus (the verified negative), applying the § 43-1401(2)
+    SHAPE to it changes nothing and the figure is **line 1 = line 37**. That is
+    BUILD-TO-THE-FORM, not a synthesised corporate definition — but it is a
+    SECOND-ORDER consequence of the refinement rather than something the
+    refinement ruled on. See AZ_EST_MEASUREMENT_SCORP_GAP.
+
+    ⚠ The test measures the **PRECEDING** taxable year.
+    """
+    if form_code not in AZ_EST_MEASUREMENT_FIGURE_BY_FORM:
+        raise ArizonaFormGovernsError(
+            f"Unknown Arizona form code {form_code!r}. The § 43-581(C) measurement figure lands on "
+            f"DIFFERENT LINES on the two returns (Form 165 line 5; Form 120S line 1) and this helper "
+            f"refuses to default."
+        )
+    return {
+        "basis_source": AZ_EST_MEASUREMENT_BASIS,                 # the ruled SOURCE leg
+        "basis_resolves_to": AZ_EST_MEASUREMENT_BASIS_RESOLVES_TO,  # the ruled NUMBER leg
+        "definition": AZ_EST_MEASUREMENT_DEFINITION,
+        "source_line": AZ_EST_MEASUREMENT_FIGURE_BY_FORM[form_code],
+        "figure": None if prior_year_line is None else float(prior_year_line),
+        "is_engineering_inference": form_code == FORM_CODE_120S,
+        "diagnostic": ("D_AZ120S_EST_BASIS_NO_ANALOGUE" if form_code == FORM_CODE_120S
+                       else "D_AZ_U19_150K_BASIS"),
+        "ruling": "campaign D-12 A1 as REFINED 2026-08-19",
+        "provisional": True,          # ⚠ U19 stays OPEN AS A MATTER OF FACT
+        "unverified_item": "U19",
+    }
+
+
 def az_estimated_payments_required(prior_year_taxable_income: float,
                                    year: int = FORM_TAX_YEAR) -> bool:
     """A.R.S. § 43-581(C) — STRICTLY GREATER THAN $150,000.
 
     ⚠ `>` NOT `>=`. An entity at EXACTLY $150,000 of prior-year taxable income
     owes NO PTE estimated payments. See AZ_EST_BOUNDARY_CORRECTION_HISTORY.
-    ⚠ WHICH taxable income is `AZ_EST_MEASUREMENT_BASIS` — a RULING (D-12 A1),
-    not a published AZDOR position. U19 is open.
+    ⚠ WHICH taxable income is `AZ_EST_MEASUREMENT_BASIS`, RESOLVING TO
+    `AZ_EST_MEASUREMENT_BASIS_RESOLVES_TO` per § 43-1401(2) — a RULING (D-12 A1 as
+    refined), NOT a published AZDOR position. U19 is open and the determination
+    stays PROVISIONAL. Use az_estimated_payments_required_for() to resolve the
+    figure and apply the boundary in one step.
     """
     return float(prior_year_taxable_income) > float(_yk(AZ_EST_THRESHOLD, year))
+
+
+def az_estimated_payments_required_for(form_code: str, prior_year_line: float | None,
+                                       year: int = FORM_TAX_YEAR) -> dict:
+    """Resolve the § 43-1401(2) figure, THEN apply the settled `exceeds` boundary.
+
+    The two halves of the § 43-581(C) question were resolved differently and stay
+    separable on purpose:
+      • THE NOUN — which taxable income — is a RULING on a contested question
+        (D-12 A1, refined). U19 is OPEN and the answer is PROVISIONAL.
+      • THE VERB — "exceeds" — is SETTLED by seven sources and needs no ruling.
+        ⚠ An earlier verification pass flipped it the wrong way and a later one
+        caught it, so it is pinned in both directions and must not drift.
+    """
+    resolved = az_est_measurement_figure(form_code, prior_year_line)
+    figure = resolved["figure"]
+    resolved["threshold"] = _yk(AZ_EST_THRESHOLD, year)
+    resolved["boundary"] = AZ_EST_BOUNDARY                    # STRICTLY GREATER THAN
+    resolved["required"] = (None if figure is None
+                            else az_estimated_payments_required(figure, year))
+    return resolved
 
 
 # Installments. ⚠ THE FOURTH ONE IS THE 15TH DAY OF THE **1ST** MONTH AFTER THE
@@ -1880,7 +2078,9 @@ AZ_UNVERIFIED: dict[str, dict] = {
     "U18": {"risk": "orange", "topic": "do the H.B. 4168 § 43-1022 MCTCP subtractions reach the 165 PTE base",
             "encoded_as": "D_AZ165_U18_MCTCP_BY_REFERENCE"},
     "U19": {"risk": "red", "topic": "WHICH taxable income measures the $150,000 threshold",
-            "encoded_as": "D_AZ_U19_150K_BASIS + AZ_EST_MEASUREMENT_BASIS (ruled by D-12 A1; OPEN AS FACT)"},
+            "encoded_as": ("D_AZ_U19_150K_BASIS + AZ_EST_MEASUREMENT_BASIS, resolving via "
+                           "AZ_EST_MEASUREMENT_BASIS_RESOLVES_TO and az_est_measurement_figure() "
+                           "(ruled by D-12 A1, REFINED same session; STILL OPEN AS A FACT)")},
     "U20": {"risk": "yellow", "topic": "Form 220/PTE line 37's routing list is wrong and omits Form 165",
             "encoded_as": "D_AZ_U20_220PTE_LINE37 + AZ_PRINTED_DEFECTS AZ-D4"},
     "U21": {"risk": "yellow", "topic": "the A.R.S. § 43-1011(A)(9) pinpoint is unsupported (404 / superseded)",
@@ -3492,8 +3692,12 @@ AZ165_FACTS: list[dict] = [
                "internally inconsistent three ways. AN EARLIER VERIFICATION PASS FLIPPED THIS THE "
                "WRONG WAY AND A LATER ONE CAUGHT IT. (2) WHICH TAXABLE INCOME IS A RULING, NOT A "
                "PUBLISHED POSITION: AZDOR prints FOUR bases and four of six documents contradict "
-               "themselves internally. D-12 A1 ruled the statute's bare 'taxable income'; U19 STAYS "
-               "OPEN. Encoded as the single constant AZ_EST_MEASUREMENT_BASIS.")},
+               "themselves internally. D-12 A1 ruled the statute's bare 'taxable income' and was "
+               "REFINED the same session — that named a SOURCE without naming a NUMBER, and A.R.S. "
+               "§ 43-1401(2) DEFINES the term as ARIZONA TAXABLE INCOME. ⚠ ON THIS FORM THE FIGURE "
+               "IS **PRIOR-YEAR LINE 5**, NOT LINE 10 — line 8 (= line 5) plus line 9 reconstructs "
+               "§ 43-1014(B)(1)(a)(ii), so line 10 is the larger PTE BASE and would be a FIFTH reading "
+               "no AZDOR document prints. U19 STAYS OPEN and the determination is PROVISIONAL.")},
 ]
 
 
@@ -3877,10 +4081,12 @@ AZ165_RULES: list[dict] = [
      "notes": ("⚠ AN EARLIER VERIFICATION PASS FLIPPED THIS BOUNDARY TO 'OR MORE' AND A LATER ONE "
                "CAUGHT IT; conformity/az_conformity.md §4 and §12-H still carry the wrong version and "
                "need amending. Vintage-clean: § 43-581 is amended by neither Ch. 182 nor Ch. 140.")},
-    {"rule_id": "R-AZ165-EST-BASIS", "title": "WHICH taxable income: a RULING on a contested question (D-12 A1)",
-     "rule_type": "classification", "sort_order": 26, "inputs": [],
-     "outputs": ["az_est_measurement_basis"],
-     "formula": "AZ_EST_MEASUREMENT_BASIS == 'statutory_bare_taxable_income'",
+    {"rule_id": "R-AZ165-EST-BASIS", "title": "WHICH taxable income: a RULING on a contested question (D-12 A1, refined)",
+     "rule_type": "classification", "sort_order": 26, "inputs": ["az165_prior_year_taxable_income"],
+     "outputs": ["az_est_measurement_basis", "az_est_measurement_figure"],
+     "formula": ("AZ_EST_MEASUREMENT_BASIS == 'statutory_bare_taxable_income' (the SOURCE leg) "
+                 "RESOLVES TO 'arizona_taxable_income' per A.R.S. § 43-1401(2) (the NUMBER leg) = "
+                 "PRIOR-YEAR Form 165 line 5 — ⚠ NOT line 10"),
      "description": ("⚠⚠ AZDOR PRINTS **FOUR** DIFFERENT MEASUREMENT BASES AND **FOUR OF SIX "
                      "DOCUMENTS CONTRADICT THEMSELVES INTERNALLY**: (1) bare 'taxable income' — the "
                      "statute, both entity instruction books, one Form 120/PTE-W sentence and the Pub "
@@ -3891,15 +4097,29 @@ AZ165_RULES: list[dict] = [
                      "has $100,000 of PTE income — IN under base 2, OUT under base 3, FROM READINGS "
                      "PRINTED IN THE SAME BOOK — and it decides whether the Form 220/PTE underpayment "
                      "penalty applies. CAMPAIGN D-12 A1 RULED THE STATUTE'S BARE 'TAXABLE INCOME', as "
-                     "the only one of the four with controlling authority behind it."),
-     "exceptions": ("⚠⚠ RECORDED AS A RULING ON A CONTESTED QUESTION, **NOT** AS A PUBLISHED AZDOR "
-                    "POSITION. [UNVERIFIED] U19 STAYS OPEN AS A MATTER OF FACT. The three losing "
-                    "readings are kept on the record in AZ_EST_MEASUREMENT_BASIS_CANDIDATES so a DOR "
-                    "answer can be ADJUDICATED rather than inherited. Settled by an AZDOR ruling, "
+                     "the only one of the four with controlling authority behind it. ⚠⚠ REFINED THE "
+                     "SAME SESSION — THE RULING NAMED A SOURCE WITHOUT NAMING A NUMBER, AND "
+                     "ESTIMATED-PAYMENT AND FORM 220/PTE PENALTY LOGIC NEED A FIGURE. Title 43 "
+                     "chapter 14 DEFINES the statute's term at § 43-1401(2) as 'ARIZONA TAXABLE "
+                     "INCOME' — 'its Arizona gross income adjusted by the modifications specified in "
+                     "sections 43-1021 and 43-1022 and section 43-1414, subsection A' — so the ruled "
+                     "source RESOLVES INTO base 2. RULED 2026-08-19: COMPUTE ARIZONA TAXABLE INCOME. "
+                     "On Form 165 that is PRIOR-YEAR LINE 5. ⚠ NOT LINE 10: line 8 (= line 5) PLUS "
+                     "line 9 reconstructs § 43-1014(B)(1)(a)(ii), so § 43-1401(2) ALONE is line 5, and "
+                     "line 10 — the larger PTE base — would be a FIFTH reading no AZDOR document "
+                     "prints."),
+     "exceptions": ("⚠⚠ THE REFINEMENT NARROWS WHAT WE COMPUTE; IT DOES NOT CLOSE THE QUESTION. "
+                    "STILL RECORDED AS A RULING ON A CONTESTED QUESTION, **NOT A PUBLISHED AZDOR "
+                    "POSITION**. [UNVERIFIED] U19 STAYS OPEN AS A MATTER OF FACT, all four candidate "
+                    "bases stay on the record in AZ_EST_MEASUREMENT_BASIS_CANDIDATES with the three "
+                    "losers explicitly NOT REFUTED, and D_AZ_U19_150K_BASIS still tells the preparer "
+                    "the threshold determination is PROVISIONAL. Settled by an AZDOR ruling, "
                     "procedure, or written Corporate Income Tax section response."),
-     "notes": ("ENCODED AS A SINGLE NAMED CONSTANT so a DOR answer changes ONE THING. ⚠ Note that "
-               "this is a DIFFERENT question from the BOUNDARY, which is settled and needed no "
-               "ruling.")},
+     "notes": ("ENCODED AS A SINGLE NAMED CONSTANT (plus its RESOLVES_TO second leg) so a DOR answer "
+               "changes ONE THING. ⚠ A DIFFERENT question from the BOUNDARY, which is settled and "
+               "needed no ruling. ⚠⚠ SECOND-ORDER GAP: § 43-1401 is a chapter-14 PARTNERSHIP "
+               "definitions section with NO S-corp analogue, while § 43-581(C) reaches both entity "
+               "types — see AZ_EST_MEASUREMENT_SCORP_GAP and D_AZ120S_EST_BASIS_NO_ANALOGUE.")},
     {"rule_id": "R-AZ165-1021-15", "title": "§ 43-1021(15): OWNER LEVEL ONLY — the entity half has no line",
      "rule_type": "classification", "sort_order": 27, "inputs": [],
      "outputs": ["az_entity_level_pte_addback"],
@@ -4938,6 +5158,23 @@ AZ165_SCENARIOS: list[dict] = [
                "D-12 A1 RULED the statute's bare 'taxable income' — A RULING ON A CONTESTED QUESTION, "
                "NOT A PUBLISHED AZDOR POSITION. All four candidates stay on the record so a DOR answer "
                "can be adjudicated rather than inherited.")},
+    {"scenario_name": "AZ-165 A1 REFINED — the ruled SOURCE resolves to a computable NUMBER",
+     "scenario_type": "edge", "sort_order": 17,
+     "inputs": {"form_code": "AZ_165", "prior_year_line_5": 1_000_000,
+                "prior_year_line_10_for_contrast": 1_180_000},
+     "expected_outputs": {"basis_source": "statutory_bare_taxable_income",
+                          "basis_resolves_to": "arizona_taxable_income",
+                          "definition": "A.R.S. 43-1401(2)",
+                          "figure": 1_000_000, "source_line": "PRIOR-YEAR Form 165 line 5",
+                          "required": True, "provisional": True,
+                          "is_engineering_inference": False,
+                          "line_10_would_be_a_FIFTH_reading": True},
+     "notes": ("⚠ THE SECOND STEP A1 ORIGINALLY LACKED. § 43-1401(2) is 'Arizona gross income "
+               "adjusted by the modifications specified in sections 43-1021 and 43-1022 and section "
+               "43-1414, subsection A' = FORM 165 LINE 5. ⚠⚠ NOT LINE 10: line 8 (= line 5) PLUS line "
+               "9 reconstructs 43-1014(B)(1)(a)(ii), so line 10 is the larger PTE BASE and using it "
+               "here would be a FIFTH reading no AZDOR document prints. The determination stays "
+               "PROVISIONAL because U19 is open.")},
     {"scenario_name": "AZ-165 PART 2 GATE — no election, but PTE estimates were paid",
      "scenario_type": "edge", "sort_order": 6,
      "inputs": {"question_A": False, "pte_estimated_payments_made": 40_000},
@@ -5307,8 +5544,14 @@ AZ120S_FACTS: list[dict] = [
      "data_type": "decimal", "sort_order": 80,
      "notes": ("⚠ SAME TWO QUESTIONS AS ON FORM 165. Boundary: 'EXCEEDS' — exactly $150,000 is OUT "
                "(settled, seven sources). Basis: RULED to the statute's bare 'taxable income' (D-12 "
-               "A1), with U19 open as a fact. ⚠ THE FORM 120S INSTRUCTIONS THEMSELVES CONTRADICT "
-               "THEMSELVES, using bare 'taxable income' in one place and 'PTE income' in another.")},
+               "A1) and REFINED the same session to the figure A.R.S. § 43-1401(2) defines — ARIZONA "
+               "TAXABLE INCOME — which on this return resolves to PRIOR-YEAR LINE 1. ⚠⚠ THAT LAST "
+               "STEP IS AN ENGINEERING INFERENCE, NOT A PUBLISHED DEFINITION: § 43-1401 is a "
+               "chapter-14 PARTNERSHIP definitions section with NO S-corp analogue, and Delvio "
+               "reaches line 1 by BUILDING TO THE FORM — Form 120S has no Arizona modification "
+               "apparatus, so there is nothing to adjust. See D_AZ120S_EST_BASIS_NO_ANALOGUE. U19 "
+               "stays open as a fact. ⚠ THE FORM 120S INSTRUCTIONS THEMSELVES CONTRADICT THEMSELVES, "
+               "using bare 'taxable income' in one place and 'PTE income' in another.")},
 ]
 
 
@@ -5595,7 +5838,13 @@ AZ120S_RULES: list[dict] = [
                      "make payments of estimated tax.' EXACTLY $150,000 IS OUT."),
      "exceptions": ("⚠ THE FORM 120S BOOK CONTRADICTS ITSELF ON THE MEASUREMENT BASE, using bare "
                     "'taxable income' in one place and 'PTE INCOME' in another. Campaign D-12 A1 ruled "
-                    "the statute's bare 'taxable income'; U19 stays open as a fact. ⚠ The FOURTH "
+                    "the statute's bare 'taxable income' and REFINED it the same session to the figure "
+                    "A.R.S. § 43-1401(2) defines — ARIZONA TAXABLE INCOME — which on this return "
+                    "resolves to PRIOR-YEAR LINE 1. ⚠⚠ THAT LAST STEP IS AN ENGINEERING INFERENCE: "
+                    "§ 43-1401 is a chapter-14 PARTNERSHIP definitions section with NO S-corp "
+                    "analogue, and Delvio reaches line 1 by BUILDING TO THE FORM (Form 120S has no "
+                    "Arizona modification apparatus, so there is nothing to adjust). See "
+                    "D_AZ120S_EST_BASIS_NO_ANALOGUE. U19 stays open as a fact. ⚠ The FOURTH "
                     "installment is the 15th day of the 1ST MONTH AFTER the close of the taxable year "
                     "(W17). ⚠ Form 220/PTE Part C line 17 substitutes months by form type: 'Forms "
                     "120S: Use 3rd month instead of 4th month. PTE's: Use 3rd month instead of 4th "
@@ -6318,6 +6567,27 @@ AZ120S_DIAGNOSTICS: list[dict] = [
                  "amount on line 37.' Every shareholder's ownership share must land in exactly one of "
                  "the four buckets. Also check 43A + 43B == 43."),
      "notes": "One of two face-printed proof obligations; the other is C8 column (c) == 1.000000."},
+    {"diagnostic_id": "D_AZ120S_EST_BASIS_NO_ANALOGUE", "severity": "warning",
+     "title": "⚠ § 43-1401(2) is a PARTNERSHIP definition -- the S-corp figure is an inference",
+     "condition": "the § 43-581(C) $150,000 estimated-payment test is applied to an S corporation",
+     "message": ("Campaign D-12 A1 as REFINED rules that the $150,000 threshold is measured on "
+                 "ARIZONA TAXABLE INCOME as defined by A.R.S. 43-1401(2). ⚠ THAT SECTION IS THE "
+                 "DEFINITIONS SECTION OF TITLE 43 CHAPTER 14 -- THE PARTNERSHIP CHAPTER -- AND ITS "
+                 "SUBSECTION (2) DEFINES 'Arizona taxable income' OF A PARTNERSHIP. THERE IS NO "
+                 "S-CORPORATION ANALOGUE IN IT, and no corporate 'Arizona taxable income' definition "
+                 "was pulled by the research pass, while 43-581(C) reaches 'an entity that is treated "
+                 "as a partnership OR S CORPORATION'. DELVIO RESOLVES THE S-CORP FIGURE TO PRIOR-YEAR "
+                 "FORM 120S LINE 1 BY BUILDING TO THE FORM: Form 120S carries no Arizona modification "
+                 "apparatus at all, so applying the 43-1401(2) shape to it changes nothing and line 1 "
+                 "= line 37 is the only Arizona income figure the return produces. REVIEW THIS "
+                 "ENTITY'S THRESHOLD DETERMINATION."),
+     "notes": ("⚠⚠ AN ENGINEERING INFERENCE, NOT A PUBLISHED AZDOR OR STATUTORY DEFINITION, AND A "
+               "SECOND-ORDER CONSEQUENCE OF THE A1 REFINEMENT RATHER THAN SOMETHING THE REFINEMENT "
+               "RULED ON. It follows the campaign's standing build-to-the-form posture (D-10 ruling "
+               "2, D-11 A1, D-12 A3 and A4) rather than synthesising a corporate definition Arizona "
+               "has never stated. Settled by an AZDOR answer on 43-581(C) (which also closes U19), or "
+               "by pulling a corporate 'Arizona taxable income' definition. Flagged to Ken as an open "
+               "second-order question. Constant: AZ_EST_MEASUREMENT_SCORP_GAP.")},
     {"diagnostic_id": "D_AZ120S_SCHC_XFOOT", "severity": "error",
      "title": "Schedule C cross-foot failed: C8 column (c) must total 1.000000",
      "condition": "Schedule C line C8 column (c) != 1.000000",
@@ -6448,7 +6718,26 @@ AZ120S_SCENARIOS: list[dict] = [
      "notes": ("A.R.S. 43-581(C) reaches 'an entity that is treated as a partnership OR S CORPORATION'. "
                "⚠ THE FORM 120S BOOK CONTRADICTS ITSELF, using bare 'taxable income' in one place and "
                "'PTE income' in another — one of the four documents that do. D-12 A1 ruled the "
-               "statutory reading; U19 stays open as a fact.")},
+               "statutory reading and REFINED it to 43-1401(2)'s Arizona taxable income; U19 stays "
+               "open as a fact.")},
+    {"scenario_name": "AZ-120S A1 REFINED — 43-1401(2) has NO S-corp analogue, and the figure says so",
+     "scenario_type": "failure", "sort_order": 13,
+     "inputs": {"form_code": "AZ_120S", "prior_year_line_1": 800_000},
+     "expected_outputs": {"basis_resolves_to": "arizona_taxable_income",
+                          "definition": "A.R.S. 43-1401(2)",
+                          "figure": 800_000, "source_line": "PRIOR-YEAR Form 120S line 1",
+                          "required": True, "provisional": True,
+                          "is_engineering_inference": True,
+                          "diagnostic": "D_AZ120S_EST_BASIS_NO_ANALOGUE"},
+     "notes": ("⚠⚠ THE SECOND-ORDER GAP THE A1 REFINEMENT CREATES, RECORDED RATHER THAN PAPERED. "
+               "A.R.S. 43-1401 is the DEFINITIONS section of Title 43 CHAPTER 14 — the PARTNERSHIP "
+               "chapter — and its subsection (2) defines 'Arizona taxable income' OF A PARTNERSHIP. "
+               "THERE IS NO S-CORPORATION ANALOGUE, while 43-581(C) reaches both entity types. Delvio "
+               "resolves to line 1 BY BUILDING TO THE FORM (Form 120S has no Arizona modification "
+               "apparatus, so there is nothing to adjust and line 1 = line 37 is the only Arizona "
+               "income figure the return produces) — the campaign's standing posture, NOT a "
+               "synthesised corporate definition. IT IS STILL AN ENGINEERING INFERENCE AND THE FLAG "
+               "SAYS SO.")},
     {"scenario_name": "AZ-120S INFORMATION RETURN PENALTY — line 32 must be blank when electing",
      "scenario_type": "failure", "sort_order": 11,
      "inputs": {"question_A": True, "months_late": 3, "line_32_attempted": 300},
@@ -6596,14 +6885,22 @@ AZ_SHARED_DIAGNOSTICS: list[dict] = [
                  "$1,000,000 of Arizona taxable income and 10% consenting ownership has $100,000 of "
                  "PTE income — IN under base 2, OUT under base 3, FROM READINGS PRINTED IN THE SAME "
                  "BOOK. It decides whether the Form 220/PTE underpayment penalty applies. CAMPAIGN "
-                 "D-12 A1 RULED the statute's bare 'taxable income'. TREAT THIS ENTITY'S THRESHOLD "
-                 "DETERMINATION AS PROVISIONAL."),
-     "notes": ("[UNVERIFIED] U19 STAYS OPEN AS A MATTER OF FACT. Recorded as a RULING ON A CONTESTED "
-               "QUESTION, NOT A PUBLISHED AZDOR POSITION. All four candidates are kept in "
-               "AZ_EST_MEASUREMENT_BASIS_CANDIDATES so a DOR answer can be ADJUDICATED rather than "
-               "inherited, and the basis is a SINGLE NAMED CONSTANT so a DOR answer changes ONE "
-               "THING. Settled by an AZDOR ruling, procedure, or written Corporate Income Tax section "
-               "response. ⚠ THE SEPARATE BOUNDARY QUESTION IS SETTLED AND NEEDED NO RULING.")},
+                 "D-12 A1 RULED the statute's bare 'taxable income', AND WAS REFINED THE SAME "
+                 "SESSION BECAUSE THAT NAMED A SOURCE WITHOUT NAMING A NUMBER: A.R.S. § 43-1401(2) "
+                 "DEFINES the statute's term as 'ARIZONA TAXABLE INCOME', so Delvio computes that "
+                 "figure — PRIOR-YEAR Form 165 LINE 5 for a partnership (⚠ NOT line 10, the larger "
+                 "PTE base), and PRIOR-YEAR Form 120S LINE 1 for an S corporation. TREAT THIS "
+                 "ENTITY'S THRESHOLD DETERMINATION AS PROVISIONAL."),
+     "notes": ("[UNVERIFIED] U19 STAYS OPEN AS A MATTER OF FACT. Still recorded as a RULING ON A "
+               "CONTESTED QUESTION, NOT A PUBLISHED AZDOR POSITION — THE REFINEMENT NARROWS WHAT WE "
+               "COMPUTE, IT DOES NOT CLOSE THE QUESTION. All four candidates are kept in "
+               "AZ_EST_MEASUREMENT_BASIS_CANDIDATES with the three losers explicitly NOT REFUTED, so "
+               "a DOR answer can be ADJUDICATED rather than inherited, and the basis is a SINGLE "
+               "NAMED CONSTANT (plus its RESOLVES_TO second leg) so a DOR answer changes ONE THING. "
+               "Settled by an AZDOR ruling, procedure, or written Corporate Income Tax section "
+               "response. ⚠ THE SEPARATE BOUNDARY QUESTION IS SETTLED AND NEEDED NO RULING. "
+               "⚠⚠ SECOND-ORDER GAP: § 43-1401 is a chapter-14 PARTNERSHIP definitions section with "
+               "NO S-corp analogue — see D_AZ120S_EST_BASIS_NO_ANALOGUE.")},
     {"diagnostic_id": "D_AZ_EST_4TH_INSTALLMENT_MONTH", "severity": "error",
      "title": "⚠ The FOURTH PTE installment is the 1st month AFTER year end, not the 12th month",
      "condition": "PTE estimated installment dates are computed",
@@ -7229,19 +7526,27 @@ FLOW_ASSERTIONS: list[dict] = [
      "bug_reference": "A `>=` implementation bills four installments and a Form 220/PTE penalty to "
                       "entities the statute exempts"},
     {"assertion_id": "FA-AZ-150K-BASIS", "status": "draft", "sort_order": 10,
-     "title": "WHICH taxable income measures $150,000 is a RULING held in ONE named constant",
+     "title": "The $150,000 basis is a RULING that names a SOURCE and now also a NUMBER",
      "assertion_type": "table_invariant", "entity_types": ["1065", "1120S"],
      "description": ("AZDOR prints FOUR measurement bases and four of six documents contradict "
                      "themselves internally. Campaign D-12 A1 ruled the statute's bare 'taxable "
-                     "income' — A RULING ON A CONTESTED QUESTION, NOT A PUBLISHED AZDOR POSITION, with "
-                     "U19 open as a fact. The basis is a SINGLE NAMED CONSTANT so a DOR answer changes "
-                     "one thing, and all four candidates stay on the record so an answer can be "
-                     "ADJUDICATED rather than inherited."),
+                     "income' and was REFINED the same session, because that named a SOURCE without "
+                     "naming a NUMBER: A.R.S. § 43-1401(2) DEFINES the statute's term as 'Arizona "
+                     "taxable income', so the ruled source RESOLVES INTO base 2 and the engine "
+                     "computes PRIOR-YEAR Form 165 line 5 / Form 120S line 1. ⚠ STILL A RULING ON A "
+                     "CONTESTED QUESTION, NOT A PUBLISHED AZDOR POSITION, with U19 OPEN AS A FACT and "
+                     "the determination PROVISIONAL — the refinement narrows what we compute, it "
+                     "does not close the question. All four candidates stay on the record with the "
+                     "three losers explicitly NOT REFUTED."),
      "definition": {"rule": "R-AZ165-EST-BASIS",
                     "check": ("AZ_EST_MEASUREMENT_BASIS == 'statutory_bare_taxable_income' AND "
+                              "AZ_EST_MEASUREMENT_BASIS_RESOLVES_TO == 'arizona_taxable_income' AND "
+                              "AZ_EST_MEASUREMENT_DEFINITION names § 43-1401(2) AND "
+                              "az_est_measurement_figure() resolves a FIGURE for each form AND "
                               "len(AZ_EST_MEASUREMENT_BASIS_CANDIDATES) == 4 AND the three "
-                              "non-ruled candidates are still recorded AND the ruling text says it is "
-                              "not a published AZDOR position")},
+                              "non-ruled candidates are still recorded as NOT REFUTED AND the ruling "
+                              "text says it is not a published AZDOR position AND "
+                              "D_AZ_U19_150K_BASIS still says PROVISIONAL")},
      "bug_reference": "$1,000,000 of Arizona taxable income at 10% consenting ownership is IN under "
                       "base 2 and OUT under base 3, from the same instruction book"},
     {"assertion_id": "FA-AZ-DIVISOR", "status": "draft", "sort_order": 11,
@@ -7531,6 +7836,23 @@ class Command(BaseCommand):
                 "The $150,000 measurement-base conflict record no longer holds FOUR candidates. "
                 "D-12 A1 is a RULING ON A CONTESTED QUESTION and U19 is OPEN; the losing readings "
                 "must survive so a DOR answer can be re-adjudicated rather than inherited.")
+        if (AZ_EST_MEASUREMENT_BASIS_RESOLVES_TO != "arizona_taxable_income"
+                or AZ_EST_MEASUREMENT_BASIS_RESOLVES_TO not in AZ_EST_MEASUREMENT_BASIS_CANDIDATES):
+            tripwires.append(
+                "THE A1 REFINEMENT WAS UNDONE. D-12 A1 named a SOURCE without naming a NUMBER and was "
+                "REFINED the same session to compute ARIZONA TAXABLE INCOME, because A.R.S. "
+                "§ 43-1401(2) DEFINES the statute's term. Without the RESOLVES_TO leg the "
+                "estimated-payment and Form 220/PTE penalty logic has a citation instead of a figure.")
+        if "43-1401(2)" not in AZ_EST_MEASUREMENT_DEFINITION:
+            tripwires.append(
+                "AZ_EST_MEASUREMENT_DEFINITION no longer names A.R.S. § 43-1401(2) — the definition "
+                "the A1 refinement follows. The refinement's whole mechanism is that Title 43 "
+                "chapter 14 defines the statute's term; drop the cite and the ruling loses its basis.")
+        if not set(AZ_EST_MEASUREMENT_FIGURE_BY_FORM) == set(FORM_CODES):
+            tripwires.append(
+                "AZ_EST_MEASUREMENT_FIGURE_BY_FORM no longer resolves a figure for BOTH forms. "
+                "§ 43-581(C) reaches partnerships AND S corporations, and the two figures land on "
+                "DIFFERENT lines (Form 165 line 5; Form 120S line 1).")
         if AZ_165PA_STATUS != "RED_DEFER":
             tripwires.append(
                 "FORM 165PA WAS UN-DEFERRED. Its face prints 4.5% against the statute's 2.5% and "
