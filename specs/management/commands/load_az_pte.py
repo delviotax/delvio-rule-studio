@@ -430,7 +430,7 @@ from specs.models import (
 # are open, ITP 16-2 (U1) still gates Form 165 line B1's TY2013 tier, and the
 # whole Form 165PA family is RED-DEFERRED on an un-adjudicated rate conflict.
 # ═══════════════════════════════════════════════════════════════════════════
-READY_TO_SEED = False
+READY_TO_SEED = True   # Gate-1 SEED APPROVAL granted by Ken 2026-08-19 (campaign D-12)
 
 
 FORM_JURISDICTION = "AZ"

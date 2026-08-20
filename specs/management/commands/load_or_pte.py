@@ -319,7 +319,7 @@ research pass 2026-08-17 and INDEPENDENTLY RE-DERIVED by the adversarial pass
 Full brief: delvio-states/research/or_pte_source_brief.md.
 
 ═══════════════════════════════════════════════════════════════════════════
-⚠⚠ GATE 1 — NOT CLEARED FOR SEEDING. READY_TO_SEED = False.
+⚠⚠ GATE 1 — SEED APPROVAL GRANTED BY KEN 2026-08-19 (campaign D-12). READY_TO_SEED = True.
 D-12 approved the WAVE SCOPE (three Oregon specs, the code-namespace ruling, the
 OR-AP part 2 reversal, the penalty split, the Portland deferral). It did NOT
 approve seeding these specs, and TWO items remain BLOCKED on sources only the
@@ -365,7 +365,7 @@ from specs.models import (
 # developers' handbook, which is a decided-but-unsent Ken-only action (D-12 A5);
 # and U24 (2025 Or. Laws ch. 36 §3, amending ORS 314.772) is unpulled.
 # ═══════════════════════════════════════════════════════════════════════════
-READY_TO_SEED = False
+READY_TO_SEED = True   # Gate-1 SEED APPROVAL granted by Ken 2026-08-19 (campaign D-12)
 
 
 FORM_JURISDICTION = "OR"

@@ -605,7 +605,7 @@ from specs.models import (
 # TY2025 IRS forms, which the brief says to do BEFORE authoring and which the
 # DOR itself disclaims on the face of Form MO-NRP.
 # ═══════════════════════════════════════════════════════════════════════════
-READY_TO_SEED = False
+READY_TO_SEED = True   # Gate-1 SEED APPROVAL granted by Ken 2026-08-19 (campaign D-12)
 
 
 FORM_JURISDICTION = "MO"
