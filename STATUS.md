@@ -1,7 +1,7 @@
 ---
 type: project-status
 project: delvio-rule-studio
-last_updated: 2026-08-19
+last_updated: 2026-08-20
 ---
 
 # STATUS — delvio-rule-studio (renamed from sherpa-tax-rule-studio 2026-08-05; GitHub + local folder renamed, Render service name unchanged — see render.yaml note)
@@ -12,7 +12,58 @@ last_updated: 2026-08-19
 
 ## Current state
 
-**NEW 2026-08-19 (latest) — WAVE 4 AUTHORING: OREGON IS WRITTEN, GATED AND GREEN (`WO-W04-PTE`).**
+**NEW 2026-08-20 (latest) — WAVE 4 AUTHORING: ARIZONA IS WRITTEN, GATED AND GREEN
+(`WO-W04-PTE`).** `specs/management/commands/load_az_pte.py` — **TWO specs, not three**: `AZ_165`
+(Arizona Form 165) and `AZ_120S` (Arizona Form 120S). **Arizona's elective PTE tax needs NO third
+form** — it is computed in Part 2 of each existing return (165 lines 8-40, tax at line 25; 120S
+lines 37-52, tax at line 52 carried to line 18), proved four ways including A.R.S. §43-1014(A):
+*"The election under this subsection is made by filing the business's return under this title."*
+Arizona is the only Wave 4 state that works this way — MO, OR and MA each need a separate return.
+`READY_TO_SEED = False` and the guard refuses in terms. **PROD IS UNTOUCHED at 148 forms with ZERO
+AZ rows.** Counts: AZ_165 62 facts / 38 rules / 85 lines / 58 diagnostics / 16 scenarios;
+AZ_120S 54 / 31 / 69 / 54 / 12; plus **25 flow assertions**, 20 new authority sources (48 excerpts),
+7 topics, 143 authority links. Harness `scratchpad/validate_az.py`: **224 assertions, 224 PASS /
+0 FAIL.** Full suite **234 passed**.
+
+⚠ **THE FACT THE WHOLE ARIZONA BUILD TURNS ON: THE TWO RETURNS ARE NOT PARALLEL AND THERE IS NO
+SHARED MODIFICATION ENGINE (D-12 Group B).** Form 165 carries a full federal→Arizona stack on its
+face — Schedule A additions, Schedule B subtractions, three page-6 worksheets and a **five**-vintage
+-tier depreciation recomputation on the **individual** full-§168(k) basis — and its PTE base is
+line 5 **plus** line 9. **Form 120S carries none of it: line 37 = line 1, unadjusted.** That is a
+VERIFIED NEGATIVE ("the rule says no"), not an unimplemented feature: the four Arizona modification
+statutes are cited **zero** times in the 28-page 120S instruction book, `Arizona basis` occurs zero
+times, and the corporate-level chain is unadjusted too. It is built as CODE — both 120S helpers
+RAISE — and the harness pins the absence **structurally** as well as by flag, so "adding one for
+symmetry" fails three independent checks. ⚠ The asymmetry is **real economics**: the individual
+rule is net-zero only for post-2016 assets, so a partnership with an old asset base computes a
+different PTE base than an identical S corporation.
+
+⚠ **FIFTEEN SUBSTANTIVE TRIPWIRES SIT INSIDE THE SEED GUARD**, one per campaign ruling, each flipped
+in memory by the harness to prove the guard refuses *and* leaves the DB clean. The `$150,000`
+boundary is pinned in **both** directions — $149,999 OUT, **$150,000 OUT**, $150,001 IN — because an
+earlier verification pass flipped it the wrong way in `az_conformity.md` and a later pass caught it;
+the correction history travels **with** the constant so a later pass re-adjudicates rather than
+inherits. The measurement basis (D-12 A1) is a **single named constant** with all four AZDOR
+candidates retained and the three losers marked *not refuted*, because U19 stays open as a fact.
+`az_165pa_rate()` RAISES rather than choosing between the printed 4.5% and the statute's 2.5%
+(D-12 A2), and `az_entity_level_pte_addback()` and the corporate-basis recomputation refuse under
+D-12 A3 and A4.
+
+⚠ **THE HARNESS CAUGHT THREE DEFECTS DURING AUTHORING**, all provenance-string mismatches where a
+constant carried its ruling but not in the words the pin looked for — fixed in the loader rather
+than by relaxing the pins. **No tax-content defect was found in the Arizona brief**, whose
+transcription had already come back 0 errors on a 48-line positional sample. ⚠ One correction was
+carried *out* of the brief instead: the Laws 2025 Ch. 182 section numbering (Sec. 6 = §43-1014,
+Sec. 7 = §43-1414, Sec. 9 = Retroactivity) is off by one in `WORK_ORDERS.md`'s Gate-1 summary.
+
+⚠ **Arizona's seed approval needs ITP 16-2 pulled** — the only unpulled document gating a mainstream
+line (Form 165 line B1's TY2013 vintage tier, where AZDOR defers entirely). Twenty-one
+`[UNVERIFIED]` items are open, three of them blocking (U19, U14, U3); the verification pass closed
+**none** outright and **added three**.
+
+---
+
+**2026-08-19 — WAVE 4 AUTHORING: OREGON IS WRITTEN, GATED AND GREEN (`WO-W04-PTE`).**
 `specs/management/commands/load_or_pte.py` — **THREE specs, not two**: `OR_65` (Form OR-65),
 `OR_20_S` (Form OR-20-S) and **`OR_21` (Form OR-21, the PTE-E elective tax) AS ITS OWN SPEC** per
 campaign D-12, because its base is built entirely from federal Schedule K with **zero** inputs from

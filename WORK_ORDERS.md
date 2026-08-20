@@ -258,9 +258,48 @@ from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 > member credit against $13,500 of entity tax). **The obvious fix reasons from a tie-out Caution,
 > not from a cited rule, and is encoded as a labelled CANDIDATE, never as DOR guidance.**
 > **U24 (2025 Or. Laws ch.36 §3 amending ORS 314.772) separately blocks OR-20-S line 15.**
-> · **NEXT — author MO and AZ loaders** (`READY_TO_SEED=False`) + SQLite validation harnesses, then
-> ONE batched Gate-1 seed approval covering all 8 forms. ⚠ **Oregon's seed approval also needs the
+> · ✅ **ARIZONA AUTHORED 2026-08-20 — `load_az_pte.py` (2 specs, 7,753 lines, `READY_TO_SEED=False`)
+> + `scratchpad/validate_az.py` (224 assertions, 224 PASS / 0 FAIL). PROD UNTOUCHED at 148 forms
+> with ZERO AZ rows; `AZ_165` and `AZ_120S` both still 404.**
+> **AZ_165** facts 62 / rules 38 / lines 85 / diagnostics 58 / scenarios 16 · **AZ_120S** 54 / 31 /
+> 69 / 54 / 12 · **25 flow assertions**, 20 new authority sources (48 excerpts), 7 topics, 143
+> authority links, 40 form links. **TWO specs, not three — Arizona's PTE tax rides on Part 2 of each
+> existing return** (proved four ways, incl. A.R.S. §43-1014(A) "the election … is made by filing the
+> business's return"). The three seeded Tier-1 anchors are REUSED, never re-created.
+> · ⚠ **THE ASYMMETRY IS BUILT AS CODE, NOT PROSE.** `az_120s_modification()` and
+> `az_120s_depreciation_adjustment()` RAISE `ArizonaFormGovernsError`; `AZ_120S_NEGATIVE_PROOF`
+> carries the statute-cite census (43-1021/43-1022/43-1121/43-1122 = **0 each** across 28 pages) and
+> the 70 addition/subtract\* hits bucketed as READ IN CONTEXT. The harness additionally proves the
+> absence **structurally** — no `AZ_120S` fact key matches an addition/subtraction/depreciation
+> shape and no `AZ_120S` line carries a Form 165 Schedule A/B row number — so "adding one for
+> symmetry" fails on three independent checks, not one flag.
+> · **Fifteen SUBSTANTIVE TRIPWIRES sit inside the seed guard**, one per campaign ruling, and the
+> harness flips each IN MEMORY and proves the guard refuses AND leaves the DB clean. Re-pinned to
+> the MECHANISM per the D-10/D-11 process notes: the $150,000 boundary is pinned in **both**
+> directions ($149,999 OUT / $150,000 OUT / $150,001 IN) because an earlier verification pass
+> flipped it the wrong way and a later one caught it. The measurement basis is a **single named
+> constant** with all four AZDOR candidates retained and the three losers marked *not refuted*.
+> · ⚠ **`AZ_165PA` STAYS RED-DEFERRED AND `az_165pa_rate()` RAISES** rather than choosing between
+> the printed 4.5% and the statute's 2.5% (D-12 A2). ⚠ **One 165PA output still reaches Form 165
+> even while 165PA is deferred** — a RECEIVED 165PA Sch. K-1(NR) with a positive line 3 forces an
+> amended Form 165 at page-6 line A4; that input IS modelled.
+> · ⚠ **CORRECTION TO THIS WORK ORDER, from the verified brief §16.4 C4:** the entry above says
+> "S.B. 1274 **§8** amended only subsection (A)". The **chaptered** Laws 2025 Ch. 182 headers read
+> **Sec. 6 = §43-1014, Sec. 7 = §43-1414, Sec. 8 = Laws 2023 ch.147 §3, Sec. 9 = Retroactivity** —
+> the brief was OFF BY ONE in seven places and the correction is carried in the loader
+> (`AZ_CH182_SECTION_MAP`) and pinned in the harness. **Substance unaffected.**
+> · ⚠ **THE HARNESS CAUGHT THREE DEFECTS DURING AUTHORING** — all provenance-string mismatches
+> where a constant carried its ruling but not in the words the pin looked for (the A4 pass-through
+> did not say its U2 gap was OPEN; the U19 diagnostic said "not **as** a published AZDOR position").
+> Fixed in the loader rather than by relaxing the pins, on the D-11 principle that a guard is
+> re-pinned to the mechanism, never retired. **No tax-content defect was found in the brief itself**
+> — Arizona's transcription had already come back 0/48 on the positional sample.
+> · **NEXT — author the MO loaders** (`READY_TO_SEED=False`) + SQLite validation harness, then ONE
+> batched Gate-1 seed approval covering all 8 forms. ⚠ **Oregon's seed approval also needs the
 > DOR developers'-handbook answer, or an explicit ruling to ship OR_21 on worksheet provenance.**
+> ⚠ **Arizona's seed approval needs ITP 16-2 pulled** (U1 — the only unpulled document gating a
+> mainstream line, Form 165 line B1's TY2013 vintage tier); U19, U14 and U3 are ruled/deferred but
+> stay **open as matters of fact**.
 
 > **[WO-W03-PTE] 45-state campaign Wave 3 — VA + CO + MS + MD pass-through lane
 > (BUILD_ORDER S-27; campaign `delvio-states` WAVE_PLAN.md wave 3) · ✅ **APPROVED + SEEDED
