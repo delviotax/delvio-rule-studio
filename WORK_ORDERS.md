@@ -99,6 +99,29 @@ and namespace everything new. ⚠ Also note the app-side wart this feeds: delvio
 *No independent backlog here (see header). Sequence = BUILD_ORDER.md SPINE; statuses seeded
 from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 
+> **[WO-W06-LA-PILOT] 45-state campaign Wave 6 — PILOT DEMAND: Louisiana PTE (paired) +
+> AL/NC line-number re-verification (campaign `delvio-states` D-14) · **GAP-CHECKED — opened
+> 2026-08-22 — JUMPS THE QUEUE ahead of WO-W05's authoring leg (Ken, in-session 2026-08-22)**
+> · **Trigger:** Codex's ten-return TY2025 partnership pilot in delvio-tax needs CO · AL · LA ·
+> MS · NC. CO/MS are seeded and dispatched (w03); AL/NC are seeded with [UNVERIFIED] line
+> numbers printed in their own loaders; **LA has nothing.**
+> · **The wave:** LA paired PTE (1065 + 1120S). **GAP-CHECK OK 2026-08-22 — all LA codes 404**
+> (`LA_IT565` · `LA_CIFT620` · `LA_R6922` + variants, against RS prod at 156 forms).
+> · WARNING **Module-boundary hazard, known in advance:** Louisiana routes ELECTING pass-throughs to
+> **CIFT-620 — the corporate form** — and folded the composite return (R-6922) into IT-565 in
+> recent years. The 1065/1120S/1120 boundary is nonstandard; the research brief must settle which
+> codes this wave actually authors. Never clone GA; never clone any prior state's shape.
+> · **Conformity prerequisite NOT satisfied** — LA has NO conformity brief and NO
+> `JurisdictionConformitySource` row. Per campaign D-8 the conformity brief + row come FIRST.
+> · **Also in this WO:** re-pull AL Form 65 / Form 20S and NC D-403 / CD-401S / NC-PE line
+> numbers against FINAL TY2025 PDFs (the loaders' own `CARRIED [UNVERIFIED]` flags); corrections
+> to the seeded specs, if any, go to Ken with the batched Gate-1 walk.
+> · **NEXT — research fan-out** (LA conformity brief FIRST + LA PTE brief in parallel with
+> conformity content deferred; AL/NC re-verification), then adversarial verification, then ONE
+> batched Gate-1 walk (folding in the CO $5,000 two-predicate ratification, Wave 5 walk item G2),
+> then `load_la_pte.py` (`READY_TO_SEED=False`). WARNING **Nothing may be authored until the LA
+> briefs are adversarially verified.**
+
 > **[WO-W05-CCORP] 45-state campaign Wave 5 — C-corp sweep, 7 states
 > (BUILD_ORDER S-27; campaign `delvio-states` WAVE_PLAN.md wave 5) · **GAP-CHECKED — opened
 > 2026-08-21**
