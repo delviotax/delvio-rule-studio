@@ -2844,7 +2844,10 @@ CO_RULES: list[dict] = [
                      "unpaid at the extension due date.")},
     {"rule_id": "R-CO-EST-TAX", "title": "Estimated tax (DR 0106EP / DR 0233) - PTE rules, NOT C-corp rules",
      "rule_type": "calculation", "sort_order": 64,
-     "formula": ("required if net Colorado tax liability > $5,000  [W9 RULING - see below] ; "
+     "formula": ("OBLIGATION TO REMIT: required if net Colorado tax liability > $5,000 ; "
+                 "PENALTY EXCEPTION (a SEPARATE predicate, Sec. 39-22-606(6)(a)(I) C.R.S. via Sec. 39-22-344(2)): "
+                 "no penalty if net Colorado tax < $5,000 -- at EXACTLY $5,000 there is NO obligation but FULL "
+                 "penalty exposure [G2 RE-RATIFIED 2026-08-22 - see below] ; "
                  "required annual amount = LESSER OF 70% of current-year net Colorado tax, or 100% of the preceding "
                  "year's - the 100% leg ONLY IF the preceding year was 12 months AND a Colorado return was filed AND "
                  "taxable income was under $1,000,000 in all three preceding years ; "
@@ -2862,14 +2865,22 @@ CO_RULES: list[dict] = [
                      "option for partnerships or S corporations to compute their estimated payments using an "
                      "annualized income installment method', while the Corporate Guide Part 9 expressly GRANTS it to "
                      "C corporations. "
-                     "THE $5,000 THRESHOLD IS A LIVE 3-2 SOURCE SPLIT (verifier correction C9), NOT AN ERRATUM: "
-                     "'exceeds' per the DR 0233 instructions, DR 0106EP and the SALT Parity pub; '>=' / 'less than "
-                     "$5,000' per DR 0106 line 31 AND the Corporate Income Tax Guide, which the DR 0106 EXPRESSLY "
-                     "INCORPORATES BY REFERENCE for exactly this rule. Exposure is the single point net tax == "
-                     "$5,000. Built STRICTLY GREATER THAN, because DR 0233 Part 1 computes 'line 1 - $5,000; If line "
-                     "2 is larger, enter zero and no penalty is due' - the form's own arithmetic is the tiebreak. "
-                     "RULED BY KEN 2026-08-17 (Gate-1 walk item B2). Recorded AS A RULING ON A SOURCE SPLIT, "
-                     "NOT as a correction of an erratum."),
+                     "THE $5,000 RULE IS TWO PREDICATES, NOT ONE THRESHOLD [RE-RATIFIED 2026-08-22, campaign "
+                     "D-16 walk item G2, SUPERSEDING D-12 B2]. Colorado's sources were never in conflict - they "
+                     "describe two DIFFERENT rules: (1) the OBLIGATION to remit applies when net Colorado tax "
+                     "EXCEEDS $5,000 (DR 0106 face, DR 0233 instructions, DR 0106EP, SALT Parity pub) - strictly "
+                     "greater; (2) the PENALTY EXCEPTION is settled AT STATUTE LEVEL by Sec. 39-22-606(6)(a)(I), "
+                     "C.R.S., which Sec. 39-22-344(2) routes electing PTEs through - no penalty where the tax is "
+                     "LESS THAN $5,000 - strictly less. AT EXACTLY $5,000 THERE IS NO REMITTANCE OBLIGATION BUT "
+                     "FULL PENALTY EXPOSURE. Never collapse them into one constant and never implement the "
+                     "exception as the negation of the obligation - a single strictly-greater constant silently "
+                     "suppresses a real penalty at the boundary. "
+                     "SUPERSEDED HISTORY (recorded so it is not re-litigated): the first pass characterised this "
+                     "as a live 3-2 SOURCE SPLIT (verifier correction C9) and Ken ruled it strictly-greater on "
+                     "2026-08-17 (D-12 B2) reasoning that 'DR 0233 Part 1 yields a zero base at $5,000 either "
+                     "way'. That rationale was a CATEGORY ERROR - the sources describe two rules, not one "
+                     "contested one, and DR 0233 Part 1 line 3 feeds nothing. Found by the Wave-5 C-corp "
+                     "verification pass."),
      "exceptions": ("No estimated tax penalty is due 'if the Department determines that the underpayment was due to "
                     "good cause shown by the taxpayer'. Short/fiscal periods -> R13 RED-defer.")},
 
@@ -3013,7 +3024,7 @@ CO_RULE_LINKS: list[tuple[str, str, str, str]] = [
     ("R-CO-DUEDATE", "CO_2025_DR0106", "secondary", "April 15 / automatic 6 months / no extension to pay"),
     ("R-CO-PENALTY", "CO_2025_DR0106", "primary", "line 29 penalty text, verbatim"),
     ("R-CO-EST-TAX", "CO_2025_DR0233", "primary", "70%/100%, first-year block, no annualized method, interest"),
-    ("R-CO-EST-TAX", "CO_CORP_TAX_GUIDE_2026", "secondary", "C9 - the other side of the $5,000 3-2 split"),
+    ("R-CO-EST-TAX", "CO_CORP_TAX_GUIDE_2026", "secondary", "the penalty-exception predicate (< $5,000); statute-level authority is Sec. 39-22-606(6)(a)(I) [G2]"),
     ("R-CO-CR-COLS", "CO_2025_DR0106CR", "primary", "L38 = SUM(L5..L37); the column rule; lines 2-4"),
     ("R-CO-OWNER-SIDE", "CO_CRS_39_22_347_CREDIT", "primary", "refundable credit -> DR 0104CR Part I line 11"),
     ("R-CO-OWNER-SIDE", "CO_ITT_SALT_PARITY_2025", "primary", "forced full Sec. 199A add-back on every owner"),

@@ -242,7 +242,7 @@ AUTHORITY_SOURCES: list[dict] = [
         }],
     },
     {
-        "source_code": "LA_RS_47_287_732_2", "source_type": "statute", "source_rank": "controlling",
+        "source_code": "LA_RS_47_287_732_2", "source_type": "state_statute", "source_rank": "controlling",
         "jurisdiction_code": "LA", "title": "La. R.S. 47:287.732.2 — the elective pass-through entity tax",
         "citation": "La. R.S. 47:287.732.2; R.S. 47:32; LAC 61:I.1001", "issuer": "Louisiana Legislature",
         "official_url": "https://legis.la.gov/legis/Law.aspx?d=1148883",
@@ -269,7 +269,7 @@ AUTHORITY_SOURCES: list[dict] = [
         }],
     },
     {
-        "source_code": "LA_RS_47_201_1", "source_type": "statute", "source_rank": "controlling",
+        "source_code": "LA_RS_47_201_1", "source_type": "state_statute", "source_rank": "controlling",
         "jurisdiction_code": "LA", "title": "La. R.S. 47:201 / 47:201.1 — partnership information return and the composite mandate",
         "citation": "La. R.S. 47:201; 47:201.1(A), (D)(1), (F)(4); 47:103(A)(2)", "issuer": "Louisiana Legislature",
         "official_url": "https://legis.la.gov/legis/Law.aspx?d=101460",
@@ -290,7 +290,7 @@ AUTHORITY_SOURCES: list[dict] = [
         }],
     },
     {
-        "source_code": "LA_TY2026_CLIFF", "source_type": "session_law", "source_rank": "controlling",
+        "source_code": "LA_TY2026_CLIFF", "source_type": "state_statute", "source_rank": "controlling",
         "jurisdiction_code": "LA", "title": "Louisiana TY2026 cliff — Acts 5, 6, 11 (2024 3ES) and Act 382 (2025 RS)",
         "citation": "Acts 5, 6, 11 of the 2024 Third Extraordinary Session; Act 382 of 2025 (enrolled HB 567); RIB 25-032",
         "issuer": "Louisiana Legislature", "official_url": "https://legis.la.gov/legis/BillInfo.aspx?i=250444",
