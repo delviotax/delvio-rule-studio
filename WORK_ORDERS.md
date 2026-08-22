@@ -99,6 +99,38 @@ and namespace everything new. ⚠ Also note the app-side wart this feeds: delvio
 *No independent backlog here (see header). Sequence = BUILD_ORDER.md SPINE; statuses seeded
 from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 
+> **[WO-W05-CCORP] 45-state campaign Wave 5 — C-corp sweep, 7 states
+> (BUILD_ORDER S-27; campaign `delvio-states` WAVE_PLAN.md wave 5) · **GAP-CHECKED — opened
+> 2026-08-21**
+> · **The wave:** the C-corp return for every state whose PTE forms are already seeded —
+> **MO · OR · AZ · VA · CO · MS · MD = 7 forms.** `MO_1120` · `OR_20` · `AZ_120` · `VA_500` ·
+> `CO_DR0112` · `MS_83_105` · `MD_500`.
+> · **GAP-CHECK ✅ 2026-08-21 — all 7 are gaps** (all 404 against RS prod, which holds 156 forms).
+> · ⚠ **SCOPING CALL: `MA_355` is NOT in this wave.** Massachusetts was split to its own Wave 4b at
+> campaign D-12; its C-corp travels with the rest of its forms so MA is researched, walked and
+> authored as one unit. `MA_355` also gap-checked 404 and is recorded against Wave 4b.
+> · **Why this wave is cheap, and the specific reason it is cheaper than it looks:** every one of
+> these seven states **already has a VERIFIED PTE form-structure brief** from Waves 3 and 4, plus a
+> verified conformity brief and a **seeded `JurisdictionConformitySource` row**. Apportionment,
+> modification-code vocabulary, credit schedules, filing mechanics and the federal handoff are
+> largely SHARED between a state's PTE and C-corp returns. The research is therefore a **delta
+> against a known baseline**, not a greenfield read. WAVE_PLAN records C-corp as the fastest module
+> to batch historically (WO-12: three states in a day).
+> · ⚠ **But it is NOT a clone job, and two traps are already known:**
+>   - **AZ**: Forms 165 and 120S are **not parallel** and cannot share a modification engine
+>     (campaign D-12). Do not assume `AZ_120` mirrors either of them — the C-corp regime is the one
+>     that **decouples** from §168(k) while individuals conform.
+>   - **CO**: the DR 0112 is a different form from the DR 0106, and the **C-corp due dates were a
+>     documented error** the Tier-1 conformity verification pass had to correct.
+> · ⚠ **OH has NO corporate income tax** — its CAT is a different animal and is correctly absent
+> from this wave (WAVE_PLAN §3).
+> · **Conformity prerequisite ✅ SATISFIED** for all seven (campaign D-10) — authority anchors
+> resolve immediately, as in Waves 3 and 4.
+> · **NEXT — research fan-out** (delta against each state's existing verified PTE brief), then
+> adversarial verification, then ONE batched Gate-1 scope walk. ⚠ **Nothing may be authored until
+> each brief exists AND has been adversarially verified** — the Wave 4 verification pass corrected
+> items in every single brief and caught four errors in the ruling layer itself.
+
 > **[WO-W04-PTE] 45-state campaign Wave 4 — MO + OR + AZ pass-through lane
 > (BUILD_ORDER S-27; campaign `delvio-states` WAVE_PLAN.md wave 4) · ✅ **GATE-1 RULED 2026-08-19
 > (campaign D-12) — RE-SCOPED TO MO · OR · AZ, 8 forms; MA SPLIT TO ITS OWN WAVE. AUTHORING NEXT.**
