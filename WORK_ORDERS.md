@@ -121,6 +121,25 @@ from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 > batched Gate-1 walk (folding in the CO $5,000 two-predicate ratification, Wave 5 walk item G2),
 > then `load_la_pte.py` (`READY_TO_SEED=False`). WARNING **Nothing may be authored until the LA
 > briefs are adversarially verified.**
+> · **CLOSED 2026-08-22 — SEEDED (campaign D-17, Ken's DIRECT seed approval).** Both LA briefs
+> adversarially VERIFIED; `load_la_pte.py` authored and seeded. LIVE: **`LA_IT565`** (facts 11 /
+> rules 4 / lines 4 / diag 5 / tests 4) and **`LA_CIT620`** (12 / 9 / 6 / 10 / 8) + 5 flow
+> assertions; both exports 200; the stale `LA_CIFT620` correctly 404s. LA conformity row + its
+> authority source also authored and seeded (**19 conformity rows live**) — the forms had exported
+> a NULL `state_conformity` block because LA was never a Tier-1 subject, which is the condition
+> D-8 exists to prevent. Harness 36/36 · RS suite 234 · `seed_all --dry-run` clean.
+> · **AL/NC leg also closed:** AL verified BUILD-SAFE as seeded; **NC corrected and reseeded**
+> (two computational defects — a repealed pre-2023 Taxed-PTE base that OVERSTATED tax, and a
+> CD-401S franchise cloned from the C-corp rule: $2,000 where TY2025 gives $1,700).
+> · ⚠ **A loader defect found and fixed here, worth knowing repo-wide:** every upsert keys on a
+> NAME and never pruned, so RENAMING a row created a duplicate and left the original live — the
+> first NC reseed shipped the repealed fact and scenario ALONGSIDE their replacements. `_prune()`
+> added to NC and built into LA from the start. **67 of 115 loaders still lack it**; an exact
+> audit (`scratchpad/audit_orphan_rows.py`) shows **zero realised orphans** across all 16 seeded
+> state forms, so it is latent capacity rather than live exposure.
+> · ⚠ **SEEDING IS NOT BUILDING** — the LA app build is deferred pending a design conversation:
+> LA has no S-corp return, so a non-electing S corp files **CIT-620 computed AS A C CORPORATION**
+> and the 1120S module's state return IS the C-corp computation, inverting the usual module order.
 
 > **[WO-W05-CCORP] 45-state campaign Wave 5 — C-corp sweep, 7 states
 > (BUILD_ORDER S-27; campaign `delvio-states` WAVE_PLAN.md wave 5) · **GAP-CHECKED — opened
