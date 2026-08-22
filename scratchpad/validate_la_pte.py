@@ -1,11 +1,13 @@
 """Validation harness for the Louisiana pass-through specs (IT-565 + CIT-620).
 
 Runs the loader's own computation helpers against hand-derived vectors AND
-asserts the spec's structural invariants — WITHOUT seeding (the loader stays
-READY_TO_SEED=False until Ken's Gate-1 SEED approval).
+asserts the spec's structural invariants WITHOUT seeding. The seed-gate check
+is pinned to the GATE MECHANISM, never to the sentinel's current value (see
+the note at that check).
 
 Run: poetry run python scratchpad/validate_la_pte.py
 """
+import io
 import os
 import sys
 import importlib.util
@@ -112,13 +114,25 @@ sev = {d["diagnostic_id"]: d["severity"] for f in LA.FORMS for d in f["diagnosti
 check(sev.get("D_LAIT565_EFILE_MANDATE") == "error", "e-file mandate is severity=error")
 check(sev.get("D_LAIT565_R90158_DEFER") == "error", "R-90158 RED-defer is severity=error")
 
-check(LA.READY_TO_SEED is False,
-      "READY_TO_SEED is False (the SEED gate is separate from D-16's scope approval)",
-      "READY_TO_SEED was flipped without Ken's seed approval")
+# ⚠ RE-PINNED 2026-08-22 TO THE MECHANISM, NOT THE VALUE (campaign standing
+# rule, now its FIFTH occurrence): this check asserted READY_TO_SEED is False
+# and went red the moment Ken approved the seed — a check describing the world
+# BEFORE an approval always does. Check that the GATE WORKS, never what the
+# gate currently holds.
+_guard_src = io.open(os.path.join(
+    REPO, "specs", "management", "commands", "load_la_pte.py"), encoding="utf-8").read()
+check("if not READY_TO_SEED or empty:" in _guard_src,
+      "the seed guard still REFUSES when the sentinel is False (mechanism intact)",
+      "the seed guard's refusal path is gone -- the gate no longer exists")
+check('a bonus ADD-BACK was invented' in _guard_src,
+      "the guard still refuses a fabricated Louisiana bonus add-back (LA has none)",
+      "the no-bonus-add-back refusal was removed from the guard")
+check(isinstance(LA.READY_TO_SEED, bool),
+      f"READY_TO_SEED is a real boolean sentinel (currently {LA.READY_TO_SEED})")
 
 fa = {a["assertion_id"] for a in LA.FLOW_ASSERTIONS}
 check("FA-LAIT565-NOTAX" in fa, "flow assertion pins the IT-565 as computing NO entity tax")
-check("FA-LACIT620-TRACK-EXCLUSIVE" in fa,
+check("FA-LACIT620-XOR" in fa,
       "flow assertion pins election XOR S-corp exclusion")
 check(len(LA.FLOW_ASSERTIONS) == 5, f"5 flow assertions (got {len(LA.FLOW_ASSERTIONS)})")
 

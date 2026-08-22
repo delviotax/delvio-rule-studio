@@ -1081,7 +1081,33 @@ TIER1_SOURCES: list[dict] = [{'source_code': 'CA_SB711_2025_CONFORMITY',
                   'to federal itemized deductions flows into Form 80-108 Schedule A automatically. '
                   'Also the source for the 0%/4.4% individual rate schedule, the filing thresholds '
                   '($8,300 / $16,600 plus $1,500 per dependent), and the HB 1 (2025) legislative '
-                  'summary.'}]
+                  'summary.'},
+ {'source_code': 'LA_RS_47_CONFORMITY',
+ 'source_type': 'state_statute',
+ 'source_rank': 'controlling',
+ 'jurisdiction_code': 'LA',
+ 'title': 'La. R.S. 47:287.701 / 47:293 / 47:287.744 / 47:297.25 - Louisiana IRC conformity and the state '
+          'expensing election',
+ 'citation': 'La. R.S. 47:287.701(A)-(B); 47:287.65; 47:293(1); 47:287.744; 47:297.25; 47:287.12; 47:32; '
+             '47:601',
+ 'issuer': 'Louisiana Legislature',
+ 'official_url': 'https://legis.la.gov/legis/Law.aspx?d=101459',
+ 'current_status': 'active',
+ 'is_substantive_authority': True,
+ 'trust_score': 9.6,
+ 'excerpt_label': "Rolling conformity by 'as amended'; the state election freezes its OWN definitions at "
+                  '1/1/2024',
+ 'excerpt_text': 'R.S. 47:287.701(A): "Federal law means the Internal Revenue Code of 1986, AS AMENDED, '
+                 '(Title 26 United States Code) and applicable U.S. Treasury Regulations." No conformity '
+                 'DATE exists anywhere in the income-tax chapters. Corporate net income starts from federal '
+                 'taxable income (47:287.65); individual from federal AGI (47:293(1)). OBBBA (P.L. 119-21) '
+                 'is therefore IN for TY2025 by flow-through. THE ONE DELIBERATE EXCEPTION: the state '
+                 'elective full-expensing statutes (47:287.744 corporate / 47:297.25 individual-fiduciary, '
+                 'from Acts 5 and 11 of the 2024 Third Extraordinary Session) freeze THEIR IRC references at '
+                 'January 1, 2024 - that freeze governs only the STATE ELECTION definitions, never the '
+                 'federal starting point.',
+ 'summary_text': "Rolling ('as amended'), no conformity date; OBBBA in for TY2025; the state expensing "
+                 'election freezes only its own definitions at 1/1/2024.'}]
 
 TIER1_ROWS: list[dict] = [{'jurisdiction_code': 'CA',
   'conformity_type': 'static',
@@ -3880,4 +3906,87 @@ TIER1_ROWS: list[dict] = [{'jurisdiction_code': 'CA',
            'consistent with the official DOR PDFs, but PER CAMPAIGN RULES THESE MUST BE RE-PULLED '
            'FROM THE OFFICIAL MISSISSIPPI CODE AND ADMINISTRATIVE CODE BEFORE SPECS ARE AUTHORED. '
            'Tooling note: www.dor.ms.gov serves an incomplete TLS chain — WebFetch fails; PDFs '
-           'need a direct HTTP client (curl -k).'}]
+           'need a direct HTTP client (curl -k).'},
+ {'jurisdiction_code': 'LA',
+ 'conformity_type': 'rolling',
+ 'authority_source_code': 'LA_RS_47_CONFORMITY',
+ 'federal_reference_note': 'ROLLING, with NO conformity date anywhere in the income-tax chapters. R.S. '
+                           "47:287.701(A) defines federal law as the IRC 'as amended'; corporate net income "
+                           'starts from FEDERAL TAXABLE INCOME (47:287.65) and individual from FEDERAL AGI '
+                           '(47:293(1)). OBBBA (P.L. 119-21, enacted 7/4/2025) is therefore IN for TY2025 by '
+                           'flow-through, and no LDR OBBBA pronouncement exists either way (a recorded '
+                           'negative, not an assumption). THE ONE DELIBERATE EXCEPTION TO ROLLING: the state '
+                           'full-expensing election statutes (R.S. 47:287.744 corporate / 47:297.25 '
+                           'individual-fiduciary) freeze THEIR OWN IRC references at 1/1/2024; that freeze '
+                           'governs the election definitions only, NOT the federal starting point.',
+ 'summary': 'Rolling conformity; flat rates across the board for TY2025 (individuals/estates/trusts/electing '
+            'PTEs 3%, corporations 5.5%); corporate FRANCHISE tax repealed effective 1/1/2026 (last period '
+            '2025, reported on the 2024 CIFT-620 - the TY2025 corporate return is renamed CIT-620 and '
+            'carries no franchise schedules). NO federal bonus-depreciation add-back exists. PTE owner-side '
+            'relief is an EXCLUSION, not a credit, and reaches individuals/estates/trusts only. TY2026 is a '
+            'cliff for S corporations (Act 382).',
+ 'decoupled_items': [{'item': 'IRC 168(k) bonus depreciation',
+                      'federal_treatment': 'IRC 168(k) bonus depreciation flows into federal taxable income '
+                                           '/ AGI',
+                      'state_treatment': 'CONFORMS - NO add-back. Louisiana has no 168(k) decoupling; OBBBA '
+                                         '100% bonus flows through. Established AFFIRMATIVELY: R.S. '
+                                         '47:287.71 additions contain no depreciation item and all four '
+                                         'TY2025 booklets grep clean. A widely-circulated secondary source '
+                                         '(Bloomberg Tax) states the opposite and is WRONG on the primary '
+                                         'sources.',
+                      'authority_source_code': 'LA_RS_47_CONFORMITY',
+                      'notes': 'DO NOT code a Georgia-shaped add-back for Louisiana. This is the single most '
+                               'likely wrong port.'},
+                     {'item': 'IRC 179 expensing',
+                      'federal_treatment': 'IRC 179 expensing at the federal limit for the year',
+                      'state_treatment': 'CONFORMS BY SILENCE - zero modification lines across all four '
+                                         "TY2025 booklets. Encode as '= federal for the tax year'; no "
+                                         'Louisiana figure exists.',
+                      'authority_source_code': 'LA_RS_47_CONFORMITY',
+                      'notes': 'Never a Louisiana constant, never a frozen number.'},
+                     {'item': 'State elective 100% expensing (R.S. 47:287.744 / 47:297.25)',
+                      'federal_treatment': 'Federal cost recovery over the asset life',
+                      'state_treatment': 'ADDS AN ELECTIVE STATE-ONLY 100% EXPENSING REGIME on top (R.S. '
+                                         '47:287.744 / 47:297.25, Acts 5 and 11 of 2024 3ES; IRC definitions '
+                                         'frozen 1/1/2024), with a SUBSEQUENT-YEAR add-back of federal '
+                                         'depreciation ONLY on property the taxpayer chose to state-expense '
+                                         '(47:287.744(C)(3)). Requires Form R-90158.',
+                      'authority_source_code': 'LA_RS_47_CONFORMITY',
+                      'notes': 'RED-DEFERRED in the specs: Form R-90158 has NO PUBLISHED PDF ANYWHERE as of '
+                               '2026-08-22 (both LDR forms indexes, LDR site search and a web-wide sweep '
+                               'returned nothing), despite being named as a required attachment in five '
+                               'TY2025 booklets and RIB 25-012. Re-check before any app build.'},
+                     {'item': 'Net operating loss (IRC 172)',
+                      'federal_treatment': 'Federal NOL under IRC 172',
+                      'state_treatment': 'LOUISIANA HAS ITS OWN REGIME - federal 172 is INOPERATIVE. '
+                                         'Utilization capped at 72% of Louisiana net income; carryforward '
+                                         'INDEFINITE (R.S. 47:287.86).',
+                      'authority_source_code': 'LA_RS_47_CONFORMITY',
+                      'notes': 'CIT-620 line 1C1.'},
+                     {'item': 'Federal income tax deduction',
+                      'federal_treatment': 'Federal deduction for income taxes paid (historically deductible '
+                                           'on the LA return)',
+                      'state_treatment': 'REPEALED - the federal income tax deduction is GONE from TY2022 '
+                                         'onward (R.S. 47:293(4) repealed by Act 395 of 2021; corporate '
+                                         'parallel Act 396). No FIT plumbing exists anywhere on the TY2025 '
+                                         'forms.',
+                      'authority_source_code': 'LA_RS_47_CONFORMITY',
+                      'notes': 'A spec ported from a pre-2022 Louisiana return would look for a line that no '
+                               'longer exists.'}],
+ 'notes': 'TRANSCRIBED from the VERIFIED conformity/la_conformity.md (adversarial pass 2026-08-22; its '
+          "Verification section governs). Seeded 2026-08-22 alongside the LA form specs under Ken's direct "
+          'seed approval (campaign D-17). || ORDERING NOTE: campaign D-8 requires a state conformity row to '
+          'PRECEDE its form specs. For Louisiana that order was INVERTED - the forms seeded first and '
+          'exported a NULL state_conformity block until this row landed minutes later. Recorded rather than '
+          'tidied away, because the same inversion will recur for any state that was never a Tier-1 '
+          'conformity subject. || TY2026 IS A RE-AUTHORING EVENT, NOT A CONSTANT BUMP: four acts pivot at '
+          '1/1/2026 - Act 6 (franchise repeal), Act 5 (CIT 5.5%), Act 11 (3%), and ACT 382, which flips S '
+          'CORPORATIONS to INFORMATION filers with new Schedules K/L plus a composite, ENDS the S-corp '
+          'exclusion, and BARS the PTE election for S-corp composite filers. || VINTAGE TRAP: the CURRENTLY '
+          'CODIFIED R.S. 47:287.732 is ALREADY the Act 382 rewrite - the TY2025 S-corp exclusion text is '
+          'GONE from current law, so TY2025 authority is the CIT-620i booklet and the pre-Act-382 text, NOT '
+          'a fresh statute pull. || OPEN: whether an ELECTING PTE may take the Schedule F line 3f $20,000 '
+          'standard deduction (the printed test names corporations subject to R.S. 47:287.11, while '
+          '47:287.732.2(B) taxes the electing entity at the INDIVIDUAL rate instead - evidence against '
+          'eligibility, but no instruction addresses it either way). Current LDR MeF developer gates also '
+          'unresolved (the 2018 handbook is confirmed current).'}]

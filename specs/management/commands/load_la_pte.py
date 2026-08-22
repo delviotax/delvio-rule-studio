@@ -76,8 +76,19 @@ from specs.models import (
     FlowAssertion, FormDiagnostic, FormFact, FormLine, FormRule, TaxForm, TestScenario,
 )
 
-# ⚠ GATED. D-16 approved the SCOPE; the SEED approval is a separate Gate-1 step.
-READY_TO_SEED = False
+# FLIPPED 2026-08-22 — Ken APPROVED THE SEED DIRECTLY ("approve the LA seed"),
+# in his own words to this session. Campaign D-17.
+# ⚠ The gate discipline this wave established and which this flip HONOURS: a
+# RELAYED approval would NOT have opened this gate. The delvio-tax session
+# staged the question at Ken's instruction; Ken answered here, directly.
+# D-16 approved the SCOPE (A1 full CIT-620 incl. the C-corp computation with
+# Schedule 6922 inside LA_IT565; A2 compute-and-review-only v1; A3 pro-forma
+# direct entry). This is the SEPARATE seed approval.
+# ⚠ SEEDING IS NOT BUILDING. The app build stays deferred pending a design
+# conversation: Louisiana has no S-corp return, so a non-electing S corp files
+# CIT-620 computed AS A C CORPORATION and the 1120S module's state return IS
+# the C-corp computation — which inverts the usual module order.
+READY_TO_SEED = True
 
 FORM_JURISDICTION = "LA"
 FORM_TAX_YEAR = 2025
@@ -175,12 +186,22 @@ def la_corp_standard_deduction(modified_la_net_income_before_3f, year: int = FOR
 
 
 AUTHORITY_TOPICS: list[tuple[str, str]] = [
-    ("la_passthrough_pte", "Louisiana pass-through returns: IT-565 (informational partnership return with the "
-     "composite embedded as Schedule 6922 at 3%) and CIT-620 (renamed from CIFT-620 for TY2025) serving BOTH "
-     "the elective PTE regime (R.S. 47:287.732.2, Schedule H-1, 3%) and the non-electing S corporation "
-     "(computed as a C corporation at 5.5% with the Line 1B resident-shareholder exclusion). No S-corp return "
-     "and no PTE-specific return exist. Rolling conformity; no federal bonus add-back; elective state "
-     "100%-expensing regime. Four-act TY2026 cliff."),
+    # ⚠ topic_name is varchar(255) — keep it SHORT. The full description lives
+    # here in the source, not in the column (the campaign has hit the
+    # too-long-for-the-live-column failure before: it passes every local check
+    # and fails only against prod).
+    # Full scope: IT-565 is the informational partnership return with the
+    # composite EMBEDDED as Schedule 6922 at 3%; CIT-620 (renamed from
+    # CIFT-620 for TY2025) serves BOTH the elective PTE regime
+    # (R.S. 47:287.732.2, Schedule H-1, 3%) AND the non-electing S corporation
+    # computed as a C corporation at 5.5% with the Line 1B resident-shareholder
+    # exclusion. No S-corp return and no PTE-specific return exist. Rolling
+    # conformity; no federal bonus add-back; elective state 100%-expensing
+    # regime. Four-act TY2026 cliff.
+    ("la_passthrough_pte",
+     "Louisiana pass-through returns (IT-565 + CIT-620): composite embedded as "
+     "Schedule 6922, the elective PTE regime, and the non-electing S corporation "
+     "computed as a C corporation."),
 ]
 
 EXISTING_SOURCES_TO_REFERENCE: list[str] = []
@@ -352,7 +373,7 @@ CIT620_FACTS = [dict(f) for f in _SHARED_FACTS] + [
 
 # ── Rules ──────────────────────────────────────────────────────────────────
 IT565_RULES = [
-    {"rule_id": "R-LAIT565-INFORMATIONAL", "title": "IT-565 is an INFORMATION return — the partnership is not taxed", "rule_type": "constraint",
+    {"rule_id": "R-LAIT565-INFO", "title": "IT-565 is an INFORMATION return — the partnership is not taxed", "rule_type": "constraint",
      "formula": "partnership_income_tax = 0  # R.S. 47:201 / 47:103(A)(2). Tax arises ONLY via Schedule 6922 (composite) or, on election, on the CIT-620.",
      "inputs": ["federal_ordinary_income"], "outputs": ["partnership_income_tax"], "sort_order": 1,
      "description": "R.S. 47:201. The IT-565 itself computes NO entity tax. A spec that treats it as a tax-computing return will not produce the ordinary Louisiana partnership filing."},
@@ -363,13 +384,13 @@ IT565_RULES = [
                      "(the standalone R-6922 was abolished in TY2021); partner rosters live in the Schedules A/B "
                      "Excel workbook. The rate is DERIVATIVE of the individual rate — a separate constant from the "
                      "electing-PTE rate despite being equal for TY2025.")},
-    {"rule_id": "R-LAIT565-EFILE-MANDATE", "title": "⚠ The composite return is E-FILE ONLY, by statute", "rule_type": "constraint",
+    {"rule_id": "R-LAIT565-EFILE", "title": "⚠ The composite return is E-FILE ONLY, by statute", "rule_type": "constraint",
      "formula": "if composite_filed and not efile_available: RED('R.S. 47:201.1(F)(4) — Composite returns shall be filed electronically')",
      "inputs": ["composite_filed"], "outputs": ["efile_required"], "sort_order": 3,
      "description": ("R.S. 47:201.1(F)(4), verbatim: 'Composite returns shall be filed electronically.' A paper "
                      "IT-565 carrying Schedule 6922 is NOT a legal filing. v1 is COMPUTE-AND-REVIEW ONLY (D-16 A2) "
                      "until LA MeF lands — the diagnostic must say so on every composite return.")},
-    {"rule_id": "R-LAIT565-DUAL-ENGINE", "title": "Dual-engine partnerships — corporate AND non-corporate partners", "rule_type": "constraint",
+    {"rule_id": "R-LAIT565-DUAL", "title": "Dual-engine partnerships — corporate AND non-corporate partners", "rule_type": "constraint",
      "formula": "if has_corporate_partners and has_noncorporate_partners: require(Schedules D/E/G) and require(Schedules H/I/J)  # TWO Louisiana net incomes on one return",
      "inputs": ["has_corporate_partners", "has_noncorporate_partners"], "outputs": ["required_schedule_sets"], "sort_order": 4,
      "description": ("Walk item W7. A partnership with both partner classes files BOTH schedule sets and reports "
@@ -377,7 +398,7 @@ IT565_RULES = [
 ]
 
 CIT620_RULES = [
-    {"rule_id": "R-LACIT620-TRACK-FORK", "title": "THE THREE-TRACK FORK — election, S-corp, or ordinary C corp", "rule_type": "constraint",
+    {"rule_id": "R-LACIT620-FORK", "title": "THE THREE-TRACK FORK — election, S-corp, or ordinary C corp", "rule_type": "constraint",
      "formula": ("if pte_election_active: track = 'electing_pte' (Schedule H-1, 3%) ; "
                  "elif is_s_corporation: track = 'nonelecting_scorp' (Schedule H, 5.5%, WITH the Line 1B exclusion) ; "
                  "else: track = 'c_corp' (Schedule H, 5.5%, NO exclusion)"),
@@ -393,7 +414,7 @@ CIT620_RULES = [
                      "at the individual rate. Owner-side relief is an EXCLUSION (47:297.14 individuals; "
                      "47:300.6/300.7 estates and trusts) — CORPORATE owners remain taxable. R-6981 reports each "
                      "owner's share; R-6982 the tax paid.")},
-    {"rule_id": "R-LACIT620-SCORP-EXCL", "title": "Line 1B — the S-corp exclusion (ratio of resident-owned shares)", "rule_type": "calculation",
+    {"rule_id": "R-LACIT620-SCORP", "title": "Line 1B — the S-corp exclusion (ratio of resident-owned shares)", "rule_type": "calculation",
      "formula": ("if is_s_corporation and not pte_election_active: "
                  "line_1B = line_1A * (la_resident_shares / total_shares) ; else: line_1B = 0"),
      "inputs": ["is_s_corporation", "pte_election_active", "la_resident_shares", "total_shares"], "outputs": ["line_1B"], "sort_order": 3,
@@ -423,7 +444,7 @@ CIT620_RULES = [
                      "separate Subchapter C corporation basis' — a shadow federal 1120. D-16 A3: v1 takes the "
                      "figure by direct entry with a worksheet-attachment prompt; synthesizing it from 1065/1120-S "
                      "data is a later engine (the VA/MS direct-entry precedent).")},
-    {"rule_id": "R-LACIT620-NO-BONUS-ADDBACK", "title": "Depreciation — NO federal bonus add-back exists in Louisiana", "rule_type": "constraint",
+    {"rule_id": "R-LACIT620-NOBONUS", "title": "Depreciation — NO federal bonus add-back exists in Louisiana", "rule_type": "constraint",
      "formula": "la_bonus_addback = NONE  # rolling conformity; no modification statute. The ONLY depreciation lines are the STATE ELECTION's.",
      "inputs": ["state_expensing_election"], "outputs": [], "sort_order": 8,
      "description": ("`conformity/la_conformity.md` (VERIFIED) establishes this AFFIRMATIVELY: R.S. 47:287.71's "
@@ -433,7 +454,7 @@ CIT620_RULES = [
                      "definitions frozen 1/1/2024 and an out-year add-back on STATE-EXPENSED property only "
                      "(47:287.744(C)(3)) — Form R-90158, which has NO published PDF (U1) and is therefore "
                      "RED-DEFERRED. ⚠ Never code a Georgia-shaped bonus add-back for Louisiana.")},
-    {"rule_id": "R-LACIT620-ELECTION-LIFECYCLE", "title": "Election lifecycle — acceptance, perpetuity, Nov-1 termination, 5-year lockout", "rule_type": "constraint",
+    {"rule_id": "R-LACIT620-ELECT", "title": "Election lifecycle — acceptance, perpetuity, Nov-1 termination, 5-year lockout", "rule_type": "constraint",
      "formula": ("election_active requires: R-6980 filed AND LDR acceptance received ; perpetual until R-6983 ; "
                  "R-6983 due NOVEMBER 1 (prospective, next tax year) ; then 5-YEAR re-election lockout"),
      "inputs": ["pte_election_active"], "outputs": ["election_status"], "sort_order": 9,
@@ -444,36 +465,36 @@ CIT620_RULES = [
 ]
 
 IT565_RULE_LINKS = [
-    ("R-LAIT565-INFORMATIONAL", "LA_RS_47_201_1", "primary", "R.S. 47:201 information return"),
+    ("R-LAIT565-INFO", "LA_RS_47_201_1", "primary", "R.S. 47:201 information return"),
     ("R-LAIT565-COMPOSITE", "LA_RS_47_201_1", "primary", "R.S. 47:201.1(D)(1) composite rate"),
     ("R-LAIT565-COMPOSITE", "LA_2025_IT565", "secondary", "Schedule 6922 / Sch B Col O"),
-    ("R-LAIT565-EFILE-MANDATE", "LA_RS_47_201_1", "primary", "R.S. 47:201.1(F)(4) verbatim"),
-    ("R-LAIT565-DUAL-ENGINE", "LA_2025_IT565", "primary", "Schedules D/E/G vs H/I/J"),
+    ("R-LAIT565-EFILE", "LA_RS_47_201_1", "primary", "R.S. 47:201.1(F)(4) verbatim"),
+    ("R-LAIT565-DUAL", "LA_2025_IT565", "primary", "Schedules D/E/G vs H/I/J"),
 ]
 
 CIT620_RULE_LINKS = [
-    ("R-LACIT620-TRACK-FORK", "LA_2025_CIT620", "primary", "three tracks on one form"),
+    ("R-LACIT620-FORK", "LA_2025_CIT620", "primary", "three tracks on one form"),
     ("R-LACIT620-ELECT-TAX", "LA_RS_47_287_732_2", "primary", "R.S. 47:287.732.2(B) rate by reference"),
-    ("R-LACIT620-SCORP-EXCL", "LA_2025_CIT620", "primary", "Line 1B exclusion ratio"),
+    ("R-LACIT620-SCORP", "LA_2025_CIT620", "primary", "Line 1B exclusion ratio"),
     ("R-LACIT620-CORP-TAX", "LA_2025_CIT620", "primary", "Schedule H 5.5%"),
     ("R-LACIT620-NOL", "LA_2025_CIT620", "primary", "Line 1C1 72% cap"),
     ("R-LACIT620-STD-DED", "LA_2025_CIT620", "primary", "Schedule F line 3f"),
     ("R-LACIT620-PROFORMA", "LA_2025_CIT620", "primary", "Schedule F L1 pro-forma C basis"),
-    ("R-LACIT620-ELECTION-LIFECYCLE", "LA_RS_47_287_732_2", "primary", "R-6980/R-6983 lifecycle"),
+    ("R-LACIT620-ELECT", "LA_RS_47_287_732_2", "primary", "R-6980/R-6983 lifecycle"),
 ]
 
 IT565_LINES = [
     {"line_number": "IT565-SCH6922-L1", "description": "Schedule 6922 Line 1 — nonresident partners' LA-source shares (Sch B Column N total)", "line_type": "calculated", "source_rules": ["R-LAIT565-COMPOSITE"], "sort_order": 1},
     {"line_number": "IT565-SCH6922-L2", "description": "Schedule 6922 Line 2 — composite tax (Sch B Column O total = 3% x Column N per partner)", "line_type": "calculated", "source_rules": ["R-LAIT565-COMPOSITE"], "sort_order": 2},
     {"line_number": "IT565-SCH6922-L23", "description": "Schedule 6922 Line 23 — total composite balance due/overpayment (after credits, interest and penalties)", "line_type": "total", "source_rules": ["R-LAIT565-COMPOSITE"], "sort_order": 3},
-    {"line_number": "IT565-SCHG-L23", "description": "Schedule G Line 23 — Louisiana net income (ties to Schedule D Line 4; RED on mismatch)", "line_type": "calculated", "source_rules": ["R-LAIT565-INFORMATIONAL"], "sort_order": 4},
+    {"line_number": "IT565-SCHG-L23", "description": "Schedule G Line 23 — Louisiana net income (ties to Schedule D Line 4; RED on mismatch)", "line_type": "calculated", "source_rules": ["R-LAIT565-INFO"], "sort_order": 4},
 ]
 
 CIT620_LINES = [
-    {"line_number": "CIT620-1A", "description": "Line 1A — Louisiana net income (from Schedule D Line 31)", "line_type": "calculated", "source_rules": ["R-LACIT620-TRACK-FORK"], "sort_order": 1},
-    {"line_number": "CIT620-1B", "description": "Line 1B — S-corp exclusion (1A x resident-share ratio; zero when Line O is marked)", "line_type": "calculated", "source_rules": ["R-LACIT620-SCORP-EXCL"], "sort_order": 2},
+    {"line_number": "CIT620-1A", "description": "Line 1A — Louisiana net income (from Schedule D Line 31)", "line_type": "calculated", "source_rules": ["R-LACIT620-FORK"], "sort_order": 1},
+    {"line_number": "CIT620-1B", "description": "Line 1B — S-corp exclusion (1A x resident-share ratio; zero when Line O is marked)", "line_type": "calculated", "source_rules": ["R-LACIT620-SCORP"], "sort_order": 2},
     {"line_number": "CIT620-1C1", "description": "Line 1C1 — NOL utilization (72% of LA net income, indefinite carryforward)", "line_type": "calculated", "source_rules": ["R-LACIT620-NOL"], "sort_order": 3},
-    {"line_number": "CIT620-1D", "description": "Line 1D — Louisiana taxable income (1A − 1B − 1C1)", "line_type": "calculated", "source_rules": ["R-LACIT620-TRACK-FORK"], "sort_order": 4},
+    {"line_number": "CIT620-1D", "description": "Line 1D — Louisiana taxable income (1A − 1B − 1C1)", "line_type": "calculated", "source_rules": ["R-LACIT620-FORK"], "sort_order": 4},
     {"line_number": "CIT620-1E", "description": "Line 1E — tax (from Schedule H at 5.5%, or Schedule H-1 at 3% when Line O is marked)", "line_type": "calculated", "source_rules": ["R-LACIT620-ELECT-TAX", "R-LACIT620-CORP-TAX"], "sort_order": 5},
     {"line_number": "CIT620-SCHF-L3F", "description": "Schedule F Line 3f — $20,000 corporate standard deduction (U7: electing-PTE eligibility open)", "line_type": "calculated", "source_rules": ["R-LACIT620-STD-DED"], "sort_order": 6},
 ]
@@ -699,11 +720,11 @@ FLOW_ASSERTIONS: list[dict] = [
     {"assertion_id": "FA-LAIT565-NOTAX", "title": "The IT-565 computes NO entity-level tax",
      "assertion_type": "invariant", "entity_types": ["1065"], "status": "draft", "sort_order": 2,
      "description": "R.S. 47:201 — an information return. Any nonzero entity income tax on an IT-565 is a defect.",
-     "definition": {"rule": "R-LAIT565-INFORMATIONAL", "check": "partnership_income_tax == 0"}},
-    {"assertion_id": "FA-LACIT620-TRACK-EXCLUSIVE", "title": "The PTE election and the S-corp exclusion are mutually exclusive",
+     "definition": {"rule": "R-LAIT565-INFO", "check": "partnership_income_tax == 0"}},
+    {"assertion_id": "FA-LACIT620-XOR", "title": "The PTE election and the S-corp exclusion are mutually exclusive",
      "assertion_type": "invariant", "entity_types": ["1120S", "1120"], "status": "draft", "sort_order": 3,
      "description": "An electing entity (Line O) takes NO Line 1B exclusion, and the rate forks with it (3% vs 5.5%).",
-     "definition": {"rule": "R-LACIT620-TRACK-FORK", "check": "pte_election_active implies line_1B == 0 and rate == 0.03"}},
+     "definition": {"rule": "R-LACIT620-FORK", "check": "pte_election_active implies line_1B == 0 and rate == 0.03"}},
     {"assertion_id": "FA-LACIT620-TAXABLE", "title": "Line 1D = 1A − 1B − 1C1, and 1E applies the track's rate",
      "assertion_type": "reconciliation", "entity_types": ["1120S", "1120"], "status": "draft", "sort_order": 4,
      "description": "The Louisiana taxable-income chain and the rate fork, in one assertion.",
@@ -753,7 +774,7 @@ class Command(BaseCommand):
                 f = (r.get("formula") or "").lower()
                 if "bonus" in f and "addback" in f and "none" not in f:
                     empty.append(f"{spec['identity']['form_number']}: a bonus ADD-BACK was invented "
-                                 "(Louisiana has none — see R-LACIT620-NO-BONUS-ADDBACK)")
+                                 "(Louisiana has none — see R-LACIT620-NOBONUS)")
         if not READY_TO_SEED or empty:
             still = "\n  ".join(f"- {n}" for n in empty) or "(all populated)"
             raise CommandError(
