@@ -349,17 +349,30 @@ CO_PENALTY_ADDL_MONTH_PCT: dict[int, str] = {2025: "0.005"}
 CO_PENALTY_MAX_PCT: dict[int, str] = {2025: "0.12"}
 
 # Estimated tax (DR 0106EP / DR 0233).
-# ⚠ W9 / C9 — LIVE 3-2 SOURCE SPLIT, not an erratum. "exceeds": DR 0233 instr.,
-# DR 0106EP, SALT Parity pub. ">= / less than $5,000": DR 0106 line 31 AND the
-# Colorado Corporate Income Tax Guide (which the DR 0106 EXPRESSLY incorporates
-# by reference for this exact rule). Exposure is the single point net tax ==
-# $5,000. RULED BY KEN 2026-08-17, walk item B2 (a ruling on a source split, not
-# a correction): STRICTLY GREATER THAN $5,000, because DR 0233 Part 1 computes
-# "line 1 - $5,000; If line 2 is larger, enter zero and no penalty is due" — the
-# form's own arithmetic is the tiebreak, and the Corporate Income Tax Guide is
-# the source the DR 0106 expressly incorporates for this rule.
+# ⚠⚠ [RE-RATIFIED 2026-08-22 — campaign D-16 walk item G2; SUPERSEDES D-12 B2]
+# THE $5,000 RULE IS **TWO PREDICATES**, NOT ONE CONSTANT, AND THE EARLIER
+# 3-2 "SOURCE SPLIT" WAS A CATEGORY ERROR — the sources were never in conflict;
+# they describe two DIFFERENT rules:
+#   (1) THE OBLIGATION to remit quarterly estimated payments — "exceeds
+#       $5,000" (DR 0233 instructions, DR 0106EP, SALT Parity pub, and the
+#       DR 0106 face). Strictly greater than.
+#   (2) THE PENALTY EXCEPTION — settled AT STATUTE LEVEL by
+#       § 39-22-606(6)(a)(I), C.R.S., which § 39-22-344(2) routes electing
+#       PTEs through: the exception applies where the tax is **LESS THAN**
+#       $5,000. Strictly less than.
+# ⚠ CONSEQUENCE AT THE BOUNDARY: at net tax EXACTLY $5,000 there is **NO
+# OBLIGATION to remit** (not > 5000) and **NO PENALTY EXCEPTION** (not < 5000)
+# — i.e. FULL PENALTY EXPOSURE. A single strictly-greater constant collapses
+# both rules into one and SILENTLY SUPPRESSES A REAL PENALTY at that point.
+# The D-12 B2 rationale ("DR 0233 Part 1 yields a zero base either way") was
+# wrong: DR 0233 Part 1 line 3 feeds nothing.
+# Found by the Wave-5 C-corp verification pass; ratified by Ken 2026-08-22.
 CO_EST_TAX_THRESHOLD: dict[int, int] = {2025: 5000}
-CO_EST_THRESHOLD_STRICTLY_GREATER: dict[int, bool] = {2025: True}
+# Predicate 1 — obligation to remit (strictly greater).
+CO_EST_REMIT_STRICTLY_GREATER: dict[int, bool] = {2025: True}
+# Predicate 2 — penalty exception (strictly less). NOT the negation of
+# predicate 1; the gap between them is the boundary point.
+CO_EST_PENALTY_EXCEPTION_STRICTLY_LESS: dict[int, bool] = {2025: True}
 CO_EST_REQUIRED_CURRENT_PCT: dict[int, str] = {2025: "0.70"}   # 70% of actual net CO tax
 CO_EST_REQUIRED_PRIOR_PCT: dict[int, str] = {2025: "1.00"}     # 100% of preceding year
 CO_EST_LARGE_ENTITY_THRESHOLD: dict[int, int] = {2025: 1000000}
@@ -1193,26 +1206,44 @@ def co_delinquency_penalty(additional_tax: float, months_delinquent: int,
 
 
 def co_estimated_payments_required(net_tax_liability: float, year: int = FORM_TAX_YEAR) -> bool:
-    """DR 0106 p. 3, verbatim: a PTE "must remit quarterly estimated payments if
+    """PREDICATE 1 of 2 — THE OBLIGATION TO REMIT.
+
+    DR 0106 p. 3, verbatim: a PTE "must remit quarterly estimated payments if
     its net Colorado tax liability for the year either with a composite
     nonresident return or as a result of a SALT Parity Act Election EXCEEDS
-    $5,000."
+    $5,000." Corroborated by the DR 0233 instructions, the DR 0106EP and the
+    SALT Parity pub. STRICTLY GREATER THAN.
 
-    ⚠ W9 / C9 -- LIVE 3-2 SOURCE SPLIT, not a one-sided erratum:
-      "exceeds"            -> DR 0233 instructions, DR 0106EP, SALT Parity pub
-      ">=" / "less than"   -> DR 0106 line 31 AND the Colorado Corporate Income
-                              Tax Guide, which the DR 0106 EXPRESSLY incorporates
-                              by reference for exactly this rule
-    Exposure is the single point net tax == $5,000. Built STRICTLY GREATER THAN,
-    because DR 0233 Part 1 computes "line 1 - $5,000; If line 2 is larger, enter
-    zero and no penalty is due" -- at exactly $5,000 the Part 1 base is zero
-    either way, so the form's own arithmetic is the tiebreak.
-    THIS IS A KEN RULING, NOT A SETTLED CORRECTION.
+    ⚠ This is NOT the penalty test — see co_estimated_penalty_exception().
+    [D-16 / G2, 2026-08-22, superseding D-12 B2.]
     """
     threshold = _yk(CO_EST_TAX_THRESHOLD, year)
-    if _yk(CO_EST_THRESHOLD_STRICTLY_GREATER, year):
+    if _yk(CO_EST_REMIT_STRICTLY_GREATER, year):
         return float(net_tax_liability) > threshold
     return float(net_tax_liability) >= threshold
+
+
+def co_estimated_penalty_exception(net_tax_liability: float, year: int = FORM_TAX_YEAR) -> bool:
+    """PREDICATE 2 of 2 — THE PENALTY EXCEPTION, a SEPARATE rule with its own
+    authority.
+
+    § 39-22-606(6)(a)(I), C.R.S. (which § 39-22-344(2) routes electing PTEs
+    through): no estimated-tax penalty where the tax is **LESS THAN** $5,000.
+    STRICTLY LESS THAN.
+
+    ⚠⚠ THE BOUNDARY IS THE WHOLE POINT. At net tax EXACTLY $5,000:
+        co_estimated_payments_required(5000)  -> False  (no obligation)
+        co_estimated_penalty_exception(5000)  -> False  (no exception)
+    i.e. FULL PENALTY EXPOSURE with no remittance obligation. Collapsing the
+    two rules into one constant silently suppresses that penalty — which is
+    exactly what the pre-D-16 spec did. Do NOT re-merge them, and do NOT
+    implement this as `not co_estimated_payments_required(...)`.
+    [D-16 / G2, 2026-08-22; found by the Wave-5 C-corp verification pass.]
+    """
+    threshold = _yk(CO_EST_TAX_THRESHOLD, year)
+    if _yk(CO_EST_PENALTY_EXCEPTION_STRICTLY_LESS, year):
+        return float(net_tax_liability) < threshold
+    return float(net_tax_liability) <= threshold
 
 
 def co_required_annual_payment(current_year_tax: float, prior_year_tax: float,
@@ -3388,15 +3419,20 @@ CO_DIAGNOSTICS: list[dict] = [
                  "elects SALT Parity."),
      "notes": "W12. Where the persistent per-owner flag lives is a CLIENT-RECORD question, not just a form question."},
     {"diagnostic_id": "D_CO106_EST_TAX_THRESHOLD", "severity": "info",
-     "title": "Estimated-tax threshold built as STRICTLY GREATER THAN $5,000 (a ruling on a 3-2 source split)",
+     "title": "The $5,000 rule is TWO predicates: obligation (> $5,000) and penalty exception (< $5,000)",
      "condition": "net Colorado tax liability is at or near $5,000",
-     "message": ("Colorado's own sources SPLIT on this threshold. 'Exceeds $5,000': DR 0233 instructions, DR 0106EP, "
-                 "SALT Parity publication. '>= $5,000' / 'less than $5,000': DR 0106 line 31 AND the Colorado "
-                 "Corporate Income Tax Guide, which the DR 0106 expressly incorporates by reference for this exact "
-                 "rule. The exposure is the single point where net tax is EXACTLY $5,000. Built strictly greater "
-                 "than, because DR 0233 Part 1 yields a zero base at $5,000 either way. Also note: PTEs get NO "
+     "message": ("Colorado's sources were never in conflict here - they describe TWO DIFFERENT RULES. (1) The "
+                 "OBLIGATION to remit quarterly estimated payments applies when net Colorado tax EXCEEDS $5,000 "
+                 "(DR 0106 face, DR 0233 instructions, DR 0106EP, SALT Parity pub) - strictly greater. (2) The "
+                 "PENALTY EXCEPTION is settled at STATUTE level by Sec. 39-22-606(6)(a)(I), C.R.S., which "
+                 "Sec. 39-22-344(2) routes electing PTEs through: no penalty where the tax is LESS THAN $5,000 - "
+                 "strictly less. AT EXACTLY $5,000 THERE IS NO REMITTANCE OBLIGATION BUT FULL PENALTY EXPOSURE. "
+                 "Never collapse the two into one constant and never implement the exception as the negation of "
+                 "the obligation - that silently suppresses a real penalty at the boundary. Also note: PTEs get NO "
                  "annualized income installment method, though C corporations do."),
-     "notes": "W9 / verifier correction C9. A KEN RULING, not a settled erratum."},
+     "notes": ("W9 / verifier correction C9, RE-RATIFIED as two predicates at campaign D-16 walk item G2 "
+               "(2026-08-22), superseding D-12 B2. The old 'DR 0233 Part 1 yields a zero base either way' "
+               "rationale was a category error - Part 1 line 3 feeds nothing.")},
 
     # ---- the sixteen RED-defers, R1..R16 --------------------------------
     {"diagnostic_id": "D_CO106_R1_DR0619", "severity": "error",
@@ -3655,6 +3691,24 @@ CO_SCENARIOS: list[dict] = [
      "notes": ("Normally the lesser of 70% x 100000 = 70000 and 100% x 40000 = 40000, i.e. 40000. But a FIRST-YEAR "
                "electing entity loses the prior-year leg (DR 0233 line 6), so the required amount is 70000. A "
                "PTE-specific rule the C-corp module does NOT have. Threshold: 100000 > 5000.")},
+    {"scenario_name": "THE $5,000 BOUNDARY - no obligation, but FULL penalty exposure (D-16 / G2)",
+     "scenario_type": "edge", "sort_order": 16.5,
+     "inputs": {"net_tax_liability": 5000},
+     "expected_outputs": {"remit_required": False, "penalty_exception": False, "penalty_computed": True},
+     "notes": ("THE REGRESSION PIN for campaign D-16 walk item G2. At net tax EXACTLY $5,000: the obligation "
+               "predicate (> $5,000, DR 0106 face + DR 0233 instr. + DR 0106EP + SALT pub) is FALSE, and the "
+               "penalty-exception predicate (< $5,000, Sec. 39-22-606(6)(a)(I) C.R.S. via Sec. 39-22-344(2)) is "
+               "ALSO FALSE - so a penalty IS computed. A single strictly-greater constant makes both fall out of "
+               "one test and silently suppresses that penalty, which is what the pre-D-16 spec did. If this "
+               "scenario ever expects penalty_computed=False, the two predicates have been re-merged.")},
+    {"scenario_name": "$5,000 boundary neighbours - $4,999 exempt, $5,001 obligated (D-16 / G2)",
+     "scenario_type": "edge", "sort_order": 16.6,
+     "inputs": {"net_tax_liability_low": 4999, "net_tax_liability_high": 5001},
+     "expected_outputs": {"remit_required_low": False, "penalty_exception_low": True,
+                          "remit_required_high": True, "penalty_exception_high": False},
+     "notes": ("The two points either side of the boundary, pinned so the predicates cannot drift into each "
+               "other. Below: no obligation AND the penalty exception applies. Above: obligation applies AND no "
+               "exception. Only at exactly $5,000 do both fail.")},
     {"scenario_name": "Delinquency penalty - greater of $5 or 5% first month, capped at 12%", "scenario_type": "edge",
      "sort_order": 17,
      "inputs": {"additional_tax": 10000, "months_delinquent": 1, "pct_paid_by_original_due_date": 0.5},

@@ -85,10 +85,15 @@ for mod in (NC, AL):
 
 # ══════════════ ARITHMETIC ORACLES ══════════════
 # NC
-check(round(NC._nc_taxed_pte(500000, 200000)) == 29750, "NC Taxed PTE: (500,000+200,000) x 4.25% = 29,750", f"NC PTET wrong: {NC._nc_taxed_pte(500000,200000)}")
-check(round(NC._nc_taxed_pte(400000, 100000)) == 21250, "NC Taxed PTE (S-corp): (400,000+100,000) x 4.25% = 21,250", "NC PTET S wrong")
-check(NC._nc_franchise(2000000) == 2000, "NC franchise: 2,000,000 -> $2,000", f"NC franchise wrong: {NC._nc_franchise(2000000)}")
+# [CORRECTED D-16/NC-1] post-2022 base: NC-attributable shares of eligible owners (one arg).
+check(round(NC._nc_taxed_pte(700000)) == 29750, "NC Taxed PTE: 700,000 NC-attributable x 4.25% = 29,750", f"NC PTET wrong: {NC._nc_taxed_pte(700000)}")
+check(round(NC._nc_taxed_pte(500000)) == 21250, "NC Taxed PTE (S-corp): 500,000 NC-attributable x 4.25% = 21,250", "NC PTET S wrong")
+# [CORRECTED D-16/NC-2] CD-401S: $200 first $1M + .0015 x excess -- NOT the CD-405 $500-cap clone.
+check(NC._nc_franchise(2000000) == 1700, "NC franchise: 2,000,000 -> $1,700 (200 + 1,000,000 x .0015)", f"NC franchise wrong: {NC._nc_franchise(2000000)}")
+check(NC._nc_franchise(1000000) == 200, "NC franchise boundary: exactly 1,000,000 -> $200 flat", f"NC franchise boundary wrong: {NC._nc_franchise(1000000)}")
+check(NC._nc_franchise(1000001) == 200 + 0.0015, "NC franchise boundary: 1,000,001 -> 200 + .0015", f"NC franchise 1M+1 wrong: {NC._nc_franchise(1000001)}")
 check(NC._nc_franchise(100000) == 200, "NC franchise min: 100,000 -> $200", "NC franchise min wrong")
+check(NC._nc_franchise(200000000, is_holding=True) == 150000, "NC franchise holding cap: 200M holding -> $150,000", f"NC holding cap wrong: {NC._nc_franchise(200000000, is_holding=True)}")
 check(NC._nc_addback(80000, 0) == 68000, "NC 85% bonus add-back: 80,000 -> 68,000", f"NC add-back wrong: {NC._nc_addback(80000,0)}")
 check(round(200000 * float(NC.NC_NRW_RATE)) == 8500, "NC NR withholding: 200,000 x 4.25% = 8,500", "NC NRW wrong")
 check(NC.NC_PTET_RATE == "0.0425" and NC.NC_179_LIMIT == 25000, "NC PTET 4.25% + §179 $25k", "NC constants wrong")
