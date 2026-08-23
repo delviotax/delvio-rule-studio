@@ -99,11 +99,27 @@ from specs.models import (
 )
 
 # ═══════════════════════════════════════════════════════════════════════════
-# SAFETY GUARD — flip ONLY on Ken's Gate-1 SEED approval, given DIRECTLY.
-# Campaign D-20 approved the walk SCOPE (all 14 Maryland items). That is NOT
-# the seed gate. A relayed approval never opens a human gate.
+# GATE 1 CLEARED — flipped 2026-08-23 on Ken's DIRECT seed approval.
+#
+# Ken, in-session, in his own words: "approve the MD_500 seed."
+#
+# ⚠ Campaign D-20 approved the walk SCOPE (all 14 Maryland items). That was NOT
+# this gate. This is the separate Gate-1 SEED approval, and it was answered
+# DIRECTLY to the session doing the work — a relayed approval would not have
+# opened it, per the standing campaign rule (D-17).
+#
+# Pre-flight run against PROD before flipping (campaign D-17 lessons):
+#   · every CharField value measured against the REAL model max_length — CLEAN
+#     (worst case topic_name 240/255; the class that fails ONLY on the live DB)
+#   · MD TY2025 JurisdictionConformitySource row CONFIRMED PRESENT (rolling,
+#     8 decoupled items) — D-8's "the row precedes the forms" order is intact
+#     here, unlike Louisiana where it had to be inverted
+#   · EXISTING_SOURCES_TO_REFERENCE codes verified to RESOLVE in prod — this
+#     caught `MD_2025_500DM`, which does not exist; the real code is
+#     `MD_2025_FORM_500DM`. Left uncorrected it would have been a dangling
+#     reference, the D-25/O4 defect class.
 # ═══════════════════════════════════════════════════════════════════════════
-READY_TO_SEED = False
+READY_TO_SEED = True
 
 
 FORM_JURISDICTION = "MD"
@@ -210,9 +226,14 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
 
 # The state's conformity spine and shared MD sources are already seeded (campaign
 # D-8/D-10); reference them rather than re-authoring, per the wave process.
+# ⚠ These source_codes are VERIFIED to exist in RS prod (checked 2026-08-23 before
+# the seed). A code that does not resolve becomes a DANGLING REFERENCE — the exact
+# defect campaign D-25/O4 found in the live seeded `OR_20_S`, which references
+# `OR_AP`/`OR_ASC_CORP` in 16 places while neither exists as a form. The Form 500DM
+# source is registered as `MD_2025_FORM_500DM`, NOT `MD_2025_500DM`.
 EXISTING_SOURCES_TO_REFERENCE: list[str] = [
     "MD_TG_10_210_1",
-    "MD_2025_500DM",
+    "MD_2025_FORM_500DM",
 ]
 
 AUTHORITY_SOURCES: list[dict] = [
@@ -709,7 +730,10 @@ F_RULE_LINKS: list[tuple[str, str, str, str]] = [
     ("R-MD500-L1C", "MD_2025_500", "primary", "L1a/1b/1c face labels"),
     ("R-MD500-L1C", "MD_2025_CORP_BOOK", "secondary", "the 1c arithmetic + whole-dollars rounding"),
     ("R-MD500-L2C", "MD_2025_500", "primary", "L2a/2b/2c face labels"),
+    ("R-MD500-L2C", "MD_2025_FORM_500DM", "secondary", "L2b IS the Form 500DM addition carry-over"),
+    ("R-MD500-L2C", "MD_TG_10_210_1", "secondary", "§ 10-210.1 via § 10-310 — the decoupling authority"),
     ("R-MD500-L3E", "MD_2025_500", "primary", "L3a-3e face labels"),
+    ("R-MD500-L3E", "MD_2025_FORM_500DM", "secondary", "L3d IS the Form 500DM subtraction carry-over"),
     ("R-MD500-L4", "MD_2025_500", "primary", "L4 'Add lines 1c and 2c, and subtract line 3e.'"),
     ("R-MD500-L6", "MD_2025_500", "primary", "L6 the two-branch NOL gate, verbatim"),
     ("R-MD500-L7G", "MD_2025_500", "primary", "L7a-7g face labels"),
