@@ -15,6 +15,7 @@ Checks:
 
 Run:  .venv/Scripts/python.exe scratchpad/validate_va_500.py
 """
+import io as io2
 import os
 import sys
 
@@ -40,7 +41,9 @@ from django.core.management.base import CommandError  # noqa: E402
 from specs.models import (  # noqa: E402
     FlowAssertion, FormDiagnostic, FormFact, FormLine, FormRule, TaxForm, TestScenario,
 )
-from sources.models import AuthoritySource, AuthorityTopic, RuleAuthorityLink  # noqa: E402
+from sources.models import (  # noqa: E402
+    AuthorityExcerpt, AuthoritySource, AuthorityTopic, RuleAuthorityLink,
+)
 from specs.management.commands import load_va_500 as VA  # noqa: E402
 
 FAILURES: list[str] = []
@@ -73,7 +76,31 @@ except CommandError as exc:
     check("relayed approval never opens a human gate" in msg,
           "the guard states the gate rule", "the guard omits the gate rule")
 
+# ⚠ PROVE THE REFERENCE CHECK BITES BEFORE STANDING THE PREREQUISITE UP.
+# This loader REFERENCES VA_CODE_58_1_408 rather than declaring it, because
+# load_va_pte.py (SEEDED AND LIVE) owns that row and two live rules cite it.
+# With the throwaway DB empty the loader must REFUSE - that refusal is the
+# dangling-reference guard working, and is worth asserting before we satisfy it.
 VA.READY_TO_SEED = True
+try:
+    call_command("load_va_500", verbosity=0)
+    FAILURES.append("the loader did NOT refuse with its referenced source absent")
+except CommandError as exc:
+    check("DANGLING REFERENCE" in str(exc),
+          "the loader REFUSES while VA_CODE_58_1_408 is absent, naming the defect",
+          f"refused without naming the defect: {str(exc)[:130]!r}")
+
+# Stand the prerequisite up the way PROD has it: load_va_pte.py owns this row.
+AuthoritySource.objects.update_or_create(
+    source_code="VA_CODE_58_1_408",
+    defaults={"source_type": "state_statute", "source_rank": "controlling",
+              "jurisdiction_code": "VA",
+              "title": "Va. Code 58.1-408 - What income apportioned and how",
+              "issuer": "Virginia General Assembly", "current_status": "active",
+              "is_substantive_authority": True, "trust_score": 9.8},
+)
+PASSES.append("prerequisite VA_CODE_58_1_408 stood up (in prod it comes from load_va_pte)")
+
 _saved = VA.FLOW_ASSERTIONS
 VA.FLOW_ASSERTIONS = []
 try:
@@ -308,6 +335,58 @@ for needle, why in (("OVERWRITES", "the Line 11 overwrite"),
                     ("refused", "the combined-return gate"),
                     ("experience", "the S&L method fork")):
     check(needle.lower() in _names.lower(), f"a scenario covers {why}", f"NO scenario covers {why}")
+
+
+# ======================================================================
+# ⚠⚠ TWO-WRITERS GUARD - no source this loader DECLARES may also be
+#    declared by another loader file.
+# ----------------------------------------------------------------------
+# Found the hard way 2026-08-23: load_va_500 declared VA_CODE_58_1_408, which
+# load_va_pte.py (SEEDED AND LIVE) owns and two live rules cite. update_or_create
+# would have silently rewritten its title, citation, trust_score and source_rank
+# - `controlling` down to `primary_official`. That is not D-29's duplication; it
+# is TWO WRITERS OF ONE ROW, the hazard the 2026-07-05 delta audit flagged.
+# A static check over the command files catches it with no database at all.
+# ======================================================================
+import glob as _glob  # noqa: E402
+import os as _os  # noqa: E402
+
+_this = _os.path.basename(r"load_va_500.py")
+_declared_here = {s["source_code"] for s in VA.AUTHORITY_SOURCES}
+_clashes = []
+for _path in _glob.glob(_os.path.join(PROJECT_ROOT, "specs", "management", "commands", "load_*.py")):
+    if _os.path.basename(_path) == _this:
+        continue
+    _other = io2.open(_path, encoding="utf-8").read()
+    for _code in _declared_here:
+        if '"source_code": "%s"' % _code in _other:
+            _clashes.append((_code, _os.path.basename(_path)))
+check(not _clashes,
+      "⚠⚠ TWO-WRITERS GUARD: no source declared here is also declared by another loader",
+      f"TWO WRITERS OF ONE ROW - this loader would OVERWRITE a source another loader owns: {_clashes}")
+
+# ======================================================================
+# 5b. The two-writers fix: we CONTRIBUTE to that source, never rewrite it
+# ======================================================================
+check("VA_CODE_58_1_408" in VA.EXISTING_SOURCES_TO_REFERENCE,
+      "VA_CODE_58_1_408 is REFERENCED, not re-declared - load_va_pte.py owns it",
+      "VA_CODE_58_1_408 is not in EXISTING_SOURCES_TO_REFERENCE")
+check("VA_CODE_58_1_408" not in {x["source_code"] for x in VA.AUTHORITY_SOURCES},
+      "⚠⚠ this loader does NOT declare it, so update_or_create cannot overwrite the owner's row",
+      "the loader still DECLARES a source another loader owns - it would overwrite it")
+check(len(VA.EXCERPTS_FOR_EXISTING) == 1,
+      "this pass's derived excerpt attaches to the owner's source rather than being lost",
+      f"expected 1 excerpt for an existing source, found {len(VA.EXCERPTS_FOR_EXISTING)}")
+for _code, _exc in VA.EXCERPTS_FOR_EXISTING:
+    _n = AuthorityExcerpt.objects.filter(
+        authority_source__source_code=_code, excerpt_label=_exc["excerpt_label"]).count()
+    check(_n == 1, f"{_code}: the derived excerpt is attached exactly once",
+          f"{_code}: attached {_n} times")
+_owner = AuthoritySource.objects.filter(source_code="VA_CODE_58_1_408").first()
+check(_owner is not None and _owner.source_rank == "controlling" and float(_owner.trust_score) == 9.8,
+      "⚠⚠ the owner's row is UNCHANGED - source_rank still 'controlling', trust_score still 9.8",
+      f"the owner's row was modified: rank={getattr(_owner, 'source_rank', None)} "
+      f"trust={getattr(_owner, 'trust_score', None)}")
 
 # ======================================================================
 # 6. Report

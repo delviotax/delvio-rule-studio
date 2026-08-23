@@ -77,10 +77,25 @@ from specs.models import (
 )
 
 # ═══════════════════════════════════════════════════════════════════════════
-# SAFETY GUARD - flip ONLY on Ken's Gate-1 SEED approval, given DIRECTLY.
+# GATE 1 CLEARED - flipped 2026-08-23 on Ken's DIRECT seed approval.
+#
+# Ken, in-session: "approved", in answer to a message naming exactly
+# VA_500, AZ_120 and AZ_120A - then re-confirmed for scope after the
+# pre-flight finding below, because a bare word across three specs and two
+# states is not a gate I should widen by inference.
+#
+# D-23 approved the walk SCOPE. This is the separate Gate-1 SEED approval.
+#
+# Pre-flight against PROD before flipping:
+#   * every CharField value measured against the REAL model max_length - CLEAN
+#   * the state's TY2025 conformity row confirmed PRESENT before the forms
+#     (D-8's order, intact)
+#   * referenced source codes verified to RESOLVE - no dangling reference
+#   * declared source codes checked against every other loader - no two
+#     writers of one row
 # D-23 approved the walk SCOPE. That is not the seed gate.
 # ═══════════════════════════════════════════════════════════════════════════
-READY_TO_SEED = False
+READY_TO_SEED = True
 
 
 FORM_JURISDICTION = "AZ"

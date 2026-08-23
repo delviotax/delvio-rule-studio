@@ -8,6 +8,7 @@ The two checks that matter most, both PROVED rather than asserted:
 
 Run:  .venv/Scripts/python.exe scratchpad/validate_az_120.py
 """
+import io as io2
 import os
 import sys
 
@@ -293,6 +294,35 @@ for needle, why in (("ten-member", "the one-minimum-per-group rule"),
                     ("FORCES Form 120", "the partnership routing trap"),
                     ("rate tiers", "the TY-keyed rate tiers")):
     check(needle.lower() in _names.lower(), f"a scenario covers {why}", f"NO scenario covers {why}")
+
+
+# ======================================================================
+# ⚠⚠ TWO-WRITERS GUARD - no source this loader DECLARES may also be
+#    declared by another loader file.
+# ----------------------------------------------------------------------
+# Found the hard way 2026-08-23: load_va_500 declared VA_CODE_58_1_408, which
+# load_va_pte.py (SEEDED AND LIVE) owns and two live rules cite. update_or_create
+# would have silently rewritten its title, citation, trust_score and source_rank
+# - `controlling` down to `primary_official`. That is not D-29's duplication; it
+# is TWO WRITERS OF ONE ROW, the hazard the 2026-07-05 delta audit flagged.
+# A static check over the command files catches it with no database at all.
+# ======================================================================
+import glob as _glob  # noqa: E402
+import os as _os  # noqa: E402
+
+_this = _os.path.basename(r"load_az_120.py")
+_declared_here = {s["source_code"] for s in AZ.AUTHORITY_SOURCES}
+_clashes = []
+for _path in _glob.glob(_os.path.join(PROJECT_ROOT, "specs", "management", "commands", "load_*.py")):
+    if _os.path.basename(_path) == _this:
+        continue
+    _other = io2.open(_path, encoding="utf-8").read()
+    for _code in _declared_here:
+        if '"source_code": "%s"' % _code in _other:
+            _clashes.append((_code, _os.path.basename(_path)))
+check(not _clashes,
+      "⚠⚠ TWO-WRITERS GUARD: no source declared here is also declared by another loader",
+      f"TWO WRITERS OF ONE ROW - this loader would OVERWRITE a source another loader owns: {_clashes}")
 
 # ======================================================================
 # 6. Report

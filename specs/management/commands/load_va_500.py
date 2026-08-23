@@ -98,10 +98,25 @@ from specs.models import (
 )
 
 # ═══════════════════════════════════════════════════════════════════════════
-# SAFETY GUARD — flip ONLY on Ken's Gate-1 SEED approval, given DIRECTLY.
+# GATE 1 CLEARED - flipped 2026-08-23 on Ken's DIRECT seed approval.
+#
+# Ken, in-session: "approved", in answer to a message naming exactly
+# VA_500, AZ_120 and AZ_120A - then re-confirmed for scope after the
+# pre-flight finding below, because a bare word across three specs and two
+# states is not a gate I should widen by inference.
+#
+# D-21 approved the walk SCOPE. This is the separate Gate-1 SEED approval.
+#
+# Pre-flight against PROD before flipping:
+#   * every CharField value measured against the REAL model max_length - CLEAN
+#   * the state's TY2025 conformity row confirmed PRESENT before the forms
+#     (D-8's order, intact)
+#   * referenced source codes verified to RESOLVE - no dangling reference
+#   * declared source codes checked against every other loader - no two
+#     writers of one row
 # D-21 approved the walk SCOPE (12 items). That is not the seed gate.
 # ═══════════════════════════════════════════════════════════════════════════
-READY_TO_SEED = False
+READY_TO_SEED = True
 
 
 FORM_JURISDICTION = "VA"
@@ -236,7 +251,40 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
 
 # ⚠ Verified to RESOLVE in prod before seeding. A code that does not resolve is a
 # DANGLING REFERENCE — campaign D-25/O4, and D-29 where I made that mistake myself.
-EXISTING_SOURCES_TO_REFERENCE: list[str] = []
+#
+# ⚠⚠ `VA_CODE_58_1_408` IS OWNED BY `load_va_pte.py`, which is SEEDED AND LIVE, and
+# is cited by two live rules (R-VA-502AB on VA_502, R-VAP-502AB on VA_502PTET).
+# An earlier version of this loader DECLARED it, so `update_or_create` would have
+# silently rewritten its title, citation, trust_score and `source_rank` - the last
+# from `controlling` down to `primary_official`. That is not D-29's duplication;
+# it is TWO WRITERS OF ONE ROW, the hazard the 2026-07-05 delta audit flagged and
+# D-8 exists to prevent. Reference it; never re-declare another loader's source.
+EXISTING_SOURCES_TO_REFERENCE: list[str] = [
+    "VA_CODE_58_1_408",
+]
+
+# Verbatim excerpts this pass derived, attached to the source its OWNER already
+# maintains rather than lost or written over. Idempotent on excerpt_label.
+EXCERPTS_FOR_EXISTING: list[tuple[str, dict]] = [
+    ("VA_CODE_58_1_408", {
+        "excerpt_label": "§ 58.1-408 A stated outright (D-18/G1) + the § 58.1-408 B numerator reduction",
+        "excerpt_text": (
+            "'...shall be apportioned to the Commonwealth by multiplying such income by a fraction, the "
+            "numerator of which is the property factor plus the payroll factor, plus twice the sales "
+            "factor, and the denominator of which is four; however, where the sales factor does not "
+            "exist, the denominator of the fraction shall be the number of existing factors and where the "
+            "sales factor exists but the payroll factor or the property factor does not exist, the "
+            "denominator of the fraction shall be the number of existing factors plus one.' History ends "
+            "2018, cc. 801, 802, 807 - no 2026 amendment. ⚠ § 58.1-408 B additionally grants an ELIGIBLE "
+            "COMPANY under § 58.1-405.1 a NUMERATOR REDUCTION, running 'for the taxable year in which it "
+            "first becomes eligible and for the six subsequent, consecutive taxable years' - with NO line, "
+            "NO checkbox and NO instruction anywhere on any corporate form."
+        ),
+        "summary_text": "The 4/3/3/2 divisor is transcribed, not interpreted (D-18/G1). § 58.1-408 B is a "
+                        "live money-moving numerator reduction with zero form support (D-21/V5).",
+        "is_key_excerpt": True,
+    }),
+]
 
 AUTHORITY_SOURCES: list[dict] = [
     {
@@ -289,32 +337,6 @@ AUTHORITY_SOURCES: list[dict] = [
                 "is_key_excerpt": True,
             },
         ],
-    },
-    {
-        "source_code": "VA_CODE_58_1_408", "source_type": "state_statute", "source_rank": "primary_official",
-        "jurisdiction_code": "VA", "title": "Va. Code § 58.1-408 — apportionment, and the missing-factor divisor",
-        "citation": "Va. Code § 58.1-408 A and B", "issuer": "Virginia General Assembly",
-        "official_url": "https://law.lis.virginia.gov/vacode/title58.1/chapter3/section58.1-408/",
-        "current_status": "active", "is_substantive_authority": True, "trust_score": 10.0,
-        "topics": ["va_corp_tax"],
-        "excerpts": [{
-            "excerpt_label": "⚠ § 58.1-408 A states the divisor OUTRIGHT — it is a transcription (D-18/G1)",
-            "excerpt_text": (
-                "'...shall be apportioned to the Commonwealth by multiplying such income by a fraction, the "
-                "numerator of which is the property factor plus the payroll factor, plus twice the sales "
-                "factor, and the denominator of which is four; however, where the sales factor does not "
-                "exist, the denominator of the fraction shall be the number of existing factors and where the "
-                "sales factor exists but the payroll factor or the property factor does not exist, the "
-                "denominator of the fraction shall be the number of existing factors plus one.' History ends "
-                "2018, cc. 801, 802, 807 - no 2026 amendment. ⚠ § 58.1-408 B additionally grants an ELIGIBLE "
-                "COMPANY under § 58.1-405.1 a NUMERATOR REDUCTION, running 'for the taxable year in which it "
-                "first becomes eligible and for the six subsequent, consecutive taxable years' - with NO line, "
-                "NO checkbox and NO instruction anywhere on any corporate form."
-            ),
-            "summary_text": "The 4/3/3/2 divisor is transcribed, not interpreted (D-18/G1). § 58.1-408 B is a "
-                            "live money-moving numerator reduction with zero form support (D-21/V5).",
-            "is_key_excerpt": True,
-        }],
     },
     {
         "source_code": "VA_CODE_58_1_442", "source_type": "state_statute", "source_rank": "primary_official",
@@ -877,6 +899,17 @@ class Command(BaseCommand):
             )
         for code in EXISTING_SOURCES_TO_REFERENCE:
             sources[code] = AuthoritySource.objects.get(source_code=code)
+        # Contribute this pass's verbatim text to sources ANOTHER loader owns,
+        # without rewriting the row itself.
+        added = 0
+        for code, exc in EXCERPTS_FOR_EXISTING:
+            owner = sources.get(code) or AuthoritySource.objects.filter(source_code=code).first()
+            if owner:
+                _, made = AuthorityExcerpt.objects.update_or_create(
+                    authority_source=owner, excerpt_label=exc["excerpt_label"], defaults=dict(exc))
+                added += 1 if made else 0
+        if added:
+            self.stdout.write(f"  {added} excerpt(s) attached to sources owned elsewhere")
         self.stdout.write(f"Sources ready: {len(sources)}")
         return sources
 
