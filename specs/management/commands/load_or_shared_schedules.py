@@ -249,42 +249,62 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
      "sections are form-gated and whose codes span four Appendix A lists."),
 ]
 
-EXISTING_SOURCES_TO_REFERENCE: list[str] = []
+# ⚠ CONSOLIDATED 2026-08-23. These two source_codes ALREADY EXIST in prod,
+# declared by `load_or_pte.py`, for these exact documents (Schedule OR-AP
+# 150-102-171 and Schedule OR-ASC-CORP 150-102-033, both Rev. 07-10-25 ver. 01).
+# An earlier version of this loader created OR_2025_SCH_AP / OR_2025_SCH_ASC_C
+# alongside them - two records for one document. The campaign rule is EXTEND,
+# DON'T DUPLICATE, which is exactly what D-25/O4 was about at the FORM level;
+# duplicating at the SOURCE level while fixing it at the form level was the same
+# mistake one layer down. Reference the survivors.
+EXISTING_SOURCES_TO_REFERENCE: list[str] = [
+    "OR_2025_SCH_OR_AP",
+    "OR_2025_SCH_ASC_CORP",
+]
+
+# Verbatim excerpts this pass derived, attached to the SURVIVING sources rather
+# than lost with the duplicates. Idempotent on excerpt_label.
+EXCERPTS_FOR_EXISTING: list[tuple[str, dict]] = [
+    ("OR_2025_SCH_OR_AP", {
+        "excerpt_label": "Shared across five returns + both worksheets (instructions, verbatim)",
+        "excerpt_text": (
+            "'Schedule OR-AP is used for all corporations and partnerships that are doing business in more "
+            "than one state and may be used with Forms OR-20, OR-20-INC, OR-20-INS, OR-20-S, and OR-65.' "
+            "Standard worksheet: 'Apportionable income is apportioned to Oregon by multiplying the income by "
+            "a multiplier equal to Oregon sales and other receipts as determined by Schedule OR-AP, part 1, "
+            "divided by total sales and other receipts from the federal return (ORS 314.650).' "
+            "'2. Oregon apportionment percentage (enter on Schedule OR-AP, part 1, line 23) (Round to four "
+            "decimal places)'. Alternative worksheet: 'Alternative apportionment worksheet (double-weighted "
+            "sales factor formula) for utility or telecommunications taxpayers only... Check the box on the "
+            "front of your return (Form OR-20, question L; Form OR-20-INC, question K; Form OR-20-S, question "
+            "I). All others use the standard apportionment worksheet above.' Its line 6: 'Number of factors "
+            "with a positive number in column b.'"
+        ),
+        "summary_text": "ONE physical form shared by five returns. Standard = single sales factor to four "
+                        "decimals. Alternative = double-weighted sales, utilities/telecom only, with a LIVE "
+                        "factor-count denominator, never the constant 4.",
+        "is_key_excerpt": True,
+    }),
+    ("OR_2025_SCH_ASC_CORP", {
+        "excerpt_label": "Form-gated sections, the entry rule and the Section D ordering (verbatim)",
+        "excerpt_text": (
+            "'This schedule is for corporation filers only. Individuals do not use this form.' FORM-GATING: "
+            "'Section E: Refundable credits (Forms OR-20, OR-20-INC, and OR-20-INS only)... There are no "
+            "refundable credits available to S corporations.' and 'Note: Form OR-20-S filers cannot claim "
+            "standard credits although some credits can flow through to shareholders.' ENTRY RULE: 'Enter "
+            "each code only once and add the claimed amounts together.' SECTION D ORDERING: 'we'll apply "
+            "your credits against your tax in the order in which they're listed on the schedule... enter "
+            "your credits in the order in which they expire... List all credits you have available even if "
+            "you can't use them this year.' DECOY: 'Note for OR-20-S filers: This schedule and these codes "
+            "are not for additions or subtractions on Schedule SM.' - INERT on OR-20, which has no Sch. SM."
+        ),
+        "summary_text": "Five sections; C and E form-gated away from OR-20-S. Each code entered ONCE with "
+                        "amounts summed. Section D carries four columns and its LISTING ORDER is operative.",
+        "is_key_excerpt": True,
+    }),
+]
 
 AUTHORITY_SOURCES: list[dict] = [
-    {
-        "source_code": "OR_2025_SCH_AP", "source_type": "state_form", "source_rank": "primary_official",
-        "jurisdiction_code": "OR", "title": "2025 Oregon Schedule OR-AP — Apportionment of Income for Corporations "
-                                            "and Partnerships",
-        "citation": "Schedule OR-AP, 150-102-171 (Rev. 07-10-25, ver. 01)", "issuer": "Oregon Department of Revenue",
-        "official_url": "https://www.oregon.gov/dor/forms/FormsPubs/schedule-or-ap_150-102-171.pdf",
-        "current_status": "active", "is_substantive_authority": True, "trust_score": 9.5,
-        "topics": ["or_shared_schedules"],
-        "excerpts": [{
-            "excerpt_label": "Shared across five returns + both worksheets (instructions, verbatim)",
-            "excerpt_text": (
-                "'Schedule OR-AP is used for all corporations and partnerships that are doing business in more "
-                "than one state and may be used with Forms OR-20, OR-20-INC, OR-20-INS, OR-20-S, and OR-65.' "
-                "Standard worksheet: 'Apportionable income is apportioned to Oregon by multiplying the income by "
-                "a multiplier equal to Oregon sales and other receipts as determined by Schedule OR-AP, part 1, "
-                "divided by total sales and other receipts from the federal return (ORS 314.650).' '1. Total "
-                "sales and other receipts (Schedule OR-AP, part 1, line 22)... (a) Oregon (b) everywhere' "
-                "'2. Oregon apportionment percentage (enter on Schedule OR-AP, part 1, line 23) (Round to four "
-                "decimal places)'. Alternative worksheet: 'Alternative apportionment worksheet (double-weighted "
-                "sales factor formula) for utility or telecommunications taxpayers only. Taxpayers primarily "
-                "engaged in utilities or telecommunications may elect to apportion trade or business income "
-                "using the double-weighted sales factor [ORS 314.650 (1999 edition)]. Check the box on the front "
-                "of your return if you're using this alternative apportionment worksheet (Form OR-20, question "
-                "L; Form OR-20-INC, question K; Form OR-20-S, question I). All others use the standard "
-                "apportionment worksheet above.' Its line 6: 'Number of factors with a positive number in "
-                "column b.'"
-            ),
-            "summary_text": "OR-AP is ONE physical form shared by OR-20, OR-20-INC, OR-20-INS, OR-20-S and OR-65. "
-                            "Standard = single sales factor to four decimals. Alternative = double-weighted sales, "
-                            "utilities/telecom only, with a LIVE factor-count denominator.",
-            "is_key_excerpt": True,
-        }],
-    },
     {
         "source_code": "OR_ORS_314_650", "source_type": "state_statute", "source_rank": "primary_official",
         "jurisdiction_code": "OR", "title": "ORS 314.650 — Apportionment of income (single sales factor)",
@@ -307,50 +327,16 @@ AUTHORITY_SOURCES: list[dict] = [
             "is_key_excerpt": True,
         }],
     },
-    {
-        "source_code": "OR_2025_SCH_ASC_C", "source_type": "state_form", "source_rank": "primary_official",
-        "jurisdiction_code": "OR", "title": "2025 Oregon Schedule OR-ASC-CORP — Oregon Adjustments for Corporate "
-                                            "Filers",
-        "citation": "Schedule OR-ASC-CORP, 150-102-033 (Rev. 07-10-25, ver. 01); instructions 150-102-033-1 "
-                    "(Rev. 10-14-25)",
-        "issuer": "Oregon Department of Revenue",
-        "official_url": "https://www.oregon.gov/dor/forms/FormsPubs/schedule-or-asc-corp_150-102-033.pdf",
-        "current_status": "active", "is_substantive_authority": True, "trust_score": 9.5,
-        "topics": ["or_shared_schedules"],
-        "excerpts": [{
-            "excerpt_label": "Purpose, the FORM-GATED sections, and the entry rule (verbatim)",
-            "excerpt_text": (
-                "'This schedule is for corporation filers only. Individuals do not use this form. Schedule "
-                "OR-ASC-CORP is used to report Oregon additions, subtractions, and credits that don't have a "
-                "specific line on the corporate return. Code numbers and item explanations are in the "
-                "instructions for Forms OR-20, OR-20-INC, OR-20-INS, and OR-20-S.' FORM-GATING: 'Section E: "
-                "Refundable credits (Forms OR-20, OR-20-INC, and OR-20-INS only)... There are no refundable "
-                "credits available to S corporations.' and 'Note: Form OR-20-S filers cannot claim standard "
-                "credits although some credits can flow through to shareholders.' ENTRY RULE: 'Enter the code "
-                "and amount for each item you're claiming. If you're claiming multiple items with the same code, "
-                "report the items together. Enter each code only once and add the claimed amounts together.' "
-                "SECTION D ORDERING: 'we'll apply your credits against your tax in the order in which they're "
-                "listed on the schedule... enter your credits in the order in which they expire. Start with "
-                "credits that expire earlier, followed by credits that expire later. List all credits you have "
-                "available even if you can't use them this year.' DECOY: 'Note for OR-20-S filers: This schedule "
-                "and these codes are not for additions or subtractions on Schedule SM.'"
-            ),
-            "summary_text": "Five sections; C and E are FORM-GATED away from OR-20-S. Each code entered ONCE with "
-                            "amounts summed. Section D carries four columns and is ordered by expiry. The "
-                            "Schedule-SM note is INERT on OR-20, which has no Schedule SM.",
-            "is_key_excerpt": True,
-        }],
-    },
 ]
 
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
-    ("OR_2025_SCH_AP", "OR_AP", "primary_form"),
+    ("OR_2025_SCH_OR_AP", "OR_AP", "primary_form"),
     ("OR_ORS_314_650", "OR_AP", "statute"),
-    ("OR_2025_SCH_ASC_C", "OR_ASC_CORP", "primary_form"),
+    ("OR_2025_SCH_ASC_CORP", "OR_ASC_CORP", "primary_form"),
     # ⚠ The whole point of D-25/O4 — the seeded consumers now resolve.
-    ("OR_2025_SCH_AP", "OR_20_S", "related_form"),
-    ("OR_2025_SCH_ASC_C", "OR_20_S", "related_form"),
-    ("OR_2025_SCH_AP", "OR_65", "related_form"),
+    ("OR_2025_SCH_OR_AP", "OR_20_S", "related_form"),
+    ("OR_2025_SCH_ASC_CORP", "OR_20_S", "related_form"),
+    ("OR_2025_SCH_OR_AP", "OR_65", "related_form"),
 ]
 
 
@@ -720,9 +706,9 @@ FORMS: list[dict] = [
         "diagnostics": AP_DIAGNOSTICS, "scenarios": AP_SCENARIOS, "assertions": AP_ASSERTIONS,
         "rule_links": [
             ("R-ORAP-SSF", "OR_ORS_314_650", "primary", "the entire section — single sales factor"),
-            ("R-ORAP-SSF", "OR_2025_SCH_AP", "secondary", "part 1 line 23, four decimals"),
-            ("R-ORAP-ALT", "OR_2025_SCH_AP", "primary", "the alternative worksheet and its live line-6 divisor"),
-            ("R-ORAP-P2", "OR_2025_SCH_AP", "primary", "part 2 lines 10a/10b/12"),
+            ("R-ORAP-SSF", "OR_2025_SCH_OR_AP", "secondary", "part 1 line 23, four decimals"),
+            ("R-ORAP-ALT", "OR_2025_SCH_OR_AP", "primary", "the alternative worksheet and its live line-6 divisor"),
+            ("R-ORAP-P2", "OR_2025_SCH_OR_AP", "primary", "part 2 lines 10a/10b/12"),
         ],
     },
     {
@@ -745,10 +731,10 @@ FORMS: list[dict] = [
         "facts": ASC_FACTS, "rules": ASC_RULES, "lines": ASC_LINES,
         "diagnostics": ASC_DIAGNOSTICS, "scenarios": ASC_SCENARIOS, "assertions": ASC_ASSERTIONS,
         "rule_links": [
-            ("R-ORASC-GATE", "OR_2025_SCH_ASC_C", "primary", "the Section C/E form-gating, verbatim"),
-            ("R-ORASC-ONCE", "OR_2025_SCH_ASC_C", "primary", "enter each code only once"),
-            ("R-ORASC-D-COLS", "OR_2025_SCH_ASC_C", "primary", "Section D four columns + expiry ordering"),
-            ("R-ORASC-NO-SM", "OR_2025_SCH_ASC_C", "primary", "the Schedule-SM note and its inertness on OR-20"),
+            ("R-ORASC-GATE", "OR_2025_SCH_ASC_CORP", "primary", "the Section C/E form-gating, verbatim"),
+            ("R-ORASC-ONCE", "OR_2025_SCH_ASC_CORP", "primary", "enter each code only once"),
+            ("R-ORASC-D-COLS", "OR_2025_SCH_ASC_CORP", "primary", "Section D four columns + expiry ordering"),
+            ("R-ORASC-NO-SM", "OR_2025_SCH_ASC_CORP", "primary", "the Schedule-SM note and its inertness on OR-20"),
         ],
     },
 ]
@@ -841,6 +827,17 @@ class Command(BaseCommand):
             )
         for code in EXISTING_SOURCES_TO_REFERENCE:
             sources[code] = AuthoritySource.objects.get(source_code=code)
+        # Attach this pass's verbatim excerpts to the SURVIVING sources, so
+        # consolidating the duplicates loses none of the derived text.
+        added = 0
+        for code, exc in EXCERPTS_FOR_EXISTING:
+            src_obj = sources.get(code) or AuthoritySource.objects.filter(source_code=code).first()
+            if src_obj:
+                _, made = AuthorityExcerpt.objects.update_or_create(
+                    authority_source=src_obj, excerpt_label=exc["excerpt_label"], defaults=dict(exc))
+                added += 1 if made else 0
+        if added:
+            self.stdout.write(f"  {added} excerpt(s) attached to existing sources")
         self.stdout.write(f"Sources ready: {len(sources)}")
         return sources
 

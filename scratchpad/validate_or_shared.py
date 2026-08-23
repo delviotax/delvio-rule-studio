@@ -43,7 +43,9 @@ from django.core.management.base import CommandError  # noqa: E402
 from specs.models import (  # noqa: E402
     FlowAssertion, FormDiagnostic, FormFact, FormLine, FormRule, TaxForm, TestScenario,
 )
-from sources.models import AuthoritySource, AuthorityTopic, RuleAuthorityLink  # noqa: E402
+from sources.models import (  # noqa: E402
+    AuthorityExcerpt, AuthoritySource, AuthorityTopic, RuleAuthorityLink,
+)
 from specs.management.commands import load_or_shared_schedules as OR  # noqa: E402
 
 FAILURES: list[str] = []
@@ -90,7 +92,36 @@ except CommandError as exc:
           "the guard records that wiring OR_20_S own lines is a separate, still-open change",
           "the guard does not distinguish the deeper re-point as separate")
 
+# ⚠ PROVE THE REFERENCE CHECK BITES BEFORE STANDING THE PREREQUISITES UP.
+# After the 2026-08-23 consolidation this loader REFERENCES the OR-AP and
+# OR-ASC-CORP sources rather than creating them (they belong to load_or_pte).
+# With the throwaway DB empty, the loader must REFUSE - that refusal is the
+# dangling-reference guard doing its job, and it is worth asserting before we
+# satisfy it.
 OR.READY_TO_SEED = True
+try:
+    call_command("load_or_shared_schedules", verbosity=0)
+    FAILURES.append("the loader did NOT refuse with its referenced sources absent")
+except CommandError as exc:
+    check("DANGLING REFERENCE" in str(exc),
+          "the loader REFUSES while its referenced sources are absent, naming the D-25/O4 defect",
+          f"refused, but without naming the defect: {str(exc)[:140]!r}")
+
+# Stand up the prerequisites the way PROD has them: load_or_pte.py owns these two
+# source_codes. Minimal stand-ins are enough for this harness's purposes.
+for _code, _title in (
+    ("OR_2025_SCH_OR_AP", "2025 Schedule OR-AP, Apportionment of Income for Corporations and Partnerships"),
+    ("OR_2025_SCH_ASC_CORP", "2025 Schedule OR-ASC-CORP, Oregon Adjustments for Corporation Returns"),
+):
+    AuthoritySource.objects.update_or_create(
+        source_code=_code,
+        defaults={"source_type": "state_form", "source_rank": "primary_official",
+                  "jurisdiction_code": "OR", "title": _title,
+                  "issuer": "Oregon Department of Revenue", "current_status": "active",
+                  "is_substantive_authority": True, "trust_score": 9.5},
+    )
+PASSES.append("prerequisite sources stood up (in prod these come from load_or_pte)")
+
 _saved = OR.FORMS[0]["assertions"]
 OR.FORMS[0]["assertions"] = []
 try:
@@ -183,6 +214,7 @@ check(RuleAuthorityLink.objects.count() > 0, "authority links persisted", "no au
 # ⚠ The loader must REFUSE an unresolvable referenced source -- the very defect
 # this spec exists to fix. Prove the check bites.
 _saved_refs = OR.EXISTING_SOURCES_TO_REFERENCE
+# Second proof of the same guard, this time with a code that could never exist.
 OR.EXISTING_SOURCES_TO_REFERENCE = ["OR_DOES_NOT_EXIST"]
 try:
     call_command("load_or_shared_schedules", verbosity=0)
@@ -300,6 +332,32 @@ _ap_lines = [l["line_number"] for s in OR.FORMS if s["identity"]["form_number"] 
 check(all(l.startswith("AP-") for l in _ap_lines),
       "G4: OR_AP lines are namespaced AP-<part>-<line> off the OR-AP face",
       f"G4 violation in OR_AP lines: {_ap_lines}")
+
+# ======================================================================
+# 4b. The consolidation: excerpts land on the SURVIVING sources
+# ----------------------------------------------------------------------
+# An earlier version of this loader created OR_2025_SCH_AP / OR_2025_SCH_ASC_C
+# alongside the pre-existing OR_2025_SCH_OR_AP / OR_2025_SCH_ASC_CORP - two
+# records for one document. The campaign rule is EXTEND, DON'T DUPLICATE. These
+# checks pin that the loader now references the survivors and still contributes
+# its derived verbatim text to them.
+# ======================================================================
+check("OR_2025_SCH_OR_AP" in OR.EXISTING_SOURCES_TO_REFERENCE
+      and "OR_2025_SCH_ASC_CORP" in OR.EXISTING_SOURCES_TO_REFERENCE,
+      "the loader REFERENCES the pre-existing OR-AP / OR-ASC-CORP sources",
+      "the loader does not reference the surviving source codes")
+_declared_codes = {x["source_code"] for x in OR.AUTHORITY_SOURCES}
+check("OR_2025_SCH_AP" not in _declared_codes and "OR_2025_SCH_ASC_C" not in _declared_codes,
+      "the duplicate source codes are no longer declared - they cannot be recreated",
+      "the loader still declares the duplicate source codes")
+check(len(OR.EXCERPTS_FOR_EXISTING) == 2,
+      "the verbatim excerpts derived this pass attach to the SURVIVING sources, not lost with the duplicates",
+      f"expected 2 excerpts for existing sources, found {len(OR.EXCERPTS_FOR_EXISTING)}")
+for _code, _exc in OR.EXCERPTS_FOR_EXISTING:
+    _n = AuthorityExcerpt.objects.filter(
+        authority_source__source_code=_code, excerpt_label=_exc["excerpt_label"]).count()
+    check(_n == 1, f"{_code}: the derived excerpt is attached exactly once",
+          f"{_code}: derived excerpt attached {_n} times")
 
 # ======================================================================
 # 5. Report
