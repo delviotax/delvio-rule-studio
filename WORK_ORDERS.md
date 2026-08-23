@@ -216,6 +216,52 @@ from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 >     L14 has no printed destination, DR 0112RF L14 does) · MD (`.000001` on 510/511, `.000000` on
 >     500). **Applies directly to this wave** — every C-corp loader transcribes from its own form
 >     face, never from the state's already-seeded PTE sibling.
+> · ✅ **MISSISSIPPI + COLORADO AUTHORED 2026-08-23 — `load_ms_83105.py` and `load_co_dr0112.py`,
+> both `READY_TO_SEED=False`. THE SEVEN C-CORP SPECS ARE NOW ALL AUTHORED.** Harnesses
+> **MS 89 pass / 0 fail · CO 104 pass / 0 fail**, both on throwaway SQLite. ⚠ **No RS suite run** —
+> `delvio-tax-3a` confirmed it was holding `test_postgres` mid-batch, so the per-state harnesses
+> were the only thing run.
+>   – **MS_83105** (D-26, 16 items): 27 facts / 9 rules / 10 lines / 13 diag / 11 tests / 6 FA.
+>     **S1** ships the DOR line-4 zero floor against § 27-13-5(1)(b)'s $25 minimum as ONE constant,
+>     `MS_FRANCHISE_NET_FLOOR`, carrying its basis *and* the competing citation; the harness computes
+>     **both** readings and proves they differ by $25, so the ruling reads as a choice between two
+>     live DOR texts rather than a formality. **S4** keys the rate ladder by **taxpayer type**, and
+>     the harness proves the corporate and individual ladders diverge by $3,000 at TY2027 on a 250k
+>     return. **S2** ½% proved to be exactly half the regulation's 1%. **S3** 2/20 with an
+>     `ast`-based ABSENCE check proving the stale five-year figure appears in no NOL constant *and*
+>     that the check cannot pass by being empty. Also proved: the printed L19/L20 asymmetry
+>     (symmetrising shorts the client $300 on the fixture) and that *"or fractional part thereof"*
+>     makes the franchise unit count a **ceiling**. TY2028 **refuses** rather than computing — the
+>     levy is repealed, not zero-rated, and those differ because a zero rate still carries the $25
+>     minimum.
+>   – **CO_DR0112** (D-27): 24 facts / 9 rules / 13 lines / 16 diag / 11 tests / 7 FA. **C2** builds
+>     the six tests from **statute**, prompts with the **form** and diagnoses the **Guide**; the
+>     unity diagnostic names each divergence so the preparer can see where the texts part. **C3**
+>     computes 16(a)–(d) over a vintaged ledger, and the harness proves the wrong 80% base is
+>     **impossible**, not merely different — applied to line 15 it yields a deduction larger than the
+>     income it offsets, which is exactly why 16(b) is printed. The **two $5,000 predicates** are
+>     separate constants with different operators, proved to disagree at exactly $5,000. **W9** proves
+>     a December 52-53 week year takes the following year's rate. **W5** ships as an affirmative
+>     ruling carrying § 39-22-304(3)(p)(III), with a code-level ABSENCE check that 1965 appears in no
+>     numeric position while remaining discussed in prose so a future reader knows it was rejected.
+>     ⚠ **TY2027/28 rates are deliberately absent and `_yk` REFUSES them** — LCS projections
+>     (4.33%/4.29%) are not enacted rates.
+> · ⚠⚠ **THE TWO-WRITERS GUARD WAS INCOMPLETE AND IS NOW HARDENED (both harnesses).** The version
+> shipped with MO/VA/AZ scans only `load_*.py` for a **double-quoted** `"source_code":`. The shared
+> module **`_state_conformity_tier1.py` matches neither** — it is not `load_*` and it uses single
+> quotes — yet it **owns** `CO_CRS_39_22_103` and other rows. A guard that cannot see the owner
+> cannot detect a second writer of it. Both harnesses now scan **every module in the commands
+> directory and both quote styles**, and the CO harness **proves the hardening was necessary** by
+> asserting the old pattern misses the real owner. ⚠ **The MO / VA / AZ harnesses still carry the
+> old pattern — worth backporting when those files are next touched.**
+> · ⚠ **A brief defect found while authoring CO:** `co_ccorp_source_brief.md` §1.2 lists
+> `CO_CRS_39_22_103` as *"read out of the seeded `load_co_dr0106.py`"*. It is **not declared there** —
+> `load_co_dr0106.py` only *references* it too. The real owner is `_state_conformity_tier1.py`.
+> Trusting the brief's list unchecked would have shipped exactly the **dangling reference** defect
+> (D-25/O4, D-29). Both harnesses now assert every referenced code is genuinely owned somewhere,
+> and that no code has two owners.
+> · **NEXT:** Ken's Gate-1 **SEED** approval for `MO_1120`, `MS_83105` and `CO_DR0112` — three
+> authored-and-gated specs. Nothing seeds without his direct word.
 
 > **[WO-W04-PTE] 45-state campaign Wave 4 — MO + OR + AZ pass-through lane
 > (BUILD_ORDER S-27; campaign `delvio-states` WAVE_PLAN.md wave 4) · ✅ **GATE-1 RULED 2026-08-19

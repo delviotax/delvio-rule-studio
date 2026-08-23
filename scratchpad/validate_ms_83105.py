@@ -164,34 +164,45 @@ check(not _bad_form_links, "every AUTHORITY_FORM_LINK resolves",
       f"⚠ DANGLING SOURCE in AUTHORITY_FORM_LINKS: {sorted(_bad_form_links)}")
 
 # ⚠⚠ TWO-WRITERS GUARD (the D-31 lesson) - static, no database needed.
-_declared_here = {s["source_code"] for s in MS.AUTHORITY_SOURCES}
-_clashes = []
+# ⚠ HARDENED while authoring CO_DR0112: the older version scanned only `load_*.py`
+# for a DOUBLE-QUOTED `"source_code":`. The shared module `_state_conformity_tier1.py`
+# matches NEITHER - it is not `load_*` and it uses single quotes - yet it OWNS
+# several AuthoritySource rows. A guard that cannot see the owner cannot detect a
+# second writer of it. This version scans every module and both quote styles.
 import glob as _glob  # noqa: E402
-for _path in _glob.glob(os.path.join(PROJECT_ROOT, "specs", "management", "commands", "load_*.py")):
-    if os.path.basename(_path) == "load_ms_83105.py":
-        continue
-    _other = io2.open(_path, encoding="utf-8").read()
-    for _code in _declared_here:
-        if '"source_code": "%s"' % _code in _other:
-            _clashes.append((_code, os.path.basename(_path)))
-check(not _clashes,
-      "⚠⚠ TWO-WRITERS GUARD: no source declared here is also declared by another loader",
-      f"TWO WRITERS OF ONE ROW - would OVERWRITE a source another loader owns: {_clashes}")
+import re as _re  # noqa: E402
 
-# ...and the mirror: everything we REFERENCE must actually be owned somewhere else.
-_owned_elsewhere = set()
-for _path in _glob.glob(os.path.join(PROJECT_ROOT, "specs", "management", "commands", "load_*.py")):
-    if os.path.basename(_path) == "load_ms_83105.py":
+_COMMANDS_DIR = os.path.join(PROJECT_ROOT, "specs", "management", "commands")
+
+
+def _declares_source(text, code):
+    return bool(_re.search(r"""['"]source_code['"]\s*:\s*['"]%s['"]""" % _re.escape(code), text))
+
+
+_declared_here = {s["source_code"] for s in MS.AUTHORITY_SOURCES}
+_clashes, _owners = [], {}
+for _name in os.listdir(_COMMANDS_DIR):
+    if not _name.endswith(".py") or _name == "load_ms_83105.py":
         continue
-    _other = io2.open(_path, encoding="utf-8").read()
+    _other = io2.open(os.path.join(_COMMANDS_DIR, _name), encoding="utf-8").read()
+    for _code in _declared_here:
+        if _declares_source(_other, _code):
+            _clashes.append((_code, _name))
     for _code in MS.EXISTING_SOURCES_TO_REFERENCE:
-        if '"source_code": "%s"' % _code in _other:
-            _owned_elsewhere.add(_code)
-_orphan_refs = set(MS.EXISTING_SOURCES_TO_REFERENCE) - _owned_elsewhere
+        if _declares_source(_other, _code):
+            _owners.setdefault(_code, []).append(_name)
+check(not _clashes,
+      "⚠⚠ TWO-WRITERS GUARD (hardened): no source declared here is declared by any other module",
+      f"TWO WRITERS OF ONE ROW - would OVERWRITE a source another module owns: {_clashes}")
+
+_orphan_refs = [c for c in MS.EXISTING_SOURCES_TO_REFERENCE if c not in _owners]
 check(not _orphan_refs,
-      "every EXISTING_SOURCES_TO_REFERENCE code is genuinely owned by another loader",
-      f"⚠ referenced but owned by NO loader (would be a dangling reference on a clean DB): "
-      f"{sorted(_orphan_refs)}")
+      "every EXISTING_SOURCES_TO_REFERENCE code is genuinely owned by another module",
+      f"⚠ referenced but owned by NOTHING (a dangling reference on a clean database): "
+      f"{_orphan_refs}")
+_multi_owned = {c: m for c, m in _owners.items() if len(m) > 1}
+check(not _multi_owned, "no referenced source has two owners",
+      f"⚠ DUPLICATE OWNERSHIP - two modules declare the same row: {_multi_owned}")
 
 # ======================================================================
 # 3. ⚠⚠ S1 - THE FRANCHISE FLOOR. Both readings computed; they MUST differ.
