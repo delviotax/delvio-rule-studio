@@ -172,6 +172,40 @@ from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 > adversarial verification, then ONE batched Gate-1 scope walk. ⚠ **Nothing may be authored until
 > each brief exists AND has been adversarially verified** — the Wave 4 verification pass corrected
 > items in every single brief and caught four errors in the ruling layer itself.
+> · ✅ **ALL SEVEN BRIEFS VERIFIED 2026-08-22.** The walk is `delvio-states/dispatch/WAVE5_WALK.md`
+> (three layers: governance · seven state walks · dated Ken-only externals).
+> · ✅ **GATE-1 LAYER 1 (GOVERNANCE) RULED 2026-08-22 — campaign D-18.** Ken approved all four.
+> **Layers 2 and 3 remain OPEN; no C-corp loader may be authored yet.** What landed in RS:
+>   – **G1 — `load_va_pte.py` provenance RE-BASED onto Va. Code § 58.1-408 A.** D-12 B1 had
+>     ratified the 4/3/3/2 divisor as *"an interpretation… neither source states the rule
+>     outright"*; **the statute states it outright in both branches**, so it is a TRANSCRIPTION.
+>     **D-12 B1 is SUPERSEDED.** Four sites edited (the `_va_apportionment_pct` docstring, the
+>     `502A-B2f` DIVISOR NOTE, flow assertion `FA-VA-APPORT-DIV4`, and a module-header supersession
+>     note). ⚠ **DOCUMENTATION ONLY — no computed value moved**; the function was already right in
+>     all four cases. Harness **VA 243 → 250, 0 fail**, the seven new checks being a **provenance
+>     ratchet** (statute cited · the superseded "interpretation" premise absent · the `plus one`
+>     divergence recorded) **proven to fail against the pre-edit text**.
+>     ⚠ **NOT RE-SEEDED.** Two of the three brief-named sites are **seeded** text, so **prod still
+>     serves the superseded wording**. Held for Ken's separate seed approval.
+>     ⚠ **The tax posture is deliberate and money-moving:** building to statute knowingly diverges
+>     from printed FINAL Virginia sources **both ways** — divisor **2** when the sales factor is
+>     missing (500A/502A faces, 500A instructions and 500AC disagree → **more** tax) and **3** when
+>     payroll or property is missing (the **Form 502 instruction book prints 2 because it restates
+>     § 58.1-408 A but DROPS the words `plus one`** → **less** tax). The instruction book is the
+>     defective source. **Do not reconcile this spec to it.**
+>   – **G2 — no RS work: already ruled D-16 §C and already built.** The Wave 5 walk was written
+>     13:58 and the Wave 6 walk superseded it at 15:04 the same day. Verified before acting:
+>     `load_co_dr0106.py` already carries both predicates with the `not`-negation guard and the
+>     exactly-$5,000 boundary scenario, exports live, app-side diagnostic landed.
+>     → **Standing lesson: check DECISIONS before executing a walk item, not just the walk.**
+>   – **G3 — Oregon: scope note only.** The `or_code()` namespace refusal stands; the collision
+>     count corrects to **25 like-for-like, not 12**. **No change to seeded `load_or_pte.py`** — its
+>     four stale constants stay a separate latent edit to apply at C-corp authoring time.
+>   – **G4 — standing convention: NEVER clone a sibling form's line numbers, even within one
+>     state.** MS (84-122 L8/L15 ↔ 83-122, where those are computed subtotals) · CO (DR 0106 Part V
+>     L14 has no printed destination, DR 0112RF L14 does) · MD (`.000001` on 510/511, `.000000` on
+>     500). **Applies directly to this wave** — every C-corp loader transcribes from its own form
+>     face, never from the state's already-seeded PTE sibling.
 
 > **[WO-W04-PTE] 45-state campaign Wave 4 — MO + OR + AZ pass-through lane
 > (BUILD_ORDER S-27; campaign `delvio-states` WAVE_PLAN.md wave 4) · ✅ **GATE-1 RULED 2026-08-19

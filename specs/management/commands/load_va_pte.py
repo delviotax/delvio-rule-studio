@@ -218,6 +218,14 @@ credit amounts, compute only the allocation arithmetic. Walk item **B1 — the
 Schedule 502A line 2(f) divisor — was ratified as the weight-sum of existing
 factors (4 / 3 / 3 / 2)**, the only reading that reconciles the form face with
 the instruction. READY_TO_SEED was flipped on that approval and nothing else.
+
+⚠ **B1's PREMISE WAS SUPERSEDED 2026-08-22 (campaign D-18, Wave 5 walk item G1).**
+Va. Code § 58.1-408 A states the 4/3/3/2 rule OUTRIGHT, in both branches, so the
+divisor is a TRANSCRIPTION, not the interpretation B1 called it. **The numbers and
+every seeded value are unchanged**; the provenance was re-based in three places
+(the `_va_apportionment_pct` docstring, the `502A-B2f` DIVISOR NOTE, and flow
+assertion `FA-VA-APPORT-DIV4`). Building to statute knowingly diverges from printed
+FINAL Virginia sources in BOTH directions — Ken accepted that on the record.
 ═══════════════════════════════════════════════════════════════════════════
 """
 import math
@@ -572,17 +580,43 @@ def _va_apportionment_pct(prop, pay, sales, year: int = FORM_TAX_YEAR):
         2(e) = 2(a) + 2(b) + 2(d)
         2(f) = 2(e) / 4, "reduced by the number of factors, if any, having no denominator"
 
-    RECONCILIATION NOTE — RATIFIED BY KEN 2026-08-17 (Gate-1 walk item B1). Not in the
-    brief; surfaced during authoring and recorded here so it is auditable. The form
-    FACE says "divide Line 2e by 4, reduced by the number of factors having no
-    denominator"; the INSTRUCTION says the denominator "must be the number of existing
-    factors". Those readings agree only if the sales factor is counted at its DOUBLE
-    weight. ⚠ THIS IS AN INTERPRETATION, NOT A TRANSCRIPTION — neither source states
-    the weight-sum rule; it is the unique reading that makes both true at once, and
-    Ken blessed it on that basis. The divisor implemented is therefore the SUM OF THE
-    WEIGHTS of the factors that exist (property 1 + payroll 1 + sales 2 = 4):
-        all three exist  -> 4        sales missing    -> 2
-        property missing -> 3        payroll missing  -> 3
+    DIVISOR AUTHORITY — Va. Code § 58.1-408 A. TRANSCRIPTION FROM STATUTE, not an
+    interpretation. [Campaign D-18, ratified by Ken 2026-08-22, SUPERSEDING D-12 B1.]
+
+    § 58.1-408 A, verbatim (law.lis.virginia.gov, served 2026-08-21; history ends
+    "2018, cc. 801, 802, 807" — no 2026 amendment):
+        "...shall be apportioned to the Commonwealth by multiplying such income by a
+        fraction, the numerator of which is the property factor plus the payroll
+        factor, plus twice the sales factor, and the denominator of which is four;
+        however, where the sales factor does not exist, the denominator of the
+        fraction shall be the number of existing factors and where the sales factor
+        exists but the payroll factor or the property factor does not exist, the
+        denominator of the fraction shall be the number of existing factors plus one."
+
+    Applied, that is the SUM OF THE WEIGHTS of the factors that exist
+    (property 1 + payroll 1 + sales 2 = 4):
+        all three exist  -> 4 ("the denominator of which is four")
+        sales missing    -> 2 ("the number of existing factors")
+        property missing -> 3 ("the number of existing factors plus one")
+        payroll missing  -> 3 ("the number of existing factors plus one")
+
+    ⚠ D-12 B1 (2026-08-17) ratified this same 4/3/3/2 as an INTERPRETATION, on the
+    stated premise that "neither source states the rule outright." THAT PREMISE WAS
+    WRONG — the statute states it outright, in both branches. The Wave-5 C-corp
+    verification pass found it; Ken re-ratified on the statute 2026-08-22. The
+    ARITHMETIC IS UNCHANGED; only this provenance is re-based.
+
+    ⚠ BUILDING TO STATUTE KNOWINGLY DIVERGES FROM PRINTED FINAL VIRGINIA SOURCES IN
+    BOTH DIRECTIONS — accepted by Ken on the record:
+        sales missing            statute 2 | 500A face, 502A face, 500A instr. and
+                                            500AC all yield otherwise -> MORE tax
+        payroll/property missing statute 3 | the Form 502 instruction book prints 2,
+                                            because it restates the statute but DROPS
+                                            the words "plus one" -> statute means
+                                            LESS tax
+    Do NOT "fix" this against the instruction book. The book is the defective source
+    (Form 502 instructions, ModDate D:20260401083501, printed p.27).
+
     Returns None when no factor has a denominator.
     """
     w = _yk(VA_APPORT_WEIGHTS, year)
@@ -2252,9 +2286,17 @@ def _page1_rules(prefix: str, adj_schedule: str) -> list[dict]:
                          "the same nine method boxes and the same divide-by-four computation. Virginia is NOT a "
                          "single sales factor state for PTEs. Non-TPP sales are COST OF PERFORMANCE, not market; "
                          "market sourcing exists only for the two VEDP carve-outs and debt buyers. No throwback or "
-                         "throwout rule exists. DIVISOR NOTE: the face's '4 reduced by the number of factors having "
-                         "no denominator' and the instruction's 'the number of existing factors' agree only when "
-                         "sales is counted at its DOUBLE weight - hence the weight-sum divisor.")},
+                         "throwout rule exists. DIVISOR NOTE: the divisor is TRANSCRIBED FROM Va. Code Sec. 58.1-408 A, "
+                         "which states both branches outright - denominator four; 'the number of existing "
+                         "factors' where the sales factor does not exist; 'the number of existing factors PLUS "
+                         "ONE' where sales exists but payroll or property does not - i.e. 4/3/3/2, the sum of the "
+                         "weights of the factors that exist. [D-18, 2026-08-22, superseding D-12 B1, which had "
+                         "ratified the same numbers as an INTERPRETATION on the wrong premise that no source "
+                         "stated the rule.] Building to statute knowingly diverges from print BOTH WAYS: the "
+                         "500A/502A faces, the 500A instructions and 500AC do not yield 2 when sales is missing, "
+                         "and the Form 502 instruction book prints 2 where the statute requires 3 because it "
+                         "restates Sec. 58.1-408 A but DROPS the words 'plus one'. The instruction book is the "
+                         "defective source; do not reconcile the code to it.")},
         {"rule_id": f"{prefix}-502AC", "title": "Schedule 502A Section C - allocable and apportionable income (Lines 4/5/6)", "rule_type": "calculation",
          "formula": ("C1 = Form 502 Line 1 ; "
                      "if commercial_domicile_in_va: C2 = dividends_received -> Line 4 ; C3(e) = 0 -> Line 5 ; "
@@ -3581,10 +3623,14 @@ FLOW_ASSERTIONS: list[dict] = [
                      "factor has no denominator - the divisor being the sum of the weights of the factors that "
                      "exist (property 1, payroll 1, sales 2). Virginia is NOT a single sales factor state for "
                      "PTEs, and the PTE rule does not differ from the corporate rule. "
-                     "THE WEIGHT-SUM DIVISOR IS AN INTERPRETATION RATIFIED BY KEN 2026-08-17 (Gate-1 walk item "
-                     "B1), not a transcription: the form face ('4 reduced by the number of factors having no "
-                     "denominator') and the instruction ('the number of existing factors') reconcile ONLY if the "
-                     "sales factor is counted at its double weight. Neither source states the rule outright."),
+                     "THE WEIGHT-SUM DIVISOR IS A TRANSCRIPTION FROM Va. Code Sec. 58.1-408 A, which states "
+                     "both branches outright: denominator four; 'the number of existing factors' where the "
+                     "sales factor does not exist; 'the number of existing factors plus one' where sales exists "
+                     "but payroll or property does not. [D-18, 2026-08-22, SUPERSEDING D-12 B1, which ratified "
+                     "the same 4/3/3/2 as an interpretation on the premise - now known false - that neither "
+                     "source stated the rule outright.] Build to the statute: it diverges from the printed "
+                     "faces when sales is missing (statute 2, more tax) and from the Form 502 instruction book "
+                     "when payroll or property is missing (statute 3, book 2 - the book drops 'plus one')."),
      "definition": {"rule": "R-VA-502AB", "check": "L7 == (P + Y + 2S) / weight_sum_of_existing_factors"}},
     {"assertion_id": "FA-VA-502A-NO-PCT", "title": "Schedule 502A Section C has NO percentage-application line",
      "assertion_type": "flow_assertion", "entity_types": ["1065", "1120S"], "status": "draft", "sort_order": 10,

@@ -767,6 +767,47 @@ check({f["fact_key"] for f in VA._page1_facts()} <= (f_502 & f_ptet),
       "the shared Page-1 fact block is present on both forms", "the shared fact block diverged")
 
 # ======================================================================
+# 6b. G1 PROVENANCE RATCHET - campaign D-18 (2026-08-22), superseding D-12 B1
+# ----------------------------------------------------------------------
+# The 4/3/3/2 divisor is a TRANSCRIPTION from Va. Code Sec. 58.1-408 A, which
+# states BOTH branches outright. D-12 B1 had ratified the same NUMBERS on the
+# premise that no source stated the rule - a premise the Wave-5 C-corp
+# verification pass disproved. The arithmetic never changed and is pinned at
+# section 5g; what changed is the PROVENANCE, and stale provenance is this
+# campaign's repeat failure mode. These checks pin the seeded provenance text
+# so a later edit cannot quietly restore the superseded premise or "reconcile"
+# the spec to the DEFECTIVE Form 502 instruction book (which restates
+# Sec. 58.1-408 A but drops the words "plus one", printing 2 where the statute
+# requires 3).
+# ======================================================================
+_div4 = FlowAssertion.objects.filter(assertion_id="FA-VA-APPORT-DIV4").first()
+_div4_txt = (_div4.description or "") if _div4 else ""
+check(_div4 is not None,
+      "FA-VA-APPORT-DIV4 exists",
+      "FA-VA-APPORT-DIV4 is MISSING")
+check("58.1-408" in _div4_txt,
+      "FA-VA-APPORT-DIV4 cites Sec. 58.1-408 A as the divisor authority (D-18/G1)",
+      "FA-VA-APPORT-DIV4 does NOT cite Sec. 58.1-408 A - provenance regressed (D-18/G1)")
+check("IS AN INTERPRETATION" not in _div4_txt.upper(),
+      "FA-VA-APPORT-DIV4 no longer calls the divisor an INTERPRETATION (D-12 B1 premise retired)",
+      "FA-VA-APPORT-DIV4 still asserts the SUPERSEDED D-12 B1 premise ('an interpretation')")
+check("plus one" in _div4_txt.lower(),
+      "FA-VA-APPORT-DIV4 records that the Form 502 book drops the statutory 'plus one'",
+      "FA-VA-APPORT-DIV4 omits the 'plus one' divergence - the substance of D-18/G1")
+
+_b2f = FormRule.objects.filter(rule_id__endswith="-502AB").first()
+_b2f_txt = (_b2f.description or "") if _b2f else ""
+check(_b2f is not None,
+      "the 502A Section B apportionment rule (-502AB) exists",
+      "the 502A Section B apportionment rule (-502AB) is MISSING")
+check("58.1-408" in _b2f_txt,
+      "the 502A-B2f DIVISOR NOTE cites Sec. 58.1-408 A (D-18/G1)",
+      "the 502A-B2f DIVISOR NOTE does NOT cite Sec. 58.1-408 A - provenance regressed")
+check("agree only when" not in _b2f_txt,
+      "the 502A-B2f DIVISOR NOTE no longer rests on the face-vs-instruction reconciliation",
+      "the 502A-B2f DIVISOR NOTE still rests on the SUPERSEDED reconciliation premise")
+
+# ======================================================================
 # 7. Report
 # ======================================================================
 print("\n" + "=" * 74)
