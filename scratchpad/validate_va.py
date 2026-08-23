@@ -795,17 +795,22 @@ check("plus one" in _div4_txt.lower(),
       "FA-VA-APPORT-DIV4 records that the Form 502 book drops the statutory 'plus one'",
       "FA-VA-APPORT-DIV4 omits the 'plus one' divergence - the substance of D-18/G1")
 
-_b2f = FormRule.objects.filter(rule_id__endswith="-502AB").first()
-_b2f_txt = (_b2f.description or "") if _b2f else ""
-check(_b2f is not None,
-      "the 502A Section B apportionment rule (-502AB) exists",
-      "the 502A Section B apportionment rule (-502AB) is MISSING")
-check("58.1-408" in _b2f_txt,
-      "the 502A-B2f DIVISOR NOTE cites Sec. 58.1-408 A (D-18/G1)",
-      "the 502A-B2f DIVISOR NOTE does NOT cite Sec. 58.1-408 A - provenance regressed")
-check("agree only when" not in _b2f_txt,
-      "the 502A-B2f DIVISOR NOTE no longer rests on the face-vs-instruction reconciliation",
-      "the 502A-B2f DIVISOR NOTE still rests on the SUPERSEDED reconciliation premise")
+# ⚠ The -502AB rule is emitted ONCE PER FORM (R-VA-502AB on VA_502, R-VAP-502AB
+# on VA_502PTET) from one shared template, so BOTH carry the DIVISOR NOTE and
+# BOTH must be checked - .first() would have inspected only one of them.
+_b2fs = list(FormRule.objects.filter(rule_id__endswith="-502AB").order_by("rule_id"))
+check(len(_b2fs) == 2,
+      f"the 502A Section B apportionment rule exists on BOTH forms ({len(_b2fs)} found)",
+      f"expected 2 '-502AB' rules (one per form), found {len(_b2fs)}")
+for _b2f in _b2fs:
+    _b2f_txt = _b2f.description or ""
+    _rid = _b2f.rule_id
+    check("58.1-408" in _b2f_txt,
+          f"{_rid}: the DIVISOR NOTE cites Sec. 58.1-408 A (D-18/G1)",
+          f"{_rid}: the DIVISOR NOTE does NOT cite Sec. 58.1-408 A - provenance regressed")
+    check("agree only when" not in _b2f_txt,
+          f"{_rid}: the DIVISOR NOTE no longer rests on the face-vs-instruction reconciliation",
+          f"{_rid}: the DIVISOR NOTE still rests on the SUPERSEDED reconciliation premise")
 
 # ======================================================================
 # 7. Report

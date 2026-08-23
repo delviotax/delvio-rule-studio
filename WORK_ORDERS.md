@@ -185,8 +185,18 @@ from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 >     all four cases. Harness **VA 243 → 250, 0 fail**, the seven new checks being a **provenance
 >     ratchet** (statute cited · the superseded "interpretation" premise absent · the `plus one`
 >     divergence recorded) **proven to fail against the pre-edit text**.
->     ⚠ **NOT RE-SEEDED.** Two of the three brief-named sites are **seeded** text, so **prod still
->     serves the superseded wording**. Held for Ken's separate seed approval.
+>     ✅ **SEEDED 2026-08-22** on Ken's direct approval (*"approve the VA reseed"*). `VA_502` +
+>     `VA_502PTET` re-seeded, **both exports 200**, prod unchanged at **158 forms / 19 conformity
+>     rows**, `seed_all --dry-run` clean. ⚠ **Proved doc-only, not merely asserted:** both exports
+>     and all 15 `FA-VA*` rows were snapshotted before and diffed leaf-by-leaf after —
+>     **2308/2308 · 2601/2601 · 149/149 leaves, exactly 3 differences, every one a `description`**
+>     and every one intended; the superseded phrases are gone from prod.
+>     ⚠ **The seed prep caught a defect in the G1 work itself:** `-502AB` is emitted **once per
+>     form** from one shared template (`R-VA-502AB` + `R-VAP-502AB`), so **both** forms carried the
+>     stale DIVISOR NOTE, but the new ratchet used `.first()` and inspected only one — a
+>     regression on the other form would have passed silently. Now asserts on **both** with a count
+>     check; harness **250 → 252, 0 fail**. **Lesson for every future state loader: a check must
+>     cover every row its template emits, not just the first.**
 >     ⚠ **The tax posture is deliberate and money-moving:** building to statute knowingly diverges
 >     from printed FINAL Virginia sources **both ways** — divisor **2** when the sales factor is
 >     missing (500A/502A faces, 500A instructions and 500AC disagree → **more** tax) and **3** when
