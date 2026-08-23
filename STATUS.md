@@ -12,6 +12,49 @@ last_updated: 2026-08-23
 
 ## Current state
 
+✅ **SEEDED 2026-08-23 — `MO_1120` + `MS_83105` + `CO_DR0112` ARE LIVE. PROD 164 → 167.
+WAVE 5's C-CORP LANE IS CLOSED.** Ken opened the Gate-1 SEED gate directly and unmediated
+(*"seed all three"*). All three **export 200 with a non-null `state_conformity` block**;
+`seed_all --dry-run` clean at exit 0 with all three loaders in the ordering; post-seed verifier
+**29 pass / 0 fail**.
+
+| Form | facts | rules | lines | diag | tests | FA |
+|---|---|---|---|---|---|---|
+| `MO_1120` | 25 | 10 | 14 | 10 | 10 | 5 |
+| `MS_83105` | 27 | 9 | 10 | 13 | 11 | 6 |
+| `CO_DR0112` | 24 | 9 | 13 | 16 | 11 | 7 |
+
+⚠ **The pre-flight was clean this time — and it ran precisely because it was NOT clean last time.**
+The VA/AZ seed caught a **two-writers defect at this exact step**: `load_va_500.py` declared a source
+`load_va_pte.py` owns, and `update_or_create` would have degraded its `source_rank` from
+`controlling` to `primary_official` under two live rules. This batch declares **15 new sources and
+3 new topics, none of which existed in prod**, and references **11 rows it never re-declares**.
+
+⚠⚠ **PROVED, NOT ASSERTED:** the 11 referenced authority rows were snapshotted **field by field**
+before the seed and re-compared after — **121 leaves, zero differences**. That discharges D-31's
+proof obligation rather than claiming it. The snapshot is committed
+(`scratchpad/preflight_seed_3_snapshot.json`) so the comparison is reproducible.
+
+⚠ **One verification failure was mine, not the seed's.** The export check first returned **400** —
+Django's test `Client` sends `Host: testserver`, which settings only allow under the test runner, and
+`specs.urls` mounts at `/api/`. Both harness faults. Worth recording because a 400 at that step looks
+exactly like a broken export: the seeded rows had **already** been proved correct independently by
+the row-count and snapshot sections, which is why the failure was diagnosable rather than alarming.
+
+⚠ **`test_postgres` was never touched** — no test database was created or dropped at any point.
+`delvio-tax-3a` was told before the seed began and is still holding it.
+
+**Two things travel with these specs into any future work:**
+1. **`MS_83105`** ships the **DOR line-4 zero floor** against § 27-13-5(1)(b)'s **$25 statutory
+   franchise minimum**. Both are the Department's own text; a **DOR ticket is outstanding**; and
+   `MS_FRANCHISE_NET_FLOOR` is the single constant that changes if the Department answers for the
+   statute. It moves every Mississippi bank return by $25.
+2. **`CO_DR0112` must NOT be rolled forward to TY2026** — four rules change at once there
+   (HB 24-1134 combined regime · listed jurisdictions · § 250 FDDEI add-back · removal of the
+   $150,000 line-17 cap). D-27 ratified it as a **re-authoring event**.
+
+---
+
 **NEW 2026-08-23 (latest) — ALL SEVEN WAVE-5 C-CORP SPECS ARE NOW AUTHORED
 (`WO-W05-CCORP`).** `MS_83105` and `CO_DR0112` were written this session, both
 `READY_TO_SEED = False`. Harnesses **MS 89 pass / 0 fail** and **CO 104 pass / 0 fail**, on
