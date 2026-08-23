@@ -97,7 +97,7 @@ from specs.models import (
 # SAFETY GUARD - flip ONLY on Ken's Gate-1 SEED approval, given DIRECTLY.
 # D-27 approved the walk SCOPE. That is not the seed gate.
 # ═══════════════════════════════════════════════════════════════════════════
-READY_TO_SEED = False
+READY_TO_SEED = True   # ⚠ OPENED 2026-08-23 on Ken's DIRECT Gate-1 SEED approval ("seed all three"), given unmediated in session. Pre-flight clean: prod 164 forms, no two-writers hazard, all references resolve.
 
 
 FORM_JURISDICTION = "CO"
