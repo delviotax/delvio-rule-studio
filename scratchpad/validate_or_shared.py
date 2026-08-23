@@ -76,9 +76,19 @@ except CommandError as exc:
     check("relayed approval never opens a human gate" in msg,
           "the guard states the gate rule (a relayed approval never opens it)",
           "the guard message omits the gate rule")
-    check("RE-POINTS the already-seeded OR_20_S" in msg,
-          "⚠ the guard WARNS that this seed changes a LIVE spec, not just adds new ones",
-          "the guard does not warn that an already-seeded spec is affected")
+    # ⚠ CORRECTED 2026-08-23: an earlier version asserted the guard said this seed
+    # "RE-POINTS the already-seeded OR_20_S". A pre-flight against PROD showed that
+    # is NOT what the loader does - it creates two new forms and adds
+    # AuthorityFormLink rows keyed on a form_code STRING, touching no OR_20_S row.
+    # The guard now states the scope accurately and this pins the accurate wording.
+    # Overstating a blast radius is its own defect: it trains the reader to
+    # discount the warning.
+    check("this seed is ADDITIVE" in msg and "does NOT modify any OR_20_S row" in msg,
+          "the guard states the seed scope ACCURATELY (additive; no OR_20_S row modified)",
+          f"the guard misstates the seed scope: {msg[:200]!r}")
+    check("SEPARATE change" in msg,
+          "the guard records that wiring OR_20_S own lines is a separate, still-open change",
+          "the guard does not distinguish the deeper re-point as separate")
 
 OR.READY_TO_SEED = True
 _saved = OR.FORMS[0]["assertions"]

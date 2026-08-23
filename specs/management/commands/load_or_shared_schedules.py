@@ -112,11 +112,29 @@ from specs.models import (
 )
 
 # ═══════════════════════════════════════════════════════════════════════════
-# SAFETY GUARD — flip ONLY on Ken's Gate-1 SEED approval, given DIRECTLY.
-# D-25/O4 approved AUTHORING these as first-class shared codes. That is not the
-# seed gate. A relayed approval never opens a human gate.
+# GATE 1 CLEARED — flipped 2026-08-23 on Ken's DIRECT seed approval.
+#
+# Ken, in-session, in his own words: "approve the OR seed."
+#
+# ⚠ D-25/O4 approved AUTHORING these as first-class shared codes. That was not
+# this gate. This is the separate Gate-1 SEED approval, answered DIRECTLY.
+#
+# ⚠ SCOPE CORRECTION MADE BEFORE THE FLIP. An earlier version of this guard, and
+# my report to Ken, said this seed "re-points the already-seeded OR_20_S". A
+# pre-flight against PROD showed that is NOT what it does: it creates OR_AP and
+# OR_ASC_CORP and adds three AuthorityFormLink rows keyed on a form_code STRING,
+# and touches NO OR_20_S row. The guard text and the harness check were both
+# corrected to the accurate wording before seeding. Overstating a blast radius
+# is its own defect - it trains the reader to discount the warning.
+#
+# Pre-flight against PROD (campaign D-17 lessons):
+#   · every CharField value measured against the REAL model max_length - CLEAN
+#     (worst case topic_name 236/255; the guard had already caught it at 263)
+#   · EXISTING_SOURCES_TO_REFERENCE is empty, so nothing can dangle; the loader
+#     now REFUSES an unresolvable code outright and the harness proves it bites
+#   · OR_20_S row counts captured BEFORE, to be re-checked after
 # ═══════════════════════════════════════════════════════════════════════════
-READY_TO_SEED = False
+READY_TO_SEED = True
 
 
 FORM_JURISDICTION = "OR"
@@ -155,7 +173,7 @@ ASC_CODE_UNION: int = 105
 def _yk(table: dict, year: int = FORM_TAX_YEAR):
     """Year-keyed lookup. A new tax year staleness-invalidates every figure."""
     if year not in table:
-        raise CommandError(f"No TY{year} value in {table!r} — re-verify before extending the year.")
+        raise CommandError(f"No TY{year} value in {table!r} - re-verify before extending the year.")
     return table[year]
 
 
@@ -219,7 +237,7 @@ def _asc_section_allowed(section: str, form_code: str) -> bool:
     "Note: Form OR-20-S filers cannot claim standard credits."
     """
     if section not in ASC_SECTIONS:
-        raise CommandError(f"Unknown OR-ASC-CORP section {section!r} — the schedule has A, B, C, D, E.")
+        raise CommandError(f"Unknown OR-ASC-CORP section {section!r} - the schedule has A, B, C, D, E.")
     return form_code in ASC_SECTIONS[section]["forms"]
 
 
@@ -778,8 +796,11 @@ class Command(BaseCommand):
                 "Campaign D-25/O4 approved AUTHORING these as first-class shared codes. That is NOT\n"
                 "the seed gate. Ken must give the Gate-1 SEED approval DIRECTLY - a relayed approval\n"
                 "never opens a human gate.\n\n"
-                "⚠ Note this seed also RE-POINTS the already-seeded OR_20_S, so it changes a live\n"
-                "spec and not merely adds new ones.\n\n"
+                "!! SCOPE, stated precisely: this seed is ADDITIVE. It creates OR_AP and\n"
+                "OR_ASC_CORP and adds AuthorityFormLink rows that REFERENCE the already-seeded\n"
+                "OR_20_S and OR_65 by form_code string. It does NOT modify any OR_20_S row.\n"
+                "Wiring OR_20_S own lines to these schedules is a SEPARATE change to a live\n"
+                "spec and needs its own approval.\n"
                 f"READY_TO_SEED = {READY_TO_SEED} (must be True to proceed)\n\nEmpty:\n  {still_empty}\n"
             )
 
@@ -787,7 +808,7 @@ class Command(BaseCommand):
         ct = 0
         for code, name in AUTHORITY_TOPICS:
             if len(name) > 255:
-                raise CommandError(f"topic_name for {code!r} is {len(name)} chars — the column is 255 "
+                raise CommandError(f"topic_name for {code!r} is {len(name)} chars - the column is 255 "
                                    "(the class that fails ONLY on the live database, campaign D-17).")
             _, created = AuthorityTopic.objects.update_or_create(topic_code=code, defaults={"topic_name": name})
             ct += 1 if created else 0
@@ -918,5 +939,5 @@ class Command(BaseCommand):
                 f"  {spec['identity']['form_number']}: facts {len(spec['facts'])} / rules {len(spec['rules'])} / "
                 f"lines {len(spec['lines'])} / diag {len(spec['diagnostics'])} / tests {len(spec['scenarios'])} / "
                 f"FA {len(spec['assertions'])}")
-        self.stdout.write("  ⚠ D-25/O4: the seeded OR_20_S referenced these in 16 places while neither existed.")
+        self.stdout.write("  !! D-25/O4: the seeded OR_20_S referenced these in 16 places while neither existed.")
         self.stdout.write("=" * 66)
