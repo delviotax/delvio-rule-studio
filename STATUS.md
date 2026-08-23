@@ -1,7 +1,7 @@
 ---
 type: project-status
 project: delvio-rule-studio
-last_updated: 2026-08-20
+last_updated: 2026-08-23
 ---
 
 # STATUS — delvio-rule-studio (renamed from sherpa-tax-rule-studio 2026-08-05; GitHub + local folder renamed, Render service name unchanged — see render.yaml note)
@@ -11,6 +11,52 @@ last_updated: 2026-08-20
 ---
 
 ## Current state
+
+**NEW 2026-08-23 (latest) — ALL SEVEN WAVE-5 C-CORP SPECS ARE NOW AUTHORED
+(`WO-W05-CCORP`).** `MS_83105` and `CO_DR0112` were written this session, both
+`READY_TO_SEED = False`. Harnesses **MS 89 pass / 0 fail** and **CO 104 pass / 0 fail**, on
+throwaway SQLite. ⚠ **No RS suite run this session** — `delvio-tax-3a` confirmed by message that it
+was holding `test_postgres` mid-batch, and an RS suite run takes the same lock. The per-state
+harnesses were the only thing executed.
+
+- **`MS_83105`** (campaign D-26, 16 items) — 27 facts / 9 rules / 10 lines / 13 diag / 11 tests /
+  6 FA. Mississippi runs **two taxes on one return and neither gates the other**: the franchise
+  block is unqualified and L9 has no entity-type fork, unlike the PTE 84-105. **S1** ships the DOR
+  line-4 zero floor against § 27-13-5(1)(b)'s $25 statutory minimum as a **single constant**,
+  `MS_FRANCHISE_NET_FLOOR`, carrying its basis *and* the competing citation — and the harness
+  computes **both** readings so the ruling reads as a choice between two live DOR texts rather than
+  a formality. **S4** keys the rate ladder by **taxpayer type**, because HB 1 (2025) phases the
+  individual top rate from TY2027 while leaving the corporate schedule alone; the harness proves the
+  two ladders diverge by $3,000 at TY2027 on a 250k return.
+- **`CO_DR0112`** (campaign D-27) — 24 facts / 9 rules / 13 lines / 16 diag / 11 tests / 7 FA.
+  **C2** builds the six tests of unity from **statute**, prompts with the **form** and diagnoses the
+  **Guide**, because the three texts diverge in **both** directions. **C3** computes 16(a)–(d) over a
+  vintaged ledger, and the harness proves the wrong 80% base is **impossible** rather than merely
+  different — applied to line 15 it produces a deduction larger than the income it offsets, which is
+  exactly why line 16(b) is printed as its own line.
+
+⚠⚠ **THE TWO-WRITERS GUARD WAS INCOMPLETE, AND FIXING IT IS THE MOST TRANSFERABLE THING IN THIS
+SESSION.** The version shipped with MO/VA/AZ scans only `load_*.py` for a **double-quoted**
+`"source_code":`. The shared module **`_state_conformity_tier1.py` matches neither pattern** — it is
+not `load_*` and it uses single quotes — yet it **owns** `CO_CRS_39_22_103` and other rows. *A guard
+that cannot see the owner cannot detect a second writer of it.* Both new harnesses scan **every
+module in the commands directory and both quote styles**, and the CO harness **proves the hardening
+was necessary** by asserting the old pattern misses the real owner. ⚠ **`validate_mo_1120.py`,
+`validate_va_500.py` and `validate_az_120.py` still carry the old pattern** — backport when next
+touched.
+
+⚠ **A source brief was wrong about RS itself, and the guard caught it.**
+`delvio-states/research/co_ccorp_source_brief.md` §1.2 lists `CO_CRS_39_22_103` as *"read out of the
+seeded `load_co_dr0106.py`"*. It is **not declared there** — that loader only *references* it too.
+Trusting the brief's list unchecked would have shipped the **dangling-reference** defect (D-25/O4,
+D-29) into a third loader. Both harnesses now assert that every referenced code is genuinely **owned**
+by some module, and that **no code has two owners**.
+
+**Three specs are authored and GATED, awaiting Ken's Gate-1 SEED approval:** `MO_1120`, `MS_83105`,
+`CO_DR0112`. Prod is untouched at **164 forms / 19 conformity rows**. Nothing seeds without Ken's
+direct word — a relayed approval never opens a human gate.
+
+---
 
 **NEW 2026-08-20 (latest) — WAVE 4 AUTHORING: ARIZONA IS WRITTEN, GATED AND GREEN
 (`WO-W04-PTE`).** `specs/management/commands/load_az_pte.py` — **TWO specs, not three**: `AZ_165`
