@@ -12,6 +12,39 @@ last_updated: 2026-08-23
 
 ## Current state
 
+✅ **`OR_20` AUTHORED AND GATED 2026-08-23 — the gap the correction exposed is now closed in
+code.** Harness **116 pass / 0 fail**, `READY_TO_SEED=False`. Walk closed at campaign D-25; the SEED
+is a separate gate. 21 facts / 10 rules / 13 lines / 12 diag / 12 scenarios / 7 FA.
+**Wave 5's seventh C-corp return finally exists.** Prod unchanged at 168.
+
+⚠⚠ **O1 — Oregon depreciation IS federal for TY2025, and it ships ASSERTED.** Bonus and § 179 ride
+ORS 317.010(7)'s **rolling prong (b)** because they are computed in arriving at taxable income, so
+§ 168(k) conforms at OBBBA 100% and there is **no add-back**. The rejected prong-(a) reading is kept
+in a constant *with what it would have cost* — **up to sixty points of basis**. On the record and
+asserted by the harness: **Oregon does NOT share Georgia's add-back.**
+
+⚠⚠ **THE SUBTLE ONE — the credit clamp binds at lines 18, 20 AND 22 independently.** A single
+end-clamp yields the **same tax**, so a naive test passes, but it **destroys the carryforward** the
+DOR's ordering rule exists to preserve. The harness quantifies it: 5,000 of credit absorbed on the
+fixture. *The failure mode is not a wrong number this year; it is a missing one later.*
+
+**Two things authoring found:**
+1. ⚠ **The brief's own remedy for the code-namespace collision is insufficient on the brief's own
+   worked example.** It prescribed *"normalised label matching, never `==`"*. Stripping the ORS
+   citation from `Oregon Cultural Trust contribution (ORS 315.675)` still leaves **singular against
+   Pub. OR-CODES' plural**. I added a plural fold and then recorded the real conclusion: normalisation
+   is a **heuristic**, and the authoritative mechanism is an **explicit curated map** (the MO-C
+   lesson). The harness proves cite-stripping alone still fails.
+2. ⚠ Two referenced sources are owned by **`_state_conformity_tier1.py`**, not by `load_or_pte` —
+   the same shared-module pattern the Colorado work hit.
+
+⚠ **Deliberately NOT reused:** `load_or_pte.py`'s four code-collision constants, which describe the
+50-code OR-20-S surface (like-for-like count 12). OR-20's own hazard surface is **25**. The harness
+asserts the non-reuse **and confirms the latent edit to the seeded PTE loader is still outstanding**
+— staged for Ken, not folded into this work.
+
+---
+
 ⚠⚠ **CORRECTION 2026-08-23 — I SAID "ALL SEVEN WAVE-5 C-CORP SPECS ARE AUTHORED". THAT WAS
 WRONG. `OR_20` WAS NEVER WRITTEN.** Six of the seven Wave-5 C-corp **returns** are authored:
 `MD_500` · `VA_500` · `AZ_120` (+`AZ_120A`) · `MO_1120` · `MS_83105` · `CO_DR0112`. **Oregon's
