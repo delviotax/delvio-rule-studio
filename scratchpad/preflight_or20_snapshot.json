@@ -1,0 +1,93 @@
+{
+ "OR_2025_PUB_OR_CODES": {
+  "citation": "Or. Publication OR-CODES (2025), 150-101-432 Rev. 10-07-25 (PDF ModDate 2026-02-18, 5 pp.), 'Effective for tax year 2025'",
+  "current_status": "active",
+  "is_substantive_authority": "True",
+  "issuer": "Oregon Department of Revenue",
+  "jurisdiction_code": "OR",
+  "official_url": "https://www.oregon.gov/dor/forms/FormsPubs/Publication_OR-CODES_101-432_2025.pdf",
+  "source_code": "OR_2025_PUB_OR_CODES",
+  "source_rank": "primary_official",
+  "source_type": "state_instruction",
+  "title": "2025 Publication OR-CODES, 150-101-432 - THE INDIVIDUAL MODIFICATION AND CREDIT CODE SET",
+  "trust_score": "9.70"
+ },
+ "OR_2025_SCH_ASC_CORP": {
+  "citation": "Or. Schedule OR-ASC-CORP (2025), 150-102-033 Rev. 07-10-25 ver. 01 (4 pp.); Instructions 150-102-033-1 Rev. 10-14-25",
+  "current_status": "active",
+  "is_substantive_authority": "True",
+  "issuer": "Oregon Department of Revenue",
+  "jurisdiction_code": "OR",
+  "official_url": "https://www.oregon.gov/dor/forms/FormsPubs/schedule-or-asc-corp_102-033_2025.pdf",
+  "source_code": "OR_2025_SCH_ASC_CORP",
+  "source_rank": "primary_official",
+  "source_type": "state_form",
+  "title": "2025 Schedule OR-ASC-CORP, Oregon Adjustments for Corporation Returns, 150-102-033 (+ Instructions -033-1)",
+  "trust_score": "9.60"
+ },
+ "OR_2025_SCH_OR_AP": {
+  "citation": "Or. Schedule OR-AP (2025), 150-102-171 Rev. 07-10-25 ver. 01 (4 pp.); Instructions 150-102-171-1 Rev. 10-14-25",
+  "current_status": "active",
+  "is_substantive_authority": "True",
+  "issuer": "Oregon Department of Revenue",
+  "jurisdiction_code": "OR",
+  "official_url": "https://www.oregon.gov/dor/forms/FormsPubs/schedule-or-ap_102-171_2025.pdf",
+  "source_code": "OR_2025_SCH_OR_AP",
+  "source_rank": "primary_official",
+  "source_type": "state_form",
+  "title": "2025 Schedule OR-AP, Apportionment of Income for Corporations and Partnerships, 150-102-171 (+ Instructions -171-1)",
+  "trust_score": "9.40"
+ },
+ "OR_ORS_317_010_CONFORMITY": {
+  "citation": "Or. Rev. Stat. \u00a7317.010(7); Or. Rev. Stat. \u00a7316.012 (ORS 2025 Edition)",
+  "current_status": "active",
+  "is_substantive_authority": "False",
+  "issuer": "Oregon Legislative Assembly",
+  "jurisdiction_code": "OR",
+  "official_url": "https://www.oregonlegislature.gov/bills_laws/ors/ors317.html",
+  "source_code": "OR_ORS_317_010_CONFORMITY",
+  "source_rank": "controlling",
+  "source_type": "state_statute",
+  "title": "ORS 317.010(7) and ORS 316.012 \u2014 definition of \"Internal Revenue Code\" (two-pronged conformity)",
+  "trust_score": "None"
+ },
+ "OR_ORS_317_061_090_RATES": {
+  "citation": "ORS 317.061 [2013 s.s. c.5 s.1 - unamended since 2013]; ORS 317.090(1)(a),(2),(3), ORS 2025 Edition",
+  "current_status": "active",
+  "is_substantive_authority": "True",
+  "issuer": "Oregon Legislative Assembly",
+  "jurisdiction_code": "OR",
+  "official_url": "https://www.oregonlegislature.gov/bills_laws/ors/ors317.html",
+  "source_code": "OR_ORS_317_061_090_RATES",
+  "source_rank": "controlling",
+  "source_type": "state_statute",
+  "title": "ORS 317.061 (corporate rates) and ORS 317.090 (minimum tax), 2025 Edition",
+  "trust_score": "9.90"
+ },
+ "OR_ORS_317_301_DEPR": {
+  "citation": "Or. Rev. Stat. \u00a7317.301(2)\u2013(3), with applicability note 2011 c.7 \u00a731 (ORS 2025 Edition)",
+  "current_status": "active",
+  "is_substantive_authority": "False",
+  "issuer": "Oregon Legislative Assembly",
+  "jurisdiction_code": "OR",
+  "official_url": "https://www.oregonlegislature.gov/bills_laws/ors/ors317.html",
+  "source_code": "OR_ORS_317_301_DEPR",
+  "source_rank": "controlling",
+  "source_type": "state_statute",
+  "title": "ORS 317.301 \u2014 modification for IRC \u00a7168(k) and \u00a7179 (2009\u20132010 deferral, closed window)",
+  "trust_score": "None"
+ },
+ "OR_SB1507_2026_CH142": {
+  "citation": "2026 Or. Laws ch. 142 secs. 35, 41, 48(1) (SB 1507; Senate 2026-02-16, House 2026-02-25)",
+  "current_status": "active",
+  "is_substantive_authority": "True",
+  "issuer": "Oregon Legislative Assembly",
+  "jurisdiction_code": "OR",
+  "official_url": "https://olis.oregonlegislature.gov/",
+  "source_code": "OR_SB1507_2026_CH142",
+  "source_rank": "controlling",
+  "source_type": "state_statute",
+  "title": "Enrolled SB 1507 = 2026 Oregon Laws ch. 142, secs. 35, 41 and 48 - moves Oregon's fixed IRC conformity date to 12/31/2025 and decouples from IRC 168(k), BOTH EFFECTIVE TY2026. \u26a0 THE STALENESS TRIPWIRE FOR THIS ENTIRE SPEC.",
+  "trust_score": "9.70"
+ }
+}

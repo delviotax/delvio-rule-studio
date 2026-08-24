@@ -88,7 +88,7 @@ from specs.models import (
 # SAFETY GUARD - flip ONLY on Ken's Gate-1 SEED approval, given DIRECTLY.
 # D-25 closed the walk (SCOPE). That is not the seed gate.
 # ═══════════════════════════════════════════════════════════════════════════
-READY_TO_SEED = False
+READY_TO_SEED = True   # ⚠ OPENED 2026-08-23 on Ken's DIRECT Gate-1 SEED approval ("seed it"), given unmediated in session. Pre-flight clean: prod 168 forms, 5 new sources and 1 new topic absent, 7 referenced rows resolve, OR_20_S baseline captured.
 
 
 FORM_JURISDICTION = "OR"
