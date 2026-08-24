@@ -12,6 +12,31 @@ last_updated: 2026-08-23
 
 ## Current state
 
+✅ **`OR_20` SEEDED 2026-08-23. PROD 168 → 169. WAVE 5's C-CORP LANE IS CLOSED — for real this
+time.** All seven returns are live: `MD_500` · `VA_500` · `AZ_120` (+`AZ_120A`) · `MO_1120` ·
+`MS_83105` · `CO_DR0112` · **`OR_20`**. Exports 200 with a non-null `state_conformity` block;
+`seed_all --dry-run` clean at exit 0; post-seed verifier **12 pass / 0 fail**.
+
+⚠⚠ **PROVED TWICE, NOT ASSERTED:**
+1. The **7 referenced authority rows** were snapshotted field by field before the seed and
+   re-compared after — **77 leaves, zero differences.**
+2. **`OR_20_S` is byte-for-byte untouched** — identical row counts *and* the same `updated_at`
+   (`2026-08-20 22:34:47.171753+00:00`). ⚠ Campaign **D-29 recorded a seed in THIS lane being wrongly
+   described as "re-pointing" `OR_20_S`.** *Overstating a blast radius trains the reader to discount
+   the next warning*, so this one is proved not to rather than claimed not to.
+
+⚠ **The first pre-flight attempt REFUSED, and that was the guard working.** A sed-adaptation's patch
+aborted before writing, so the script still pointed at the previous batch (MO/MS/CO) and ran it
+against prod. It **failed closed** on all three counts — *already exists*, *two writers*, *sentinel
+already up* — rather than quietly passing. Rewritten from scratch instead of patched again, and the
+stale snapshot artifact from that run was **deleted** rather than left to confuse a reader.
+
+**Still outstanding, both deliberately staged rather than folded in:** `load_or_pte.py`'s four stale
+code-collision constants (they describe the 50-code OR-20-S surface; OR-20's own hazard surface is
+25), and the Massachusetts walk.
+
+---
+
 ✅ **`OR_20` AUTHORED AND GATED 2026-08-23 — the gap the correction exposed is now closed in
 code.** Harness **116 pass / 0 fail**, `READY_TO_SEED=False`. Walk closed at campaign D-25; the SEED
 is a separate gate. 21 facts / 10 rules / 13 lines / 12 diag / 12 scenarios / 7 FA.
