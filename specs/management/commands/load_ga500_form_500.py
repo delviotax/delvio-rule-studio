@@ -177,7 +177,15 @@ from specs.models import (
 # gate check_ga500_integrity.py ALL CHECKS PASS (constants + helpers + LIC table
 # + 12 scenarios re-derived independently).
 # ═══════════════════════════════════════════════════════════════════════════
-READY_TO_SEED = True
+READY_TO_SEED = False  # ⛔ CLOSED 2026-08-24. The S3-9 precision amendment below IS approved
+                       # (Ken, "approve all three"), but seeding this loader would ALSO
+                       # overwrite AuthoritySource GA_OCGA_48_7, which load_ga700.py declares
+                       # differently and which prod currently holds in GA700's form
+                       # (state_statute/controlling, dated §-list citation). This loader would
+                       # downgrade it to statute/primary_official with an undated 'et seq.'
+                       # citation, via update_or_create(defaults=...). That is campaign D-31's
+                       # TWO-WRITERS defect, live, and Ken approved a precision fix - not an
+                       # authority-graph change. Reopen only once ownership is resolved.
 
 
 FORM_JURISDICTION = "GA"
@@ -798,9 +806,9 @@ GA500_RULES: list[dict] = [
      "description": "Per-dependent exemption (HB 1437 removed the personal exemption; HB 463 raised the dependent amount to $5,000 for 2026). AMENDED 2026-08-02: 7c is derived from 7a + 7b (was typed as an input; the tts engine derives it since s176 — a blank 7c on a return with a 7a count silently dropped the whole exemption, batch-002 BURROUGHS). W2."},
 
     {"rule_id": "R-GA500-S3", "title": "Schedule 3 — part-year / nonresident proration", "rule_type": "calculation", "precedence": 5, "sort_order": 10,
-     "formula": "Col A AGI (L8) = total income (Col A) ± adjustments; Col C AGI = GA-source total ± GA adjustments. L9 ratio = L8 Col C ÷ L8 Col A (0% if GA AGI ≤0; 100% if federal AGI ≤0; bounded 0-100%). L10 deduction + L11 dependents ($4,000/$5,000 × L7c) → L12; L13 = L12 × ratio; L14 = L8 Col C − L13 → Form 500 L15a. RIE earned & unearned portions prorated separately by GA-source ratio.",
+     "formula": "Col A AGI (L8) = total income (Col A) ± adjustments; Col C AGI = GA-source total ± GA adjustments. L9 ratio = round(L8 Col C ÷ L8 Col A, 4) -- the PERCENTAGE at TWO decimals (0% if GA AGI ≤0; 100% if federal AGI ≤0; bounded 0-100%). L10 deduction + L11 dependents ($4,000/$5,000 × L7c) → L12; L13 = L12 × ratio; L14 = L8 Col C − L13 → Form 500 L15a. RIE earned & unearned portions prorated separately by GA-source ratio.",
      "inputs": ["g_residency_status", "g_s3_total_income_federal", "g_s3_total_income_ga", "g_s3_adj_1040_federal", "g_s3_adj_1040_ga", "g_s3_adj_500_federal", "g_s3_adj_500_ga", "g_num_dependents", "g_num_unborn_dependents", "g_filing_status", "g_itemize"], "outputs": ["S3-8", "S3-9", "S3-10", "S3-11", "S3-12", "S3-13", "S3-14", "15a"],
-     "description": "The 3-column GA-source proration for part-year/nonresident filers. Replaces Form 500 L9-L14; result → L15a. W6."},
+     "description": "The 3-column GA-source proration for part-year/nonresident filers. Replaces Form 500 L9-L14; result → L15a. W6. ⚠⚠ PRECISION AMENDED 2026-08-24 on Ken's direct ruling (campaign D-36 applied to GA): line 9 is a PERCENTAGE ROUNDED TO TWO DECIMALS, i.e. a four-decimal ratio, and the PRINTED percentage is what line 13 multiplies. Previously unstated, and the engine multiplied at FULL PRECISION. FACE: line 9 reads 'RATIO: Divide Line 8, Column C by Line 8, Column A' AND 'Enter percentage here (% cannot be negative and cannot exceed 100%)' with a printed % field; line 13 reads 'Multiply Line 12 by Ratio on Line 9'. IT-511 p.28: 'LINE 13: Multiply Line 12 by the ratio on Line 9.' ⭐ PROVED BY GEORGIA'S OWN WORKED EXAMPLE (IT-511 p.27, a filled Schedule 3): col A 49,500, col C 39,093 (col B 10,407; B+C=A). Exact ratio 78.975758%. The booklet PRINTS 78.98% and PRINTS line 13 as 12,637. Printed 78.98% x 16,000 = 12,636.80 -> 12,637 (MATCHES). Full precision x 16,000 = 12,636.12 -> 12,636 (MISSES by $1). Line 14 closes the loop: 39,093 - 12,637 = 26,456, as printed. ⚠ The counter-evidence that held this open is STRUCK: client-3184 (col A 127,098 / col C 2,837, line 12 12,000, filed line 13 = 268) ties under BOTH methods (267.60 and 267.86 both -> 268), so it could never have discriminated. See delvio-states research/ga500_schedule3_line9_read.md."},
 
     {"rule_id": "R-GA500-NOL", "title": "Schedule 4 — Georgia NOL (Part I/II)", "rule_type": "calculation", "precedence": 6, "sort_order": 11,
      "formula": "Part I loss = f(income before NOL L15a, GA exemption L14, excess nonbusiness deductions [Part II L18 = max(0, nonbusiness deductions − nonbusiness income)], excess nonbusiness capital losses, §461(l) loss). Part II splits nonbusiness income (cap gains, dividends, interest, alimony, pensions, GA RIE/US-interest/non-GA-muni adjustments) vs nonbusiness deductions (std/itemized less casualty/2106/SALT, Keogh, alimony paid, early-withdrawal penalty, IRA).",
@@ -1067,6 +1075,10 @@ GA500_DIAGNOSTICS: list[dict] = [
 # ═══════════════════════════════════════════════════════════════════════════
 
 GA500_SCENARIOS: list[dict] = [
+    {"scenario_name": "GA500-T0 — IT-511's OWN worked example; the fixture that BITES on precision", "scenario_type": "edge_case", "sort_order": 0,
+     "inputs": {"tax_year": 2025, "g_residency_status": "part_year", "g_filing_status": "A", "g_num_dependents": 1, "g_s3_total_income_federal": 49500, "g_s3_total_income_ga": 39093, "g_s3_adj_1040_federal": 0, "g_s3_adj_1040_ga": 0, "g_s3_adj_500_federal": 0, "g_s3_adj_500_ga": 0, "g_itemize": False},
+     "expected_outputs": {"S3-9": 0.7898, "S3-12": 16000, "S3-13": 12637, "S3-14": 26456, "15a": 26456},
+     "notes": "⭐ GEORGIA'S OWN ARITHMETIC, from the filled Schedule 3 printed in IT-511 p.27 - not a constructed case and not a filed return. 39,093/49,500 = 0.7897575758 -> PRINTED 78.98% -> x 16,000 (12,000 standard + 4,000 one dependent) = 12,636.80 -> 12,637, the booklet's own printed line 13. ⚠ FULL PRECISION GIVES 12,636 - this scenario fails under the superseded reading, which is the whole point of it. ⚠⚠ THE FIGURES ARE DELIBERATELY UGLY. A tidy ratio (0.60, 0.80, 1.00) is exact at every precision and proves nothing about rounding - that is exactly how the SC_SCHEDULE_NR defect survived seeding, and why SCDOR's own 60/80/90% examples cannot settle South Carolina's equivalent question. DO NOT 'clean up' these numbers."},
     {"scenario_name": "GA500-T1 — full-year single, standard deduction, no dependents (2025)", "scenario_type": "normal", "sort_order": 1,
      "inputs": {"tax_year": 2025, "g_residency_status": "full_year", "g_filing_status": "A", "g_num_dependents": 0, "g_federal_agi": 60000},
      "expected_outputs": {"8": 60000, "9": 0, "10": 60000, "11": 12000, "13": 48000, "14": 0, "15a": 48000, "15b": 0, "15c": 48000, "16": 2491, "22": 0, "23": 2491},

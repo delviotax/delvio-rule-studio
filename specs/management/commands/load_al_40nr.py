@@ -188,7 +188,21 @@ AL_TAX_COLUMN: dict[str, str] = {
     "hof": "single_mfs_hof",   # ⚠⚠ NOT "mfj" - the trap this constant exists to prevent
     "mfj": "mfj",
 }
-AL_TAX_TABLE_BAND: dict[int, int] = {2025: 100}       # $100 bands to $100,000
+AL_TAX_TABLE_BAND: dict[int, int] = {2025: 100}       # $100 bands ABOVE the floor rows
+# ⚠⚠ THE TABLE IS NOT UNIFORMLY BANDED. Below $100 it carries TWO $50-wide rows,
+# and those two round DOWN where the rest of the table rounds half-up.
+# Established by harvesting all 1,006 published rows: Alabama rounds half-up on
+# 1,910 of 1,914 exact-half cases; the ONLY exceptions are these two, in BOTH
+# columns - [0,50) raw 0.50 -> 0 and [50,100) raw 1.50 -> 1. They are therefore
+# encoded AS PRINTED rather than computed. CORRECTED 2026-08-24 on Ken's ruling.
+# ⚠ Same shape as the SC tax-table band error: a table whose row width is not
+# uniform across its range. The floor, the ceiling and every width change need
+# their own fixture - the interior gets tested and the boundaries do not.
+AL_TAX_TABLE_FLOOR_BAND: dict[int, int] = {2025: 50}       # $50-wide rows below $100
+AL_TAX_TABLE_FLOOR_CEILING: dict[int, int] = {2025: 100}   # where the $100 bands begin
+AL_TAX_TABLE_FLOOR_ROWS: dict[int, dict[int, int]] = {     # AS PRINTED, both columns
+    2025: {0: 0, 50: 1},
+}
 AL_TAX_TABLE_CEILING: dict[int, int] = {2025: 100000}
 # Over $100,000 the table is replaced by a printed worksheet:
 # taxable - 100,000.00 -> x .05 -> + constant.
@@ -397,6 +411,19 @@ def _al_tax(taxable_income, filing_status: str, year: int = FORM_TAX_YEAR):
     if ti >= ceiling:
         const = float(_yk(AL_OVER_100K_CONSTANT, year)[col])
         return (ti - ceiling) * float(_yk(AL_OVER_100K_RATE, year)) + const
+    # ⚠ THE FLOOR ROWS ARE $50-WIDE AND PRINT 0 / 1 - see AL_TAX_TABLE_FLOOR_ROWS.
+    # They are read straight off the table; computing them gives 1 and 2 instead.
+    floor_ceiling = _yk(AL_TAX_TABLE_FLOOR_CEILING, year)
+    if ti < floor_ceiling:
+        fband = _yk(AL_TAX_TABLE_FLOOR_BAND, year)
+        row = int(math.floor(ti / fband) * fband)
+        rows = _yk(AL_TAX_TABLE_FLOOR_ROWS, year)
+        if row not in rows:
+            raise CommandError(
+                f"AL tax table floor row {row!r} is not encoded for {year}; "
+                f"known rows {sorted(rows)}. Refusing to compute it."
+            )
+        return float(rows[row])
     band = _yk(AL_TAX_TABLE_BAND, year)
     midpoint = (math.floor(ti / band) * band) + band / 2.0
     remaining, tax = midpoint, 0.0
@@ -1419,6 +1446,10 @@ F_DIAGNOSTICS: list[dict] = [
 
 F_SCENARIOS: list[dict] = [
     # ── The tax function, pinned against THREE independently known figures ──
+    {"scenario_name": "AL40NR-A0 — ⚠ the tax table's FLOOR: $0-49 prints ZERO, not one", "scenario_type": "edge", "sort_order": 0,
+     "inputs": {"L18": 25, "filing_status": "single"},
+     "expected_outputs": {"L19": 0},
+     "notes": "⚠⚠ THE BOUNDARY THE OLD SPEC GOT WRONG. Alabama's table is NOT uniformly $100-banded: below $100 it carries two $50-wide rows, printing 0 for [0,50) and 1 for [50,100). The superseded uniform-$100 model put taxable income 25 in the [0,100) band, took midpoint 50, computed 50 x 2% = 1.00 and returned 1 - a dollar of tax Alabama does not charge. ⚠ The $50-99 range agreed BY LUCK (both give 1), so only $0-49 was ever wrong, and no fixture touched it. ⭐ Established by harvesting all 1,006 printed rows: half-up holds for 1,910 of 1,914 exact-half cases and these two floor rows are the only exceptions, in both columns. ⭐ THE GENERAL LESSON: the interior of a table gets tested and its BOUNDARIES do not - the floor, the ceiling, every row-width change and every handoff to a worksheet each need their own fixture. Same class as the SC tax-table band error and the Form 40 $100,000 handoff gap."},
     {"scenario_name": "AL40NR-A - the tax table reproduces its own printed figures",
      "scenario_type": "normal", "sort_order": 1,
      "inputs": {"taxable_income": 23050, "band": "23,000-23,100"},
