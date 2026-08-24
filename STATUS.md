@@ -12,6 +12,46 @@ last_updated: 2026-08-23
 
 ## Current state
 
+**NEW 2026-08-23 (latest) — `AL_FORM_40NR` AUTHORED AND GATED.** Alabama's nonresident
+individual return, `READY_TO_SEED = False`. Harness **144 pass / 0 fail** on throwaway SQLite; no RS
+suite run. Gate-1 walk closed at campaign **D-32**; the SEED is a separate gate. Counts: **29 facts /
+12 rules / 14 lines / 15 diagnostics / 15 scenarios / 7 flow assertions.** Prod untouched at 167.
+
+⚠⚠ **THE RULE THAT MOVES MONEY SILENTLY.** Alabama's nonresident retirement treatment is
+**categorical, not a sourcing test**. Column C is *always* zero for pensions — r. 810-3-14-.05
+enumerates a nonresident's Alabama gross income exhaustively and pensions appear nowhere in it — but
+**column B carries the distribution anyway** if a *resident* would be taxed on it, precisely so it
+enlarges the line-10 denominator. So retirement income Alabama never taxes still **shrinks every
+prorated deduction**. Schedule RS Part I exempts by **PLAN TYPE** (§ 414(j) is defined *benefit*),
+never by location.
+
+⚠⚠ **TWO RULES THE FIXTURES FORCED, NEITHER STATED IN ANY SOURCE.** Both were recovered by
+reconstructing a real filed return, and both are now pinned:
+
+1. **Alabama multiplies by the PRINTED two-decimal percentage, not full precision.**
+   17,138 / 39,693 = 43.17638%, printed as 43.18%. Schedule A line 21 of 21,559 gives **9,308** at
+   full precision and **9,309** at the printed figure — and the filed return shows **9,309**.
+2. **The Schedule A floors round to whole dollars before subtraction.** 4% × 39,693 = 1,587.72, and
+   the filed medical line reads 12,751 − 1,588 = 11,163. ⚠ **My first implementation carried cents
+   and the filed return proved it wrong** — the harness failure was the code's fault, not the test's.
+
+**The centrepiece scenario is that filed return in BOTH positions** — as filed, and with retirement
+correctly in column B. The harness proves the whole cascade moves *together* (itemized 9,309 → 6,608,
+federal-tax deduction 1,681 → 1,194, personal exemption 1,295 → 920) and the tax goes **174 → 343**.
+That togetherness is exactly why the filed error is invisible: the return foots perfectly either way.
+*(De-identified — figures only, per the suite's standing fixture rule.)*
+
+Other things proved rather than asserted: the tax table reproduces **three independently known
+figures** (1,113 and 1,073 printed in the booklet, 174 from the filed return); **Head of Family sits
+in the SINGLE tax column** despite taking the MFJ-sized $3,000 exemption; the encoded
+standard-deduction bands are contiguous and non-overlapping while the DOR chart **as printed is
+genuinely ambiguous** at an AGI of 25,700; the corrected $26,500 is the reading that makes the MFJ
+ladder step uniformly by $175; A1's two methods are identical, then divergent, then reversed; and
+flooring medical on column C instead of column B overstates the deduction while the return still
+foots.
+
+---
+
 ✅ **SEEDED 2026-08-23 — `MO_1120` + `MS_83105` + `CO_DR0112` ARE LIVE. PROD 164 → 167.
 WAVE 5's C-CORP LANE IS CLOSED.** Ken opened the Gate-1 SEED gate directly and unmediated
 (*"seed all three"*). All three **export 200 with a non-null `state_conformity` block**;
