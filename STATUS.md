@@ -12,6 +12,22 @@ last_updated: 2026-08-23
 
 ## Current state
 
+⚠⚠ **CORRECTION 2026-08-23 — I SAID "ALL SEVEN WAVE-5 C-CORP SPECS ARE AUTHORED". THAT WAS
+WRONG. `OR_20` WAS NEVER WRITTEN.** Six of the seven Wave-5 C-corp **returns** are authored:
+`MD_500` · `VA_500` · `AZ_120` (+`AZ_120A`) · `MO_1120` · `MS_83105` · `CO_DR0112`. **Oregon's
+`OR_20` was walked at campaign D-25 and never authored** — it exists in neither prod nor any loader
+file. What D-29 seeded was **`OR_AP` + `OR_ASC_CORP`, Oregon's SHARED SCHEDULES**, which closed the
+O4 dangling reference. Those are not the C-corp return.
+
+⭐ **`delvio-states/STATE_MATRIX.md` was right the whole time** — Oregon's 1120 cell has always read
+`—`. The *tracker* was correct and the *narrative* was wrong, which is exactly the failure the grid
+exists to catch. **Believe the grid over the prose.** Found while compiling a campaign tally, which
+the wrong count would have corrupted.
+
+**Wave 5 still owes `OR_20` (author + seed) plus Layer 3's dated externals.**
+
+---
+
 ✅ **SEEDED 2026-08-23 — `AL_FORM_40NR` IS LIVE. PROD 167 → 168.** Ken opened the Gate-1 SEED
 gate directly (*"seed it"*). Exports **200** with a non-null `state_conformity` block;
 `seed_all --dry-run` clean at exit 0 with `load_al_40nr` in the ordering; post-seed verifier
