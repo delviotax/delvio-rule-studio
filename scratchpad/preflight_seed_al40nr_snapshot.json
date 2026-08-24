@@ -1,0 +1,54 @@
+{
+ "AL_2025_FORM_40": {
+  "citation": "Alabama Form 40 (2025), 25f40blk.pdf",
+  "current_status": "active",
+  "is_substantive_authority": "True",
+  "issuer": "Alabama Department of Revenue",
+  "jurisdiction_code": "AL",
+  "official_url": "https://www.revenue.alabama.gov/wp-content/uploads/2026/01/25f40blk.pdf",
+  "source_code": "AL_2025_FORM_40",
+  "source_rank": "primary_official",
+  "source_type": "state_form",
+  "title": "2025 Alabama Form 40 \u2014 Individual Income Tax Return (Residents & Part-Year Residents)",
+  "trust_score": "9.50"
+ },
+ "AL_2025_FORM_40_BOOKLET": {
+  "citation": "Alabama Form 40 Booklet (2025), 25f40bk.pdf (updated Jan 2026)",
+  "current_status": "active",
+  "is_substantive_authority": "True",
+  "issuer": "Alabama Department of Revenue",
+  "jurisdiction_code": "AL",
+  "official_url": "https://www.revenue.alabama.gov/wp-content/uploads/2026/01/25f40bk.pdf",
+  "source_code": "AL_2025_FORM_40_BOOKLET",
+  "source_rank": "primary_official",
+  "source_type": "state_instruction",
+  "title": "2025 Alabama Form 40 Booklet \u2014 Instructions, Tax Tables, Worksheets",
+  "trust_score": "9.50"
+ },
+ "AL_CODE_40_18_15": {
+  "citation": "Ala. Code \u00a740-18-15 (2025)",
+  "current_status": "active",
+  "is_substantive_authority": "True",
+  "issuer": "Alabama Legislature",
+  "jurisdiction_code": "AL",
+  "official_url": "https://law.justia.com/codes/alabama/title-40/chapter-18/article-1/section-40-18-15/",
+  "source_code": "AL_CODE_40_18_15",
+  "source_rank": "controlling",
+  "source_type": "state_statute",
+  "title": "Ala. Code \u00a740-18-15 \u2014 Deductions (federal income tax paid or accrued)",
+  "trust_score": "9.00"
+ },
+ "AL_CODE_40_18_5": {
+  "citation": "Ala. Code \u00a740-18-5 (2025)",
+  "current_status": "active",
+  "is_substantive_authority": "True",
+  "issuer": "Alabama Legislature",
+  "jurisdiction_code": "AL",
+  "official_url": "https://law.justia.com/codes/alabama/title-40/chapter-18/article-1/section-40-18-5/",
+  "source_code": "AL_CODE_40_18_5",
+  "source_rank": "controlling",
+  "source_type": "state_statute",
+  "title": "Ala. Code \u00a740-18-5 \u2014 Individual income tax rates (2/4/5%)",
+  "trust_score": "9.40"
+ }
+}
