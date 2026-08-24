@@ -12,6 +12,30 @@ last_updated: 2026-08-23
 
 ## Current state
 
+✅ **SEEDED 2026-08-23 — `AL_FORM_40NR` IS LIVE. PROD 167 → 168.** Ken opened the Gate-1 SEED
+gate directly (*"seed it"*). Exports **200** with a non-null `state_conformity` block;
+`seed_all --dry-run` clean at exit 0 with `load_al_40nr` in the ordering; post-seed verifier
+**11 pass / 0 fail**. Live: facts 29 / rules 12 / lines 14 / diag 15 / tests 15 / FA 7.
+
+⚠ **Pre-flight clean** — the 7 new sources and 1 new topic were all absent from prod, and the 4
+referenced rows resolved. ⚠⚠ **Proved, not asserted:** those 4 rows were snapshotted field by field
+before the seed and re-compared after — **44 leaves, zero differences**. `test_postgres` untouched.
+
+⚠⚠ **This closes ONE of the blocked packet's TWO hold reasons.** The missing-module gap is gone; the
+**suspected source defect on the filed return is untouched** and still needs the third
+distribution's plan type off the actual 1099-R. Disposition is Ken's.
+
+**Three things carry into the app build** and are enforced by the spec:
+- **Head of Family uses the SINGLE tax column**, not the married one, despite taking the MFJ-sized
+  $3,000 personal exemption.
+- **Schedule A carries three floors reading TWO different columns** — medical on col B, casualty and
+  job expenses on col C.
+- **Alabama multiplies by the PRINTED two-decimal percentage** and **rounds the Schedule A floors to
+  whole dollars.** Neither is documented in any Alabama source; both were recovered by reconstructing
+  a real filed return. An engine carrying full precision will disagree with Alabama by a dollar a line.
+
+---
+
 **NEW 2026-08-23 (latest) — `AL_FORM_40NR` AUTHORED AND GATED.** Alabama's nonresident
 individual return, `READY_TO_SEED = False`. Harness **144 pass / 0 fail** on throwaway SQLite; no RS
 suite run. Gate-1 walk closed at campaign **D-32**; the SEED is a separate gate. Counts: **29 facts /
