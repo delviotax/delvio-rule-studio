@@ -696,10 +696,10 @@ SCHNR_RULES: list[dict] = [
      "formula": "L43 = nr_sc_additions - nr_sc_subtractions ; L44 = nr_agi_col_b_sc + L43",
      "inputs": ["nr_agi_col_b_sc", "nr_sc_additions", "nr_sc_subtractions"], "outputs": ["L43", "L44"], "sort_order": 1,
      "description": "SC subtractions (dep exemption, retirement, age-65, under-6, 44% cap gain) are FULL in the L33-42 block — NOT prorated by line 45."},
-    {"rule_id": "R-NR-PRORATION", "title": "Proration percentage (line 45)", "rule_type": "calculation",
-     "formula": "L45 = min(1.00, round(nr_agi_col_b_sc / nr_agi_col_a_federal, 2))  [0 if Col A <= 0]",
+    {"rule_id": "R-NR-PRORATION", "title": "Proration percentage (line 45) - FOUR decimals", "rule_type": "calculation",
+     "formula": "L45 = min(1.00, round(nr_agi_col_b_sc / nr_agi_col_a_federal, 4))  [0 if Col A <= 0]",
      "inputs": ["nr_agi_col_b_sc", "nr_agi_col_a_federal"], "outputs": ["L45"], "sort_order": 2,
-     "description": "SC-source ratio = L31 Col B ÷ L31 Col A, ≤100%, 2 decimals. Prorates ONLY the deduction (L47)."},
+     "description": "SC-source ratio = L31 Col B ÷ L31 Col A, capped at 100%. CORRECTED 2026-08-23 on Ken's direct ruling: FOUR decimals as a RATIO, i.e. the PERCENTAGE rounded to TWO decimals. It previously read round(...,2) - a 2-decimal RATIO - which OVERSTATES the deduction. SchNRInst_2025 line 45: 'Divide line 31, Column B by line 31, Column A. Enter the result on line 45. Round to the second decimal.' That is AMBIGUOUS alone - second decimal of what? The FACE resolves it: line 45 is denominated '%' ('= % (do not exceed 100%)') and LINE 47 reads 'Allowable deductions: Multiply line 46 by % (from line 45)', so the PRINTED PERCENT is what multiplies. Two decimals of a percent = a four-decimal ratio. PROVED on a filed return: 124,261/127,098 = 0.97767864 -> 97.77% -> x 15,750 = 15,399, the filed deduction. The old 2dp ratio gives 15,435; FULL PRECISION gives 15,398. Only the printed-percent reading reproduces the filed figure. Prorates ONLY the deduction (L47)."},
     {"rule_id": "R-NR-DEDUCTION", "title": "Allowable deduction (line 47)", "rule_type": "calculation",
      "formula": "L47 = round(nr_deduction * L45)",
      "inputs": ["nr_deduction"], "outputs": ["L47"], "sort_order": 3,
@@ -712,7 +712,7 @@ SCHNR_RULES: list[dict] = [
 
 SCHNR_RULE_LINKS: list[tuple[str, str, str, str]] = [
     ("R-NR-SCMAGI", "SC_2025_SCHEDULE_NR", "primary", "L44 SC modified AGI"),
-    ("R-NR-PRORATION", "SC_2025_SCHEDULE_NR", "primary", "L45 proration ratio, ≤100%, 2 decimals"),
+    ("R-NR-PRORATION", "SC_2025_SCHEDULE_NR", "primary", "L45 proration - instructions line 45 ('round to the second decimal') read WITH the face: line 45 is a '%' field and line 47 says 'Multiply line 46 by % (from line 45)'. Percent-2dp = ratio-4dp."),
     ("R-NR-DEDUCTION", "SC_2025_SCHEDULE_NR", "primary", "L47 = L46 × L45"),
     ("R-NR-TAXABLE", "SC_2025_SCHEDULE_NR", "primary", "L48 → SC1040 L5"),
 ]
@@ -723,7 +723,7 @@ SCHNR_LINES: list[dict] = [
     {"line_number": "42", "description": "Total SC subtractions (L33-41, Col B)", "line_type": "subtotal", "source_facts": ["nr_sc_subtractions"], "sort_order": 3},
     {"line_number": "43", "description": "Total SC adjustments (L32 - L42)", "line_type": "subtotal", "source_rules": ["R-NR-SCMAGI"], "sort_order": 4},
     {"line_number": "44", "description": "SC modified AGI (L31 Col B + L43)", "line_type": "subtotal", "source_rules": ["R-NR-SCMAGI"], "sort_order": 5},
-    {"line_number": "45", "description": "Proration % (L31 Col B / L31 Col A, ≤100%)", "line_type": "calculated", "source_rules": ["R-NR-PRORATION"], "sort_order": 6},
+    {"line_number": "45", "description": "Proration % (L31 Col B / L31 Col A, capped at 100%) - the PRINTED percent (2dp) is what line 47 multiplies", "line_type": "calculated", "source_rules": ["R-NR-PRORATION"], "sort_order": 6},
     {"line_number": "46", "description": "Standard or itemized deduction (Parts I-IV)", "line_type": "input", "source_facts": ["nr_deduction"], "sort_order": 7},
     {"line_number": "47", "description": "Allowable deduction (L46 × L45)", "line_type": "calculated", "source_rules": ["R-NR-DEDUCTION"], "sort_order": 8},
     {"line_number": "48", "description": "SC taxable income → SC1040 line 5", "line_type": "total", "calculation": "R-NR-TAXABLE", "destination_form": "SC1040", "source_rules": ["R-NR-TAXABLE"], "sort_order": 9},
@@ -744,6 +744,15 @@ SCHNR_SCENARIOS: list[dict] = [
      "inputs": {"nr_agi_col_a_federal": 40000, "nr_agi_col_b_sc": 50000, "nr_sc_additions": 0, "nr_sc_subtractions": 0, "nr_deduction": 14600},
      "expected_outputs": {"L45": 1.00, "L47": 14600},
      "notes": "Ratio 50000/40000=1.25 → capped 1.00; L47 = full deduction."},
+    {"scenario_name": "Filed return - the fixture that BITES on precision", "scenario_type": "edge", "sort_order": 3,
+     "inputs": {"nr_agi_col_a_federal": 127098, "nr_agi_col_b_sc": 124261, "nr_sc_additions": 0, "nr_sc_subtractions": 0, "nr_deduction": 15750},
+     "expected_outputs": {"L45": 0.9777, "L47": 15399},
+     "notes": "THE SCENARIO THAT SHOULD HAVE EXISTED. 124,261/127,098 = 0.97767864 -> printed 97.77% "
+              "-> x 15,750 = 15,399, matching a filed return. The superseded 2-decimal RATIO (0.98) "
+              "gives 15,435; FULL PRECISION gives 15,398. Only the printed-percent reading reproduces "
+              "the filed figure. NOTE: the two scenarios above are INSENSITIVE to this defect - 0.60 "
+              "and 1.00 are exact at either precision - which is exactly why it survived seeding. "
+              "A fixture that cannot fail is not a test."},
 ]
 
 
