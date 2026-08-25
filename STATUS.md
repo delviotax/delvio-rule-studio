@@ -14,6 +14,12 @@ last_updated: 2026-08-25
 
 ### ✅ 2026-08-25 — A2: ENUM LABELS CORRECTED AND RE-SEEDED, ratchet moved to the seed pre-flight (D-41)
 
+✅ **FULL RS SUITE GREEN — 243 passed, 0 failed** (final run 2026-08-25, once delvio-tax released
+`test_postgres`). This morning it was **233 passed, 1 failed**. The standing red from 2026-08-23 is
+gone and the count rose by 9: the 8 new `test_authority_guard.py` tests (D-40 — the guard had none
+at all) plus `test_enum_ratchet_can_fail` (D-41). ⭐ **Every net-new test proves an instrument can
+FAIL** — the property whose absence let that red sit unnoticed through four seed gates.
+
 Ken: *"1. correct and reseed 2. yes"*. **Prod out-of-enum 218 → 211; `state_instructions` and
 `state_guidance` are now ZERO in production.**
 
