@@ -16,6 +16,8 @@ New instruction sources created for Schedule B, L, M-3, and 8283.
 Idempotent: uses update_or_create throughout.
 """
 from django.core.management.base import BaseCommand
+
+from . import _authority_wiring as _wire
 from django.db import transaction
 
 from sources.models import (
@@ -333,6 +335,14 @@ FRESH_SOURCES = [
     },
 ]
 
+# Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
+# available here. Empty: adding it changes nothing until an entry lands.
+EXISTING_SOURCES_TO_REFERENCE: list[str] = []
+
+# Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
+# available here. Empty: adding it changes nothing until an entry lands.
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+
 # ═══════════════════════════════════════════════════════════════════════════
 # Form 6198 — verbatim i6198 (Rev. November 2025) excerpts, pymupdf-extracted
 # from the fetched irs.gov PDF 2026-07-12. These REPLACE the pre-2026-07-12
@@ -509,6 +519,10 @@ class Command(BaseCommand):
             src = AuthoritySource.objects.filter(source_code=code).first()
             if src:
                 sources[code] = src
+        # ⚠ D-42: these two lists existed and were NEVER READ. One module DECLARES a
+        #   source, every other REFERENCES it (D-29) — that only works if both halves run.
+        _wire.resolve_references(EXISTING_SOURCES_TO_REFERENCE, sources, self.stdout.write)
+        _wire.apply_new_excerpts(NEW_EXCERPTS_ON_EXISTING, sources, self.stdout.write)
         self.stdout.write(f"Sources ready: {len(sources)}")
         return sources
 

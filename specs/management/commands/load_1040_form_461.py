@@ -31,6 +31,8 @@ thresholds + the EBL mechanic + the diagnostic-only scope + the NOL year-keyed c
 """
 
 from django.core.management.base import BaseCommand, CommandError
+
+from . import _authority_wiring as _wire
 from django.db import transaction
 
 from sources.models import (
@@ -475,6 +477,10 @@ class Command(BaseCommand):
             src = AuthoritySource.objects.filter(source_code=code).first()
             if src:
                 sources[code] = src
+        # ⚠ D-42: these two lists existed and were NEVER READ. One module DECLARES a
+        #   source, every other REFERENCES it (D-29) — that only works if both halves run.
+        _wire.resolve_references(EXISTING_SOURCES_TO_REFERENCE, sources, self.stdout.write)
+        _wire.apply_new_excerpts(NEW_EXCERPTS_ON_EXISTING, sources, self.stdout.write)
         self.stdout.write(f"Sources ready: {len(sources)}")
         return sources
 

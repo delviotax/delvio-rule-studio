@@ -14,6 +14,8 @@ Georgia rates from verified CLAUDE.md values (GA DOR site returned 404).
 Idempotent: uses update_or_create throughout.
 """
 from django.core.management.base import BaseCommand
+
+from . import _authority_wiring as _wire
 from django.db import transaction
 
 from sources.models import (
@@ -263,6 +265,14 @@ FRESH_SOURCES = [
     },
 ]
 
+# Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
+# available here. Empty: adding it changes nothing until an entry lands.
+EXISTING_SOURCES_TO_REFERENCE: list[str] = []
+
+# Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
+# available here. Empty: adding it changes nothing until an entry lands.
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+
 EXISTING_SOURCES = [
     "IRS_2025_1120S_INSTR", "IRS_2025_1120S_INSTR_FULL",
     "IRC_179", "IRC_168", "IRC_197", "IRC_1363", "IRC_1366", "IRC_1367", "IRC_1368",
@@ -315,6 +325,10 @@ class Command(BaseCommand):
             src = AuthoritySource.objects.filter(source_code=code).first()
             if src:
                 sources[code] = src
+        # ⚠ D-42: these two lists existed and were NEVER READ. One module DECLARES a
+        #   source, every other REFERENCES it (D-29) — that only works if both halves run.
+        _wire.resolve_references(EXISTING_SOURCES_TO_REFERENCE, sources, self.stdout.write)
+        _wire.apply_new_excerpts(NEW_EXCERPTS_ON_EXISTING, sources, self.stdout.write)
         self.stdout.write(f"Sources ready: {len(sources)}")
 
         # NOTE (2026-08-05): the Georgia JurisdictionConformitySource row was written HERE until

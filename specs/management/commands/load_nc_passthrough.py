@@ -45,6 +45,8 @@ NC rate/§179 stay year-keyed. Re-verify at TY2026.
 SAFETY GUARD — READY_TO_SEED stays False until Ken approves the review walk (W1-W3).
 """
 from django.core.management.base import BaseCommand, CommandError
+
+from . import _authority_wiring as _wire
 from django.db import transaction
 
 from sources.models import (
@@ -197,6 +199,10 @@ AUTHORITY_SOURCES: list[dict] = [
         }],
     },
 ]
+
+# Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
+# available here. Empty: adding it changes nothing until an entry lands.
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
 
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
     ("NC_2025_PTE_RETURNS", "NC_D403", "governs"), ("NC_SL_2021_180", "NC_D403", "governs"),
@@ -468,6 +474,10 @@ class Command(BaseCommand):
                 t = AuthorityTopic.objects.filter(topic_code=tc).first()
                 if t:
                     AuthoritySourceTopic.objects.get_or_create(authority_source=src, authority_topic=t)
+        # ⚠ D-42: these two lists existed and were NEVER READ. One module DECLARES a
+        #   source, every other REFERENCES it (D-29) — that only works if both halves run.
+        _wire.resolve_references(EXISTING_SOURCES_TO_REFERENCE, sources, self.stdout.write)
+        _wire.apply_new_excerpts(NEW_EXCERPTS_ON_EXISTING, sources, self.stdout.write)
         self.stdout.write(f"Sources ready: {len(sources)}")
         return sources
 

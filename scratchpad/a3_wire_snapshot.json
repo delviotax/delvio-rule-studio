@@ -1,0 +1,234 @@
+{
+ "load_1040_form_461.py": {
+  "work": {
+   "NEW_EXCERPTS_ON_EXISTING": "wire"
+  },
+  "lengths": {
+   "EXISTING_SOURCES_TO_REFERENCE": 0,
+   "NEW_EXCERPTS_ON_EXISTING": 0
+  }
+ },
+ "load_1041_spine.py": {
+  "work": {
+   "NEW_EXCERPTS_ON_EXISTING": "add+wire"
+  },
+  "lengths": {
+   "EXISTING_SOURCES_TO_REFERENCE": 0
+  }
+ },
+ "load_1065_l_b.py": {
+  "work": {
+   "EXISTING_SOURCES_TO_REFERENCE": "add+wire",
+   "NEW_EXCERPTS_ON_EXISTING": "add+wire"
+  },
+  "lengths": {}
+ },
+ "load_1065_m1_m2.py": {
+  "work": {
+   "EXISTING_SOURCES_TO_REFERENCE": "add+wire",
+   "NEW_EXCERPTS_ON_EXISTING": "add+wire"
+  },
+  "lengths": {}
+ },
+ "load_1065_schedule_k.py": {
+  "work": {
+   "EXISTING_SOURCES_TO_REFERENCE": "add+wire",
+   "NEW_EXCERPTS_ON_EXISTING": "add+wire"
+  },
+  "lengths": {}
+ },
+ "load_1065_schedule_k1.py": {
+  "work": {
+   "EXISTING_SOURCES_TO_REFERENCE": "add+wire",
+   "NEW_EXCERPTS_ON_EXISTING": "add+wire"
+  },
+  "lengths": {}
+ },
+ "load_1065_se.py": {
+  "work": {
+   "EXISTING_SOURCES_TO_REFERENCE": "add+wire",
+   "NEW_EXCERPTS_ON_EXISTING": "add+wire"
+  },
+  "lengths": {}
+ },
+ "load_1120_spine.py": {
+  "work": {
+   "NEW_EXCERPTS_ON_EXISTING": "add+wire"
+  },
+  "lengths": {
+   "EXISTING_SOURCES_TO_REFERENCE": 0
+  }
+ },
+ "load_1120s_complete.py": {
+  "work": {
+   "EXISTING_SOURCES_TO_REFERENCE": "add+wire",
+   "NEW_EXCERPTS_ON_EXISTING": "add+wire"
+  },
+  "lengths": {}
+ },
+ "load_3115.py": {
+  "work": {
+   "EXISTING_SOURCES_TO_REFERENCE": "wire"
+  },
+  "lengths": {
+   "EXISTING_SOURCES_TO_REFERENCE": 0
+  }
+ },
+ "load_4562_destination_rounding.py": {
+  "work": {
+   "EXISTING_SOURCES_TO_REFERENCE": "wire"
+  },
+  "lengths": {
+   "EXISTING_SOURCES_TO_REFERENCE": 1,
+   "NEW_EXCERPTS_ON_EXISTING": 1
+  }
+ },
+ "load_4562_section179_carryover.py": {
+  "work": {
+   "EXISTING_SOURCES_TO_REFERENCE": "wire"
+  },
+  "lengths": {
+   "EXISTING_SOURCES_TO_REFERENCE": 2,
+   "NEW_EXCERPTS_ON_EXISTING": 3
+  }
+ },
+ "load_4684.py": {
+  "work": {
+   "EXISTING_SOURCES_TO_REFERENCE": "wire",
+   "NEW_EXCERPTS_ON_EXISTING": "add+wire"
+  },
+  "lengths": {
+   "EXISTING_SOURCES_TO_REFERENCE": 0
+  }
+ },
+ "load_4952.py": {
+  "work": {
+   "EXISTING_SOURCES_TO_REFERENCE": "wire"
+  },
+  "lengths": {
+   "EXISTING_SOURCES_TO_REFERENCE": 0
+  }
+ },
+ "load_6765.py": {
+  "work": {
+   "NEW_EXCERPTS_ON_EXISTING": "add+wire"
+  },
+  "lengths": {
+   "EXISTING_SOURCES_TO_REFERENCE": 0
+  }
+ },
+ "load_709.py": {
+  "work": {
+   "EXISTING_SOURCES_TO_REFERENCE": "wire"
+  },
+  "lengths": {
+   "EXISTING_SOURCES_TO_REFERENCE": 0
+  }
+ },
+ "load_8379.py": {
+  "work": {
+   "EXISTING_SOURCES_TO_REFERENCE": "wire"
+  },
+  "lengths": {
+   "EXISTING_SOURCES_TO_REFERENCE": 0
+  }
+ },
+ "load_8814.py": {
+  "work": {
+   "EXISTING_SOURCES_TO_REFERENCE": "wire"
+  },
+  "lengths": {
+   "EXISTING_SOURCES_TO_REFERENCE": 0
+  }
+ },
+ "load_8832.py": {
+  "work": {
+   "EXISTING_SOURCES_TO_REFERENCE": "wire"
+  },
+  "lengths": {
+   "EXISTING_SOURCES_TO_REFERENCE": 0
+  }
+ },
+ "load_8839.py": {
+  "work": {
+   "EXISTING_SOURCES_TO_REFERENCE": "wire"
+  },
+  "lengths": {
+   "EXISTING_SOURCES_TO_REFERENCE": 0
+  }
+ },
+ "load_8990.py": {
+  "work": {
+   "EXISTING_SOURCES_TO_REFERENCE": "wire"
+  },
+  "lengths": {
+   "EXISTING_SOURCES_TO_REFERENCE": 0
+  }
+ },
+ "load_al_passthrough.py": {
+  "work": {
+   "EXISTING_SOURCES_TO_REFERENCE": "wire"
+  },
+  "lengths": {
+   "EXISTING_SOURCES_TO_REFERENCE": 0
+  }
+ },
+ "load_entity_boundary.py": {
+  "work": {
+   "NEW_EXCERPTS_ON_EXISTING": "wire"
+  },
+  "lengths": {
+   "EXISTING_SOURCES_TO_REFERENCE": 0,
+   "NEW_EXCERPTS_ON_EXISTING": 0
+  }
+ },
+ "load_la_pte.py": {
+  "work": {
+   "EXISTING_SOURCES_TO_REFERENCE": "wire"
+  },
+  "lengths": {
+   "EXISTING_SOURCES_TO_REFERENCE": 0
+  }
+ },
+ "load_nc_passthrough.py": {
+  "work": {
+   "EXISTING_SOURCES_TO_REFERENCE": "wire",
+   "NEW_EXCERPTS_ON_EXISTING": "add+wire"
+  },
+  "lengths": {
+   "EXISTING_SOURCES_TO_REFERENCE": 0
+  }
+ },
+ "load_remaining_1120s.py": {
+  "work": {
+   "EXISTING_SOURCES_TO_REFERENCE": "add+wire",
+   "NEW_EXCERPTS_ON_EXISTING": "add+wire"
+  },
+  "lengths": {}
+ },
+ "load_sc1040.py": {
+  "work": {
+   "NEW_EXCERPTS_ON_EXISTING": "wire"
+  },
+  "lengths": {
+   "EXISTING_SOURCES_TO_REFERENCE": 1,
+   "NEW_EXCERPTS_ON_EXISTING": 0
+  }
+ },
+ "load_sc1120.py": {
+  "work": {
+   "NEW_EXCERPTS_ON_EXISTING": "add+wire"
+  },
+  "lengths": {
+   "EXISTING_SOURCES_TO_REFERENCE": 0
+  }
+ },
+ "load_sch_h.py": {
+  "work": {
+   "EXISTING_SOURCES_TO_REFERENCE": "wire"
+  },
+  "lengths": {
+   "EXISTING_SOURCES_TO_REFERENCE": 0
+  }
+ }
+}

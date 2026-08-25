@@ -43,6 +43,8 @@ community-property override (9 states), W4 the 8379-vs-8857 boundary + 3yr/2yr t
 (scratchpad/validate_8379.py, 29/0).
 """
 from django.core.management.base import BaseCommand, CommandError
+
+from . import _authority_wiring as _wire
 from django.db import transaction
 
 from sources.models import (
@@ -421,6 +423,9 @@ class Command(BaseCommand):
                 t = AuthorityTopic.objects.filter(topic_code=tc).first()
                 if t:
                     AuthoritySourceTopic.objects.get_or_create(authority_source=src, authority_topic=t)
+        # ⚠ D-42: these two lists existed and were NEVER READ. One module DECLARES a
+        #   source, every other REFERENCES it (D-29) — that only works if both halves run.
+        _wire.resolve_references(EXISTING_SOURCES_TO_REFERENCE, sources, self.stdout.write)
         self.stdout.write(f"Sources ready: {len(sources)}")
         return sources
 

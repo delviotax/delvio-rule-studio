@@ -237,7 +237,13 @@ SCENARIOS: list[dict] = [
 # NEW EXCERPTS on the EXISTING IRS_2025_4562_INSTR_FULL source
 # ═══════════════════════════════════════════════════════════════════════════
 
-EXISTING_SOURCES_TO_REFERENCE: list[str] = ["IRS_2025_4562_INSTR_FULL", "IRC_179"]
+# ⚠ D-42 (2026-08-25): the vestigial EXISTING_SOURCES_TO_REFERENCE list that stood here
+#   was DELETED, not wired. This loader has no `sources` dict — it resolves every code
+#   directly with AuthoritySource.objects.filter(source_code=...) at the point of use,
+#   both for authority links and for NEW_EXCERPTS_ON_EXISTING, and warns when one is
+#   missing. So the list was read by nothing and adding a code to it would have done
+#   nothing — a trap, not a mechanism. Every code it named still appears where it is
+#   actually used. Removing it is the honest description of this loader's design.
 
 NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [
     ("IRS_2025_4562_INSTR_FULL", {
