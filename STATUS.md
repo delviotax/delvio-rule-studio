@@ -59,8 +59,51 @@ would have passed.** Check 3 rediscovered **`IRC_704`** as the benign-that-isn't
 
 ✅ Verified end to end: `check_authority_owners` (all four flags), **`seed_all --dry-run` clean, 0
 MISSING**. **No loader content edited, no `READY_TO_SEED` flipped, nothing seeded.**
-🔴 **RS pytest deliberately NOT run** — `test_postgres` is cross-repo and delvio-tax-89 is running
-sequential foreground suites against it. Held pending its all-clear.
+✅ **RS pytest RUN once delvio-tax-89 released `test_postgres`: 233 passed, 1 failed.**
+
+✅ **`tests/test_authority_guard.py` ADDED — the guard had NO test at all before A1.** Eight tests,
+no DB, pinned to the MECHANISM (never to a collision count): the selftest passes, every population
+yields declarations, the `federal_data` import reader still works, **the guard refuses when a
+population goes dark**, no unacknowledged collision exists on disk, an acknowledgement is of a
+*writer set* not a code, no `ZZ_` fixture is scanned, and **no ACKNOWLEDGED entry is stale** — the
+list is a worklist and entries are meant to leave it (D-39 removed one). ⭐ **Each was
+mutation-probed to prove it CAN fail**; the suite is clean again afterwards.
+
+## 🔴 STANDING RED — `test_no_new_invalid_source_types`, red since 2026-08-23
+
+⚠⚠ **Pre-existing and NOT caused by A1 — proved, not assumed:** that test's only input is
+`load_*.py`, and A1 touched no loader (`368223e` = the guard, the check command, `seed_all`, a
+harness, this file). Its input is byte-identical before and after.
+
+`tests/test_state_conformity.py::test_no_new_invalid_source_types` is a **ratchet over every
+`load_*.py`**: the invalid-`source_type` debt may shrink, never grow. Baseline frozen 2026-08-16.
+
+| value | baseline | on disk | in prod | |
+|---|---|---|---|---|
+| `state_instructions` | — | **4** | **4** | 🔴 new |
+| `state_guidance` | — | **1** | **1** | 🔴 new |
+| `official_instructions` | 60 | **61** | 57 | ⚠ grew |
+| `federal_form` | 29 | **30** | 29 | ⚠ grew |
+| `statute` | 109 | 108 | 91 | ✅ shrank — D-39, showing up exactly as a ratchet should |
+| **total** | **234** | **240** | **218** | |
+
+🔴 **The four loaders that broke it are this campaign's own, all authored 2026-08-23** —
+`load_al_40nr.py` (×2) · `load_md_500.py` · `load_ms_83105.py` · `load_or_20.py` — **and all four
+were seeded to prod afterwards. Four seed gates passed with this test red.**
+
+⚠ `load_ga700.py:297` carries a comment saying `state_guidance` is not a valid choice. Someone found
+it there and the same value went into `load_md_500.py` later. *A fix recorded in one file is not a
+guard.*
+
+⚠ The test asserts *new values* before *growth*, so it fails on the two new ones and **never reaches**
+the `federal_form`/`official_instructions` growth. And it globs `load_*.py` only, so it cannot see
+`_1120s_sources.py` or `_state_conformity_tier1.py` — **the same pattern blindness A1 just fixed in
+the guard, in a third instrument.**
+
+🔴 **NOT FIXED, deliberately.** `state_instructions` → `state_instruction` is one character, but these
+rows are **seeded**, so it is a content change needing a re-seed — Ken's gate. And `state_guidance`
+(`MD_AR_43`, a Maryland Administrative Release) has **no obvious correct enum member**; guessing one
+is what the Authoritative-Source Rule forbids. **Staged for Ken; it belongs with A2.**
 
 ⚠⚠ **AND THE WIDENED GUARD IMMEDIATELY SHOWED SOMETHING: `seed_all` today would silently CHANGE 11
 authority rows.** Prod is **not reproducible from the loaders** — simulating overlay semantics in
