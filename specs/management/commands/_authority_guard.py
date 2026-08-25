@@ -65,8 +65,10 @@ ACKNOWLEDGED: dict[str, tuple[tuple[str, ...], str]] = {
     # ⚠ The WRITER SET is part of the acknowledgement. A new module joining an
     #    existing collision is a NEW collision and the guard will refuse it.
     # --- writers DISAGREE: live last-writer-wins rows ----------------------
+    # ✅ GA_OCGA_48_7 was here. RESOLVED 2026-08-24: load_ga700.py declares it,
+    #    load_ga500_form_500.py now references it. This list is a worklist, and
+    #    entries are meant to LEAVE it. 20 -> 19 disagreeing.
     "AL_CODE_40_18":             (('load_al_form20c.py', 'load_al_passthrough.py'), "differs: title,citation"),
-    "GA_OCGA_48_7":              (('load_ga500_form_500.py', 'load_ga700.py'), "differs: source_type,source_rank,title,citation. PROVEN downgrade; load_ga500_form_500 is gated on this (D-38)."),
     "IRC_1402":                  (('load_1040_minister.py', 'load_1040_schedule_k1.py', 'load_1065_se.py'), "differs: title,citation,official_url"),
     "IRC_163J":                  (('load_1120_spine.py', 'load_8990.py'), "differs: title,citation"),
     "IRC_168":                   (('_1120s_sources.py', 'load_4797.py'), "differs: source_type,source_rank,title,citation,issuer,official_url"),

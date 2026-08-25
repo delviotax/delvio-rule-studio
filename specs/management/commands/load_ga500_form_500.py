@@ -177,15 +177,10 @@ from specs.models import (
 # gate check_ga500_integrity.py ALL CHECKS PASS (constants + helpers + LIC table
 # + 12 scenarios re-derived independently).
 # ═══════════════════════════════════════════════════════════════════════════
-READY_TO_SEED = False  # ⛔ CLOSED 2026-08-24. The S3-9 precision amendment below IS approved
-                       # (Ken, "approve all three"), but seeding this loader would ALSO
-                       # overwrite AuthoritySource GA_OCGA_48_7, which load_ga700.py declares
-                       # differently and which prod currently holds in GA700's form
-                       # (state_statute/controlling, dated §-list citation). This loader would
-                       # downgrade it to statute/primary_official with an undated 'et seq.'
-                       # citation, via update_or_create(defaults=...). That is campaign D-31's
-                       # TWO-WRITERS defect, live, and Ken approved a precision fix - not an
-                       # authority-graph change. Reopen only once ownership is resolved.
+READY_TO_SEED = True   # ✅ REOPENED 2026-08-24 on Ken's direct instruction ("resolve the GA_OCGA_48_7 ownership and unblock GA-500").
+                       # The blocker is GONE, not overridden: this loader no longer DECLARES GA_OCGA_48_7 -
+                       # load_ga700.py owns it and this spec references it, so seeding can no longer
+                       # rewrite that row. Verified: the two-writers guard reports the collision resolved.
 
 
 FORM_JURISDICTION = "GA"
@@ -295,6 +290,16 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
 
 EXISTING_SOURCES_TO_REFERENCE: list[str] = [
     "IRS_2025_1040_FORM",  # the federal AGI (1040 L11) / 6b / 4b / 5b cross-form handoffs
+    # ⚠⚠ OWNERSHIP RESOLVED 2026-08-24 (campaign D-38/D-39). This loader used to DECLARE
+    # GA_OCGA_48_7, which load_ga700.py also declares -- two writers of one row, and both
+    # write with update_or_create(defaults=...), so whichever ran last decided production.
+    # load_ga700.py is the OWNER, on objective grounds and not preference:
+    #   * "state_statute" is a valid SourceType; this loader's "statute" is NOT in the enum
+    #   * a STATUTE is controlling authority; "primary_official" fits a form or instruction
+    # Its section 48-7-27 excerpt is re-homed to NEW_EXCERPTS_ON_EXISTING below, not dropped.
+    # ⚠ If this spec ever needs section 48-7-29.10 (child-care credit) named in the source
+    # TITLE, that is a change to the OWNER, load_ga700.py -- do not re-declare it here.
+    "GA_OCGA_48_7",
 ]
 
 AUTHORITY_SOURCES: list[dict] = [
@@ -492,33 +497,6 @@ AUTHORITY_SOURCES: list[dict] = [
         ],
     },
     {
-        "source_code": "GA_OCGA_48_7",
-        "source_type": "statute",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "GA",
-        "title": "O.C.G.A. Title 48, Chapter 7 — Georgia Income Tax",
-        "citation": "Ga. Code Ann. §48-7-1 et seq. (incl. §48-7-20 rate, §48-7-27 RIE, §48-7-29.10 child-care credit)",
-        "issuer": "Georgia General Assembly",
-        "official_url": "https://law.justia.com/codes/georgia/title-48/chapter-7/",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "trust_score": 10.0,
-        "topics": ["georgia_income_tax"],
-        "excerpts": [
-            {
-                "excerpt_label": "§48-7-27 retirement income exclusion",
-                "excerpt_text": (
-                    "O.C.G.A. §48-7-27(a)(5): retirement income exclusion of up to $35,000 (age 62-64 or "
-                    "permanently and totally disabled) / $65,000 (age 65+); up to $5,000 of the maximum "
-                    "may be earned income. §48-7-27(a)(5.1): military retirement exclusion for taxpayers "
-                    "under 62 ($17,500 base, additional $17,500 with ≥ $17,500 GA earned income)."
-                ),
-                "summary_text": "Statutory basis for the retirement income exclusion ($35k/$65k, ≤$5k earned) and the military exclusion.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
-    {
         "source_code": "GA_HB463_2026",
         "source_type": "statute",
         "source_rank": "primary_official",
@@ -622,7 +600,22 @@ AUTHORITY_SOURCES: list[dict] = [
 ]
 
 # New excerpts to add to sources that already exist in the RS DB.
-NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [
+    # Re-homed 2026-08-24 when GA_OCGA_48_7 ownership moved to load_ga700.py. This spec
+    # still contributes the retirement-exclusion excerpt; it just no longer rewrites the
+    # source row to do it.
+    ("GA_OCGA_48_7", {
+        "excerpt_label": "§48-7-27 retirement income exclusion",
+        "excerpt_text": (
+            "O.C.G.A. §48-7-27(a)(5): retirement income exclusion of up to $35,000 (age 62-64 or "
+            "permanently and totally disabled) / $65,000 (age 65+); up to $5,000 of the maximum "
+            "may be earned income. §48-7-27(a)(5.1): military retirement exclusion for taxpayers "
+            "under 62 ($17,500 base, additional $17,500 with ≥ $17,500 GA earned income)."
+        ),
+        "summary_text": "Statutory basis for the retirement income exclusion ($35k/$65k, ≤$5k earned) and the military exclusion.",
+        "is_key_excerpt": True,
+    }),
+]
 
 # Source → form links (this spec's sources support form "500").
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
