@@ -25,7 +25,9 @@ Usage:
   poetry run python manage.py seed_all --dry-run  # print the plan only
 """
 from django.core.management import call_command, get_commands
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
+
+from ._authority_guard import guard as authority_guard, selftest as authority_selftest
 
 # Loaders that amend an existing base spec and must run AFTER all base forms exist.
 # load_1120s_full amends SCH_K_1120S / SCHD_1120S (adds R010-R018 / R010-R012) — it must run
@@ -57,6 +59,18 @@ class Command(BaseCommand):
         )
 
     def handle(self, *_args, **opts):
+        # ── THE TWO-WRITERS GUARD (campaign D-31 / D-38) ──────────────────────
+        # Loaders write authority rows with update_or_create(defaults=...), so if two
+        # of them declare the same source_code the LAST one to run silently decides
+        # what production holds. seed_all runs them all, in order, so it is exactly
+        # where an unnoticed collision does its damage. Refuse before writing anything.
+        if not authority_selftest():
+            raise CommandError(
+                "the two-writers guard's own selftest FAILED — it cannot detect a "
+                "synthetic collision, so its all-clear would mean nothing. Refusing to seed."
+            )
+        authority_guard(write=self.stdout.write, raise_on_new=True)
+
         registered = get_commands()
         specs_loaders = sorted(
             name
