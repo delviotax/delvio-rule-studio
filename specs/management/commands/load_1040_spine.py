@@ -948,7 +948,9 @@ FORM_FACTS: list[dict] = [
                  "descendant_of_sibling", "foster_child", "adopted_child", "other"],
      "sort_order": 23, "notes": "Per-Dependent (col 4). Same 8 codes as the SCH_8812 spec / Dependent model."},
     {"fact_key": "dep_dob", "label": "Dependent date of birth", "data_type": "date",
-     "sort_order": 24, "notes": "Per-Dependent. Drives age-consistency diagnostics (D_1040_008/009); NOT an adjudication input."},
+     "sort_order": 24, "notes": ("Per-Dependent. Drives D_1040_009 (implausible DOB) and, since 2026-08-25, the CTC/ODC "
+               "DERIVATION in R-DEP-03. ⚠ It no longer feeds D_1040_008, which is retired - the note "
+               "said so for the rest of the day after that retirement landed.")},
     {"fact_key": "dep_lived_with_taxpayer_majority", "label": "Lived with you more than half the year (col 5a)",
      "data_type": "boolean", "sort_order": 25, "notes": "Per-Dependent. Preparer-asserted."},
     {"fact_key": "dep_residence_in_us", "label": "...and in the U.S. (col 5b)", "data_type": "boolean",
@@ -957,10 +959,38 @@ FORM_FACTS: list[dict] = [
      "sort_order": 27, "notes": "Per-Dependent. NEW 2025 box. Stored; feeds EIC/kiddie logic later."},
     {"fact_key": "dep_permanently_disabled", "label": "Permanently and totally disabled (col 6)",
      "data_type": "boolean", "sort_order": 28, "notes": "Per-Dependent. Exists on the Dependent model."},
-    {"fact_key": "dep_ctc_flag", "label": "Child tax credit box (col 7)", "data_type": "boolean",
-     "sort_order": 29, "notes": "Per-Dependent. Preparer-asserted; D_1040_008 checks age consistency. Consumed by SCH_8812."},
-    {"fact_key": "dep_odc_flag", "label": "Credit for other dependents box (col 7)", "data_type": "boolean",
-     "sort_order": 30, "notes": "Per-Dependent. Preparer-asserted; mutually exclusive with the CTC box."},
+    # ⚠⚠ dep_ctc_flag / dep_odc_flag REMOVED 2026-08-25 (Ken ruling, given directly):
+    #   "remove the CTC and ODC boxes from the input forms — there is not a scenario
+    #   where any of it's up to the tax preparer's discretion. The credit amount is
+    #   based on the facts in the return and that should control."
+    #   ⭐ He is right on the law: § 24 contains no election. Column (7) on the printed
+    #   1040 is the RESULT of the determination, not an input to it. The one case that
+    #   LOOKS discretionary — divorced parents — is a fact about WHO CLAIMS the
+    #   dependent (Form 8332), not a choice about the box.
+    #   ⚠⚠ A derivation cannot run without its inputs, so the three facts below are
+    #   added in the same amendment. Removing the boxes without them would have made
+    #   the engine derive confidently and sometimes wrongly — the defect family this
+    #   campaign spent 2026-08-25 documenting.
+    #   Deleted from prod via CTCODC_RETIRE_FACT_KEYS (the explicit-retirement pattern).
+    {"fact_key": "dep_tin_type", "label": "Dependent's taxpayer-ID type (SSN / ITIN / ATIN)",
+     "data_type": "string", "sort_order": 29,
+     "notes": ("Per-Dependent. ⚠⚠ DECISIVE for CTC vs ODC: § 24(h)(7) requires a SOCIAL SECURITY "
+               "number for the child tax credit, so an ITIN or ATIN dependent can qualify for ODC "
+               "and NEVER for CTC. ⚠ Inferable from the number's own format (ITIN area 9xx with "
+               "specific group ranges; ATIN 9xx-93-xxxx) — but inference is not a captured fact, "
+               "and a tax determination should not rest on parsing a string.")},
+    {"fact_key": "dep_ssn_valid_for_employment_by_due_date", "label": "SSN valid for employment, issued by the due date",
+     "data_type": "boolean", "sort_order": 30,
+     "notes": ("Per-Dependent. § 24(h)(7): the SSN must be valid for employment AND issued before "
+               "the return's due date including extensions. Fails it -> ODC, not CTC. Distinct from "
+               "dep_tin_type: a real SSN issued late still cannot support CTC.")},
+    {"fact_key": "dep_released_by_form_8332", "label": "Claimed under a Form 8332 release (noncustodial)",
+     "data_type": "boolean", "sort_order": 30.5,
+     "notes": ("Per-Dependent. ⚠⚠ THE CASE THAT LOOKS LIKE PREPARER DISCRETION AND IS NOT. A custodial "
+               "parent may release the claim; the noncustodial parent then takes CTC/ODC while EIC, "
+               "head-of-household and the dependent-care credit STAY with the custodial parent. So the "
+               "same child yields different credits to two different filers — driven by this fact, "
+               "never by ticking a box.")},
 
     # ── Income inputs (lines 1-8) ──
     {"fact_key": "w2_box1_total", "label": "Sum of W-2 box 1 (line 1a)", "data_type": "decimal",
@@ -1165,12 +1195,14 @@ FORM_RULES: list[dict] = [
      "description": "ONCE PER RETURN. D_1040_006 warns when HOH/QSS with no dependents and no name."},
 
     # ── Dependents (entry + diagnostics only — NO adjudication engine) ──
-    {"rule_id": "R-DEP-01", "title": "Dependent entry is preparer-asserted", "rule_type": "classification",
+    {"rule_id": "R-DEP-01", "title": "Dependent entry is preparer-asserted EXCEPT column (7)", "rule_type": "classification",
      "precedence": 0, "sort_order": 10,
-     "formula": "dependent rows are entered with columns (1)-(7); qualification flags are assertions, not computed",
+     "formula": ("dependent rows are entered with columns (1)-(6); the §152 tests remain preparer "
+                 "assertions, but COLUMN (7) is DERIVED by R-DEP-03 and is not entered"),
      "inputs": ["dep_first_name", "dep_last_name", "dep_ssn", "dep_relationship", "dep_dob",
                 "dep_lived_with_taxpayer_majority", "dep_residence_in_us", "dep_full_time_student",
-                "dep_permanently_disabled", "dep_ctc_flag", "dep_odc_flag"], "outputs": [],
+                "dep_permanently_disabled", "dep_tin_type",
+                "dep_ssn_valid_for_employment_by_due_date", "dep_released_by_form_8332"], "outputs": [],
      "description": ("PER DEPENDENT ROW. Sprint scope: NO eligibility adjudication engine. The §152 "
                      "tests live with the preparer; the spine stores the assertions and fires "
                      "consistency diagnostics (D_1040_007/008/009). SCH_8812 consumes the CTC/ODC flags.")},
@@ -1179,12 +1211,23 @@ FORM_RULES: list[dict] = [
      "formula": "dep_ssn matches NNN-NN-NNNN",
      "inputs": ["dep_ssn"], "outputs": [],
      "description": "PER DEPENDENT ROW. Entry-level validation; D_1040_007 (error) on failure."},
-    {"rule_id": "R-DEP-03", "title": "CTC flag vs age consistency", "rule_type": "validation",
+    {"rule_id": "R-DEP-03", "title": "CTC vs ODC is DERIVED, never preparer-asserted", "rule_type": "calculation",
      "precedence": 0, "sort_order": 12,
-     "formula": "dep_ctc_flag implies age at Dec 31 of tax_year < 17 (per §24(c)); else D_1040_008",
-     "inputs": ["dep_ctc_flag", "dep_dob", "tax_year"], "outputs": [],
-     "description": ("PER DEPENDENT ROW. Consistency check only (the 8812 spec adjudicates the credit). "
-                     "Also: CTC and ODC boxes are mutually exclusive on one row.")},
+     "formula": ("per dependent: CTC iff age at Dec 31 of tax_year < 17 (§24(c)) AND dep_tin_type == 'ssn' "
+                 "AND dep_ssn_valid_for_employment_by_due_date (§24(h)(7)) AND the dependency test is met; "
+                 "ODC iff a dependent and NOT CTC-qualifying (§24(h)(4)); never both"),
+     "inputs": ["dep_dob", "tax_year", "dep_tin_type", "dep_ssn_valid_for_employment_by_due_date",
+                "dep_relationship", "dep_lived_with_taxpayer_majority", "dep_residence_in_us",
+                "dep_released_by_form_8332"],
+     "outputs": ["dep_ctc_qualifying", "dep_odc_qualifying"],
+     "description": ("PER DEPENDENT ROW. ⚠⚠ RE-SPECIFIED 2026-08-25 (Ken ruling, given directly): this "
+                     "was a VALIDATION of a preparer-asserted flag against age, backed by D_1040_008. The "
+                     "flags are gone. §24 contains no election, so entitlement follows the facts and the "
+                     "column-(7) checkbox on the printed form is the RESULT, not an input. ⭐ The two "
+                     "mutually-exclusive outputs replace the old 'CTC and ODC boxes are mutually exclusive' "
+                     "consistency check - the exclusivity is now structural rather than asserted and then "
+                     "verified. ⚠ SCH_8812 still adjudicates the CREDIT; this determines only which "
+                     "column-(7) classification a dependent falls in.")},
 
     # ── Income (lines 1-11) ──
     {"rule_id": "R-INC-01", "title": "Line 1a = sum of W-2 box 1", "rule_type": "calculation",
@@ -1746,7 +1789,7 @@ FORM_DIAGNOSTICS: list[dict] = [
                "engine-DERIVED, so the asserted-flag divergence this checked "
                "cannot occur through any real path; the app registry keeps the "
                "entry is_active=False (the s266 way) and scenario DG-4 was "
-               "dropped with it. Entry kept here for the audit record.")},
+               "dropped with it. Entry kept here for the audit record. ⚠⚠ ITS `condition` NAMES dep_ctc_flag, WHICH NO LONGER EXISTS - the column-(7) boxes were removed as inputs later the same day (Ken ruling; R-DEP-03 now DERIVES the classification). The condition is preserved as the historical statement of what this diagnostic checked, NOT as a live expression. Read it as a record, not as something evaluable.")},
     {"diagnostic_id": "D_1040_009", "title": "Dependent date of birth implausible", "severity": "warning",
      "condition": "dep_dob missing, after Dec 31 of tax_year, or > 120 years before tax year end",
      "message": "Dependent date of birth is missing or inconsistent with the tax year — verify.",
@@ -1976,9 +2019,14 @@ TEST_SCENARIOS: list[dict] = [
      "scenario_type": "failure", "sort_order": 52,
      "inputs": {"tax_year": 2025, "filing_status": "hoh", "taxpayer_dob": "1985-01-01",
                 "dependents": [{"dep_first_name": "A", "dep_last_name": "B", "dep_ssn": "123-45-678",
-                                "dep_relationship": "child", "dep_dob": "2015-05-01", "dep_ctc_flag": True}]},
+                                "dep_relationship": "child", "dep_dob": "2015-05-01",
+                                "dep_tin_type": "ssn",
+                                "dep_ssn_valid_for_employment_by_due_date": True}]},
      "expected_outputs": {"D_1040_007_fires": True},
-     "notes": "8-digit SSN fails the NNN-NN-NNNN gate."},
+     "notes": ("8-digit SSN fails the NNN-NN-NNNN gate. ⚠ Carried dep_ctc_flag until 2026-08-25; "
+               "the column-(7) boxes were removed as inputs that day and the scenario now supplies the "
+               "facts the DERIVATION reads. The assertion is unchanged - this tests the format gate, "
+               "not the credit.")},
     # DG-4 (CTC box on an 18-year-old -> D_1040_008) RETIRED 2026-08-25 (Ken
     # ruling, s290): D_1040_008 is retired in the app — CTC/ODC became DERIVED
     # (Dependent classifiers in compute), so the preparer-asserted flag the
@@ -2185,6 +2233,12 @@ class Command(BaseCommand):
     # retirement) — only the scenario is deleted.
     D008_RETIRE_SCENARIO_PREFIXES = ("DG-4 ",)
 
+    # ⚠⚠ CTC/ODC BOX REMOVAL (2026-08-25, Ken ruling given directly): the two
+    # preparer-asserted column-(7) flags are removed as INPUTS - entitlement is
+    # derived from the return's facts (R-DEP-03), and § 24 contains no election.
+    # Deleted from prod explicitly, the same way every other retirement here is.
+    CTCODC_RETIRE_FACT_KEYS = ("dep_ctc_flag", "dep_odc_flag")
+
     @transaction.atomic
     def handle(self, *args, **opts):
         self._guard_against_hollow_seed()
@@ -2198,6 +2252,7 @@ class Command(BaseCommand):
         self._retire_stub_artifacts(form)
         self._retire_bridge_artifacts(form)
         self._retire_d008_artifacts(form)
+        self._retire_ctcodc_box_facts(form)
         self._upsert_facts(form)
         rules = self._upsert_rules(form)
         self._upsert_authority_links(rules, sources)
@@ -2286,6 +2341,25 @@ class Command(BaseCommand):
 
     # ─────────────────────────────────────────────────────────────────────────
     # D_1040_008 retirement (2026-08-25, Ken ruling s290)
+    # ─────────────────────────────────────────────────────────────────────────
+
+    def _retire_ctcodc_box_facts(self, form):
+        """Remove the preparer-asserted CTC/ODC column-(7) flags (Ken, 2026-08-25).
+
+        ⚠ Ordering matters and is why this runs BEFORE _upsert_facts: the same
+        sort_order slots (29/30) are reused by the derivation facts that replace
+        them, so the old rows have to go first.
+        """
+        n_facts, _ = FormFact.objects.filter(
+            tax_form=form, fact_key__in=self.CTCODC_RETIRE_FACT_KEYS,
+        ).delete()
+        if n_facts:
+            self.stdout.write(self.style.WARNING(
+                f"  retired CTC/ODC box facts: {n_facts} "
+                "(dep_ctc_flag/dep_odc_flag — entitlement is DERIVED, not asserted; "
+                "Ken ruling 2026-08-25)"
+            ))
+
     # ─────────────────────────────────────────────────────────────────────────
 
     def _retire_d008_artifacts(self, form):
