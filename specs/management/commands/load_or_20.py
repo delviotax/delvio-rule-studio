@@ -467,7 +467,9 @@ AUTHORITY_SOURCES: list[dict] = [
         ],
     },
     {
-        "source_code": "OR_2025_FORM_OR20_INSTR", "source_type": "state_instructions",
+        # ⚠ source_type corrected 2026-08-25 (campaign D-41, Ken: "correct and reseed"). Was "state_instructions" (plural),
+        #   which is NOT a SourceType member; Django does not enforce choices on update_or_create.
+        "source_code": "OR_2025_FORM_OR20_INSTR", "source_type": "state_instruction",
         "source_rank": "primary_official", "jurisdiction_code": "OR",
         "title": "2025 Oregon Form OR-20 Instructions incl. Appendix A (codes) and Appendix B (rates)",
         "citation": "Form OR-20 Instructions (Rev. 10-27-25), 150-102-020-1",

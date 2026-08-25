@@ -344,7 +344,21 @@ AUTHORITY_SOURCES: list[dict] = [
         }],
     },
     {
-        "source_code": "MD_AR_43", "source_type": "state_guidance", "source_rank": "secondary_official",
+        # ⚠⚠ source_type AND source_rank corrected 2026-08-25 (campaign D-41, Ken: "correct and
+        #    reseed"). Was "state_guidance" / "secondary_official" — NEITHER is a member of its
+        #    enum. Django does not enforce choices on update_or_create, so both were written
+        #    silently and were live in prod.
+        #    ⭐ This was the one row where the right value was NOT obvious, and it is settled by
+        #    PRECEDENT rather than preference: the library already types departmental
+        #    sub-regulatory guidance as "state_instruction" — CO_GIL_22_003 (a General Information
+        #    Letter, the closest analogue to an Administrative Release), AZ_2025_PUB_713,
+        #    CO_CORP_TAX_GUIDE_2026, GA_HB149_PTET_FAQ.
+        #    ⚠ NOT "state_regulation": Maryland's regulations are COMAR, and an Administrative
+        #    Release is sub-regulatory. Typing it as a regulation would OVERSTATE its authority —
+        #    the same error D-39 corrected on GA_OCGA_48_7, in the opposite direction.
+        #    "implementation_official" preserves the author's evident intent (a rank below
+        #    primary, trust_score 8.5) with a valid member, and matches AZ_2025_PUB_713.
+        "source_code": "MD_AR_43", "source_type": "state_instruction", "source_rank": "implementation_official",
         "jurisdiction_code": "MD", "title": "Maryland Administrative Release 43 — Corporate Apportionment of Income",
         "citation": "Administrative Release No. 43 (October 27, 2022)", "issuer": "Comptroller of Maryland",
         "official_url": "https://www.marylandcomptroller.gov/content/dam/mdcomp/tax/legal-publications/"
@@ -365,7 +379,9 @@ AUTHORITY_SOURCES: list[dict] = [
         }],
     },
     {
-        "source_code": "MD_2025_CORP_BOOK", "source_type": "official_instructions", "source_rank": "primary_official",
+        # ⚠ source_type corrected 2026-08-25 (campaign D-41, Ken: "correct and reseed"). Was "official_instructions" (plural, and federal),
+        #   which is NOT a SourceType member; Django does not enforce choices on update_or_create.
+        "source_code": "MD_2025_CORP_BOOK", "source_type": "state_instruction", "source_rank": "primary_official",
         "jurisdiction_code": "MD", "title": "2025 Maryland Corporate Booklet — Form 500 instructions",
         "citation": "TY2025 Corporate Booklet (ModDate D:20260305113852)", "issuer": "Comptroller of Maryland",
         "official_url": "https://www.marylandcomptroller.gov/content/dam/mdcomp/tax/instructions/2025/"

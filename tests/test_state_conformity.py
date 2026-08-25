@@ -520,26 +520,44 @@ def _survey_invalid_source_types() -> dict[str, int]:
 def test_no_new_invalid_source_types():
     """Ratchet on the source_type vocabulary debt — it may shrink, never grow.
 
-    The campaign adds ~130-200 state forms; without this gate each new loader is free to
-    invent another unvalidated vocabulary word, and the enum drifts further from practice.
+    ⚠⚠ MOVED 2026-08-25 (campaign D-41). The logic and the baseline now live in
+    `specs/management/commands/_enum_guard.py`, and `seed_all` plus the per-loader
+    pre-flight `check_authority_owners --loader X --strict` run them. This test
+    DELEGATES so there is ONE baseline rather than two that drift apart.
+
+    Why it moved: it lived here alone, so it only ran when someone ran the suite. It
+    went red on 2026-08-23 and FOUR SEED GATES PASSED THROUGH IT — the four loaders
+    that broke it were all seeded afterwards and the invalid values went live, because
+    seeding does not run pytest.
+
+    ⚠ It also now sees all three writer populations, not just `load_*.py` — the same
+    directory blindness that made the two-writers guard miss two thirds of its problem
+    (D-40). Both scopes agree today; agreeing today is not a reason to stay narrow.
     """
-    found = _survey_invalid_source_types()
+    from specs.management.commands._enum_guard import check
 
-    new_values = set(found) - set(SOURCE_TYPE_DEBT_BASELINE)
-    assert not new_values, (
-        f"new invalid source_type value(s): {sorted(new_values)}. "
-        f"Use a real SourceType choice — see sources/models.py SourceType."
-    )
+    ok, problems = check()
+    assert ok, "; ".join(problems)
 
-    grew = {
-        value: (count, SOURCE_TYPE_DEBT_BASELINE[value])
-        for value, count in found.items()
-        if count > SOURCE_TYPE_DEBT_BASELINE[value]
+
+def test_enum_ratchet_can_fail():
+    """⭐ A fixture that cannot fail is not a test (campaign D-36).
+
+    Proves the ratchet FIRES on a synthetic invalid value rather than merely passing
+    on a clean tree — the property that would have made its two-day red visible.
+    """
+    from specs.management.commands._enum_guard import check
+
+    fake = {
+        "ZZ_FAKE": {"specs/load_zz.py": {
+            "source_code": "ZZ_FAKE",
+            "source_type": "totally_not_a_choice",
+            "source_rank": "controlling",
+        }},
     }
-    assert not grew, (
-        "invalid source_type occurrences increased (value: now vs baseline): "
-        f"{grew}. Use a real SourceType choice."
-    )
+    ok, problems = check(decls=fake)
+    assert not ok
+    assert any("totally_not_a_choice" in p for p in problems), problems
 
 
 def test_state_conformity_loader_uses_valid_source_types():

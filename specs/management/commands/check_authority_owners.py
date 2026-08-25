@@ -28,6 +28,7 @@ that list is generated rather than hand-typed. It prints; it never writes.
 from django.core.management.base import BaseCommand
 
 from . import _authority_guard as AG
+from . import _enum_guard as EG
 from ._authority_guard import (
     ACKNOWLEDGED, MATERIAL_FIELDS, collisions, coverage, guard, is_acknowledged,
     selftest_report,
@@ -65,6 +66,8 @@ class Command(BaseCommand):
                             help="show which writer production currently matches")
         parser.add_argument("--regenerate-acknowledged", action="store_true",
                             help="print the ACKNOWLEDGED block for the current scan (never writes)")
+        parser.add_argument("--regenerate-enum-baseline", action="store_true",
+                            help="print the enum-ratchet baseline for the current tree (never writes)")
 
     def handle(self, *args, **o):
         ok, failures = selftest_report()
@@ -83,6 +86,11 @@ class Command(BaseCommand):
         if o["regenerate_acknowledged"]:
             self.stdout.write("")
             self.stdout.write(_acknowledged_block(found))
+            return
+
+        if o["regenerate_enum_baseline"]:
+            self.stdout.write("")
+            self.stdout.write(EG.baseline_block(decls))
             return
 
         if o["loader"]:
@@ -136,6 +144,12 @@ class Command(BaseCommand):
 
         self.stdout.write("")
         guard(loader_name=o["loader"], write=self.stdout.write, raise_on_new=o["strict"])
+
+        # ⚠ The enum ratchet is library-wide, not per-loader: an invalid value anywhere is a
+        #   seed that must not proceed, and scoping it to --loader would let the next loader
+        #   ship the one this one avoided. Campaign D-41.
+        self.stdout.write("")
+        EG.guard(write=self.stdout.write, raise_on_problem=o["strict"], decls=decls)
         if new and not o["strict"]:
             self.stdout.write(self.style.WARNING(
                 "\n%d NEW collision(s) reported above. Re-run with --strict to fail on them."

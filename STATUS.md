@@ -12,6 +12,72 @@ last_updated: 2026-08-25
 
 ## Current state
 
+### ✅ 2026-08-25 — A2: ENUM LABELS CORRECTED AND RE-SEEDED, ratchet moved to the seed pre-flight (D-41)
+
+Ken: *"1. correct and reseed 2. yes"*. **Prod out-of-enum 218 → 211; `state_instructions` and
+`state_guidance` are now ZERO in production.**
+
+⚠⚠ **The red was SEVEN rows, not the five the failing assertion named.** The test asserts *new
+values* before *growth*, so it **never reached** `official_instructions` 60→61 and `federal_form`
+29→30. Diffing the whole inventory against the baseline commit found them. **A test that stops at
+the first category of failure hides the rest.**
+
+| loader | code | field | was | now |
+|---|---|---|---|---|
+| `load_al_40nr.py` | `AL_2025_BOOKLET_40NR` | `source_type` | `state_instructions` | `state_instruction` |
+| `load_al_40nr.py` | `AL_2026_WH_TAX_TABLES` | `source_type` | `state_instructions` | `state_instruction` |
+| `load_al_40nr.py` | `AL_40NR_IRS_2025_HANDOFF` | `source_type` | `federal_form` | `official_form` |
+| `load_md_500.py` | `MD_2025_CORP_BOOK` | `source_type` | `official_instructions` | `state_instruction` |
+| `load_md_500.py` | `MD_AR_43` | `source_type` | `state_guidance` | `state_instruction` |
+| `load_md_500.py` | `MD_AR_43` | `source_rank` | `secondary_official` | `implementation_official` |
+| `load_ms_83105.py` | `MS_2025_BOOKLET_83_100` | `source_type` | `state_instructions` | `state_instruction` |
+| `load_or_20.py` | `OR_2025_FORM_OR20_INSTR` | `source_type` | `state_instructions` | `state_instruction` |
+
+⭐ **`MD_AR_43` was the one needing judgement, and PRECEDENT settled it, not preference.** The
+library already types departmental sub-regulatory guidance as `state_instruction` —
+`CO_GIL_22_003` (a General Information Letter, the closest analogue to an Administrative Release),
+`AZ_2025_PUB_713`, `CO_CORP_TAX_GUIDE_2026`, `GA_HB149_PTET_FAQ`. 🔴 **NOT `state_regulation`:**
+Maryland's regulations are COMAR and an AR is sub-regulatory — typing it as a regulation would
+**overstate its authority, the same error D-39 corrected on `GA_OCGA_48_7`, in reverse.**
+
+⚠⚠ **PROVED, NOT CLAIMED — `scratchpad/validate_enum_reseed.py`.** Re-running a loader rewrites
+**every** row it declares, so all **40 sources in scope (23 declared + 17 referenced-only)** were
+snapshotted field by field before and after:
+✅ all 8 approved changes landed · ✅ **0 unintended content differences** across all 40 ·
+✅ **0 referenced-only rows written** — `updated_at` did not move on any of the 17 ·
+✅ prod steady at **169 forms / 690 authority rows** · ✅ all four export **200** with non-null
+`state_conformity`, counts matching the loaders · ✅ per-loader two-writers pre-flight clean on all
+four before seeding.
+
+### ✅ The enum ratchet now runs in the seed pre-flight — `_enum_guard.py`
+
+Invoked by **`seed_all`** and by **`check_authority_owners --loader X --strict`**.
+⚠⚠ **Why it moved: it lived only in pytest, went red 2026-08-23, and FOUR SEED GATES PASSED THROUGH
+IT** — seeding does not run pytest.
+
+- ⭐ **ONE baseline.** `tests/test_state_conformity.py` **delegates** to it instead of carrying a
+  second copy that could drift.
+- ⚠ Sees **all three writer populations**, not `load_*.py` alone — the same blindness D-40 fixed in
+  the two-writers guard, in a third instrument. *Both scopes agree today at 108 `statute`; agreeing
+  today is not a reason to stay narrow.*
+- Baseline **tightened** to the post-fix debt (233 + 5); it reports shrinkage so it gets tightened
+  again. **A ratchet never tightened stops being one.**
+- ⭐ **`test_enum_ratchet_can_fail` added** — proves it FIRES on a synthetic invalid value. *A
+  fixture that cannot fail is not a test*, and that absence is precisely what let a two-day red pass.
+- 🔴 Raising the baseline to make a seed pass is named in the error as **Ken's call, not a workaround.**
+
+⭐ **A ±1 I nearly waved through, reconciled:** my `statute` counts read 109 in one place and 108 in
+another. The pre-A1 scanner was counting **the guard's own `selftest()` fixture** as a real
+declaration. A1's hygiene fix removed it — independent confirmation the fix worked.
+
+⚠ **Deliberately left: the other 5 invalid `source_rank` values** (`primary_authority` ×4,
+`primary_statute` ×1) in loaders not otherwise being edited. They are in the baseline and cannot
+grow; correcting them is a content change needing its own seed approval, **not smuggled in under
+this one.** ⚠ **No tax figure moved** — all of this is provenance metadata.
+
+---
+
+
 ### ⚠⚠ 2026-08-25 — THE TWO-WRITERS GUARD'S SCOPE IS FIXED (campaign A1, Ken's direct go)
 
 **It was seeing 19 of 46 disagreeing authority rows — 41%.** It scanned
@@ -69,7 +135,7 @@ population goes dark**, no unacknowledged collision exists on disk, an acknowled
 list is a worklist and entries are meant to leave it (D-39 removed one). ⭐ **Each was
 mutation-probed to prove it CAN fail**; the suite is clean again afterwards.
 
-## 🔴 STANDING RED — `test_no_new_invalid_source_types`, red since 2026-08-23
+## ✅ CLOSED 2026-08-25 (D-41) — the standing red below is FIXED; kept for the record
 
 ⚠⚠ **Pre-existing and NOT caused by A1 — proved, not assumed:** that test's only input is
 `load_*.py`, and A1 touched no loader (`368223e` = the guard, the check command, `seed_all`, a

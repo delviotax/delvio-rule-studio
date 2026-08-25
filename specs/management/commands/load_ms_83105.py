@@ -428,7 +428,9 @@ AUTHORITY_SOURCES: list[dict] = [
         ],
     },
     {
-        "source_code": "MS_2025_BOOKLET_83_100", "source_type": "state_instructions",
+        # ⚠ source_type corrected 2026-08-25 (campaign D-41, Ken: "correct and reseed"). Was "state_instructions" (plural),
+        #   which is NOT a SourceType member; Django does not enforce choices on update_or_create.
+        "source_code": "MS_2025_BOOKLET_83_100", "source_type": "state_instruction",
         "source_rank": "primary_official", "jurisdiction_code": "MS",
         "title": "2025 Mississippi Form 83-100 - Corporate Income and Franchise Tax Instructions",
         "citation": "Form 83-100 (2025)", "issuer": "Mississippi Department of Revenue",

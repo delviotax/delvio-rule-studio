@@ -28,6 +28,7 @@ from django.core.management import call_command, get_commands
 from django.core.management.base import BaseCommand, CommandError
 
 from ._authority_guard import guard as authority_guard, selftest_report as authority_selftest_report
+from ._enum_guard import guard as enum_guard
 
 # Loaders that amend an existing base spec and must run AFTER all base forms exist.
 # load_1120s_full amends SCH_K_1120S / SCHD_1120S (adds R010-R018 / R010-R012) — it must run
@@ -75,6 +76,13 @@ class Command(BaseCommand):
                 "nothing. Refusing to seed.\n    " + "\n    ".join(_why)
             )
         authority_guard(write=self.stdout.write, raise_on_new=True)
+
+        # ── THE ENUM RATCHET (campaign D-41, Ken 2026-08-25: run it in the seed pre-flight) ──
+        # SourceType/SourceRank are TextChoices, which Django validates in full_clean() — a
+        # method update_or_create() never calls. An invalid value seeds silently. This ratchet
+        # lived only in the pytest suite, went red on 2026-08-23, and FOUR SEED GATES PASSED
+        # THROUGH IT because seeding does not run pytest. Now it runs where the damage happens.
+        enum_guard(write=self.stdout.write, raise_on_problem=True)
 
         registered = get_commands()
         specs_loaders = sorted(

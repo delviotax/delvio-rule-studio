@@ -677,7 +677,9 @@ AUTHORITY_SOURCES: list[dict] = [
         ],
     },
     {
-        "source_code": "AL_2025_BOOKLET_40NR", "source_type": "state_instructions",
+        # ⚠ source_type corrected 2026-08-25 (campaign D-41, Ken: "correct and reseed"). Was "state_instructions" (plural),
+        #   which is NOT a SourceType member; Django does not enforce choices on update_or_create.
+        "source_code": "AL_2025_BOOKLET_40NR", "source_type": "state_instruction",
         "source_rank": "primary_official", "jurisdiction_code": "AL",
         "title": "2025 Alabama Form 40NR Booklet - Instructions, Tax Tables, Charts, Worksheets",
         "citation": "Alabama Form 40NR Booklet (2025), 25f40nrbk.pdf (29 pp., Dec 2025)",
@@ -857,7 +859,9 @@ AUTHORITY_SOURCES: list[dict] = [
         ],
     },
     {
-        "source_code": "AL_2026_WH_TAX_TABLES", "source_type": "state_instructions",
+        # ⚠ source_type corrected 2026-08-25 (campaign D-41, Ken: "correct and reseed"). Was "state_instructions" (plural),
+        #   which is NOT a SourceType member; Django does not enforce choices on update_or_create.
+        "source_code": "AL_2026_WH_TAX_TABLES", "source_type": "state_instruction",
         "source_rank": "primary_official", "jurisdiction_code": "AL",
         "title": "Alabama Withholding Tax Tables and Instructions for Employers (Jan 2026)",
         "citation": "whbooklet_0126.pdf, pp. 7 and 9", "issuer": "Alabama Department of Revenue",
@@ -883,7 +887,9 @@ AUTHORITY_SOURCES: list[dict] = [
         }],
     },
     {
-        "source_code": "AL_40NR_IRS_2025_HANDOFF", "source_type": "federal_form",
+        # ⚠ source_type corrected 2026-08-25 (campaign D-41, Ken: "correct and reseed"). Was "federal_form",
+        #   which is NOT a SourceType member; Django does not enforce choices on update_or_create.
+        "source_code": "AL_40NR_IRS_2025_HANDOFF", "source_type": "official_form",
         "source_rank": "primary_official", "jurisdiction_code": "US",
         "title": "FINAL TY2025 IRS Forms 1040, 1040-NR, Schedule 3 and 8960 - the 40NR federal handoff",
         "citation": "2025 Form 1040 / 1040-NR / Schedule 3 / Form 8960",
