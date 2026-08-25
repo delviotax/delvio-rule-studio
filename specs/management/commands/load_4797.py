@@ -372,6 +372,7 @@ EXISTING_SOURCES_TO_REFERENCE: list[str] = [
     "IRS_2025_1040_FORM",
     "IRS_2025_1040_INSTR",
     "IRS_2025_1120S_INSTR",   # entity pass-through leg (2026-07-08): line 4 + code K excerpts added below
+    "IRS_2025_1065_INSTR",  # ownership -> forms_1065.py (A3/D-42, 2026-08-25)
 ]
 
 AUTHORITY_SOURCES: list[dict] = [
@@ -716,43 +717,6 @@ AUTHORITY_SOURCES: list[dict] = [
         ],
     },
     {
-        "source_code": "IRS_2025_1065_INSTR",
-        "source_type": "official_instructions", "source_rank": "primary_official", "jurisdiction_code": "FED",
-        "entity_type_code": "1065", "tax_year_start": 2025, "tax_year_end": 2025,
-        "title": "Instructions for Form 1065 (2025) — U.S. Return of Partnership Income",
-        "citation": "Instructions for Form 1065 (2025)", "issuer": "IRS",
-        "official_url": "https://www.irs.gov/instructions/i1065",
-        "current_status": "active", "is_substantive_authority": False, "is_filing_authority": True,
-        "trust_score": 9.5, "requires_human_review": False,
-        "notes": "Added 2026-07-08 (entity pass-through leg): the 1065 analog of the 1120-S §179-"
-                 "disposition exclusion (K-1 box 20 code L). Quotes verified via pymupdf on the "
-                 "downloaded i1065 PDF (p.20 line-6 instructions; p.52 box 20 code L).",
-        "topics": ["4797", "depreciation_recapture"],
-        "excerpts": [
-            {"excerpt_label": "Line 6 — partnerships shouldn't use Form 4797 for §179-passed-through property (verbatim)",
-             "location_reference": "i1065 (2025) p.20, line 6 instructions (verified 2026-07-08, pymupdf)",
-             "excerpt_text": (
-                 "Partnerships shouldn't use Form 4797 to report the sale or other disposition of "
-                 "property if a section 179 expense deduction was previously passed through to any of "
-                 "its partners for that property. Instead, report it in box 20 of Schedule K-1 using "
-                 "code L. See Dispositions of property with section 179 deductions (code L), later, "
-                 "for details."),
-             "summary_text": "1065 analog of the 1120-S rule: entity exclusion → K-1 box 20 code L.",
-             "is_key_excerpt": True},
-            {"excerpt_label": "Box 20 code L — dispositions of property with section 179 deductions (verbatim)",
-             "location_reference": "i1065 (2025) p.52, Code L (verified 2026-07-08, pymupdf)",
-             "excerpt_text": (
-                 "Code L. Dispositions of property with section 179 deductions. This represents gain or "
-                 "loss on the sale, exchange, or other disposition of property for which a section 179 "
-                 "deduction has been passed through to partners. The partnership must provide all the "
-                 "following information related to such dispositions (see the instructions for page 1, "
-                 "line 6, earlier)."),
-             "summary_text": "The partnership-side statement obligation (item list parallels the "
-                             "i1120s code-K list quoted on IRS_2025_1120S_INSTR).",
-             "is_key_excerpt": True},
-        ],
-    },
-    {
         "source_code": "IRS_PUB_544",
         "source_type": "official_publication", "source_rank": "primary_official", "jurisdiction_code": "FED",
         "tax_year_start": 2025, "tax_year_end": 2025,
@@ -812,6 +776,29 @@ NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [
                       "cost figure is reduced by non-§179 depreciation but EXCLUDES the §179 deduction "
                       "(each owner applies their own §179).",
       "is_key_excerpt": True}),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRS_2025_1065_INSTR is DECLARED by forms_1065.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRS_2025_1065_INSTR", {"excerpt_label": "Line 6 — partnerships shouldn't use Form 4797 for §179-passed-through property (verbatim)",
+                 "location_reference": "i1065 (2025) p.20, line 6 instructions (verified 2026-07-08, pymupdf)",
+                 "excerpt_text": (
+                     "Partnerships shouldn't use Form 4797 to report the sale or other disposition of "
+                     "property if a section 179 expense deduction was previously passed through to any of "
+                     "its partners for that property. Instead, report it in box 20 of Schedule K-1 using "
+                     "code L. See Dispositions of property with section 179 deductions (code L), later, "
+                     "for details."),
+                 "summary_text": "1065 analog of the 1120-S rule: entity exclusion → K-1 box 20 code L.",
+                 "is_key_excerpt": True}),
+    ("IRS_2025_1065_INSTR", {"excerpt_label": "Box 20 code L — dispositions of property with section 179 deductions (verbatim)",
+                 "location_reference": "i1065 (2025) p.52, Code L (verified 2026-07-08, pymupdf)",
+                 "excerpt_text": (
+                     "Code L. Dispositions of property with section 179 deductions. This represents gain or "
+                     "loss on the sale, exchange, or other disposition of property for which a section 179 "
+                     "deduction has been passed through to partners. The partnership must provide all the "
+                     "following information related to such dispositions (see the instructions for page 1, "
+                     "line 6, earlier)."),
+                 "summary_text": "The partnership-side statement obligation (item list parallels the "
+                                 "i1120s code-K list quoted on IRS_2025_1120S_INSTR).",
+                 "is_key_excerpt": True}),
 ]
 
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [

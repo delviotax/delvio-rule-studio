@@ -1,0 +1,343 @@
+{
+ "load_1040_2210.py": {
+  "IRS_2025_1040_FORM": [],
+  "IRS_2025_1040_INSTR": [],
+  "IRS_2025_F2210_INSTR": [
+   "Part I \u2014 the required annual payment + the $1,000 de-minimis",
+   "Schedule AI \u2014 the annualized income method",
+   "The Regular Method penalty + the \u00a76621 rate"
+  ],
+  "IRC_6654": [
+   "\u00a76654(d) the required annual payment"
+  ],
+  "IRS_2025_1040_MEF_BR": [
+   "F2210-002-02 \u2014 a transmitted 2210 needs a Part II box",
+   "F2210-006-01 \u2014 the 2210 penalty must equal the return's penalty"
+  ]
+ },
+ "load_1040_8960.py": {
+  "IRS_2025_1040_FORM": [],
+  "IRS_2025_1040_INSTR": [],
+  "IRS_2025_F8960_INSTR": [
+   "Part I income + the \u00a71411 adjustments",
+   "Part III \u2014 the 3.8% NIIT on the lesser amount"
+  ],
+  "IRC_1411": [
+   "\u00a71411(a)(1) the tax"
+  ]
+ },
+ "load_1040_form_7206.py": {
+  "IRS_2025_1040_FORM": [],
+  "IRS_2025_1040_INSTR": [],
+  "IRS_2025_F7206_FORM": [
+   "Line 11 \u2014 S-corp 2% shareholder limit = Box 5 Medicare wages",
+   "Line 4 \u2014 S corporations skip to line 11",
+   "Lines 6-10 + 13-14 \u2014 the Sch C earned-income limit and the smaller-of"
+  ],
+  "IRS_2025_F7206_INSTR": [
+   "One Form 7206 per trade/business; the S-corp wages",
+   "Pub 974 \u2014 the Marketplace/PTC iterative"
+  ],
+  "IRC_162L": [
+   "\u00a7162(l)(2)(A) \u2014 capped at earned income from the business"
+  ]
+ },
+ "load_1040_form_8829.py": {
+  "IRS_2025_1040_FORM": [],
+  "IRS_2025_8829_FORM": [
+   "Form 8829 Part III\u2013IV (2025) \u2014 depreciation + carryover",
+   "Form 8829 Part I\u2013II (2025) \u2014 verified line face + \u00a7280A tier ordering"
+  ],
+  "IRS_2025_8829_INSTR": [
+   "Line 41/42 depreciation table + Part IV carryover",
+   "Lines 9-11 / 16-17 \u2014 deductible-vs-excess split (standard deduction vs itemizer)"
+  ],
+  "IRC_280A": [
+   "\u00a7280A(c)(1) business use + (c)(5) gross-income limitation & ordering"
+  ],
+  "IRC_168_PUB946": [
+   "\u00a7168 \u2014 39-yr nonresidential real property, mid-month, straight-line"
+  ]
+ },
+ "load_1040_form_8863.py": {
+  "IRS_2025_1040_FORM": [],
+  "IRS_2025_1040_INSTR": [],
+  "IRS_2025_F8863_INSTR": [
+   "AOTC + LLC amounts (2025)",
+   "Line 7 refundable lockout + the Credit Limit Worksheet",
+   "Phaseout (lines 4-6 / 13-17)",
+   "Who cannot claim a credit (MFS / dependent)"
+  ],
+  "IRC_25A": [
+   "\u00a725A(b)/(c)/(d) AOTC + LLC + phaseout",
+   "\u00a725A(i) refundable AOTC + the line-7 lockout"
+  ],
+  "IRS_PUB_970": [
+   "AOTC eligibility + adjusted qualified expenses",
+   "MAGI for the education credits"
+  ]
+ },
+ "load_1040_form_8962.py": {
+  "IRS_2025_1040_FORM": [],
+  "IRS_2025_1040_INSTR": [],
+  "IRS_2025_F8962_INSTR": [
+   "2024 FPL tables (2025 returns)",
+   "Line 5 + the applicable figure (2025)",
+   "Table 5 repayment limitation (2025)"
+  ],
+  "IRS_2025_F8962_FORM": [
+   "Part IV header + columns (face text)",
+   "Part IV line 34 \u2014 the allocation mechanic (face text, verbatim)"
+  ],
+  "IRC_36B": [
+   "\u00a736B(f) reconciliation + repayment limitation"
+  ],
+  "IRS_PUB_974": [
+   "The SEHI <-> PTC iterative calculation"
+  ]
+ },
+ "load_1040_minister.py": {
+  "IRS_2025_1040_FORM": [],
+  "IRS_2025_1040_INSTR": [],
+  "IRS_2025_PUB517": [
+   "Deason / \u00a7265 \u2014 income tax only, not SE tax",
+   "Excess allowance \u2192 Form 1040 line 1h",
+   "Form 4361 approved \u2192 omit ministerial earnings from SE",
+   "Housing excluded for income tax but INCLUDED for SE tax",
+   "W-2 minister wages \u2192 Schedule SE line 2 (no Schedule C, no FICA)",
+   "\u00a7107 least-of-three housing exclusion"
+  ],
+  "IRC_107": [
+   "\u00a7107 \u2014 parsonage and rental allowance exclusion"
+  ],
+  "IRC_1402": [
+   "\u00a71402(a)(8) \u2014 housing/parsonage in net SE earnings",
+   "\u00a71402(e) \u2014 Form 4361 exemption from SE tax"
+  ],
+  "IRS_2025_F4361": [
+   "Form 4361 \u2014 scope and irrevocability"
+  ]
+ },
+ "load_1040_schedule_a.py": {
+  "IRS_2025_1040_FORM": [],
+  "IRS_2025_1040_INSTR": [],
+  "IRS_2025_SCHA_FORM": [
+   "Medical 7.5% floor + the SALT line structure (2025)"
+  ],
+  "IRC_170": [
+   "\u00a7170(b)(1) class ceilings (residual formulas)",
+   "\u00a7170(b)(1)(I) \u2014 the 0.5% floor and its absorption order",
+   "\u00a7170(d)(1) \u2014 5-year carryover; floored amounts INCREASE the carryover"
+  ],
+  "IRS_PUB526_2025": [
+   "AGI-bucket limits + carryover (Pub 526)"
+  ],
+  "OBBBA_2025_SCHA": [
+   "Charitable 0.5% floor / PMI / gambling / \u00a768 (OBBBA, 2026)",
+   "SALT cap + phasedown (OBBBA, 2025/2026)"
+  ],
+  "IRS_2025_SCHA_INSTR": [
+   "Line 5a \u2014 what to include (state/local income taxes)"
+  ]
+ },
+ "load_1040_schedule_c.py": {
+  "RP_2025_32": [
+   "\u00a74.26 Qualified Business Income (TY2026 \u00a7199A thresholds, verbatim)"
+  ],
+  "IRS_2025_1040_FORM": [],
+  "IRS_2025_1040_INSTR": [
+   "Rounding Off to Whole Dollars (verbatim \u2014 the per-line convention)"
+  ],
+  "IRS_2025_SCHEDC_FORM": [
+   "Line 30 simplified-method home office (verbatim) + Simplified Method Worksheet",
+   "Part I Income + Part II totals (lines 1-31, verbatim line list)",
+   "Part III Cost of Goods Sold (lines 33-42, verbatim)"
+  ],
+  "IRS_2025_SCHEDC_INSTR": [
+   "Statutory employee + at-risk (line 1 box / line 32, verbatim)"
+  ],
+  "IRS_2025_SCHEDSE_FORM": [
+   "Part I standard method (lines 1a-13, verbatim)"
+  ],
+  "IRS_2025_8995_FORM": [
+   "Lines 1-17 (the real 17-line face, verbatim)"
+  ],
+  "IRS_2025_8995_INSTR": [
+   "QBI per business reduced by 1/2-SE-tax / SEHI / SE-retirement (verbatim guidance)"
+  ],
+  "IRS_2025_8959_FORM": [
+   "Parts I/II/IV/V (lines 1-24, verbatim) \u2014 the threshold-reduced-by-wages nuance"
+  ],
+  "IRS_2025_8959_INSTR": [
+   "Who Must File (verbatim) \u2014 the four engage conditions"
+  ],
+  "IRS_TOPIC751_SE": [
+   "Rates + 2026 SS wage base (verbatim)"
+  ]
+ },
+ "load_1040_schedule_e.py": {
+  "IRS_2025_1040_FORM": [],
+  "IRS_2025_1040_INSTR": [],
+  "IRS_2025_SCHE_INSTR": [
+   "Schedule E Part I line structure (2025)"
+  ],
+  "IRS_2025_F8582_INSTR": [
+   "Modified adjusted gross income (2025)",
+   "Per-activity Parts IV-IX (2025)",
+   "Special allowance + phaseout (2025, lines 5-9)"
+  ],
+  "IRC_469": [
+   "\u00a7469(c)(7) \u2014 real estate professional (the two tests)",
+   "\u00a7469(i) the $25,000 offset + phaseout",
+   "\u00a7469(k) \u2014 publicly traded partnerships (separate application)"
+  ],
+  "TREAS_REG_469": [
+   "\u00a71.469-2(f)(6) \u2014 property rented to a nonpassive activity (self-rental)",
+   "\u00a71.469-2T(d)(6) \u2014 passive loss determined after \u00a7465 at-risk",
+   "\u00a71.469-9(e),(g) \u2014 RE-professional per-activity + aggregation election"
+  ],
+  "IRC_465": [
+   "\u00a7465(b) \u2014 amounts considered at risk"
+  ]
+ },
+ "load_1040_schedule_k1.py": {
+  "IRS_2025_1040_FORM": [],
+  "IRS_2025_1040_INSTR": [],
+  "IRS_2025_SCHE_INSTR": [],
+  "IRS_2025_F8582_INSTR": [],
+  "IRC_469": [],
+  "IRS_2025_1065_K1_INSTR": [
+   "Box 1 \u2192 Sch E line 28 columns (passive vs material participation)",
+   "Box 14 code A net SE earnings \u2192 Schedule SE; codes B/C optional methods",
+   "Box 20 code Z \u2014 Section 199A information"
+  ],
+  "IRS_2025_1120S_K1_INSTR": [
+   "Box 17 code V \u2014 Section 199A information",
+   "S-corp share is not self-employment income"
+  ],
+  "IRS_2025_1041_K1_INSTR": [
+   "1041 K-1 'Report on' table (boxes 1-8, 14I)"
+  ],
+  "IRC_199A": [
+   "\u00a7199A 20% deduction on QBI + REIT/PTP"
+  ],
+  "IRC_1402": [
+   "\u00a71402(a) partner's distributive share is SE earnings"
+  ],
+  "IRC_PASSTHROUGH_CHARACTER": [
+   "Character retained in the recipient's hands"
+  ]
+ },
+ "load_1040_w2g.py": {
+  "IRS_2025_1040_FORM": [],
+  "IRS_2025_1040_INSTR": [],
+  "IRC_61": [
+   "\u00a761(a) all income from whatever source derived"
+  ],
+  "IRC_165D": [
+   "\u00a7165(d) wagering losses capped at wagering gains"
+  ],
+  "IRS_W2G_INSTR": [
+   "Box 1 \u2014 reportable winnings",
+   "Box 15 \u2014 state income tax withheld",
+   "Box 4 \u2014 federal income tax withheld"
+  ],
+  "IRS_2025_SCH1_LINE8B": [
+   "Gambling winnings \u2192 Schedule 1 line 8b",
+   "W-2G box 4 federal withholding \u2192 Form 1040 line 25c"
+  ]
+ },
+ "load_4797.py": {
+  "IRS_2025_1040_FORM": [],
+  "IRS_2025_1040_INSTR": [],
+  "IRS_2025_1120S_INSTR": [
+   "Box 17 code K \u2014 the shareholder statement item list (verbatim)",
+   "Line 4 \u2014 corporations shouldn't use Form 4797 for \u00a7179-passed-through property (verbatim)"
+  ],
+  "IRC_1231": [
+   "\u00a71231(a) netting; \u00a71231(c) 5-year lookback"
+  ],
+  "IRC_1245": [
+   "\u00a71245(a)(1) \u2014 recapture of all depreciation",
+   "\u00a71245(a)(3) \u2014 what IS \u00a71245 property (the classification)"
+  ],
+  "IRC_1250": [
+   "\u00a71250(a) \u2014 additional-depreciation recapture",
+   "\u00a71250(c) + (b)(1) \u2014 property definition + additional depreciation (verbatim)"
+  ],
+  "IRC_168": [
+   "\u00a7168(b)(2)(A) + (b)(3)/(e)(6) \u2014 150DB for 15/20-yr; QIP is SL 15-yr",
+   "\u00a7168(e)(4) \u2014 railroad grading or tunnel bore",
+   "\u00a7168(i)(13) \u2014 single purpose agricultural or horticultural structure",
+   "\u00a7168(k) special (bonus) allowance is a depreciation adjustment (\u00a71250(b)(3))"
+  ],
+  "IRC_1_H_1_E": [
+   "Unrecaptured \u00a71250 gain \u2014 max 25%"
+  ],
+  "IRC_1252_1254_1255": [
+   "\u00a71252 / \u00a71254 / \u00a71255 recapture \u2014 smaller-of pattern"
+  ],
+  "IRC_179D_280F": [
+   "\u00a7179(d)(10) / \u00a7280F(b)(2) \u2014 business-use-drop recapture"
+  ],
+  "IRS_2025_4797_INSTR": [
+   "Disposition by a Partnership or S Corporation of Section 179 Property (verbatim)",
+   "Line 26a \u2014 additional depreciation INCLUDES bonus (verbatim)",
+   "Part I lines 7-9 \u2014 net \u00a71231 + the 5-year lookback \u2192 Schedule D",
+   "Part II line 18 \u2014 individuals' split \u2192 Sch 1 L4 / Sch A L16",
+   "Part III \u2014 recapture \u2192 Part II L13; excess \u2192 Part I L6",
+   "Part IV \u2014 \u00a7179/\u00a7280F recapture; SE-tax note",
+   "\u00a71250 property + the line-26 carve-out classes (verbatim)"
+  ],
+  "IRS_2025_1065_INSTR": [
+   "Box 20 code L \u2014 dispositions of property with section 179 deductions (verbatim)",
+   "Line 6 \u2014 partnerships shouldn't use Form 4797 for \u00a7179-passed-through property (verbatim)"
+  ],
+  "IRS_PUB_544": [
+   "Ordinary vs capital; holding period"
+  ]
+ },
+ "load_6252.py": {
+  "IRS_2025_4797_INSTR": [],
+  "IRC_453": [
+   "\u00a7453(a),(c) \u2014 installment method gross-profit ratio"
+  ],
+  "IRC_453_E_G": [
+   "\u00a7453(e) second-disposition acceleration; \u00a7453(g) depreciable bar"
+  ],
+  "IRC_453A": [
+   "\u00a7453A(a)-(c) \u2014 interest on deferred tax; >$150k + >$5M tests"
+  ],
+  "IRS_2025_6252_FORM": [
+   "Line 12 \u2014 recapture full in year of sale; lines 25/26 destinations",
+   "Part I/II line-by-line (L5-L26) + GP% frozen",
+   "Part III \u2014 related-party second disposition (L27-L37)"
+  ],
+  "IRS_PUB_537": [
+   "Interest on Deferred Tax \u2014 how to figure (\u00a7453A)"
+  ]
+ },
+ "load_8824.py": {
+  "IRS_2025_4797_INSTR": [],
+  "IRC_1031": [
+   "\u00a71031(a),(b),(c),(d) \u2014 nonrecognition, boot, basis"
+  ],
+  "IRC_1031_F": [
+   "\u00a71031(f) \u2014 2-year related-party rule"
+  ],
+  "IRC_1245_1250_LKE": [
+   "\u00a71245(b)(4)/\u00a71250(d)(4) recapture-limit lesser-of tests"
+  ],
+  "IRC_1043": [
+   "\u00a71043 \u2014 conflict-of-interest divestiture deferral"
+  ],
+  "IRS_2025_8824_FORM": [
+   "Part III line-by-line (L12-L25) + boot / recapture / basis",
+   "i8824 lines 15/18 liability-netting + lines 21/22 recapture & routing",
+   "i8824 multi-asset / \u00a7121-home / Part IV \u00a71043"
+  ],
+  "IRS_PUB_544": [
+   "Deferred-exchange 45-day / 180-day timing"
+  ]
+ }
+}

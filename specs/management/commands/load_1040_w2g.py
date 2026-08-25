@@ -98,41 +98,10 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
 EXISTING_SOURCES_TO_REFERENCE: list[str] = [
     "IRS_2025_1040_FORM",
     "IRS_2025_1040_INSTR",
+    "IRC_61",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
 ]
 
 AUTHORITY_SOURCES: list[dict] = [
-    {
-        "source_code": "IRC_61",
-        "source_type": "statute",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1040",
-        "tax_year_start": 2025,
-        "tax_year_end": 2026,
-        "title": "IRC §61 — Gross Income Defined",
-        "citation": "26 U.S.C. §61(a) (gross income means all income from whatever source derived)",
-        "issuer": "U.S. Congress",
-        "official_url": "https://uscode.house.gov/view.xhtml?req=(title:26%20section:61%20edition:prelim)",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "is_filing_authority": False,
-        "trust_score": 10.00,
-        "requires_human_review": False,
-        "notes": "Gambling winnings are fully includible in gross income under §61(a). No exclusion; no year-keyed constant (the §165(d) loss limitation is the deduction side, on Schedule A).",
-        "topics": ["gambling_winnings"],
-        "excerpts": [
-            {
-                "excerpt_label": "§61(a) all income from whatever source derived",
-                "location_reference": "26 U.S.C. §61(a)",
-                "excerpt_text": (
-                    "Except as otherwise provided in this subtitle, gross income means all income from whatever "
-                    "source derived"
-                ),
-                "summary_text": "Gambling winnings are fully includible in gross income (no specific exclusion).",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
     {
         "source_code": "IRC_165D",
         "source_type": "statute",
@@ -258,7 +227,19 @@ AUTHORITY_SOURCES: list[dict] = [
     },
 ]
 
-NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_61 is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_61", {
+                    "excerpt_label": "§61(a) all income from whatever source derived",
+                    "location_reference": "26 U.S.C. §61(a)",
+                    "excerpt_text": (
+                        "Except as otherwise provided in this subtitle, gross income means all income from whatever "
+                        "source derived"
+                    ),
+                    "summary_text": "Gambling winnings are fully includible in gross income (no specific exclusion).",
+                    "is_key_excerpt": True,
+                }),
+]
 
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
     ("IRC_61", "FORM_W2G", "governs"),

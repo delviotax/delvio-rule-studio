@@ -205,6 +205,8 @@ EXISTING_SOURCES_TO_REFERENCE: list[str] = [
     "RP_2025_32",            # §4.26 TY2026 QBI thresholds (§2.06/§4.03 already used by eic/intdiv)
     "IRS_2025_1040_FORM",    # 1040 lines 13a (QBI), 23 (other taxes), 25c (withholding)
     "IRS_2025_1040_INSTR",   # i1040gi cross-references
+    "IRS_2025_8959_INSTR",  # ownership -> forms_supporting.py (A3/D-42, 2026-08-25)
+    "IRS_2025_8995_INSTR",  # ownership -> forms_supporting.py (A3/D-42, 2026-08-25)
 ]
 
 
@@ -464,51 +466,6 @@ AUTHORITY_SOURCES: list[dict] = [
         ],
     },
     {
-        "source_code": "IRS_2025_8995_INSTR",
-        "source_type": "official_instructions",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1040",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "2025 Instructions for Form 8995",
-        "citation": "i8995 (2025)",
-        "issuer": "IRS",
-        "official_url": "https://www.irs.gov/pub/irs-pdf/i8995.pdf",
-        "current_status": "active",
-        "is_substantive_authority": False,
-        "is_filing_authority": False,
-        "trust_score": 9.00,
-        "requires_human_review": False,
-        "notes": "RE-AUTHORED over the stub source. QBI-reduction rule + line 11/12 sourcing transcribed 2026-06-12.",
-        "topics": ["qbi_deduction"],
-        "excerpts": [
-            {
-                "excerpt_label": "QBI per business reduced by 1/2-SE-tax / SEHI / SE-retirement (verbatim guidance)",
-                "location_reference": "i8995 (2025), 'Determining Your Qualified Business Income'",
-                "excerpt_text": (
-                    "Your qualified business income for a qualified trade or business "
-                    "includes income effectively connected with the conduct of the trade or "
-                    "business and reduced by the deductions attributable to it, including the "
-                    "deductible part of self-employment tax, self-employed health insurance, "
-                    "and self-employed retirement (SEP, SIMPLE, and qualified plans) "
-                    "deductions to the extent they are attributable to the trade or business. "
-                    "Line 11: enter your taxable income figured before any qualified business "
-                    "income deduction (Form 1040 line 11 minus line 12). Line 12: enter your "
-                    "net capital gain. Net capital gain means qualified dividends plus the "
-                    "excess of net long-term capital gain over net short-term capital loss."
-                ),
-                "summary_text": (
-                    "QBI (per business) = Sch C net profit - attributable 1/2-SE-tax (Sch 1 "
-                    "L15) - SEHI (Sch 1 L17) - SE-retirement (Sch 1 L16). L11 = 1040 L11 - "
-                    "L12. L12 = qualified dividends (1040 L3a) + net capital gain (Schedule D; "
-                    "v1 = cap-gain distributions until Sch D is built)."
-                ),
-                "is_key_excerpt": True,
-            },
-        ],
-    },
-    {
         "source_code": "IRS_2025_8959_FORM",
         "source_type": "official_form",
         "source_rank": "primary_official",
@@ -554,56 +511,6 @@ AUTHORITY_SOURCES: list[dict] = [
                     "REDUCED BY Medicare wages -> L11 = max(0, threshold - L4); L12 = max(0, "
                     "L8 - L11); L13 = L12 x 0.9%. L18 = L7+L13+L17 -> Sch 2 L11. L24 = "
                     "L22+L23 -> 1040 L25c. Part III RRTA = RED-defer."
-                ),
-                "is_key_excerpt": True,
-            },
-        ],
-    },
-    {
-        "source_code": "IRS_2025_8959_INSTR",
-        "source_type": "official_instructions",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1040",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "2025 Instructions for Form 8959",
-        "citation": "Instructions for Form 8959 (2025); Cat. 53784D; rev. Aug 7, 2025",
-        "issuer": "IRS",
-        "official_url": "https://www.irs.gov/pub/irs-pdf/i8959.pdf",
-        "current_status": "active",
-        "is_substantive_authority": False,
-        "is_filing_authority": True,
-        "trust_score": 9.50,
-        "requires_human_review": False,
-        "notes": "Fetched + transcribed 2026-07-02 for the R-8959-ENGAGE amendment "
-                 "(ATS Scenario 5 surfaced the rounding-artifact mis-engage).",
-        "topics": ["additional_medicare_tax"],
-        "excerpts": [
-            {
-                "excerpt_label": "Who Must File (verbatim) — the four engage conditions",
-                "location_reference": "2025 Instructions for Form 8959, Who Must File",
-                "excerpt_text": (
-                    "You must file Form 8959 if one or more of the following applies to "
-                    "you. • Your Medicare wages and tips on any single Form W-2 (box 5) "
-                    "are greater than $200,000. • Your RRTA compensation on any single "
-                    "Form W-2 (box 14) is greater than $200,000. • Your total Medicare "
-                    "wages and tips plus your self-employment income, if any, and your "
-                    "spouse's Medicare wages and tips and self-employment income, if "
-                    "married filing jointly, are greater than the threshold amount for "
-                    "your filing status in the Threshold Amounts for Additional Medicare "
-                    "Tax chart. • Your total RRTA compensation and tips (Form W-2, box "
-                    "14) and your spouse's RRTA compensation and tips, if married filing "
-                    "jointly, are greater than the threshold amount for your filing "
-                    "status in the Threshold Amounts for Additional Medicare Tax chart."
-                ),
-                "summary_text": (
-                    "Four engage conditions ONLY: single-W-2 box 5 > $200,000 FLAT (the "
-                    "employer-withholding case); single-W-2 RRTA > $200,000; total wages"
-                    "+SE > filing-status threshold; total RRTA > threshold. 'You had "
-                    "Additional Medicare Tax withheld' is NOT a standalone condition — "
-                    "a box-6 excess over 1.45% alone (e.g. whole-dollar rounding) does "
-                    "not require the form."
                 ),
                 "is_key_excerpt": True,
             },
@@ -700,6 +607,60 @@ NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [
             "is_key_excerpt": True,
         },
     ),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRS_2025_8959_INSTR is DECLARED by forms_supporting.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRS_2025_8959_INSTR", {
+                    "excerpt_label": "Who Must File (verbatim) — the four engage conditions",
+                    "location_reference": "2025 Instructions for Form 8959, Who Must File",
+                    "excerpt_text": (
+                        "You must file Form 8959 if one or more of the following applies to "
+                        "you. • Your Medicare wages and tips on any single Form W-2 (box 5) "
+                        "are greater than $200,000. • Your RRTA compensation on any single "
+                        "Form W-2 (box 14) is greater than $200,000. • Your total Medicare "
+                        "wages and tips plus your self-employment income, if any, and your "
+                        "spouse's Medicare wages and tips and self-employment income, if "
+                        "married filing jointly, are greater than the threshold amount for "
+                        "your filing status in the Threshold Amounts for Additional Medicare "
+                        "Tax chart. • Your total RRTA compensation and tips (Form W-2, box "
+                        "14) and your spouse's RRTA compensation and tips, if married filing "
+                        "jointly, are greater than the threshold amount for your filing "
+                        "status in the Threshold Amounts for Additional Medicare Tax chart."
+                    ),
+                    "summary_text": (
+                        "Four engage conditions ONLY: single-W-2 box 5 > $200,000 FLAT (the "
+                        "employer-withholding case); single-W-2 RRTA > $200,000; total wages"
+                        "+SE > filing-status threshold; total RRTA > threshold. 'You had "
+                        "Additional Medicare Tax withheld' is NOT a standalone condition — "
+                        "a box-6 excess over 1.45% alone (e.g. whole-dollar rounding) does "
+                        "not require the form."
+                    ),
+                    "is_key_excerpt": True,
+                }),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRS_2025_8995_INSTR is DECLARED by forms_supporting.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRS_2025_8995_INSTR", {
+                    "excerpt_label": "QBI per business reduced by 1/2-SE-tax / SEHI / SE-retirement (verbatim guidance)",
+                    "location_reference": "i8995 (2025), 'Determining Your Qualified Business Income'",
+                    "excerpt_text": (
+                        "Your qualified business income for a qualified trade or business "
+                        "includes income effectively connected with the conduct of the trade or "
+                        "business and reduced by the deductions attributable to it, including the "
+                        "deductible part of self-employment tax, self-employed health insurance, "
+                        "and self-employed retirement (SEP, SIMPLE, and qualified plans) "
+                        "deductions to the extent they are attributable to the trade or business. "
+                        "Line 11: enter your taxable income figured before any qualified business "
+                        "income deduction (Form 1040 line 11 minus line 12). Line 12: enter your "
+                        "net capital gain. Net capital gain means qualified dividends plus the "
+                        "excess of net long-term capital gain over net short-term capital loss."
+                    ),
+                    "summary_text": (
+                        "QBI (per business) = Sch C net profit - attributable 1/2-SE-tax (Sch 1 "
+                        "L15) - SEHI (Sch 1 L17) - SE-retirement (Sch 1 L16). L11 = 1040 L11 - "
+                        "L12. L12 = qualified dividends (1040 L3a) + net capital gain (Schedule D; "
+                        "v1 = cap-gain distributions until Sch D is built)."
+                    ),
+                    "is_key_excerpt": True,
+                }),
 ]
 
 

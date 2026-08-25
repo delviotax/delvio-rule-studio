@@ -257,33 +257,10 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
 
 EXISTING_SOURCES_TO_REFERENCE: list[str] = [
     "IRS_2025_4797_INSTR",   # the recapture interplay (6252 L12/L25/L26 ↔ 4797 lines 4/15/31)
+    "IRC_453",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
 ]
 
 AUTHORITY_SOURCES: list[dict] = [
-    {
-        "source_code": "IRC_453",
-        "source_type": "statute", "source_rank": "primary_official", "jurisdiction_code": "FED",
-        "title": "IRC §453 — Installment Method",
-        "citation": "26 U.S.C. §453", "issuer": "U.S. Congress",
-        "official_url": "https://uscode.house.gov/view.xhtml?req=(title:26%20section:453%20edition:prelim)",
-        "current_status": "active", "is_substantive_authority": True, "is_filing_authority": False,
-        "trust_score": 10.0, "requires_human_review": True,
-        "notes": "Installment method: income = payments received × gross profit %. Losses can't use it (Rev. Rul. 70-430).",
-        "topics": ["installment_method"],
-        "excerpts": [
-            {"excerpt_label": "§453(a),(c) — installment method gross-profit ratio",
-             "location_reference": "§453(a), §453(c)",
-             "excerpt_text": (
-                 "Under the installment method, the income recognized for any taxable year from a "
-                 "disposition is the proportion of the payments received in that year which the gross "
-                 "profit (realized or to be realized when payment is completed) bears to the total "
-                 "contract price. An installment sale is a disposition of property where at least one "
-                 "payment is received after the close of the year of disposition. The installment method "
-                 "may be used only where the sale results in a gain."),
-             "summary_text": "Income = payments × (gross profit / contract price); gains only.",
-             "is_key_excerpt": True},
-        ],
-    },
     {
         "source_code": "IRC_453_E_G",
         "source_type": "statute", "source_rank": "primary_official", "jurisdiction_code": "FED",
@@ -413,7 +390,20 @@ AUTHORITY_SOURCES: list[dict] = [
     },
 ]
 
-NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_453 is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_453", {"excerpt_label": "§453(a),(c) — installment method gross-profit ratio",
+                 "location_reference": "§453(a), §453(c)",
+                 "excerpt_text": (
+                     "Under the installment method, the income recognized for any taxable year from a "
+                     "disposition is the proportion of the payments received in that year which the gross "
+                     "profit (realized or to be realized when payment is completed) bears to the total "
+                     "contract price. An installment sale is a disposition of property where at least one "
+                     "payment is received after the close of the year of disposition. The installment method "
+                     "may be used only where the sale results in a gain."),
+                 "summary_text": "Income = payments × (gross profit / contract price); gains only.",
+                 "is_key_excerpt": True}),
+]
 
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
     ("IRC_453", "6252", "governs"),

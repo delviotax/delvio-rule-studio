@@ -12,6 +12,69 @@ last_updated: 2026-08-25
 
 ## Current state
 
+### ⚠⚠ 2026-08-25 — A3: 20 of 45 ownership conversions DONE. **25 are BLOCKED, and the reason is the day's third instance of the same defect**
+
+Ken: *"do A3"*. Read as **A3(a) — ownership only**, which is what I recommended: one module
+DECLARES, the rest REFERENCE. 🔴 **Nothing seeded; no prod row changed.**
+
+| | before | after |
+|---|---|---|
+| multi-writer codes | 53 | **35** |
+| writers DISAGREE | 46 | **28** |
+| invalid `source_type` declarations | 233 | **213** |
+| invalid `source_rank` declarations | 5 | **4** |
+
+⭐ **Resolving ownership shrinks the vocabulary debt as a side effect** — deleting a non-owner's
+declaration deletes whatever invalid label it carried. 20 conversions removed 20 invalid values
+without anyone editing a label.
+
+⭐ **The invariant that made a mechanical edit safe**, and the only reason 31 excerpts could be
+re-homed by script: *for every module, the set of codes it declares-OR-references and the set of
+(code, excerpt_label) pairs it contributes must be IDENTICAL before and after.* A conversion moves
+WHERE a contribution is expressed, never WHETHER. **Verified across all 15 modules: invariant holds**
+(`scratchpad/a3_convert.py verify`).
+
+### 🔴 25 conversions are BLOCKED — the D-29 remedy's machinery is not wired up
+
+**20 modules define `EXISTING_SOURCES_TO_REFERENCE` and/or `NEW_EXCERPTS_ON_EXISTING` and their
+`handle()` NEVER READS THEM.** Converting a declaration into those lists there would **silently drop
+the link and the excerpt** — the exact failure D-38 caught on GA-500.
+
+⚠⚠ **This is the third instance today of one shape: a mechanism that looks present and is not wired
+up.** The two-writers guard could not see 2 of 3 populations (D-40). The enum checker was pointed at
+the one clean module (D-41). Now the documented ownership remedy is decorative in 20 loaders.
+
+🔴 **NOT forced.** Wiring those loaders' `_load_sources()` to consume both lists changes what they do
+on seed, and **a seeding-machinery change cannot be verified without seeding** — which Ken's
+ownership-only ruling excludes. **Staged for him, not smuggled in.**
+
+Blocked losers: `load_1065_schedule_k1` (4) · `load_1065_schedule_k` (3) · `federal_data/irc_sections`
+(2) · `load_1120_spine` (2) · `load_1065_se` (2) · `load_1065_m1_m2` (2) · `load_remaining_1120s` (2)
+· `load_sc1120` (2) · `load_4684` · `load_6765` · `load_1065_l_b` · `load_1120s_complete` ·
+`load_nc_passthrough` · `load_1041_spine`.
+
+### ⭐ The guard caught its own worklist going stale, and said exactly why
+
+Converting 2 of `IRC_1402`'s 4 writers left a writer set that no longer matched its acknowledgement,
+so the guard **refused** — and the `NOTE: acknowledged with a DIFFERENT writer set` line added in A1
+named the cause on sight. `ACKNOWLEDGED` regenerated 53 → 35; the enum baseline re-tightened to
+213 + 4 (`primary_statute` reached **zero** and left the list entirely).
+
+✅ Verified: `check_authority_owners --strict` clean · `seed_all --dry-run` 0 MISSING ·
+guard + conformity tests **29/29**.
+
+⚠ **16 codes the objective criteria do NOT decide** and I did not guess: `AL_CODE_40_18` ·
+`IRC_1222` · `IRC_163` · `IRC_163J` · `IRC_168` · `IRC_179` · `IRC_1G` · `IRC_707C` ·
+`IRS_2025_1120S_SCHD_INSTR` · `IRS_2025_4562_INSTR` · `IRS_2025_8949_INSTR` · `IRS_2025_F1065` ·
+`IRS_2025_F1120` · `IRS_2025_I1065` · `IRS_2025_I1120` · `IRS_PUB_544`.
+
+⚠ **A real property of A3(a), stated plainly:** ~35 prod rows now hold content matching no remaining
+declarer until someone re-seeds the ratified owner. ⭐ Still strictly better than before — a future
+re-seed is now **single-valued and predictable** instead of order-dependent.
+
+---
+
+
 ### ✅ 2026-08-25 — A2: ENUM LABELS CORRECTED AND RE-SEEDED, ratchet moved to the seed pre-flight (D-41)
 
 ✅ **FULL RS SUITE GREEN — 243 passed, 0 failed** (final run 2026-08-25, once delvio-tax released

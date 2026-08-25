@@ -119,6 +119,7 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
 EXISTING_SOURCES_TO_REFERENCE: list[str] = [
     "IRS_2025_1040_FORM",
     "IRS_2025_1040_INSTR",
+    "IRS_2025_F7206_INSTR",  # ownership -> load_1040_retirement.py (A3/D-42, 2026-08-25)
 ]
 
 AUTHORITY_SOURCES: list[dict] = [
@@ -190,56 +191,6 @@ AUTHORITY_SOURCES: list[dict] = [
         ],
     },
     {
-        "source_code": "IRS_2025_F7206_INSTR",
-        "source_type": "official_instructions",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1040",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "2025 Instructions for Form 7206 — Self-Employed Health Insurance Deduction",
-        "citation": "Instructions for Form 7206 (2025)",
-        "issuer": "IRS",
-        "official_url": "https://www.irs.gov/instructions/i7206",
-        "current_status": "active",
-        "is_substantive_authority": False,
-        "is_filing_authority": True,
-        "trust_score": 9.50,
-        "requires_human_review": True,
-        "notes": (
-            "A separate Form 7206 per trade/business; the S-corp wages are 'shown as wages on Form W-2.' "
-            "Pub 974 governs the SEHI↔PTC iterative when the plan is Marketplace coverage with advance/"
-            "claimed premium tax credit."
-        ),
-        "topics": ["self_employed_health_insurance"],
-        "excerpts": [
-            {
-                "excerpt_label": "One Form 7206 per trade/business; the S-corp wages",
-                "location_reference": "i7206 (2025)",
-                "excerpt_text": (
-                    "If you have more than one health plan during the year and each plan is established "
-                    "under a different business, you must use a separate Form 7206 to figure each plan's "
-                    "net earnings limit. You received wages in 2025 from an S corporation in which you "
-                    "were a more-than-2% shareholder. Health insurance premiums paid or reimbursed by the "
-                    "S corporation are shown as wages on Form W-2."
-                ),
-                "summary_text": "One Form 7206 per business; the 2% S-corp premium is reported as W-2 wages (in Box 1, deductible as SEHI).",
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "Pub 974 — the Marketplace/PTC iterative",
-                "location_reference": "i7206 (2025), line 1 caution",
-                "excerpt_text": (
-                    "See Pub. 974 if the insurance plan was considered to be established under your "
-                    "business and was obtained through the Marketplace, and advance payments of the "
-                    "premium tax credit were made or you are claiming the premium tax credit."
-                ),
-                "summary_text": "SEHI + Marketplace/PTC → the Pub 974 iterative (handled by Form 8962 in this app).",
-                "is_key_excerpt": False,
-            },
-        ],
-    },
-    {
         "source_code": "IRC_162L",
         "source_type": "statute",
         "source_rank": "primary_official",
@@ -280,7 +231,33 @@ AUTHORITY_SOURCES: list[dict] = [
     },
 ]
 
-NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): IRS_2025_F7206_INSTR is DECLARED by load_1040_retirement.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRS_2025_F7206_INSTR", {
+                    "excerpt_label": "One Form 7206 per trade/business; the S-corp wages",
+                    "location_reference": "i7206 (2025)",
+                    "excerpt_text": (
+                        "If you have more than one health plan during the year and each plan is established "
+                        "under a different business, you must use a separate Form 7206 to figure each plan's "
+                        "net earnings limit. You received wages in 2025 from an S corporation in which you "
+                        "were a more-than-2% shareholder. Health insurance premiums paid or reimbursed by the "
+                        "S corporation are shown as wages on Form W-2."
+                    ),
+                    "summary_text": "One Form 7206 per business; the 2% S-corp premium is reported as W-2 wages (in Box 1, deductible as SEHI).",
+                    "is_key_excerpt": True,
+                }),
+    ("IRS_2025_F7206_INSTR", {
+                    "excerpt_label": "Pub 974 — the Marketplace/PTC iterative",
+                    "location_reference": "i7206 (2025), line 1 caution",
+                    "excerpt_text": (
+                        "See Pub. 974 if the insurance plan was considered to be established under your "
+                        "business and was obtained through the Marketplace, and advance payments of the "
+                        "premium tax credit were made or you are claiming the premium tax credit."
+                    ),
+                    "summary_text": "SEHI + Marketplace/PTC → the Pub 974 iterative (handled by Form 8962 in this app).",
+                    "is_key_excerpt": False,
+                }),
+]
 
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
     ("IRS_2025_F7206_FORM", "FORM_7206", "governs"),

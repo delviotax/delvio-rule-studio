@@ -141,6 +141,8 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
 EXISTING_SOURCES_TO_REFERENCE: list[str] = [
     "IRS_2025_1040_FORM",
     "IRS_2025_1040_INSTR",
+    "IRC_465",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
+    "IRC_469",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
 ]
 
 AUTHORITY_SOURCES: list[dict] = [
@@ -254,72 +256,6 @@ AUTHORITY_SOURCES: list[dict] = [
         ],
     },
     {
-        "source_code": "IRC_469",
-        "source_type": "statute",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1040",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "IRC §469 — Passive Activity Losses and Credits Limited",
-        "citation": "26 U.S.C. §469 (passive activity loss; §469(i) the $25,000 offset; §469(c)(7) real estate professional; §469(g) disposition)",
-        "issuer": "U.S. Congress",
-        "official_url": "https://www.law.cornell.edu/uscode/text/26/469",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "is_filing_authority": False,
-        "trust_score": 10.00,
-        "requires_human_review": False,
-        "notes": "The substantive passive-activity authority: §469(i) the $25,000 active-participation offset + the $100k-$150k phaseout; §469(c)(2) rental = passive per se; §469(c)(7) real-estate-professional exception; §469(g) fully-taxable disposition releases suspended losses.",
-        "topics": ["passive_activity_loss"],
-        "excerpts": [
-            {
-                "excerpt_label": "§469(i) the $25,000 offset + phaseout",
-                "location_reference": "26 U.S.C. §469(i)(2)-(3),(5)",
-                "excerpt_text": (
-                    "§469(i)(2): the $25,000 amount. §469(i)(3)(A): the $25,000 amount is reduced by 50% of the "
-                    "amount by which the adjusted gross income exceeds $100,000. §469(i)(5): in the case of a "
-                    "married individual filing separately who lived apart, $12,500 and $50,000 (substituted for "
-                    "$25,000 and $100,000); a married individual filing separately who did not live apart gets "
-                    "zero. §469(g): a fully taxable disposition of an entire interest releases the suspended loss."
-                ),
-                "summary_text": "§469(i): $25,000 offset reduced 50% of AGI over $100,000; MFS-apart $12,500/$50,000; MFS-together $0; §469(g) disposition releases the suspended loss.",
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "§469(k) — publicly traded partnerships (separate application)",
-                "location_reference": "26 U.S.C. §469(k)(1),(3)",
-                "excerpt_text": (
-                    "§469(k)(1): This section shall be applied separately with respect to items attributable to "
-                    "each publicly traded partnership. §469(k)(2): a partnership is publicly traded if interests "
-                    "are traded on an established securities market or are readily tradable on a secondary market "
-                    "(or the substantial equivalent thereof). §469(k)(3): a taxpayer is not treated as having "
-                    "disposed of his entire interest in an activity of a PTP until he disposes of his entire "
-                    "interest in such partnership."
-                ),
-                "summary_text": "§469(k): §469 applied SEPARATELY to each PTP — a PTP passive loss offsets only that same PTP's passive income; suspended losses freed only on full disposition of the entire PTP interest.",
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "§469(c)(7) — real estate professional (the two tests)",
-                "location_reference": "26 U.S.C. §469(c)(7)(A),(B),(C)",
-                "excerpt_text": (
-                    "§469(c)(7)(B): a taxpayer qualifies if (i) more than one-half of the personal services "
-                    "performed in trades or businesses during the taxable year are performed in real property "
-                    "trades or businesses in which the taxpayer materially participates, and (ii) such taxpayer "
-                    "performs more than 750 hours of services during the taxable year in real property trades or "
-                    "businesses in which the taxpayer materially participates. In the case of a joint return, the "
-                    "requirements are satisfied only if either spouse separately satisfies them. §469(c)(7)(C): "
-                    "'real property trade or business' means any real property development, redevelopment, "
-                    "construction, reconstruction, acquisition, conversion, rental, operation, management, "
-                    "leasing, or brokerage trade or business."
-                ),
-                "summary_text": "§469(c)(7): REP = (i) >½ personal services in real-property trades/businesses + (ii) >750 hours, BOTH met by one spouse alone (no combining). Qualifying removes the per-se-passive rule for rental RE; each rental still needs material participation unless the §1.469-9(g) election aggregates them.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
-    {
         "source_code": "TREAS_REG_469",
         "source_type": "regulation",
         "source_rank": "primary_official",
@@ -379,46 +315,72 @@ AUTHORITY_SOURCES: list[dict] = [
             },
         ],
     },
-    {
-        "source_code": "IRC_465",
-        "source_type": "statute",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1040",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "IRC §465 — Deductions Limited to Amount at Risk",
-        "citation": "26 U.S.C. §465(b)(1),(2),(6) (amounts at risk; personal liability; qualified nonrecourse financing)",
-        "issuer": "U.S. Congress",
-        "official_url": "https://www.law.cornell.edu/uscode/text/26/465",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "is_filing_authority": False,
-        "trust_score": 10.00,
-        "requires_human_review": False,
-        "notes": "The at-risk limitation (Form 6198) applied BEFORE §469 (Reg 1.469-2T(d)(6)) and before §461(l). S-6 R4 = diagnostic-only (route to 6198); the compute lives in the 6198 spec / tts.",
-        "topics": ["passive_activity_loss"],
-        "excerpts": [
-            {
-                "excerpt_label": "§465(b) — amounts considered at risk",
-                "location_reference": "26 U.S.C. §465(b)(1),(2),(6)",
-                "excerpt_text": (
-                    "§465(b)(1): a taxpayer is at risk for the amount of money and the adjusted basis of other "
-                    "property contributed to the activity, plus amounts borrowed with respect to the activity (as "
-                    "limited by (b)(2)). §465(b)(2): borrowed amounts count to the extent the taxpayer is personally "
-                    "liable for repayment, or has pledged property (other than property used in the activity) as "
-                    "security, to the net FMV of the interest. §465(b)(6): in the case of an activity of holding "
-                    "real property, the taxpayer is at risk for the taxpayer's share of qualified nonrecourse "
-                    "financing secured by real property used in the activity."
-                ),
-                "summary_text": "At risk = cash + adjusted basis of contributed property + personally-liable borrowings + qualified nonrecourse financing (real property). Applies before §469.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
 ]
 
-NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_465 is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_465", {
+                    "excerpt_label": "§465(b) — amounts considered at risk",
+                    "location_reference": "26 U.S.C. §465(b)(1),(2),(6)",
+                    "excerpt_text": (
+                        "§465(b)(1): a taxpayer is at risk for the amount of money and the adjusted basis of other "
+                        "property contributed to the activity, plus amounts borrowed with respect to the activity (as "
+                        "limited by (b)(2)). §465(b)(2): borrowed amounts count to the extent the taxpayer is personally "
+                        "liable for repayment, or has pledged property (other than property used in the activity) as "
+                        "security, to the net FMV of the interest. §465(b)(6): in the case of an activity of holding "
+                        "real property, the taxpayer is at risk for the taxpayer's share of qualified nonrecourse "
+                        "financing secured by real property used in the activity."
+                    ),
+                    "summary_text": "At risk = cash + adjusted basis of contributed property + personally-liable borrowings + qualified nonrecourse financing (real property). Applies before §469.",
+                    "is_key_excerpt": True,
+                }),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_469 is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_469", {
+                    "excerpt_label": "§469(i) the $25,000 offset + phaseout",
+                    "location_reference": "26 U.S.C. §469(i)(2)-(3),(5)",
+                    "excerpt_text": (
+                        "§469(i)(2): the $25,000 amount. §469(i)(3)(A): the $25,000 amount is reduced by 50% of the "
+                        "amount by which the adjusted gross income exceeds $100,000. §469(i)(5): in the case of a "
+                        "married individual filing separately who lived apart, $12,500 and $50,000 (substituted for "
+                        "$25,000 and $100,000); a married individual filing separately who did not live apart gets "
+                        "zero. §469(g): a fully taxable disposition of an entire interest releases the suspended loss."
+                    ),
+                    "summary_text": "§469(i): $25,000 offset reduced 50% of AGI over $100,000; MFS-apart $12,500/$50,000; MFS-together $0; §469(g) disposition releases the suspended loss.",
+                    "is_key_excerpt": True,
+                }),
+    ("IRC_469", {
+                    "excerpt_label": "§469(k) — publicly traded partnerships (separate application)",
+                    "location_reference": "26 U.S.C. §469(k)(1),(3)",
+                    "excerpt_text": (
+                        "§469(k)(1): This section shall be applied separately with respect to items attributable to "
+                        "each publicly traded partnership. §469(k)(2): a partnership is publicly traded if interests "
+                        "are traded on an established securities market or are readily tradable on a secondary market "
+                        "(or the substantial equivalent thereof). §469(k)(3): a taxpayer is not treated as having "
+                        "disposed of his entire interest in an activity of a PTP until he disposes of his entire "
+                        "interest in such partnership."
+                    ),
+                    "summary_text": "§469(k): §469 applied SEPARATELY to each PTP — a PTP passive loss offsets only that same PTP's passive income; suspended losses freed only on full disposition of the entire PTP interest.",
+                    "is_key_excerpt": True,
+                }),
+    ("IRC_469", {
+                    "excerpt_label": "§469(c)(7) — real estate professional (the two tests)",
+                    "location_reference": "26 U.S.C. §469(c)(7)(A),(B),(C)",
+                    "excerpt_text": (
+                        "§469(c)(7)(B): a taxpayer qualifies if (i) more than one-half of the personal services "
+                        "performed in trades or businesses during the taxable year are performed in real property "
+                        "trades or businesses in which the taxpayer materially participates, and (ii) such taxpayer "
+                        "performs more than 750 hours of services during the taxable year in real property trades or "
+                        "businesses in which the taxpayer materially participates. In the case of a joint return, the "
+                        "requirements are satisfied only if either spouse separately satisfies them. §469(c)(7)(C): "
+                        "'real property trade or business' means any real property development, redevelopment, "
+                        "construction, reconstruction, acquisition, conversion, rental, operation, management, "
+                        "leasing, or brokerage trade or business."
+                    ),
+                    "summary_text": "§469(c)(7): REP = (i) >½ personal services in real-property trades/businesses + (ii) >750 hours, BOTH met by one spouse alone (no combining). Qualifying removes the per-se-passive rule for rental RE; each rental still needs material participation unless the §1.469-9(g) election aggregates them.",
+                    "is_key_excerpt": True,
+                }),
+]
 
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
     ("IRS_2025_SCHE_INSTR", "SCHEDULE_E", "governs"),

@@ -104,6 +104,7 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
 EXISTING_SOURCES_TO_REFERENCE: list[str] = [
     "IRS_2025_1040_FORM",
     "IRS_2025_1040_INSTR",
+    "IRC_1411",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
 ]
 
 AUTHORITY_SOURCES: list[dict] = [
@@ -157,42 +158,22 @@ AUTHORITY_SOURCES: list[dict] = [
             },
         ],
     },
-    {
-        "source_code": "IRC_1411",
-        "source_type": "statute",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1040",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "IRC §1411 — Net Investment Income Tax",
-        "citation": "26 U.S.C. §1411(a)-(b) (3.8% on the lesser of NII or the MAGI excess over the threshold)",
-        "issuer": "U.S. Congress",
-        "official_url": "https://uscode.house.gov/view.xhtml?req=(title:26%20section:1411%20edition:prelim)",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "is_filing_authority": False,
-        "trust_score": 10.00,
-        "requires_human_review": False,
-        "notes": "§1411(a)(1): 3.8% of the lesser of net investment income or the excess of MAGI over the threshold ($250k/$125k/$200k, NOT inflation-indexed).",
-        "topics": ["net_investment_income_tax"],
-        "excerpts": [
-            {
-                "excerpt_label": "§1411(a)(1) the tax",
-                "location_reference": "26 U.S.C. §1411(a)(1)",
-                "excerpt_text": (
-                    "There is hereby imposed a tax equal to 3.8 percent of the lesser of net investment income "
-                    "for the taxable year, or the excess (if any) of modified adjusted gross income over the "
-                    "threshold amount."
-                ),
-                "summary_text": "3.8% × min(net investment income, MAGI − threshold).",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
 ]
 
-NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_1411 is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_1411", {
+                    "excerpt_label": "§1411(a)(1) the tax",
+                    "location_reference": "26 U.S.C. §1411(a)(1)",
+                    "excerpt_text": (
+                        "There is hereby imposed a tax equal to 3.8 percent of the lesser of net investment income "
+                        "for the taxable year, or the excess (if any) of modified adjusted gross income over the "
+                        "threshold amount."
+                    ),
+                    "summary_text": "3.8% × min(net investment income, MAGI − threshold).",
+                    "is_key_excerpt": True,
+                }),
+]
 
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
     ("IRS_2025_F8960_INSTR", "FORM_8960", "governs"),

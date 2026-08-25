@@ -377,6 +377,7 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
 EXISTING_SOURCES_TO_REFERENCE: list[str] = [
     "IRS_2025_1040_FORM",
     "IRS_2025_1040_INSTR",
+    "IRC_6654",  # ownership -> load_1040_spine.py (A3/D-42, 2026-08-25)
 ]
 
 AUTHORITY_SOURCES: list[dict] = [
@@ -437,39 +438,6 @@ AUTHORITY_SOURCES: list[dict] = [
                     "installment is the smaller of this annualized installment or the regular method installment."
                 ),
                 "summary_text": "AI installment = annualized tax × (22.5/45/67.5/90)% − prior installments; the required installment is the smaller of the AI or regular amount.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
-    {
-        "source_code": "IRC_6654",
-        "source_type": "statute",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1040",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "IRC §6654 — Failure to Pay Estimated Income Tax",
-        "citation": "26 U.S.C. §6654 (the addition to tax for underpayment of estimated tax; the §6621 rate)",
-        "issuer": "U.S. Congress",
-        "official_url": "https://uscode.house.gov/view.xhtml?req=(title:26%20section:6654%20edition:prelim)",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "is_filing_authority": False,
-        "trust_score": 10.00,
-        "requires_human_review": False,
-        "notes": "§6654: the required annual payment is the lesser of 90% of the current tax or 100% (110% high-income) of the prior; the penalty is the §6621 underpayment rate on each underpaid installment.",
-        "topics": ["estimated_tax_penalty"],
-        "excerpts": [
-            {
-                "excerpt_label": "§6654(d) the required annual payment",
-                "location_reference": "26 U.S.C. §6654(d)(1)",
-                "excerpt_text": (
-                    "The required annual payment is the lesser of 90 percent of the tax shown on the return for "
-                    "the taxable year, or 100 percent of the tax shown on the return for the preceding taxable "
-                    "year (110 percent if the adjusted gross income exceeded $150,000)."
-                ),
-                "summary_text": "Required annual payment = lesser of 90% current or 100%/110% prior.",
                 "is_key_excerpt": True,
             },
         ],
@@ -541,7 +509,20 @@ AUTHORITY_SOURCES: list[dict] = [
     },
 ]
 
-NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_6654 is DECLARED by load_1040_spine.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_6654", {
+                    "excerpt_label": "§6654(d) the required annual payment",
+                    "location_reference": "26 U.S.C. §6654(d)(1)",
+                    "excerpt_text": (
+                        "The required annual payment is the lesser of 90 percent of the tax shown on the return for "
+                        "the taxable year, or 100 percent of the tax shown on the return for the preceding taxable "
+                        "year (110 percent if the adjusted gross income exceeded $150,000)."
+                    ),
+                    "summary_text": "Required annual payment = lesser of 90% current or 100%/110% prior.",
+                    "is_key_excerpt": True,
+                }),
+]
 
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
     ("IRS_2025_F2210_INSTR", "FORM_2210", "governs"),

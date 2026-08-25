@@ -135,6 +135,7 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
 EXISTING_SOURCES_TO_REFERENCE: list[str] = [
     "IRS_2025_1040_FORM",
     "IRS_2025_1040_INSTR",
+    "IRC_170",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
 ]
 
 AUTHORITY_SOURCES: list[dict] = [
@@ -168,85 +169,6 @@ AUTHORITY_SOURCES: list[dict] = [
                     "the limit. Line 6 other taxes. Line 7 add 5e and 6."
                 ),
                 "summary_text": "Medical floor 7.5% AGI; SALT 5a (income OR sales) + 5b + 5c = 5d; 5e = min(5d, cap); 7 = 5e + 6.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
-    {
-        "source_code": "IRC_170",
-        "source_type": "statute",
-        "source_rank": "primary_statute",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1040",
-        "tax_year_start": 2025,
-        "tax_year_end": None,
-        "title": "IRC §170 — Charitable, etc., contributions and gifts",
-        "citation": "26 U.S.C. §170(b)(1), (d)(1) (as amended by P.L. 119-21 §70425)",
-        "issuer": "Congress",
-        "official_url": "https://www.law.cornell.edu/uscode/text/26/170",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "is_filing_authority": False,
-        "trust_score": 9.90,
-        "requires_human_review": True,
-        "notes": ("Added s266 (2026-08-15, Ken Gate-1 approval of the charitable amendment). "
-                  "The class ceilings, the 0.5% floor, and the floored-amount carryover. "
-                  "REQUIRES HUMAN REVIEW: (1) the (b)(1)(I) absorption order C-before-B tiebreak "
-                  "— both classes are 30%; two independent readings (LII full-text analysis + "
-                  "practitioner summaries) agree on D,C,B,E,A,G ('lowest limitation first') but "
-                  "FIVE attempts at verbatim primary text were blocked (uscode.house.gov, eCFR, "
-                  "Bloomberg, the P.L. 119-21 HTML truncation, the CRS PDF); (2) the "
-                  "floored-only-once carryover relief mechanics — re-verify BOTH against Pub 526 "
-                  "(2026) when it publishes. TY2026 floor logic is PROVISIONAL until then."),
-        "topics": ["itemized_deductions"],
-        "excerpts": [
-            {
-                "excerpt_label": "§170(b)(1) class ceilings (residual formulas)",
-                "location_reference": "26 U.S.C. §170(b)(1)(A)-(H)",
-                "excerpt_text": (
-                    "(A) 50% of the contribution base for contributions to 50%-limit organizations. "
-                    "(B) for other contributions, the LESSER of 30% of the contribution base or the excess "
-                    "of 50% of the contribution base over the (A) contributions. "
-                    "(C) 30% of the contribution base for capital gain property to 50%-limit organizations. "
-                    "(D) for other capital gain property, the LESSER of 20% of the contribution base or the "
-                    "excess of 30% of the contribution base over the capital gain property to which (C) "
-                    "applies. (E) qualified conservation contributions: 50% of the contribution base over "
-                    "all other charitable contributions (100% for qualified farmers and ranchers). "
-                    "(G) cash to 50%-limit organizations: 60% of the contribution base over the (A) "
-                    "contributions taken into account. (H) contribution base = AGI computed without any "
-                    "net operating loss carryback."
-                ),
-                "summary_text": "The seven-class ceiling structure: 60/50/30/30/20 with statutory residuals; conservation 50%/100%; base = AGI w/o NOL carryback.",
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "§170(b)(1)(I) — the 0.5% floor and its absorption order",
-                "location_reference": "26 U.S.C. §170(b)(1)(I), added by P.L. 119-21 §70425 (tax years beginning after 2025)",
-                "excerpt_text": (
-                    "Contributions are taken into account 'only to the extent that the aggregate of such "
-                    "contributions exceeds 0.5 percent of the taxpayer's contribution base for the taxable "
-                    "year.' The reduction applies to the CONTRIBUTIONS taken into account (not to the "
-                    "computed deduction), absorbed in a prescribed order across the (b)(1) classes — "
-                    "lowest AGI limitation first: (D), then (C), then (B), then (E), then (A), then (G). "
-                    "[The C-before-B sequencing within the two 30% classes is flagged requires_human_review "
-                    "— see source notes.]"
-                ),
-                "summary_text": "0.5% floor reduces CONTRIBUTIONS (not the deduction), absorbed D→C→B→E→A→G; effective TY2026.",
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "§170(d)(1) — 5-year carryover; floored amounts INCREASE the carryover",
-                "location_reference": "26 U.S.C. §170(d)(1), incl. (d)(1)(C) added by P.L. 119-21",
-                "excerpt_text": (
-                    "Excess contributions are treated as paid in each of the 5 succeeding taxable years, in "
-                    "order of time, after the contributions actually paid in that year. (d)(1)(C): the "
-                    "carryover rule is 'applied by increasing the excess determined under such applicable "
-                    "carryover rule for the contribution year (before the application of subparagraph (B)) "
-                    "by the amount attributable to the charitable contributions to which such rule applies "
-                    "which is not allowed as a deduction for the contribution year by reason of subsection "
-                    "(b)(1)(I).' An amount disallowed by the floor is NOT lost — it carries forward."
-                ),
-                "summary_text": "5 years, oldest first, current-year first; the floored amount is ADDED to the carryover — never destroyed.",
                 "is_key_excerpt": True,
             },
         ],
@@ -378,7 +300,58 @@ AUTHORITY_SOURCES: list[dict] = [
     },
 ]
 
-NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_170 is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_170", {
+                    "excerpt_label": "§170(b)(1) class ceilings (residual formulas)",
+                    "location_reference": "26 U.S.C. §170(b)(1)(A)-(H)",
+                    "excerpt_text": (
+                        "(A) 50% of the contribution base for contributions to 50%-limit organizations. "
+                        "(B) for other contributions, the LESSER of 30% of the contribution base or the excess "
+                        "of 50% of the contribution base over the (A) contributions. "
+                        "(C) 30% of the contribution base for capital gain property to 50%-limit organizations. "
+                        "(D) for other capital gain property, the LESSER of 20% of the contribution base or the "
+                        "excess of 30% of the contribution base over the capital gain property to which (C) "
+                        "applies. (E) qualified conservation contributions: 50% of the contribution base over "
+                        "all other charitable contributions (100% for qualified farmers and ranchers). "
+                        "(G) cash to 50%-limit organizations: 60% of the contribution base over the (A) "
+                        "contributions taken into account. (H) contribution base = AGI computed without any "
+                        "net operating loss carryback."
+                    ),
+                    "summary_text": "The seven-class ceiling structure: 60/50/30/30/20 with statutory residuals; conservation 50%/100%; base = AGI w/o NOL carryback.",
+                    "is_key_excerpt": True,
+                }),
+    ("IRC_170", {
+                    "excerpt_label": "§170(b)(1)(I) — the 0.5% floor and its absorption order",
+                    "location_reference": "26 U.S.C. §170(b)(1)(I), added by P.L. 119-21 §70425 (tax years beginning after 2025)",
+                    "excerpt_text": (
+                        "Contributions are taken into account 'only to the extent that the aggregate of such "
+                        "contributions exceeds 0.5 percent of the taxpayer's contribution base for the taxable "
+                        "year.' The reduction applies to the CONTRIBUTIONS taken into account (not to the "
+                        "computed deduction), absorbed in a prescribed order across the (b)(1) classes — "
+                        "lowest AGI limitation first: (D), then (C), then (B), then (E), then (A), then (G). "
+                        "[The C-before-B sequencing within the two 30% classes is flagged requires_human_review "
+                        "— see source notes.]"
+                    ),
+                    "summary_text": "0.5% floor reduces CONTRIBUTIONS (not the deduction), absorbed D→C→B→E→A→G; effective TY2026.",
+                    "is_key_excerpt": True,
+                }),
+    ("IRC_170", {
+                    "excerpt_label": "§170(d)(1) — 5-year carryover; floored amounts INCREASE the carryover",
+                    "location_reference": "26 U.S.C. §170(d)(1), incl. (d)(1)(C) added by P.L. 119-21",
+                    "excerpt_text": (
+                        "Excess contributions are treated as paid in each of the 5 succeeding taxable years, in "
+                        "order of time, after the contributions actually paid in that year. (d)(1)(C): the "
+                        "carryover rule is 'applied by increasing the excess determined under such applicable "
+                        "carryover rule for the contribution year (before the application of subparagraph (B)) "
+                        "by the amount attributable to the charitable contributions to which such rule applies "
+                        "which is not allowed as a deduction for the contribution year by reason of subsection "
+                        "(b)(1)(I).' An amount disallowed by the floor is NOT lost — it carries forward."
+                    ),
+                    "summary_text": "5 years, oldest first, current-year first; the floored amount is ADDED to the carryover — never destroyed.",
+                    "is_key_excerpt": True,
+                }),
+]
 
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
     ("IRS_2025_SCHA_FORM", "SCHEDULE_A", "governs"),

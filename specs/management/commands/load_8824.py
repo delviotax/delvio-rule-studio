@@ -302,35 +302,10 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
 
 EXISTING_SOURCES_TO_REFERENCE: list[str] = [
     "IRS_2025_4797_INSTR",   # the recapture interplay (8824 L21→4797 L16, L22→4797 L5, L35→4797 L10)
+    "IRC_1031",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
 ]
 
 AUTHORITY_SOURCES: list[dict] = [
-    {
-        "source_code": "IRC_1031",
-        "source_type": "statute", "source_rank": "primary_official", "jurisdiction_code": "FED",
-        "title": "IRC §1031 — Exchange of Real Property Held for Productive Use or Investment",
-        "citation": "26 U.S.C. §1031", "issuer": "U.S. Congress",
-        "official_url": "https://uscode.house.gov/view.xhtml?req=(title:26%20section:1031%20edition:prelim)",
-        "current_status": "active", "is_substantive_authority": True, "is_filing_authority": False,
-        "trust_score": 10.0, "requires_human_review": True,
-        "notes": "Post-TCJA (2018+): nonrecognition applies ONLY to exchanges of real property held for business/investment. Gain recognized to the extent of boot; loss never recognized.",
-        "topics": ["like_kind_exchange"],
-        "excerpts": [
-            {"excerpt_label": "§1031(a),(b),(c),(d) — nonrecognition, boot, basis",
-             "location_reference": "§1031(a)-(d)",
-             "excerpt_text": (
-                 "No gain or loss is recognized on the exchange of real property held for productive use "
-                 "in a trade or business or for investment if such property is exchanged solely for real "
-                 "property of like kind to be so held (§1031(a); real property only for exchanges after "
-                 "2017). If the taxpayer also receives money or non-like-kind property (boot), gain (but "
-                 "not loss) is recognized to the extent of that money and the FMV of the other property "
-                 "(§1031(b),(c)). The basis of the property received is the basis of the property given "
-                 "up, decreased by money received and increased by gain (or decreased by loss) recognized "
-                 "(§1031(d))."),
-             "summary_text": "Real-property-only nonrecognition; gain recognized up to boot, no loss; substituted basis.",
-             "is_key_excerpt": True},
-        ],
-    },
     {
         "source_code": "IRC_1031_F",
         "source_type": "statute", "source_rank": "primary_official", "jurisdiction_code": "FED",
@@ -483,7 +458,22 @@ AUTHORITY_SOURCES: list[dict] = [
     },
 ]
 
-NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_1031 is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_1031", {"excerpt_label": "§1031(a),(b),(c),(d) — nonrecognition, boot, basis",
+                 "location_reference": "§1031(a)-(d)",
+                 "excerpt_text": (
+                     "No gain or loss is recognized on the exchange of real property held for productive use "
+                     "in a trade or business or for investment if such property is exchanged solely for real "
+                     "property of like kind to be so held (§1031(a); real property only for exchanges after "
+                     "2017). If the taxpayer also receives money or non-like-kind property (boot), gain (but "
+                     "not loss) is recognized to the extent of that money and the FMV of the other property "
+                     "(§1031(b),(c)). The basis of the property received is the basis of the property given "
+                     "up, decreased by money received and increased by gain (or decreased by loss) recognized "
+                     "(§1031(d))."),
+                 "summary_text": "Real-property-only nonrecognition; gain recognized up to boot, no loss; substituted basis.",
+                 "is_key_excerpt": True}),
+]
 
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
     ("IRC_1031", "8824", "governs"),

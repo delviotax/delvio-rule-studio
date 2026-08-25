@@ -266,6 +266,7 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
 
 EXISTING_SOURCES_TO_REFERENCE: list[str] = [
     "IRS_2025_1040_FORM",  # Schedule C line 29/30 cross-form lines
+    "IRC_280A",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
 ]
 
 
@@ -370,38 +371,6 @@ AUTHORITY_SOURCES: list[dict] = [
         ],
     },
     {
-        "source_code": "IRC_280A",
-        "source_type": "statute",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "title": "IRC §280A — Disallowance of certain expenses in connection with business use of home",
-        "citation": "26 U.S.C. §280A (§280A(c)(1) business-use exception; §280A(c)(5) gross-income limitation + carryover)",
-        "issuer": "U.S. Congress",
-        "official_url": "https://www.law.cornell.edu/uscode/text/26/280A",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "trust_score": 10.0,
-        "topics": ["business_use_of_home"],
-        "excerpts": [
-            {
-                "excerpt_label": "§280A(c)(1) business use + (c)(5) gross-income limitation & ordering",
-                "excerpt_text": (
-                    "§280A(c)(1): a deduction is allowed for the portion of a dwelling unit used exclusively and "
-                    "regularly as the principal place of business, a place to meet patients/clients/customers, or a "
-                    "separate structure. §280A(c)(5): the deductions allowable for business use of the home (other than "
-                    "those allowable without regard to business use — i.e., mortgage interest and real estate taxes) "
-                    "may not exceed the gross income from the business use reduced by (A) the deductions allocable to "
-                    "the business that are not home-use deductions, and (B) the home-use deductions allowable without "
-                    "regard to business use. Amounts disallowed by this limitation carry over to the succeeding year, "
-                    "subject to the same limitation. The ordering: otherwise-allowable items first, then operating "
-                    "expenses, then depreciation (so depreciation is the first to be disallowed and carried over)."
-                ),
-                "summary_text": "§280A(c)(5): home-office deduction capped at business gross income; disallowed amounts carry over; deduct in order — deductible-anyway, then operating, then depreciation.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
-    {
         "source_code": "IRC_168_PUB946",
         "source_type": "statute",
         "source_rank": "primary_official",
@@ -433,7 +402,25 @@ AUTHORITY_SOURCES: list[dict] = [
     },
 ]
 
-NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_280A is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_280A", {
+                    "excerpt_label": "§280A(c)(1) business use + (c)(5) gross-income limitation & ordering",
+                    "excerpt_text": (
+                        "§280A(c)(1): a deduction is allowed for the portion of a dwelling unit used exclusively and "
+                        "regularly as the principal place of business, a place to meet patients/clients/customers, or a "
+                        "separate structure. §280A(c)(5): the deductions allowable for business use of the home (other than "
+                        "those allowable without regard to business use — i.e., mortgage interest and real estate taxes) "
+                        "may not exceed the gross income from the business use reduced by (A) the deductions allocable to "
+                        "the business that are not home-use deductions, and (B) the home-use deductions allowable without "
+                        "regard to business use. Amounts disallowed by this limitation carry over to the succeeding year, "
+                        "subject to the same limitation. The ordering: otherwise-allowable items first, then operating "
+                        "expenses, then depreciation (so depreciation is the first to be disallowed and carried over)."
+                    ),
+                    "summary_text": "§280A(c)(5): home-office deduction capped at business gross income; disallowed amounts carry over; deduct in order — deductible-anyway, then operating, then depreciation.",
+                    "is_key_excerpt": True,
+                }),
+]
 
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
     ("IRS_2025_8829_FORM", "8829", "defines"),

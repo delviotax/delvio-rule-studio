@@ -228,109 +228,13 @@ EXISTING_SOURCES_TO_REFERENCE: list[str] = [
     "IRS_2025_SCHE_INSTR",     # from load_1040_schedule_e
     "IRS_2025_F8582_INSTR",    # passive loss limitation
     "IRC_469",                 # passive activity
+    "IRC_1402",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
+    "IRC_199A",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
+    "IRS_2025_1065_K1_INSTR",  # ownership -> forms_1065.py (A3/D-42, 2026-08-25)
+    "IRS_2025_1120S_K1_INSTR",  # ownership -> forms_1120s.py (A3/D-42, 2026-08-25)
 ]
 
 AUTHORITY_SOURCES: list[dict] = [
-    {
-        "source_code": "IRS_2025_1065_K1_INSTR",
-        "source_type": "official_instructions",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1040",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "2025 Partner's Instructions for Schedule K-1 (Form 1065)",
-        "citation": "Partner's Instructions for Schedule K-1 (Form 1065) (2025); i1065sk1",
-        "issuer": "IRS",
-        "official_url": "https://www.irs.gov/pub/irs-pdf/i1065sk1.pdf",
-        "current_status": "active",
-        "is_substantive_authority": False,
-        "is_filing_authority": True,
-        "trust_score": 9.50,
-        "requires_human_review": True,
-        "notes": "Partner K-1 box routing: box 1/2/3 → Sch E line 28 cols (g)/(h)/(i)/(k) by material participation; box 4a/4b guaranteed payments → col (k); box 5/6a/6b → Sch B; box 7 → Sch E Part I line 4; box 8/9a → Sch D line 5/12; box 12 §179 → col (j); box 14 code A net SE → Sch SE; box 20 code Z → §199A. REQUIRES HUMAN REVIEW: confirm box codes vs the 2025 K-1 (pinned from f1065sk1.pdf + i1065sk1 at the spec leg).",
-        "topics": ["k1_passthrough"],
-        "excerpts": [
-            {
-                "excerpt_label": "Box 1 → Sch E line 28 columns (passive vs material participation)",
-                "location_reference": "i1065sk1 (2025), Box 1 Ordinary Business Income (Loss)",
-                "excerpt_text": (
-                    "1. Report box 1 income (loss) from partnership trade or business activities in which you "
-                    "materially participated in column (i) or (k) of Schedule E (Form 1040), line 28. 2. … did not "
-                    "materially participate … a. If income is reported in box 1, report the income in column (h) … "
-                    "b. If a loss is reported in box 1, follow the Instructions for Form 8582 … column (g)."
-                ),
-                "summary_text": "Box 1 (and 2/3): material participation → col (i) loss / (k) income; passive income → (h); passive loss → (g) via Form 8582.",
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "Box 14 code A net SE earnings → Schedule SE; codes B/C optional methods",
-                "location_reference": "i1065sk1 (2025), Box 14 Self-Employment Earnings (Loss)",
-                "excerpt_text": (
-                    "Code A. Net earnings (loss) from self-employment. If you're a general partner, reduce this "
-                    "amount before entering it on Schedule SE (Form 1040) by any section 179 expense deduction "
-                    "claimed, unreimbursed partnership expenses claimed, and depletion … Code B. Gross farming or "
-                    "fishing income … Code C. Gross nonfarm income … nonfarm optional method on Schedule SE Part II."
-                ),
-                "summary_text": "Box 14 code A = net SE earnings → Schedule SE; codes B/C = gross farm/nonfarm for the optional methods (RED-defer in v1).",
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "Box 20 code Z — Section 199A information",
-                "location_reference": "i1065sk1 (2025), Box 20 code Z",
-                "excerpt_text": (
-                    "Code Z. Section 199A information. Generally, you may be allowed a deduction of up to 20% of "
-                    "your net qualified business income (QBI) plus 20% of your qualified REIT dividends, also known "
-                    "as section 199A dividends, and qualified PTP income from your partnership."
-                ),
-                "summary_text": "Box 20 code Z = §199A information (QBI + REIT dividends + PTP) → Form 8995 / 8995-A.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
-    {
-        "source_code": "IRS_2025_1120S_K1_INSTR",
-        "source_type": "official_instructions",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1040",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "2025 Shareholder's Instructions for Schedule K-1 (Form 1120-S)",
-        "citation": "Shareholder's Instructions for Schedule K-1 (Form 1120-S) (2025); i1120ssk",
-        "issuer": "IRS",
-        "official_url": "https://www.irs.gov/pub/irs-pdf/i1120ssk.pdf",
-        "current_status": "active",
-        "is_substantive_authority": False,
-        "is_filing_authority": True,
-        "trust_score": 9.50,
-        "requires_human_review": True,
-        "notes": "S-corp shareholder K-1: box 1/2/3 → Sch E line 28 (same passive/material logic); box 4/5a/5b → Sch B; box 6 royalties → Sch E Part I; box 7/8a → Sch D 5/12; box 11 §179 → col (j); box 17 code V → §199A. NO self-employment tax on the shareholder's share. REQUIRES HUMAN REVIEW: confirm vs the 2025 1120-S K-1.",
-        "topics": ["k1_passthrough"],
-        "excerpts": [
-            {
-                "excerpt_label": "S-corp share is not self-employment income",
-                "location_reference": "i1120ssk (2025), General Information",
-                "excerpt_text": (
-                    "Your share of S corporation income isn't self-employment income and it isn't subject to "
-                    "self-employment tax."
-                ),
-                "summary_text": "An S-corp shareholder's distributive share is NOT subject to SE tax (no Schedule SE flow).",
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "Box 17 code V — Section 199A information",
-                "location_reference": "i1120ssk (2025), Box 17 code V",
-                "excerpt_text": (
-                    "Code V. Section 199A information. Generally, you may be allowed a deduction of up to 20% of "
-                    "your net qualified business income (QBI) plus 20% of your qualified REIT dividends, also known "
-                    "as section 199A dividends, and qualified publicly traded partnership (PTP) income."
-                ),
-                "summary_text": "Box 17 code V = §199A information → Form 8995 / 8995-A.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
     {
         "source_code": "IRS_2025_1041_K1_INSTR",
         "source_type": "official_instructions",
@@ -362,73 +266,6 @@ AUTHORITY_SOURCES: list[dict] = [
                     "rental income → Schedule E, line 33, column (d) or (f). 14 code I. Section 199A information."
                 ),
                 "summary_text": "1041 K-1: interest/dividends/cap-gains → 1040/Sch D; boxes 5/6/7/8 → Sch E Part III line 33 cols (d)/(f); box 14 code I = §199A.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
-    {
-        "source_code": "IRC_199A",
-        "source_type": "statute",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1040",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "IRC §199A — Qualified Business Income Deduction",
-        "citation": "26 U.S.C. §199A (20% QBI deduction; §199A(b) combined amount; §199A(e)(3) qualified REIT dividends and PTP income)",
-        "issuer": "U.S. Congress",
-        "official_url": "https://www.law.cornell.edu/uscode/text/26/199A",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "is_filing_authority": False,
-        "trust_score": 10.00,
-        "requires_human_review": False,
-        "notes": "The 20% QBI deduction. A K-1's §199A info (QBI, REIT dividends, PTP income) is the recipient's input to Form 8995/8995-A. v1 routes QBI → 8995 line 2 and REIT/PTP → 8995 line 6 (the existing Topic-8 8995 engine).",
-        "topics": ["k1_passthrough"],
-        "excerpts": [
-            {
-                "excerpt_label": "§199A 20% deduction on QBI + REIT/PTP",
-                "location_reference": "26 U.S.C. §199A(a),(b),(e)(3)",
-                "excerpt_text": (
-                    "There shall be allowed as a deduction an amount equal to … 20 percent of the qualified business "
-                    "income … plus … 20 percent of the aggregate amount of the qualified REIT dividends and qualified "
-                    "publicly traded partnership income."
-                ),
-                "summary_text": "§199A: 20% of QBI plus 20% of qualified REIT dividends and qualified PTP income.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
-    {
-        "source_code": "IRC_1402",
-        "source_type": "statute",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1040",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "IRC §1402 — Net Earnings From Self-Employment",
-        "citation": "26 U.S.C. §1402(a) (a partner's distributive share of partnership trade-or-business income is SE earnings); §1402(a)(13) limited partner exclusion",
-        "issuer": "U.S. Congress",
-        "official_url": "https://www.law.cornell.edu/uscode/text/26/1402",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "is_filing_authority": False,
-        "trust_score": 10.00,
-        "requires_human_review": False,
-        "notes": "A general partner's distributive share + guaranteed payments are SE earnings (1065 box 14A) → Schedule SE. §1402(a)(13): a limited partner's share (other than guaranteed payments for services) is excluded. An S-corp shareholder's share is NOT SE income (§1402 covers partners, not S-corp shareholders).",
-        "topics": ["k1_passthrough"],
-        "excerpts": [
-            {
-                "excerpt_label": "§1402(a) partner's distributive share is SE earnings",
-                "location_reference": "26 U.S.C. §1402(a), (a)(13)",
-                "excerpt_text": (
-                    "The term 'net earnings from self-employment' means … the distributive share (whether or not "
-                    "distributed) of income or loss … from any trade or business carried on by a partnership of which "
-                    "he is a member … there shall be excluded the distributive share of any item of income or loss "
-                    "of a limited partner, as such, other than guaranteed payments … for services actually rendered."
-                ),
-                "summary_text": "Partner's trade/business distributive share = SE earnings (box 14A → Sch SE); a limited partner excludes all but guaranteed payments for services.",
                 "is_key_excerpt": True,
             },
         ],
@@ -468,7 +305,94 @@ AUTHORITY_SOURCES: list[dict] = [
     },
 ]
 
-NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_1402 is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_1402", {
+                    "excerpt_label": "§1402(a) partner's distributive share is SE earnings",
+                    "location_reference": "26 U.S.C. §1402(a), (a)(13)",
+                    "excerpt_text": (
+                        "The term 'net earnings from self-employment' means … the distributive share (whether or not "
+                        "distributed) of income or loss … from any trade or business carried on by a partnership of which "
+                        "he is a member … there shall be excluded the distributive share of any item of income or loss "
+                        "of a limited partner, as such, other than guaranteed payments … for services actually rendered."
+                    ),
+                    "summary_text": "Partner's trade/business distributive share = SE earnings (box 14A → Sch SE); a limited partner excludes all but guaranteed payments for services.",
+                    "is_key_excerpt": True,
+                }),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_199A is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_199A", {
+                    "excerpt_label": "§199A 20% deduction on QBI + REIT/PTP",
+                    "location_reference": "26 U.S.C. §199A(a),(b),(e)(3)",
+                    "excerpt_text": (
+                        "There shall be allowed as a deduction an amount equal to … 20 percent of the qualified business "
+                        "income … plus … 20 percent of the aggregate amount of the qualified REIT dividends and qualified "
+                        "publicly traded partnership income."
+                    ),
+                    "summary_text": "§199A: 20% of QBI plus 20% of qualified REIT dividends and qualified PTP income.",
+                    "is_key_excerpt": True,
+                }),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRS_2025_1065_K1_INSTR is DECLARED by forms_1065.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRS_2025_1065_K1_INSTR", {
+                    "excerpt_label": "Box 1 → Sch E line 28 columns (passive vs material participation)",
+                    "location_reference": "i1065sk1 (2025), Box 1 Ordinary Business Income (Loss)",
+                    "excerpt_text": (
+                        "1. Report box 1 income (loss) from partnership trade or business activities in which you "
+                        "materially participated in column (i) or (k) of Schedule E (Form 1040), line 28. 2. … did not "
+                        "materially participate … a. If income is reported in box 1, report the income in column (h) … "
+                        "b. If a loss is reported in box 1, follow the Instructions for Form 8582 … column (g)."
+                    ),
+                    "summary_text": "Box 1 (and 2/3): material participation → col (i) loss / (k) income; passive income → (h); passive loss → (g) via Form 8582.",
+                    "is_key_excerpt": True,
+                }),
+    ("IRS_2025_1065_K1_INSTR", {
+                    "excerpt_label": "Box 14 code A net SE earnings → Schedule SE; codes B/C optional methods",
+                    "location_reference": "i1065sk1 (2025), Box 14 Self-Employment Earnings (Loss)",
+                    "excerpt_text": (
+                        "Code A. Net earnings (loss) from self-employment. If you're a general partner, reduce this "
+                        "amount before entering it on Schedule SE (Form 1040) by any section 179 expense deduction "
+                        "claimed, unreimbursed partnership expenses claimed, and depletion … Code B. Gross farming or "
+                        "fishing income … Code C. Gross nonfarm income … nonfarm optional method on Schedule SE Part II."
+                    ),
+                    "summary_text": "Box 14 code A = net SE earnings → Schedule SE; codes B/C = gross farm/nonfarm for the optional methods (RED-defer in v1).",
+                    "is_key_excerpt": True,
+                }),
+    ("IRS_2025_1065_K1_INSTR", {
+                    "excerpt_label": "Box 20 code Z — Section 199A information",
+                    "location_reference": "i1065sk1 (2025), Box 20 code Z",
+                    "excerpt_text": (
+                        "Code Z. Section 199A information. Generally, you may be allowed a deduction of up to 20% of "
+                        "your net qualified business income (QBI) plus 20% of your qualified REIT dividends, also known "
+                        "as section 199A dividends, and qualified PTP income from your partnership."
+                    ),
+                    "summary_text": "Box 20 code Z = §199A information (QBI + REIT dividends + PTP) → Form 8995 / 8995-A.",
+                    "is_key_excerpt": True,
+                }),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRS_2025_1120S_K1_INSTR is DECLARED by forms_1120s.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRS_2025_1120S_K1_INSTR", {
+                    "excerpt_label": "S-corp share is not self-employment income",
+                    "location_reference": "i1120ssk (2025), General Information",
+                    "excerpt_text": (
+                        "Your share of S corporation income isn't self-employment income and it isn't subject to "
+                        "self-employment tax."
+                    ),
+                    "summary_text": "An S-corp shareholder's distributive share is NOT subject to SE tax (no Schedule SE flow).",
+                    "is_key_excerpt": True,
+                }),
+    ("IRS_2025_1120S_K1_INSTR", {
+                    "excerpt_label": "Box 17 code V — Section 199A information",
+                    "location_reference": "i1120ssk (2025), Box 17 code V",
+                    "excerpt_text": (
+                        "Code V. Section 199A information. Generally, you may be allowed a deduction of up to 20% of "
+                        "your net qualified business income (QBI) plus 20% of your qualified REIT dividends, also known "
+                        "as section 199A dividends, and qualified publicly traded partnership (PTP) income."
+                    ),
+                    "summary_text": "Box 17 code V = §199A information → Form 8995 / 8995-A.",
+                    "is_key_excerpt": True,
+                }),
+]
 
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
     ("IRS_2025_1065_K1_INSTR", "SCHEDULE_K1", "governs"),

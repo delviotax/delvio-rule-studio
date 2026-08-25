@@ -6,10 +6,10 @@ WHY THIS EXISTS
 `SourceType`/`SourceRank` are `TextChoices`, which Django validates in `full_clean()` —
 a method `update_or_create()` never calls. There is no DB check constraint either. So a
 loader can write `"state_instructions"` (plural), `"federal_form"` or `"statute"` and it
-lands in production silently. 233 rows currently do.
+lands in production silently. 211 prod rows currently hold one.
 
 ⭐ A ratchet is the right instrument precisely because it needs NO ruling on the existing
-debt. It does not ask anyone to fix 233 rows. It stops the 234th.
+debt. It does not ask anyone to fix the backlog. It stops the next one.
 
 WHY IT MOVED HERE (2026-08-25, campaign D-41 — Ken: "yes", run it in the seed pre-flight)
 ------------------------------------------------------------------------------------------
@@ -28,8 +28,8 @@ SCOPE
 ⚠ The pytest version globbed `load_*.py` only — the same directory/pattern blindness that
 made the two-writers guard miss two thirds of its problem (D-40). This one reuses
 `_authority_guard.coverage()`, so it sees all three writer populations. Verified
-2026-08-25: both scopes agree at 108 `statute` occurrences, because no non-`load_` module
-contributes an invalid value today. Agreeing today is not a reason to stay narrow.
+2026-08-25: both scopes agreed exactly when measured, because no non-`load_` module
+contributed an invalid value that day. Agreeing on one day is not a reason to stay narrow.
 
 ⚠ NOT CLAIMED: none of this affects a computed tax figure. `source_type` and `source_rank`
 are provenance metadata — they drive retrieval (`sources/views.py` filters on
@@ -49,26 +49,28 @@ from . import _authority_guard as AG
 #   NEVER raise it to make a seed pass. A new invalid value is a typo to fix,
 #   not a number to accommodate.
 #
-# Set 2026-08-25 after campaign D-41 corrected seven rows across four loaders
+# Re-tightened 2026-08-25 after campaign A3/D-42: converting 20 non-owner declarations
+# into references DELETED their invalid values too — source_type 233 -> 213, rank 5 -> 4.
+# ⭐ Resolving ownership shrinks the vocabulary debt as a side effect.
+# Previously set 2026-08-25 after campaign D-41 corrected seven rows across four loaders
 # (`state_instructions`->`state_instruction` x4, `federal_form`->`official_form`,
 # `official_instructions`->`state_instruction`, `state_guidance`->`state_instruction`).
 # Previous baseline, frozen 2026-08-16, totalled 234 source_type occurrences.
 # ---------------------------------------------------------------------------
 SOURCE_TYPE_DEBT: dict[str, int] = {
-    "statute": 108,
-    "official_instructions": 60,
-    "federal_form": 29,
-    "official_guidance": 28,
-    "instructions": 2,
-    "revenue_procedure": 2,
-    "form": 2,
-    "irs_guidance": 1,
-    "case_law": 1,
+    "statute":                 94,
+    "official_instructions":   54,
+    "federal_form":            29,
+    "official_guidance":       28,
+    "form":                    2,
+    "instructions":            2,
+    "revenue_procedure":       2,
+    "case_law":                1,
+    "irs_guidance":            1,
 }
 
 SOURCE_RANK_DEBT: dict[str, int] = {
-    "primary_authority": 4,
-    "primary_statute": 1,
+    "primary_authority":       4,
 }
 
 

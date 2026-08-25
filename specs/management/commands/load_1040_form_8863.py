@@ -168,6 +168,7 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
 EXISTING_SOURCES_TO_REFERENCE: list[str] = [
     "IRS_2025_1040_FORM",
     "IRS_2025_1040_INSTR",
+    "IRC_25A",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
 ]
 
 AUTHORITY_SOURCES: list[dict] = [
@@ -248,55 +249,6 @@ AUTHORITY_SOURCES: list[dict] = [
         ],
     },
     {
-        "source_code": "IRC_25A",
-        "source_type": "statute",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1040",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "IRC §25A — Hope and Lifetime Learning Credits (the education credits)",
-        "citation": "26 U.S.C. §25A (§25A(b) AOTC; §25A(c) LLC; §25A(d) phaseout; §25A(i) the refundable AOTC + the line-7 lockout)",
-        "issuer": "U.S. Congress",
-        "official_url": "https://uscode.house.gov/view.xhtml?req=(title:26%20section:25A%20edition:prelim)",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "is_filing_authority": False,
-        "trust_score": 10.00,
-        "requires_human_review": False,
-        "notes": ("The substantive §25A authority: §25A(b)(1) the 100%/25% AOTC; §25A(c)(1) the 20% LLC; "
-                  "§25A(d) the MAGI phaseout; §25A(i)(5) the 40% refundable portion; §25A(i)(6) the line-7 "
-                  "kiddie-tax lockout (cross-references §1(g))."),
-        "topics": ["education_credits"],
-        "excerpts": [
-            {
-                "excerpt_label": "§25A(b)/(c)/(d) AOTC + LLC + phaseout",
-                "location_reference": "26 U.S.C. §25A(b)(1), (c)(1), (d)",
-                "excerpt_text": (
-                    "§25A(b)(1): the American Opportunity Credit = 100% of so much of the qualified tuition and "
-                    "related expenses as does not exceed $2,000, plus 25% of such expenses in excess of $2,000 "
-                    "(but not more than $4,000). §25A(c)(1): the Lifetime Learning Credit = 20% of so much of "
-                    "the qualified expenses as does not exceed $10,000. §25A(d): the credit phases out ratably "
-                    "over a $10,000 ($20,000 joint) modified-AGI range."
-                ),
-                "summary_text": "§25A(b) AOTC 100%/25% to $4,000; (c) LLC 20% to $10,000; (d) the $10k/$20k phaseout range.",
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "§25A(i) refundable AOTC + the line-7 lockout",
-                "location_reference": "26 U.S.C. §25A(i)(5), (i)(6)",
-                "excerpt_text": (
-                    "§25A(i)(5): 40% of the American Opportunity Credit is treated as a refundable credit. "
-                    "§25A(i)(6): the refundable portion does not apply to a taxpayer to whom the §1(g) "
-                    "kiddie-tax rules apply (a child under 24 with the support/parent/joint-return conditions); "
-                    "the entire credit is then nonrefundable."
-                ),
-                "summary_text": "§25A(i)(5): 40% refundable. (i)(6): the §1(g) kiddie-tax child loses the refundable portion.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
-    {
         "source_code": "IRS_PUB_970",
         "source_type": "official_guidance",
         "source_rank": "primary_official",
@@ -347,7 +299,34 @@ AUTHORITY_SOURCES: list[dict] = [
     },
 ]
 
-NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_25A is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_25A", {
+                    "excerpt_label": "§25A(b)/(c)/(d) AOTC + LLC + phaseout",
+                    "location_reference": "26 U.S.C. §25A(b)(1), (c)(1), (d)",
+                    "excerpt_text": (
+                        "§25A(b)(1): the American Opportunity Credit = 100% of so much of the qualified tuition and "
+                        "related expenses as does not exceed $2,000, plus 25% of such expenses in excess of $2,000 "
+                        "(but not more than $4,000). §25A(c)(1): the Lifetime Learning Credit = 20% of so much of "
+                        "the qualified expenses as does not exceed $10,000. §25A(d): the credit phases out ratably "
+                        "over a $10,000 ($20,000 joint) modified-AGI range."
+                    ),
+                    "summary_text": "§25A(b) AOTC 100%/25% to $4,000; (c) LLC 20% to $10,000; (d) the $10k/$20k phaseout range.",
+                    "is_key_excerpt": True,
+                }),
+    ("IRC_25A", {
+                    "excerpt_label": "§25A(i) refundable AOTC + the line-7 lockout",
+                    "location_reference": "26 U.S.C. §25A(i)(5), (i)(6)",
+                    "excerpt_text": (
+                        "§25A(i)(5): 40% of the American Opportunity Credit is treated as a refundable credit. "
+                        "§25A(i)(6): the refundable portion does not apply to a taxpayer to whom the §1(g) "
+                        "kiddie-tax rules apply (a child under 24 with the support/parent/joint-return conditions); "
+                        "the entire credit is then nonrefundable."
+                    ),
+                    "summary_text": "§25A(i)(5): 40% refundable. (i)(6): the §1(g) kiddie-tax child loses the refundable portion.",
+                    "is_key_excerpt": True,
+                }),
+]
 
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
     ("IRS_2025_F8863_INSTR", "FORM_8863", "governs"),

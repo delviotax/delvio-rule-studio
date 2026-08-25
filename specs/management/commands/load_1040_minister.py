@@ -154,6 +154,7 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
 EXISTING_SOURCES_TO_REFERENCE: list[str] = [
     "IRS_2025_1040_FORM",
     "IRS_2025_1040_INSTR",
+    "IRC_1402",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
 ]
 
 AUTHORITY_SOURCES: list[dict] = [
@@ -304,57 +305,6 @@ AUTHORITY_SOURCES: list[dict] = [
         ],
     },
     {
-        "source_code": "IRC_1402",
-        "source_type": "statute",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1040",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "IRC §1402 — Definitions (self-employment); §1402(a)(8) clergy housing; §1402(e) exemption",
-        "citation": "26 U.S.C. §1402(a)(8), §1402(c)(4), §1402(e)",
-        "issuer": "U.S. Congress",
-        "official_url": "https://uscode.house.gov/view.xhtml?req=(title:26%20section:1402%20edition:prelim)",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "is_filing_authority": False,
-        "trust_score": 10.00,
-        "requires_human_review": True,
-        "notes": (
-            "§1402(c)(4) makes the performance of ministerial services a trade or business (self-employment) "
-            "even when the minister is a common-law employee; §1402(a)(8) adds the §107 housing/parsonage "
-            "value back into net SE earnings; §1402(e) authorizes the Form 4361 exemption. §1402(a)(12) "
-            "is the 0.9235 net-earnings multiplier (applied on Schedule SE by the existing engine)."
-        ),
-        "topics": ["minister_clergy_tax"],
-        "excerpts": [
-            {
-                "excerpt_label": "§1402(a)(8) — housing/parsonage in net SE earnings",
-                "location_reference": "26 U.S.C. §1402(a)(8)",
-                "excerpt_text": (
-                    "The rental value of a home furnished to a minister, or a rental allowance paid to a "
-                    "minister (including the value of meals and lodging), shall be included in computing "
-                    "net earnings from self-employment, notwithstanding the exclusion of such amounts from "
-                    "gross income under section 107."
-                ),
-                "summary_text": "§1402(a)(8): the §107-excluded housing/parsonage value is added back into the SE base.",
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "§1402(e) — Form 4361 exemption from SE tax",
-                "location_reference": "26 U.S.C. §1402(e)",
-                "excerpt_text": (
-                    "A minister who is conscientiously opposed to, or because of religious principles "
-                    "opposed to, the acceptance of public insurance may file an application for an "
-                    "exemption from the tax imposed by chapter 2 with respect to services performed as a "
-                    "minister. An approved exemption is irrevocable."
-                ),
-                "summary_text": "§1402(e): an approved Form 4361 exempts ministerial earnings from SE tax; irrevocable.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
-    {
         "source_code": "IRS_2025_F4361",
         "source_type": "official_form",
         "source_rank": "primary_official",
@@ -397,7 +347,33 @@ AUTHORITY_SOURCES: list[dict] = [
     },
 ]
 
-NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_1402 is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_1402", {
+                    "excerpt_label": "§1402(a)(8) — housing/parsonage in net SE earnings",
+                    "location_reference": "26 U.S.C. §1402(a)(8)",
+                    "excerpt_text": (
+                        "The rental value of a home furnished to a minister, or a rental allowance paid to a "
+                        "minister (including the value of meals and lodging), shall be included in computing "
+                        "net earnings from self-employment, notwithstanding the exclusion of such amounts from "
+                        "gross income under section 107."
+                    ),
+                    "summary_text": "§1402(a)(8): the §107-excluded housing/parsonage value is added back into the SE base.",
+                    "is_key_excerpt": True,
+                }),
+    ("IRC_1402", {
+                    "excerpt_label": "§1402(e) — Form 4361 exemption from SE tax",
+                    "location_reference": "26 U.S.C. §1402(e)",
+                    "excerpt_text": (
+                        "A minister who is conscientiously opposed to, or because of religious principles "
+                        "opposed to, the acceptance of public insurance may file an application for an "
+                        "exemption from the tax imposed by chapter 2 with respect to services performed as a "
+                        "minister. An approved exemption is irrevocable."
+                    ),
+                    "summary_text": "§1402(e): an approved Form 4361 exempts ministerial earnings from SE tax; irrevocable.",
+                    "is_key_excerpt": True,
+                }),
+]
 
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
     ("IRS_2025_PUB517", "MINISTER", "governs"),

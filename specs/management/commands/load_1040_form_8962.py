@@ -157,6 +157,7 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
 EXISTING_SOURCES_TO_REFERENCE: list[str] = [
     "IRS_2025_1040_FORM",
     "IRS_2025_1040_INSTR",
+    "IRC_36B",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
 ]
 
 AUTHORITY_SOURCES: list[dict] = [
@@ -275,40 +276,6 @@ AUTHORITY_SOURCES: list[dict] = [
         ],
     },
     {
-        "source_code": "IRC_36B",
-        "source_type": "statute",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1040",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "IRC §36B — Refundable Credit for Coverage Under a Qualified Health Plan",
-        "citation": "26 U.S.C. §36B (premium tax credit; §36B(b) the applicable percentage; §36B(f) reconciliation of advance payments)",
-        "issuer": "U.S. Congress",
-        "official_url": "https://www.law.cornell.edu/uscode/text/26/36B",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "is_filing_authority": False,
-        "trust_score": 10.00,
-        "requires_human_review": False,
-        "notes": "The substantive PTC authority: §36B(b)(3)(A) applicable percentage (the ARPA/IRA enhancement through 2025); §36B(c)(1) household income / MAGI; §36B(f)(2) reconciliation + the repayment limitation.",
-        "topics": ["premium_tax_credit"],
-        "excerpts": [
-            {
-                "excerpt_label": "§36B(f) reconciliation + repayment limitation",
-                "location_reference": "26 U.S.C. §36B(f)(2)",
-                "excerpt_text": (
-                    "§36B(f)(2)(A): if the advance payments exceed the allowed credit, the tax is increased by "
-                    "the excess. §36B(f)(2)(B): the increase is limited (for households under 400% of the "
-                    "poverty line) to the applicable dollar amount; the limitation does not apply at or above "
-                    "400%. The ARPA/IRA enhanced applicable-percentage table applies through 2025."
-                ),
-                "summary_text": "§36B(f): reconcile APTC vs PTC; repayment limited under 400% FPL; enhanced table through 2025.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
-    {
         "source_code": "IRS_PUB_974",
         "source_type": "official_guidance",
         "source_rank": "primary_official",
@@ -345,7 +312,21 @@ AUTHORITY_SOURCES: list[dict] = [
     },
 ]
 
-NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_36B is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_36B", {
+                    "excerpt_label": "§36B(f) reconciliation + repayment limitation",
+                    "location_reference": "26 U.S.C. §36B(f)(2)",
+                    "excerpt_text": (
+                        "§36B(f)(2)(A): if the advance payments exceed the allowed credit, the tax is increased by "
+                        "the excess. §36B(f)(2)(B): the increase is limited (for households under 400% of the "
+                        "poverty line) to the applicable dollar amount; the limitation does not apply at or above "
+                        "400%. The ARPA/IRA enhanced applicable-percentage table applies through 2025."
+                    ),
+                    "summary_text": "§36B(f): reconcile APTC vs PTC; repayment limited under 400% FPL; enhanced table through 2025.",
+                    "is_key_excerpt": True,
+                }),
+]
 
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
     ("IRS_2025_F8962_INSTR", "FORM_8962", "governs"),
