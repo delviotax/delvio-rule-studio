@@ -27,7 +27,7 @@ Usage:
 from django.core.management import call_command, get_commands
 from django.core.management.base import BaseCommand, CommandError
 
-from ._authority_guard import guard as authority_guard, selftest as authority_selftest
+from ._authority_guard import guard as authority_guard, selftest_report as authority_selftest_report
 
 # Loaders that amend an existing base spec and must run AFTER all base forms exist.
 # load_1120s_full amends SCH_K_1120S / SCHD_1120S (adds R010-R018 / R010-R012) — it must run
@@ -64,10 +64,15 @@ class Command(BaseCommand):
         # of them declare the same source_code the LAST one to run silently decides
         # what production holds. seed_all runs them all, in order, so it is exactly
         # where an unnoticed collision does its damage. Refuse before writing anything.
-        if not authority_selftest():
+        # ⚠ A1 (2026-08-25): the selftest now also proves the guard's SCOPE — that all
+        #   three writer populations are actually being read. The pre-A1 guard passed
+        #   its own selftest while blind to two of them, because a synthetic fixture
+        #   proves the MATCHING works and says nothing about what is being matched.
+        _ok, _why = authority_selftest_report()
+        if not _ok:
             raise CommandError(
-                "the two-writers guard's own selftest FAILED — it cannot detect a "
-                "synthetic collision, so its all-clear would mean nothing. Refusing to seed."
+                "the two-writers guard's own selftest FAILED, so its all-clear would mean "
+                "nothing. Refusing to seed.\n    " + "\n    ".join(_why)
             )
         authority_guard(write=self.stdout.write, raise_on_new=True)
 

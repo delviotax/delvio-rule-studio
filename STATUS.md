@@ -1,7 +1,7 @@
 ---
 type: project-status
 project: delvio-rule-studio
-last_updated: 2026-08-23
+last_updated: 2026-08-25
 ---
 
 # STATUS — delvio-rule-studio (renamed from sherpa-tax-rule-studio 2026-08-05; GitHub + local folder renamed, Render service name unchanged — see render.yaml note)
@@ -11,6 +11,72 @@ last_updated: 2026-08-23
 ---
 
 ## Current state
+
+### ⚠⚠ 2026-08-25 — THE TWO-WRITERS GUARD'S SCOPE IS FIXED (campaign A1, Ken's direct go)
+
+**It was seeing 19 of 46 disagreeing authority rows — 41%.** It scanned
+`specs/management/commands/` only; **three directories write `AuthoritySource` rows**:
+
+| population | modules | declaring | codes |
+|---|---|---|---|
+| `specs/management/commands/` | 132 | 118 | 621 |
+| `sources/management/commands/` (`load_1120s_family.py`) | 16 | 1 | 7 |
+| `sources/federal_data/` (seeded by `load_all_federal`) | 7 | 6 | 98 |
+| **merged** | **155** | **125** | **690** — exactly prod's row count |
+
+⭐ **It was the same defect one generation later.** The ad-hoc guard this one replaced could not see
+`_state_conformity_tier1.py`; the fix widened the FILE PATTERN and kept the DIRECTORY, and the
+population it still could not see was four times larger than the one that motivated it.
+
+**What changed in `_authority_guard.py`:**
+- Three readers. ⚠ `sources/federal_data/` is read by **IMPORT, not `ast`** — its rows are built by
+  helper calls (`_irc(...)`), so no literal-dict scan can see them. A deliberate, scoped exception
+  to the "no execution" rule, recorded in the file; those modules are pure data and import without
+  Django. The alternative — pattern-matching the helper call — is the prose-matching method this
+  campaign has discarded three times.
+- Writer labels are **population-qualified** (`specs/load_x.py`), so two modules sharing a basename
+  across directories can never be conflated.
+- 🔴 **`guard()` now REFUSES when a population goes dark**, instead of reporting clean. And
+  `selftest()` asserts every population is actually read — **the property the old selftest could
+  not check**, because a synthetic fixture proves the MATCHING works and says nothing about SCOPE.
+- `ACKNOWLEDGED` regenerated from the widened scan (23 → **53**; 46 disagreeing + 7 identical) via
+  the new `check_authority_owners --regenerate-acknowledged`. **Generated, never typed.**
+  ⚠ **The list grew because the SCOPE was fixed, not because anything got worse.**
+- ⚠ **Six of the previous 23 writer sets were incomplete**, including **`IRC_704`, filed as
+  *"identical today"* while its unseen third writer disagreed on six fields.**
+- 🔴 Fixed in `check_authority_owners.py`: `new` was computed as `c not in ACKNOWLEDGED` — **by code,
+  not by writer set** — so its summary could print "0 NEW" while `guard()` refused. Now both use
+  `is_acknowledged()`.
+- Hygiene: the guard no longer scans **its own selftest fixtures**. Pre-A1, `ZZ_SYNTHETIC_CODE` and
+  `ZZ_SOLE_WRITER` were counted as real declarations of the guard module.
+
+⭐ **Proved, not asserted — `scratchpad/validate_authority_guard_a1.py`, 20 checks, 20 pass / 0 fail.**
+Each check shows the new behaviour DIFFERS from the old: 621 → 690 codes, **19 → 46** disagreeing,
+no regression (all 19 retained), the guard raises and names the row, a joining module is refused,
+and — ⭐ **with `federal_data` pointed at a missing directory the guard REFUSES where the pre-A1 one
+would have passed.** Check 3 rediscovered **`IRC_704`** as the benign-that-isn't *without being told*.
+⚠ Nothing is pinned to a collision COUNT; that would go red the moment Ken resolves one.
+
+✅ Verified end to end: `check_authority_owners` (all four flags), **`seed_all --dry-run` clean, 0
+MISSING**. **No loader content edited, no `READY_TO_SEED` flipped, nothing seeded.**
+🔴 **RS pytest deliberately NOT run** — `test_postgres` is cross-repo and delvio-tax-89 is running
+sequential foreground suites against it. Held pending its all-clear.
+
+⚠⚠ **AND THE WIDENED GUARD IMMEDIATELY SHOWED SOMETHING: `seed_all` today would silently CHANGE 11
+authority rows.** Prod is **not reproducible from the loaders** — simulating overlay semantics in
+seed_all's phase order gives 42 rows untouched and **11 changed**, several of them moving a *valid*
+enum value to an *invalid* one (`IRC_172` `code_section` → `statute`; `SC_ACT63_2025_CONFORMITY`
+`state_statute` → `statute`). ⚠ **Not a tax-figure defect** — provenance metadata only. Recorded, not
+acted on: delvio-states `research/authority_ownership_assessment.md` §8.
+
+⚠ **Still true and NOT fixed by A1:** the guard runs on `seed_all` and `check_authority_owners`, **not
+on an individual `manage.py load_xx`.** The one-loader pre-flight stays explicit:
+`check_authority_owners --loader load_xx.py --strict`. And the underlying damage is worse than
+last-writer-wins — omitted keys keep the previous writer's value, so prod holds **chimeras**
+(4 confirmed) that re-seeding the rightful owner will not repair.
+
+---
+
 
 ✅ **`OR_20` SEEDED 2026-08-23. PROD 168 → 169. WAVE 5's C-CORP LANE IS CLOSED — for real this
 time.** All seven returns are live: `MD_500` · `VA_500` · `AZ_120` (+`AZ_120A`) · `MO_1120` ·
