@@ -1517,21 +1517,15 @@ F_SCENARIOS: list[dict] = [
               "ROUNDING RULE: at FULL precision Schedule A gives 9,308, not the filed 9,309 - so Alabama "
               "multiplies by the PRINTED two-decimal percentage. Stated nowhere; recovered by "
               "reconstruction, and pinned here so it cannot be lost."},
-    {"scenario_name": "AL40NR-H - ⚠⚠ the SAME return with retirement correctly in column B",
+    {"scenario_name": "AL40NR-H - ⚠⚠ the SAME return, retirement in column B PER THE EXEMPT LIST",
      "scenario_type": "edge", "sort_order": 8,
-     "inputs": {"same_as": "AL40NR-G", "retirement_distributions": 16214,
-                "retirement_exempt_by_plan_type": False},
-     "expected_outputs": {"AL40NR-9B": 55907, "AL40NR-10": 0.3065, "AL40NR-SCHA-30": 6608,
-                          "AL40NR-14": 1194, "AL40NR-15": 920, "AL40NR-17": 8722,
-                          "AL40NR-18": 8416, "AL40NR-19": 343},
-     "notes": "⚠⚠ THE WHOLE CASCADE MOVES TOGETHER, which is exactly why the error is invisible. Column B "
-              "rises 39,693 -> 55,907; the percentage falls 43.18% -> 30.65%; and the itemized deduction, "
-              "the federal-tax deduction and the personal exemption ALL shrink in step, so the return "
-              "still foots perfectly. Taxable income rises 4,853 -> 8,416 and the tax goes 174 -> 343, very nearly DOUBLE. "
-              "⚠ Alabama never taxes the retirement income itself - column C stays zero throughout. It is "
-              "the DENOMINATOR that does the damage."},
+     "inputs": {"same_as": "AL40NR-G", "retirement_distributions": 3181,
+                "retirement_exempt_by_plan_type": True},
+     "expected_outputs": {"AL40NR-9B": 42874, "AL40NR-10": 0.3997, "AL40NR-SCHA-30": 8617,
+                          "AL40NR-14": 1556, "AL40NR-15": 1199, "AL40NR-17": 11372,
+                          "AL40NR-18": 5766, "AL40NR-19": 210},
+     "notes": "⚠⚠ RE-BASED 2026-08-24 on Ken's ruling. This scenario previously carried column B 55,907 / 30.65% / tax 343, which added ALL THREE distributions (16,214). That was WRONG. The 2025 40NR booklet Line 3 states the rule - retirement a nonresident is not taxed on must still be included in total AGI from all sources IN ORDER TO COMPUTE THE RATIO - but the SAME PAGE carries an EXEMPT LIST directly beneath it, naming State of Alabama Teachers’ / Employees’ / Judicial Retirement and ANY defined benefit plan under IRC 414(j), which 'should not be included in the income reported on line 3'. The 13,033 is a Retirement Systems of Alabama pension - named by system AND a 414(j) DB plan - so it is excluded twice over. Only the two ordinary IRAs (885 + 2,296 = 3,181) belong in column B. ⭐ THE CASCADE STILL MOVES TOGETHER, which is why the error stays invisible: column B 39,693 -> 42,874, the PRINTED percentage 43.18% -> 39.97%, and the itemized deduction (9,309 -> 8,617), the federal-tax deduction (1,681 -> 1,556) and the personal exemption (1,295 -> 1,199) all shrink in step, so the return foots perfectly either way. Taxable income 4,853 -> 5,766; tax 174 -> 210. ⚠ THE EXPOSURE IS 36 DOLLARS, NOT 169 - the superseded reading overstated it roughly fourfold. ⚠ Alabama never taxes the retirement itself; column C stays zero throughout. It is the DENOMINATOR that does the damage, and only for plans that are NOT on the exempt list. ⚠ OPEN, and Ken’s: Schedule RS Part IV line 3 is 'Total Alabama TAXABLE Retirement Distribution' yet routes to this same column B line - followed literally it would put 0 here, not 3,181. Two measures, one destination."},
 
-    # ── The A1 divergence ──
     {"scenario_name": "AL40NR-I - ⚠ A1: form and regulation AGREE when federal AGI = Alabama all-source",
      "scenario_type": "edge", "sort_order": 9,
      "inputs": {"fit_liability": 30000, "taxpayer_federal_agi": 100000, "spouse_federal_agi": 100000,
