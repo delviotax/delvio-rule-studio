@@ -972,18 +972,40 @@ FORM_FACTS: list[dict] = [
     #   the engine derive confidently and sometimes wrongly — the defect family this
     #   campaign spent 2026-08-25 documenting.
     #   Deleted from prod via CTCODC_RETIRE_FACT_KEYS (the explicit-retirement pattern).
-    {"fact_key": "dep_tin_type", "label": "Dependent's taxpayer-ID type (SSN / ITIN / ATIN)",
-     "data_type": "string", "sort_order": 29,
+    {"fact_key": "dep_tin_type", "label": "Dependent's taxpayer-ID type",
+     "data_type": "choice", "choices": ["valid_ssn", "itin", "atin", "none"], "sort_order": 29,
      "notes": ("Per-Dependent. ⚠⚠ DECISIVE for CTC vs ODC: § 24(h)(7) requires a SOCIAL SECURITY "
                "number for the child tax credit, so an ITIN or ATIN dependent can qualify for ODC "
                "and NEVER for CTC. ⚠ Inferable from the number's own format (ITIN area 9xx with "
                "specific group ranges; ATIN 9xx-93-xxxx) — but inference is not a captured fact, "
-               "and a tax determination should not rest on parsing a string.")},
-    {"fact_key": "dep_ssn_valid_for_employment_by_due_date", "label": "SSN valid for employment, issued by the due date",
-     "data_type": "boolean", "sort_order": 30,
-     "notes": ("Per-Dependent. § 24(h)(7): the SSN must be valid for employment AND issued before "
-               "the return's due date including extensions. Fails it -> ODC, not CTC. Distinct from "
-               "dep_tin_type: a real SSN issued late still cannot support CTC.")},
+               "and a tax determination should not rest on parsing a string. "
+               "⭐ CHOICES ALIGNED 2026-08-25 to delvio-tax's TIN_TYPE_CHOICES verbatim "
+               "(Dependent.tin_type), on Ken's word. ⚠⚠ 'valid_ssn' is NOT merely 'has an SSN' — "
+               "its own label there reads 'Valid SSN (work-authorized, issued before due date)', i.e. "
+               "it ALREADY carries the whole of § 24(h)(7). That is why "
+               "dep_ssn_valid_for_employment_by_due_date, which this spec added hours earlier the same "
+               "day, was REMOVED: it was a second representation of the same fact, and the two could "
+               "have disagreed — tin_type='valid_ssn' alongside the boolean False. Two writers of "
+               "one truth, in a different costume. 'none' covers a dependent with no TIN at all.")},
+    # ⚠⚠ dep_ssn_valid_for_employment_by_due_date REMOVED 2026-08-25, hours after this
+    #    same amendment added it. It was REDUNDANT with dep_tin_type='valid_ssn', whose
+    #    definition in delvio-tax is literally "Valid SSN (work-authorized, issued before
+    #    due date)" — the whole of § 24(h)(7). Two fields for one fact that could
+    #    contradict each other is the two-writers defect wearing a different hat, and it
+    #    was caught by the delvio-tax session raising a VOCABULARY mismatch, not a
+    #    correctness one. ⭐ Aligning on a word without checking it meant the same thing
+    #    would have hidden this rather than surfaced it.
+    #    Deleted from prod via CTCODC_RETIRE_FACT_KEYS.
+    {"fact_key": "dep_citizenship_status", "label": "Dependent's citizenship / residency status",
+     "data_type": "choice",
+     "choices": ["us_citizen", "us_national", "us_resident_alien", "nonresident_alien",
+                 "mexico_canada_resident"],
+     "sort_order": 30,
+     "notes": ("Per-Dependent. § 152(b)(3): CTC and ODC both require a US citizen, national or "
+               "resident alien. ⚠ dep_residence_in_us is the col-5b 'lived in the U.S.' box and is "
+               "NOT the same test — a nonresident alien can live in the US. Added 2026-08-25 with "
+               "the choices aligned to delvio-tax's CITIZENSHIP_CHOICES verbatim; the derivation in "
+               "R-DEP-03 needs it and this spec did not carry it.")},
     {"fact_key": "dep_released_by_form_8332", "label": "Claimed under a Form 8332 release (noncustodial)",
      "data_type": "boolean", "sort_order": 30.5,
      "notes": ("Per-Dependent. ⚠⚠ THE CASE THAT LOOKS LIKE PREPARER DISCRETION AND IS NOT. A custodial "
@@ -1201,8 +1223,8 @@ FORM_RULES: list[dict] = [
                  "assertions, but COLUMN (7) is DERIVED by R-DEP-03 and is not entered"),
      "inputs": ["dep_first_name", "dep_last_name", "dep_ssn", "dep_relationship", "dep_dob",
                 "dep_lived_with_taxpayer_majority", "dep_residence_in_us", "dep_full_time_student",
-                "dep_permanently_disabled", "dep_tin_type",
-                "dep_ssn_valid_for_employment_by_due_date", "dep_released_by_form_8332"], "outputs": [],
+                "dep_permanently_disabled", "dep_tin_type", "dep_citizenship_status",
+                "dep_released_by_form_8332"], "outputs": [],
      "description": ("PER DEPENDENT ROW. Sprint scope: NO eligibility adjudication engine. The §152 "
                      "tests live with the preparer; the spine stores the assertions and fires "
                      "consistency diagnostics (D_1040_007/008/009). SCH_8812 consumes the CTC/ODC flags.")},
@@ -1213,10 +1235,11 @@ FORM_RULES: list[dict] = [
      "description": "PER DEPENDENT ROW. Entry-level validation; D_1040_007 (error) on failure."},
     {"rule_id": "R-DEP-03", "title": "CTC vs ODC is DERIVED, never preparer-asserted", "rule_type": "calculation",
      "precedence": 0, "sort_order": 12,
-     "formula": ("per dependent: CTC iff age at Dec 31 of tax_year < 17 (§24(c)) AND dep_tin_type == 'ssn' "
-                 "AND dep_ssn_valid_for_employment_by_due_date (§24(h)(7)) AND the dependency test is met; "
+     "formula": ("per dependent: CTC iff age at Dec 31 of tax_year < 17 (§24(c)) AND dep_tin_type == 'valid_ssn' "
+                 "(§24(h)(7): work-authorized and issued by the due date) AND dep_citizenship_status is "
+                 "us_citizen/us_national/us_resident_alien (§152(b)(3)) AND the dependency test is met; "
                  "ODC iff a dependent and NOT CTC-qualifying (§24(h)(4)); never both"),
-     "inputs": ["dep_dob", "tax_year", "dep_tin_type", "dep_ssn_valid_for_employment_by_due_date",
+     "inputs": ["dep_dob", "tax_year", "dep_tin_type", "dep_citizenship_status",
                 "dep_relationship", "dep_lived_with_taxpayer_majority", "dep_residence_in_us",
                 "dep_released_by_form_8332"],
      "outputs": ["dep_ctc_qualifying", "dep_odc_qualifying"],
@@ -2020,8 +2043,8 @@ TEST_SCENARIOS: list[dict] = [
      "inputs": {"tax_year": 2025, "filing_status": "hoh", "taxpayer_dob": "1985-01-01",
                 "dependents": [{"dep_first_name": "A", "dep_last_name": "B", "dep_ssn": "123-45-678",
                                 "dep_relationship": "child", "dep_dob": "2015-05-01",
-                                "dep_tin_type": "ssn",
-                                "dep_ssn_valid_for_employment_by_due_date": True}]},
+                                "dep_tin_type": "valid_ssn",
+                                "dep_citizenship_status": "us_citizen"}]},
      "expected_outputs": {"D_1040_007_fires": True},
      "notes": ("8-digit SSN fails the NNN-NN-NNNN gate. ⚠ Carried dep_ctc_flag until 2026-08-25; "
                "the column-(7) boxes were removed as inputs that day and the scenario now supplies the "
@@ -2237,7 +2260,10 @@ class Command(BaseCommand):
     # preparer-asserted column-(7) flags are removed as INPUTS - entitlement is
     # derived from the return's facts (R-DEP-03), and § 24 contains no election.
     # Deleted from prod explicitly, the same way every other retirement here is.
-    CTCODC_RETIRE_FACT_KEYS = ("dep_ctc_flag", "dep_odc_flag")
+    CTCODC_RETIRE_FACT_KEYS = ("dep_ctc_flag", "dep_odc_flag",
+                               # added AND removed 2026-08-25 - redundant with
+                               # dep_tin_type='valid_ssn'. See the fact's notes.
+                               "dep_ssn_valid_for_employment_by_due_date")
 
     @transaction.atomic
     def handle(self, *args, **opts):
