@@ -121,7 +121,11 @@ FORM_NOTES = (
     "D_1040_001 retired with the gate. Unsupported paths remain enumerated as RED "
     "diagnostics — the spine never computes a wrong number silently. Supersedes "
     "the Session-14 stub (R001/R002/line_11_agi retired by this loader; semantics "
-    "re-specified as R-CR-03 / R-PAY-07 / lines 11a-11b)."
+    "re-specified as R-CR-03 / R-PAY-07 / lines 11a-11b). D_1040_008 RETIRED IN "
+    "THE APP 2026-08-25 (Ken ruling, s290): CTC/ODC are engine-derived, so the "
+    "asserted-flag divergence cannot occur through a real path — app registry "
+    "keeps the entry is_active=False; scenario DG-4 dropped (its last consumer); "
+    "the FormDiagnostic entry is kept here for the audit record."
 )
 
 # Existing sources to REUSE (looked up, not modified). New excerpts attach via
@@ -1737,7 +1741,12 @@ FORM_DIAGNOSTICS: list[dict] = [
     {"diagnostic_id": "D_1040_008", "title": "Dependent credit-flag inconsistency", "severity": "warning",
      "condition": "(dep_ctc_flag AND age at Dec 31 >= 17) OR (dep_ctc_flag AND dep_odc_flag)",
      "message": "CTC box checked for a dependent 17 or older at year end (or both CTC and ODC checked) — verify column (7).",
-     "notes": "Per-dependent row. Consistency only; SCH_8812 adjudicates."},
+     "notes": ("Per-dependent row. Consistency only; SCH_8812 adjudicates. "
+               "RETIRED IN THE APP 2026-08-25 (Ken ruling, s290): CTC/ODC are "
+               "engine-DERIVED, so the asserted-flag divergence this checked "
+               "cannot occur through any real path; the app registry keeps the "
+               "entry is_active=False (the s266 way) and scenario DG-4 was "
+               "dropped with it. Entry kept here for the audit record.")},
     {"diagnostic_id": "D_1040_009", "title": "Dependent date of birth implausible", "severity": "warning",
      "condition": "dep_dob missing, after Dec 31 of tax_year, or > 120 years before tax year end",
      "message": "Dependent date of birth is missing or inconsistent with the tax year — verify.",
@@ -1970,13 +1979,14 @@ TEST_SCENARIOS: list[dict] = [
                                 "dep_relationship": "child", "dep_dob": "2015-05-01", "dep_ctc_flag": True}]},
      "expected_outputs": {"D_1040_007_fires": True},
      "notes": "8-digit SSN fails the NNN-NN-NNNN gate."},
-    {"scenario_name": "DG-4 — CTC box on a 18-year-old -> D_1040_008",
-     "scenario_type": "failure", "sort_order": 53,
-     "inputs": {"tax_year": 2025, "filing_status": "single", "taxpayer_dob": "1980-01-01",
-                "dependents": [{"dep_first_name": "C", "dep_last_name": "D", "dep_ssn": "400-00-1234",
-                                "dep_relationship": "child", "dep_dob": "2007-06-01", "dep_ctc_flag": True}]},
-     "expected_outputs": {"D_1040_008_fires": True},
-     "notes": "Age 18 at Dec 31, 2025 with the CTC box checked — consistency warning."},
+    # DG-4 (CTC box on an 18-year-old -> D_1040_008) RETIRED 2026-08-25 (Ken
+    # ruling, s290): D_1040_008 is retired in the app — CTC/ODC became DERIVED
+    # (Dependent classifiers in compute), so the preparer-asserted flag the
+    # diagnostic checked can no longer diverge from age through any real path;
+    # it could fire only from a stored override (a second, divergent
+    # adjudication — the s250 shape). App registry keeps the entry with
+    # is_active=False (the s266 way); this scenario was the rule's last
+    # consumer (deleted via D008_RETIRE_SCENARIO_PREFIXES below).
     {"scenario_name": "DG-5 — MFS spouse itemizes -> 12e = 0 + D_1040_005",
      "scenario_type": "edge", "sort_order": 54,
      "inputs": {"tax_year": 2025, "filing_status": "mfs", "taxpayer_dob": "1955-01-01",
@@ -2167,6 +2177,14 @@ class Command(BaseCommand):
     BRIDGE_RETIRE_SCENARIO_PREFIXES = ("DG-1 ",)
     BRIDGE_RETIRE_ASSERTION_IDS = ("FA-1040-SPINE-15",)
 
+    # D_1040_008 retirement (2026-08-25, Ken ruling s290): CTC/ODC became
+    # engine-derived, so the diagnostic's asserted-flag divergence cannot occur
+    # through any real path. The app retires the rule (stub + kept inactive
+    # registry entry, the s266 way); scenario DG-4 was its last consumer and
+    # is dropped here. The FormDiagnostic entry is KEPT (notes record the
+    # retirement) — only the scenario is deleted.
+    D008_RETIRE_SCENARIO_PREFIXES = ("DG-4 ",)
+
     @transaction.atomic
     def handle(self, *args, **opts):
         self._guard_against_hollow_seed()
@@ -2179,6 +2197,7 @@ class Command(BaseCommand):
         form = self._upsert_form()
         self._retire_stub_artifacts(form)
         self._retire_bridge_artifacts(form)
+        self._retire_d008_artifacts(form)
         self._upsert_facts(form)
         rules = self._upsert_rules(form)
         self._upsert_authority_links(rules, sources)
@@ -2263,6 +2282,24 @@ class Command(BaseCommand):
                 f"flow_assertions={n_fas} (R-TAX-07/D_1040_001/DG-1/"
                 f"FA-1040-SPINE-15 -> 1040_INTDIV R-QDCGT-GATE/"
                 f"D_INTDIV_001..004/ID scenarios/FA-1040-INTDIV-05+10)"
+            ))
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # D_1040_008 retirement (2026-08-25, Ken ruling s290)
+    # ─────────────────────────────────────────────────────────────────────────
+
+    def _retire_d008_artifacts(self, form):
+        n_tests = 0
+        for prefix in self.D008_RETIRE_SCENARIO_PREFIXES:
+            n, _ = TestScenario.objects.filter(
+                tax_form=form, scenario_name__startswith=prefix,
+            ).delete()
+            n_tests += n
+        if n_tests:
+            self.stdout.write(self.style.WARNING(
+                f"  retired D_1040_008 artifacts: scenarios={n_tests} "
+                "(DG-4 dropped — the rule is retired in the app, entry kept "
+                "inactive; Ken ruling 2026-08-25)"
             ))
 
     # ─────────────────────────────────────────────────────────────────────────
