@@ -61,7 +61,7 @@ named the cause on sight. `ACKNOWLEDGED` regenerated 53 → 35; the enum baselin
 213 + 4 (`primary_statute` reached **zero** and left the list entirely).
 
 ✅ Verified: `check_authority_owners --strict` clean · `seed_all --dry-run` 0 MISSING ·
-guard + conformity tests **29/29**.
+**FULL RS SUITE 243 passed / 0 failed** — A3 touched 15 loader modules and broke nothing.
 
 ⚠ **16 codes the objective criteria do NOT decide** and I did not guess: `AL_CODE_40_18` ·
 `IRC_1222` · `IRC_163` · `IRC_163J` · `IRC_168` · `IRC_179` · `IRC_1G` · `IRC_707C` ·
