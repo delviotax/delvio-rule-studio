@@ -589,6 +589,26 @@ def _al_retirement_columns(gross_distribution, taxable_to_an_alabama_resident: b
     return (float(gross_distribution) if taxable_to_an_alabama_resident else 0.0), 0.0
 
 
+def _al_retirement_column_b(legs, year: int = FORM_TAX_YEAR):
+    """⚠⚠ Column B, NET of the Schedule RS line-10 exclusion, PER TAXPAYER.
+
+    `legs` = [(gross, exempt_by_plan_type, age), ...] — one entry per taxpayer.
+
+    ⚠ Two INDEPENDENT mechanisms reach the same destination and a joint return can
+    need one for each spouse:
+      * PLAN TYPE (Part I exempt list, § 414(j) defined benefit) removes the
+        distribution from column B entirely.
+      * AGE 65+ (Part II/III line 10) excludes up to $6,000 of what remains.
+    Modelling them with one return-level flag forces both spouses to the same answer,
+    which is how AL40NR-H came to assert a figure it could not have computed.
+    """
+    total = 0.0
+    for gross, exempt, age in legs:
+        col_b, _ = _al_retirement_columns(gross, not exempt)
+        total += max(0.0, col_b - _al_retirement_exclusion(col_b, age, year))
+    return total
+
+
 def _al_retirement_exclusion(taxable_retirement_to_alabama, age, year: int = FORM_TAX_YEAR):
     """⚠ A2 - Schedule RS Part II/III line 10, PER TAXPAYER."""
     if int(age) < _yk(AL_RETIREMENT_EXCLUSION_AGE, year):
@@ -968,6 +988,22 @@ F_FACTS: list[dict] = [
      "data_type": "boolean", "required": False, "sort_order": 9,
      "notes": "⚠⚠ The list reaches DEFINED BENEFIT plans under IRC § 414(j). An IRA or 401(k) is "
               "defined CONTRIBUTION and is NOT on it. 'Out of state' is not a reason."},
+    # ⚠⚠ PER-TAXPAYER retirement, added 2026-08-25 (Ken: "wire the exclusion in properly").
+    #    The return-level pair above cannot express a joint return where the two spouses'
+    #    plans differ - which is the ACTUAL shape of the case that exposed this: one
+    #    spouse's IRAs are NOT exempt-listed and are zeroed by their own age exclusion,
+    #    while the other's RSA pension is exempt-listed and never enters either column.
+    #    A single boolean forces both to the same answer.
+    {"fact_key": "primary_retirement_distributions", "label": "Primary's gross retirement distributions (Sch RS Part II)",
+     "data_type": "decimal", "required": False, "sort_order": 8.1,
+     "notes": "Schedule RS Part II line 9. Falls back to retirement_distributions when the return-level "
+              "shorthand is used (single filer, or both spouses' plans treated alike)."},
+    {"fact_key": "primary_retirement_exempt_by_plan_type", "label": "Primary's plan on Part I's exempt list?",
+     "data_type": "boolean", "required": False, "sort_order": 8.2},
+    {"fact_key": "spouse_retirement_distributions", "label": "Spouse's gross retirement distributions (Sch RS Part III)",
+     "data_type": "decimal", "required": False, "sort_order": 8.3},
+    {"fact_key": "spouse_retirement_exempt_by_plan_type", "label": "Spouse's plan on Part I's exempt list?",
+     "data_type": "boolean", "required": False, "sort_order": 8.4},
     {"fact_key": "primary_age", "label": "Primary taxpayer's age (Schedule RS line 10 gate)",
      "data_type": "integer", "required": False, "sort_order": 10},
     {"fact_key": "spouse_age", "label": "Spouse's age (Schedule RS Part III line 10 gate)",
@@ -1090,8 +1126,13 @@ F_RULES: list[dict] = [
                     "~$2 below the exact bracket computation because they carry the table's own convention."},
     {"rule_id": "R-AL40NR-RETIRE", "title": "⚠⚠ Retirement is CATEGORICAL - column B only, never column C",
      "rule_type": "calculation",
-     "formula": "col_C = 0 always ; col_B = gross_distribution iff taxable to an Alabama RESIDENT",
-     "inputs": ["retirement_distributions", "retirement_exempt_by_plan_type"],
+     "formula": ("col_C = 0 always ; per taxpayer: col_B_share = (gross iff taxable to an Alabama "
+                 "RESIDENT) MINUS that taxpayer's Schedule RS line-10 exclusion (RS_P2L10 / RS_P3L10, "
+                 "floored at 0) ; col_B = primary share + spouse share"),
+     "inputs": ["primary_retirement_distributions", "primary_retirement_exempt_by_plan_type",
+                "spouse_retirement_distributions", "spouse_retirement_exempt_by_plan_type",
+                "retirement_distributions", "retirement_exempt_by_plan_type",
+                "RS_P2L10", "RS_P3L10"],
      "outputs": ["P1L3_colB"], "sort_order": 5,
      "description": "⚠⚠ THE SILENT FAILURE ON THIS FORM. Booklet p.11: 'Pension and annuity payments "
                     "received by a nonresident are not subject to Alabama tax. However, pension and annuity "
@@ -1104,11 +1145,21 @@ F_RULES: list[dict] = [
                     "and line 10 comes out too high, every prorated figure too large, and Alabama tax is "
                     "UNDERSTATED - while the return foots perfectly. ⚠ Schedule RS Part I exempts by PLAN "
                     "TYPE (§ 414(j) is defined BENEFIT), never by location. Schedule RS Part IV line 3 "
-                    "routes to 'Form 40NR, page 2, Part 1, Line 3, COLUMN B' - the rule on the form."},
+                    "routes to 'Form 40NR, page 2, Part 1, Line 3, COLUMN B' - the rule on the form. "
+                    "⚠⚠ AMENDED 2026-08-25: Part IV line 3 is fed by Part II/III line 11, which is "
+                    "line 9 MINUS line 10 - so column B is NET of the $6,000 age-65 exclusion "
+                    "(R-AL40NR-RSEXCL). Until this amendment the two rules named the same form chain "
+                    "and did not meet: RSEXCL's outputs fed nothing, so a 65+ taxpayer's column B was "
+                    "overstated and the allocation percentage with it. ⭐ PER TAXPAYER on both legs - "
+                    "the exemption is by plan type, the exclusion is by age, and a joint return can "
+                    "need one for each spouse."},
     {"rule_id": "R-AL40NR-RSEXCL", "title": "A2 - the $6,000 age-65 retirement exclusion, PER TAXPAYER",
      "rule_type": "limitation",
      "formula": "per taxpayer aged 65+: min($6,000, that taxpayer's Alabama-taxable retirement)",
-     "inputs": ["primary_age", "spouse_age"], "outputs": ["RS_P2L10", "RS_P3L10"], "sort_order": 6,
+     "inputs": ["primary_age", "spouse_age",
+                "primary_retirement_distributions", "primary_retirement_exempt_by_plan_type",
+                "spouse_retirement_distributions", "spouse_retirement_exempt_by_plan_type"],
+     "outputs": ["RS_P2L10", "RS_P3L10"], "sort_order": 6,
      "description": "⚠ Campaign D-32 A2. Schedule RS Part II line 10 / Part III line 10: 'each taxpayer is "
                     "eligible up to $6,000 not to exceed the Retirement Income Taxable to Alabama on line "
                     "9.' ⚠⚠ The figure $6,000 appears NOWHERE in the 40NR booklet, TY2025 or TY2024 - the "
@@ -1525,12 +1576,37 @@ F_SCENARIOS: list[dict] = [
               "reconstruction, and pinned here so it cannot be lost."},
     {"scenario_name": "AL40NR-H - ⚠⚠ the SAME return, retirement in column B PER THE EXEMPT LIST",
      "scenario_type": "edge", "sort_order": 8,
-     "inputs": {"same_as": "AL40NR-G", "retirement_distributions": 3181,
-                "retirement_exempt_by_plan_type": True},
+     "inputs": {"same_as": "AL40NR-G",
+                "primary_age": 82, "spouse_age": 78,
+                "primary_retirement_distributions": 3181,
+                "primary_retirement_exempt_by_plan_type": False,
+                "spouse_retirement_distributions": 13033,
+                "spouse_retirement_exempt_by_plan_type": True},
+     "expected_outputs": {"AL40NR-9B": 39693, "AL40NR-10": 0.4318, "AL40NR-SCHA-30": 9309,
+                          "AL40NR-14": 1681, "AL40NR-15": 1295, "AL40NR-17": 12285,
+                          "AL40NR-18": 4853, "AL40NR-19": 174,
+                          "RS_P2L10": 3181, "RS_P3L10": 0},
+     "notes": "⚠⚠ RE-BASED 2026-08-25 on Ken's direct word (\"wire the exclusion in properly\"). Column B 42,874 -> 39,693, the PRINTED percentage 39.97% -> 43.18%, tax 210 -> 174 - which is AL40NR-G, the return AS FILED. THE FILED RETURN WAS CORRECT AND THE EXPOSURE IS ZERO. ⭐⭐ TWO INDEPENDENT MECHANISMS, ONE FOR EACH SPOUSE, AND THAT IS THE WHOLE POINT: the primary's 3,181 is two ordinary IRAs - defined CONTRIBUTION, so NOT on Part I's exempt list - and is zeroed by his own Part II line-10 age-65 exclusion (min(6,000, 3,181) = 3,181). The spouse's 13,033 is a Retirement Systems of Alabama pension - named on the exempt list AND a 414(j) defined-benefit plan - so it never enters either column at all. Her own exclusion would have covered only 6,000 of it, so PLAN TYPE is doing that work, not age. ⚠⚠ WHY THIS FIXTURE WAS UNABLE TO FIRE THE RULE IT IS ABOUT: it previously supplied NO AGE and a single return-level retirement_exempt_by_plan_type=True, and R-AL40NR-RSEXCL's outputs fed nothing - so the exclusion could not move column B however the scenario was written. A missing input, an unreachable branch and a rule whose output nothing consumed are ONE defect seen three ways. ⭐ THE D-36 SECOND SHAPE: the fixture sweep asks whether a value discriminates; it cannot see an input REQUIRED TO REACH the rule that is absent entirely. ⚠ Superseded readings, kept so nobody re-derives them: 30.65%/tax 343 (added all three distributions) and 39.97%/tax 210 (correct on plan type, blind to age). Paired with AL40NR-H2, which is this same return at age 64 and DOES come out at 39.97%/210 - so the two now discriminate."},
+
+    {"scenario_name": "AL40NR-H2 - ⭐ the SAME return at 64: the age exclusion is what moves it",
+     "scenario_type": "edge", "sort_order": 8.5,
+     "inputs": {"same_as": "AL40NR-G",
+                "primary_age": 64, "spouse_age": 78,
+                "primary_retirement_distributions": 3181,
+                "primary_retirement_exempt_by_plan_type": False,
+                "spouse_retirement_distributions": 13033,
+                "spouse_retirement_exempt_by_plan_type": True},
      "expected_outputs": {"AL40NR-9B": 42874, "AL40NR-10": 0.3997, "AL40NR-SCHA-30": 8617,
                           "AL40NR-14": 1556, "AL40NR-15": 1199, "AL40NR-17": 11372,
-                          "AL40NR-18": 5766, "AL40NR-19": 210},
-     "notes": "⚠⚠ RE-BASED 2026-08-24 on Ken's ruling. This scenario previously carried column B 55,907 / 30.65% / tax 343, which added ALL THREE distributions (16,214). That was WRONG. The 2025 40NR booklet Line 3 states the rule - retirement a nonresident is not taxed on must still be included in total AGI from all sources IN ORDER TO COMPUTE THE RATIO - but the SAME PAGE carries an EXEMPT LIST directly beneath it, naming State of Alabama Teachers’ / Employees’ / Judicial Retirement and ANY defined benefit plan under IRC 414(j), which 'should not be included in the income reported on line 3'. The 13,033 is a Retirement Systems of Alabama pension - named by system AND a 414(j) DB plan - so it is excluded twice over. Only the two ordinary IRAs (885 + 2,296 = 3,181) belong in column B. ⭐ THE CASCADE STILL MOVES TOGETHER, which is why the error stays invisible: column B 39,693 -> 42,874, the PRINTED percentage 43.18% -> 39.97%, and the itemized deduction (9,309 -> 8,617), the federal-tax deduction (1,681 -> 1,556) and the personal exemption (1,295 -> 1,199) all shrink in step, so the return foots perfectly either way. Taxable income 4,853 -> 5,766; tax 174 -> 210. ⚠ THE EXPOSURE IS 36 DOLLARS, NOT 169 - the superseded reading overstated it roughly fourfold. ⚠ Alabama never taxes the retirement itself; column C stays zero throughout. It is the DENOMINATOR that does the damage, and only for plans that are NOT on the exempt list. ⚠ OPEN, and Ken’s: Schedule RS Part IV line 3 is 'Total Alabama TAXABLE Retirement Distribution' yet routes to this same column B line - followed literally it would put 0 here, not 3,181. Two measures, one destination."},
+                          "AL40NR-18": 5766, "AL40NR-19": 210,
+                          "RS_P2L10": 0, "RS_P3L10": 0},
+     "notes": "⭐⭐ THE DISCRIMINATING HALF. Identical to AL40NR-H in every input but ONE - the "
+              "primary is 64, not 82 - and the answer moves by 3,181 of column B, 3.21 percentage points, "
+              "and $36 of tax. ⚠ A fixture that cannot fail is not a test (campaign D-36): AL40NR-H "
+              "asserted 39.97% for two days while carrying no age at all, so nothing about it could have "
+              "detected that the age-65 exclusion was never reaching column B. This pair can. ⚠ Note "
+              "the spouse leg is IDENTICAL in both and contributes zero either way - plan-type exemption "
+              "is age-blind, which is exactly why one mechanism cannot stand in for the other."},
 
     {"scenario_name": "AL40NR-I - ⚠ A1: form and regulation AGREE when federal AGI = Alabama all-source",
      "scenario_type": "edge", "sort_order": 9,

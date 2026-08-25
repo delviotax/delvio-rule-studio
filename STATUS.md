@@ -12,6 +12,49 @@ last_updated: 2026-08-25
 
 ## Current state
 
+### ✅ 2026-08-25 — AL_FORM_40NR: the age-65 exclusion is WIRED INTO COLUMN B and SEEDED (Ken's direct word)
+
+Ken: *"wire the exclusion in properly"*. Done and seeded. **`AL40NR-H` now reads 43.18% / column B
+39,693 / tax 174 — the return AS FILED. The filed return was correct; the exposure is zero, not $36.**
+
+⚠⚠ **CORRECTION to what I said before starting.** I called the exclusion's uncalled helper functions
+and its unconsumed rule outputs a *fourth instance* of the day's unwired-mechanism pattern. **That
+was wrong on both legs, and I checked before building on it:** in this loader **no** helper is called
+(16 of 16 are executable documentation) and **13 of 14** rule outputs are consumed by no other rule.
+Both are house style for a spec loader, not a defect. ⭐ **The real defect was narrower and
+sharper:** `R-AL40NR-RSEXCL`'s declared `inputs` were `[primary_age, spouse_age]` **only — it did not
+take the retirement amounts its own formula multiplies** — and `R-AL40NR-RETIRE` computed column B
+with no reference to the exclusion at all. Two rules naming the same Schedule RS chain and not
+meeting.
+
+**What changed:**
+- **+4 per-taxpayer facts** — `primary_/spouse_retirement_distributions` and
+  `..._exempt_by_plan_type`. ⚠ The return-level pair could not express this return's actual shape:
+  **one spouse's IRAs zeroed by AGE, the other's pension removed by PLAN TYPE.** A single boolean
+  forces both spouses to the same answer.
+- **`R-AL40NR-RETIRE` amended** — column B is now **net of Schedule RS line 10**, per taxpayer, which
+  is what Part IV line 3 (= line 9 − line 10) actually feeds.
+- **`R-AL40NR-RSEXCL` amended** — it now takes the amounts its formula needs.
+- **New helper `_al_retirement_column_b(legs)`** documenting the two-mechanism netting.
+- ⭐ **New scenario `AL40NR-H2` — the SAME return at age 64**, which comes out at 39.97% / 210.
+  **The pair now discriminates: one input differs, and column B moves by 3,181, the ratio by 3.21
+  points, and the tax by $36.** `AL40NR-H` asserted 39.97% for two days while carrying **no age at
+  all**, so nothing about it could have caught that the exclusion never reached column B.
+
+⭐ **Proved, not asserted** — the helper was run on both scenarios: H → retirement into column B
+**0** (primary 3,181 gross, excluded 3,181; spouse exempt by plan type) → 17,138/39,693 = **43.18%**;
+H2 → **3,181** → 17,138/42,874 = **39.97%**.
+
+✅ **Seed verified:** facts 29 → 33, tests 16 → 17, **rules / lines / diagnostics unchanged**, prod
+steady at **169 forms / 690 authority rows**, export **200** with non-null `state_conformity`.
+Pre-flight clean on both guards; D-17 length pre-flight clean (longest new `fact_key` 38 of 100).
+
+⚠ **Client facts are relayed, not read by me** — Ralph b. 06/24/1943 (82), Diana b. 01/23/1947 (78),
+from the packet's Main Information Sheet p21. Ken approved on that basis.
+
+---
+
+
 ### ⚠⚠ 2026-08-25 — A3: 20 of 45 ownership conversions DONE. **25 are BLOCKED, and the reason is the day's third instance of the same defect**
 
 Ken: *"do A3"*. Read as **A3(a) — ownership only**, which is what I recommended: one module
