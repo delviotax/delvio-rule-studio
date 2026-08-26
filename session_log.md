@@ -399,7 +399,7 @@
   before the worksheet published (the Q2-2026 §6621 ruling postdated the June build), and
   its authority "excerpt" had PARAPHRASED that assumption as if it were i2210 text - the
   excerpt is now faithful to the actual worksheet. Penalties were UNDERSTATED by 15 days x
-  1% - the QA Batch-001 $1-3 TaxWise deltas (Almond Barbara: Delvio 188 vs TaxWise 189).
+  1% - the QA Batch-001 $1-3 TaxWise deltas (one QA client: Delvio 188 vs TaxWise 189).
 - Constants RATE_6 -> 0.07 (machinery retained for a real straddle year), DAYS -> [365,304,
   212,90], R7_END = CAP; scenario pins P-T3 461->466, P-T6 143->145, P-T7 217->219 (P-T8
   unchanged); FA-1040-2210-02/07 text re-pinned; D_2210_TY2026 message now points at the
