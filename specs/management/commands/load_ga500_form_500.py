@@ -118,6 +118,10 @@ W5. RETIREMENT-EXCLUSION CLASSIFICATION. The RIE worksheet routes S-corp w/
     material participation + FICA/SE-taxed rental to EARNED (L2), not L13; income
     is split 50/50 for jointly-owned property; each spouse qualifies separately.
     Taxable SS subtraction = 1040 6b + RR Tier 1/2. CONFIRM.
+    ✅ PARTLY CLOSED 2026-08-26: the SPLIT half of W5 is now specified rather than
+    asserted — granularity and tie direction are in R-GA500-RIE, vendor-aware, on
+    Ken's direct Gate-1 ruling ("Write it into R-GA500-RIE"). The rest of W5 (the
+    earned/unearned classification, the taxable-SS subtraction) still says CONFIRM.
 W6. PART-YEAR / NONRESIDENT proration. Ratio = GA AGI ÷ federal AGI (bounded
     0-100%, special zero/negative rules), applied to deductions+exemptions; the
     RIE earned & unearned portions are prorated SEPARATELY by GA-source ratio.
@@ -669,6 +673,16 @@ GA500_FACTS: list[dict] = [
     {"fact_key": "g_sub_ot_tp", "label": "TP qualified overtime compensation — GA exclusion base (L12b)", "data_type": "decimal", "default_value": "0", "sort_order": 48, "notes": "§48-7-27(a)(16). IRC §225 qualified overtime (the FLSA premium portion) from W-2 EMPLOYEE compensation only — 1099 amounts never qualify ('received by a full-time employee'). Federal-pulled RAW amount (no phaseout), preparer-editable. The rule caps at $1,750 and gates on g_ot_fthourly_tp."},
     {"fact_key": "g_sub_ot_sp", "label": "Spouse qualified overtime compensation — GA exclusion base (L12b)", "data_type": "decimal", "default_value": "0", "sort_order": 49, "notes": "Spouse mirror of g_sub_ot_tp."},
 
+    {"fact_key": "g_rie_split_convention", "label": "RIE joint-income split convention (SYSTEM-DERIVED)", "data_type": "text", "default_value": "default", "sort_order": 49,
+     "notes": ("NOT A PREPARER FIELD. Values: 'default' (fresh returns and TaxWise imports — per RIE line, odd "
+               "dollar to the SPOUSE, the s275 rule) | 'lacerte' (Lacerte imports — per source row, "
+               "largest-remainder, odd dollar to the TAXPAYER). "
+               "DERIVED from the return's import provenance, exactly as x_is_superseding was derived from dates "
+               "rather than asked (D-46): a preparer cannot legitimately choose which vendor a packet came from, "
+               "so it must not be a box they can set. If the provenance is unknown the value is 'default' — the "
+               "conservative branch, because it is the convention every non-imported return already uses. "
+               "NEW 2026-08-26 (Ken, Gate-1 direct: \"Write it into R-GA500-RIE\") — the derivation needs this "
+               "input, the same reason x_extension_filed was added alongside its derivation.")},
     # — RIE: taxpayer —
     {"fact_key": "g_tp_rie_applies", "label": "Taxpayer qualifies for the retirement income exclusion", "data_type": "boolean", "default_value": "false", "sort_order": 50, "notes": "Age 62-64, or 65+, or <62 and permanently disabled. DOB required (date of disability if disability)."},
     {"fact_key": "g_tp_age_65_plus", "label": "Taxpayer is age 65 or older (→ $65,000 cap)", "data_type": "boolean", "default_value": "false", "sort_order": 51, "notes": "Selects the $65,000 vs $35,000 maximum allowable exclusion (worksheet line 16)."},
@@ -774,9 +788,37 @@ GA500_RULES: list[dict] = [
      "description": "GA subtracts the federally-taxable Social Security and Railroad Retirement included in federal AGI. W5."},
 
     {"rule_id": "R-GA500-RIE", "title": "Schedule 1 line 7 — Retirement Income Exclusion (standard worksheet)", "rule_type": "calculation", "precedence": 2, "sort_order": 5,
-     "formula": "Per qualifying person: L5 = min(salary+other earned, $5,000); L14 = max(0, Σ unearned [interest+dividends+alimony+cap gains+other+IRA+pension+rental]); L15 = L5 + L14; L17 = min(L15, max allowable [$35,000 age 62-64/disabled, $65,000 age 65+]). Taxpayer L17 → Sch 1 L7a (or L7c disability); spouse L17 → L7d (or L7f). Each spouse qualifies separately; jointly-owned income split 50/50.",
-     "inputs": ["g_tp_rie_applies", "g_tp_age_65_plus", "g_tp_rie_disability", "g_tp_rie_salary_wages", "g_tp_rie_other_earned", "g_tp_rie_interest", "g_tp_rie_dividends", "g_tp_rie_alimony", "g_tp_rie_capital_gains", "g_tp_rie_other_income", "g_tp_rie_taxable_ira", "g_tp_rie_taxable_pension", "g_tp_rie_rental_etc", "g_sp_rie_applies", "g_sp_age_65_plus", "g_sp_rie_disability", "g_sp_rie_salary_wages", "g_sp_rie_other_earned", "g_sp_rie_interest", "g_sp_rie_dividends", "g_sp_rie_alimony", "g_sp_rie_capital_gains", "g_sp_rie_other_income", "g_sp_rie_taxable_ira", "g_sp_rie_taxable_pension", "g_sp_rie_rental_etc"], "outputs": ["S1-7", "RIE-5", "RIE-14", "RIE-15", "RIE-17"],
-     "description": "The retirement income exclusion (§48-7-27(a)(5)). The center of gravity of the GA return. W5."},
+     "formula": ("Per qualifying person: L5 = min(salary+other earned, $5,000); L14 = max(0, Σ unearned "
+                 "[interest+dividends+alimony+cap gains+other+IRA+pension+rental]); L15 = L5 + L14; "
+                 "L17 = min(L15, max allowable [$35,000 age 62-64/disabled, $65,000 age 65+]). "
+                 "Taxpayer L17 → Sch 1 L7a (or L7c disability); spouse L17 → L7d (or L7f). "
+                 "Each spouse qualifies separately; jointly-owned income split 50/50. "
+                 "THE 50/50 SPLIT IS VENDOR-AWARE (Ken, Gate-1 direct 2026-08-26 — \"Write it into R-GA500-RIE\"), "
+                 "and BOTH conventions CONSERVE (the two per-spouse amounts always re-add to the joint amount, so "
+                 "Sch 1 L7 and L13 tie under either): "
+                 "(a) DEFAULT — fresh returns and TaxWise imports: allocate PER RIE LINE on the aggregate; on an "
+                 "exact half the odd dollar goes to the SPOUSE (the s275 / BATCH-296 #78 TaxWise-parity rule). "
+                 "(b) LACERTE IMPORTS (g_rie_split_convention = 'lacerte'): allocate PER SOURCE ROW by "
+                 "largest-remainder, summed into the RIE line; on an exact half the odd dollar goes to the "
+                 "TAXPAYER."),
+     "inputs": ["g_tp_rie_applies", "g_tp_age_65_plus", "g_tp_rie_disability", "g_tp_rie_salary_wages", "g_tp_rie_other_earned", "g_tp_rie_interest", "g_tp_rie_dividends", "g_tp_rie_alimony", "g_tp_rie_capital_gains", "g_tp_rie_other_income", "g_tp_rie_taxable_ira", "g_tp_rie_taxable_pension", "g_tp_rie_rental_etc", "g_sp_rie_applies", "g_sp_age_65_plus", "g_sp_rie_disability", "g_sp_rie_salary_wages", "g_sp_rie_other_earned", "g_sp_rie_interest", "g_sp_rie_dividends", "g_sp_rie_alimony", "g_sp_rie_capital_gains", "g_sp_rie_other_income", "g_sp_rie_taxable_ira", "g_sp_rie_taxable_pension", "g_sp_rie_rental_etc", "g_rie_split_convention"], "outputs": ["S1-7", "RIE-5", "RIE-14", "RIE-15", "RIE-17"],
+     "description": ("The retirement income exclusion (§48-7-27(a)(5)). The center of gravity of the GA return. W5. "
+                     "SPLIT CONVENTION ADDED 2026-08-26 (Ken, Gate-1 direct: \"Write it into R-GA500-RIE\"). "
+                     "WHY IT IS IN THE RULE AND NOT ONLY IN THE ENGINE: until now this rule said 'split 50/50' and "
+                     "NOTHING ELSE — no granularity, no tie direction — so it could not distinguish two "
+                     "implementations that print different figures, and BOTH could claim to conform. That was "
+                     "tolerable while the engine had one convention; a per-vendor engine turns the silence from an "
+                     "OMISSION into a CONTRADICTION, because the rule would describe a split the engine no longer "
+                     "performs for Lacerte imports. "
+                     "EVIDENCE (delvio-states STAGED_FOR_KEN.md S-8, from the entry lane): a Lacerte packet where "
+                     "both RIE columns print isolates the two variables cleanly — a single-row dividend line holds "
+                     "granularity still and shows the tie direction alone; a four-row interest line cancels "
+                     "direction and shows granularity alone; a third line witnesses direction again. "
+                     "⚠ NEITHER VENDOR INVENTS OR DESTROYS A DOLLAR — the earlier 'Lacerte is non-conserving' "
+                     "premise was withdrawn after two sessions independently re-read the printed page. "
+                     "The recognition signature, worth keeping: THE TOTAL TIES WHILE THE TWO PER-SPOUSE COLUMNS "
+                     "DISAGREE BY $1. "
+                     "The delvio-tax engine build (split_conserving going vendor-aware) is tracked there, not here.")},
 
     {"rule_id": "R-GA500-MIL", "title": "Schedule 1 line 7 — Military Retirement Exclusion worksheet", "rule_type": "calculation", "precedence": 2, "sort_order": 6,
      "formula": "Under 62 only. L3 = min(military retirement, $17,500). STOP branches (military retirement < $17,501 OR GA earned income < $17,501): exclusion = L3, entered on Sch 1 L7b/7e. Proceed branch: L7 = $35,000 (the worksheet's PREPRINTED total cap) and L8 = min(military retirement, L7); exclusion = L8 ALONE — NEVER L3 + L8 (IT-511: the additional $17,500 is claimed 'against the total military retirement income they received', so the total exclusion can never exceed the retirement actually received). → Sch 1 L7b/7e, entered on Sch 1 L9 as a subtraction. Max $35,000.",

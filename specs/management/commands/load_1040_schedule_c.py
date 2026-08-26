@@ -1029,11 +1029,37 @@ SCHEDSE_RULES: list[dict] = [
      "description": ("CONVENTION (Ken ruled 2026-07-02, S12 REVIEW_QUEUE). Replaces the original cents-chained math. "
                      "Guarantees the printed face is self-consistent (10 + 11 = 12 at whole dollars) and matches the "
                      "ATS answer key / TaxWise per-line convention (SPRINT_SCOPE quality rule 1).")},
-    {"rule_id": "R-SE-L2", "title": "Line 2 — aggregate Schedule C net profit per proprietor", "rule_type": "aggregation", "precedence": 1, "sort_order": 1,
-     "formula": "L2 = round(sum of Schedule C line 31 over all businesses where sc_proprietor == se_proprietor (+ 1065 K-1 box 14 A non-farm)) — cents summed, total rounded (R-SE-ROUND).",
-     "inputs": ["se_proprietor"], "outputs": ["2"],
+    {"rule_id": "R-SE-L2", "title": "Line 2 — Schedule C net profit + the non-Schedule-C addends, per proprietor", "rule_type": "aggregation", "precedence": 1, "sort_order": 1,
+     "formula": ("L2 = round(sum of Schedule C line 31 over all businesses where sc_proprietor == se_proprietor "
+                 "+ min_se_line2 (clergy net ministerial earnings for this owner, from MINISTER R-MIN-SE — 0 when "
+                 "Form 4361 is approved) (+ 1065 K-1 box 14 A non-farm)) — cents summed, total rounded (R-SE-ROUND)."),
+     "inputs": ["se_proprietor", "min_se_line2"], "outputs": ["2"],
      "description": ("PER PROPRIETOR. Decision 3: one Schedule SE per person aggregates that person's Schedule C "
-                     "businesses. Statutory-employee Schedule C is excluded (D_SC_001).")},
+                     "businesses. Statutory-employee Schedule C is excluded (D_SC_001). "
+                     "AMENDED 2026-08-26 (Ken, Gate-1 direct: \"Yes — seed both, four parked\"): line 2 now READS "
+                     "the clergy addend. MINISTER/R-MIN-SE has computed min_se_line2 since 2026-06-16 and named "
+                     "Schedule SE line 2 as its destination in words, but NOTHING READ IT — the producing rule was "
+                     "seeded, ruled on and unconnected (delvio-states research/sch_se_line2_scope_from_i1040sse.md "
+                     "§3). i1040sse (2025) confirms the routing: a minister who must pay SE tax includes ministerial "
+                     "earnings 'on Schedule SE, line 2. But don't report it on Schedule SE, line 5a; it isn't "
+                     "considered church employee income.' "
+                     "SHAPE MATCHES THE SHIPPED ENGINE: line 2 SUMS addends supplied by their owning modules; "
+                     "MINISTER does not write line 2 itself (delvio-tax se_line2_addends_by_owner / "
+                     "compute_schedule_c ~962-985, one helper that render/MeF/diagnostics all consume). "
+                     "KNOWN RESIDUAL, deliberately parked by the same ruling: the SE-SUBJECT OTHER-INCOME addend "
+                     "(Schedule 1 line 8z — board/fee income) ships in the engine and is NOT in this formula. It "
+                     "belongs to the §1402 'other income to report' scope question (delvio-states S-1 item 4), which "
+                     "Ken parked un-bundled. The spec therefore still lags the engine on that ONE addend, on purpose "
+                     "and on the record — it is not an oversight. "
+                     "⭐ THE SPEC WAS ALREADY ASSERTING THIS FLOW: FA-1040-MIN-03 ('Clergy SE base (line 9) ... → "
+                     "Schedule SE line 2') has asserted MINISTER.9 -> SCH_SE.2 since 2026-06-16, and the app runs "
+                     "and re-pins it. The ASSERTION and the ENGINE agreed; only this rule's formula lagged, which "
+                     "is why the gap never surfaced as a failure anywhere.")},
+    # NOTE (2026-08-26): R-SE-OPTIONAL and D_SE_003 are ALSO written by load_1040_schedule_f.py,
+    # which sorts AFTER this file in seed_all's alphabetical phase-2 order and therefore DECIDES
+    # what production holds. The copies below are the pre-2026-06-21 text and are immediately
+    # overwritten. The clergy narrowing (Ken, Gate-1 2026-08-26) was made THERE, in the last
+    # writer, deliberately — editing this copy would have changed nothing in prod.
     {"rule_id": "R-SE-L3", "title": "Line 3 — combine lines 1a, 1b, 2", "rule_type": "calculation", "precedence": 2, "sort_order": 2,
      "formula": "L3 = L1a + L1b + L2. (L1b is negative — CRP payments.)",
      "inputs": [], "outputs": ["3"], "description": "PER PROPRIETOR."},

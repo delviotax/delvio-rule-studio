@@ -1787,6 +1787,10 @@ from live STATUS.md per BUILD_ORDER's own rule. Reconciled 2026-07-05.*
 - **[WO-03] / [WO-04] / [WO-09]** — INTAKE, genuinely open = SPINE **S-6 / S-5 / S-11**.
 
 ## ✅ DONE (recent — proves the pipeline)
+- **Schedule SE clergy WIRING + the exemption-predicate fix** — 2026-08-26 · Gate 1 direct (Ken: *"Yes — seed both, four parked"*) · spec→seed→export 200 · suite 243/0.
+  `R-SE-L2` now READS `min_se_line2`, which `MINISTER`/`R-MIN-SE` had produced since 2026-06-16 while **nothing consumed it** — and `FA-1040-MIN-03` had been asserting that very flow the whole time. `R-SE-OPTIONAL`/`D_SE_003` narrowed: the clergy trigger keyed on the **exemption**, firing on the 4361-exempt minister (safe) and silent on the never-filed minister (unsafe). New `R-SE-LINEA` computes the Part I line-A checkbox from `min_4361_exempt` instead of accepting it as a preparer input. **Conformance fix — the shipped engine already gated affirmatively, so no return was mis-taxed.** Parked un-bundled: the §1402 13-item list (incl. the 8z addend the engine ships), meals/lodging, Form 2031, statutory-employee softening.
+- **GA-500 RIE split made VENDOR-AWARE in the rule** — 2026-08-26 · Gate 1 direct (Ken: *"Write it into `R-GA500-RIE`"*) · export 200.
+  The rule said *"split 50/50"* and nothing else — no granularity, no tie direction — so two implementations printing different figures could both claim conformance. With the engine going per-vendor that silence turns from an omission into a contradiction. Now specified: default (fresh + TaxWise) per RIE line, odd dollar to the **spouse**; Lacerte imports per source row, largest-remainder, odd dollar to the **taxpayer**. **Both conserve.** New system-derived `g_rie_split_convention` (NOT a preparer field). Engine build is delvio-tax's.
 - 1065 core (Schedule K → K-1 → M-1/M-2 → L/B) — 2026-07-04 · spec→seed→export (all 200).
 - 1065 SE (line 14a) — 2026-07-01 · spec→seed→export→build→DB-verified.
 - 4797 recapture classification + nuance legs — 2026-07-02 · caught the K8c→K9c misroute.

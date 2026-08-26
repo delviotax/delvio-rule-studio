@@ -23,6 +23,17 @@ the load_1040_schedule_k1.py / load_1040_schedule_c.py precedent):
     (line 5), and Form 4361 clergy keep firing RED. Schedule J farm income averaging
     is its OWN form unit (the immediately-following spec) — NOT in this loader.
 
+    ⚠ AMENDED AGAIN 2026-08-26 (Ken, Gate-1 direct: "Yes — seed both, four parked").
+    CLERGY NO LONGER FIRES RED — the sentence above is superseded on that one point.
+    R-SE-OPTIONAL keyed its clergy trigger on the EXEMPTION (se_minister_4361), so it
+    fired on the 4361-exempt minister — the case where the exclusion only ever reduces
+    tax — and was SILENT on the minister who never filed 4361, whose Schedule SE line 2
+    then omitted wages, housing allowance and parsonage. This file is the LAST WRITER of
+    R-SE-OPTIONAL / D_SE_003 in seed_all's alphabetical order, so the fix is made here.
+    Added: R-SE-LINEA, which computes the Part I line-A checkbox from min_4361_exempt
+    rather than accepting it as a preparer input. See delvio-states
+    research/sch_se_line2_scope_from_i1040sse.md §4 and STAGED_FOR_KEN.md S-1.
+
 Session 2026-06-21: spec-first probe found NO RS Schedule F spec (SCHEDULE_F /
 1040_SCHF / F / SCHF all 404; RS up, real 404s). Authored by transcription from
 primary sources verified the same day (pymupdf dumps + the SE Part II text):
@@ -807,8 +818,16 @@ SCHEDSE_FACTS: list[dict] = [
      "notes": "PER PROPRIETOR. COMPUTED feeder: SUM of this proprietor's Schedule F CRP portion (sf_crp_payments), negative (§1402(a)(1))."},
     # Existing facts re-declared verbatim (R-SE-OPTIONAL reads them; keeps the
     # narrowed rule's inputs all-declared — content-identical update_or_create).
-    {"fact_key": "se_minister_4361", "label": "Part I 'A' — minister/religious-order Form 4361 filer", "data_type": "boolean", "sort_order": 4,
-     "notes": "PER PROPRIETOR. Clergy/4361 special handling -> RED-defer (D_SE_003); v1 standard method only."},
+    {"fact_key": "se_minister_4361", "label": "Part I 'A' — checkbox: 4361-exempt minister with other SE earnings (COMPUTED)", "data_type": "boolean", "sort_order": 4,
+     "notes": ("PER PROPRIETOR. RE-POINTED 2026-08-26 (Ken, Gate-1 direct: \"Yes — seed both, four parked\"). "
+               "WAS a preparer-entered flag whose only consequence was a RED-defer; is now the COMPUTED Part I "
+               "line-A checkbox, derived by R-SE-LINEA from min_4361_exempt + the $400 other-earnings test. "
+               "WHY IT CHANGED, and it is two defects in one fact: (1) DUPLICATE TRUTH — min_4361_exempt "
+               "(MINISTER, person-level) already held 'this minister has an approved Form 4361', so two fields "
+               "could disagree about one fact; (2) DERIVED INPUT — the face's line A is a RESULT (exempt AND $400+ "
+               "of other SE earnings), not a preparer election, and Ken's ratified principle (D-43/D-46) is that a "
+               "value a preparer cannot legitimately choose must not be a field they can set. "
+               "min_4361_exempt remains the ONE input; this is its printed consequence.")},
     {"fact_key": "se_church_employee_income_l5a", "label": "Line 5a — church employee income (W-2)", "data_type": "decimal", "default_value": "0", "sort_order": 5,
      "notes": "PER PROPRIETOR. Church-employee SE income -> RED-defer (D_SE_003); v1 line 5a/5b = 0."},
     # ── Farm optional method (new) ──
@@ -838,11 +857,43 @@ SCHEDSE_RULES: list[dict] = [
      "description": ("PER PROPRIETOR. Ken-IN-scope 2026-06-21. Farm optional method only (the nonfarm method, "
                      "church, clergy stay RED via R-SE-OPTIONAL). 2025 verified off the Sch SE face ($7,240 / "
                      "$10,860 / $7,840); 2026 amounts UNPUBLISHED -> RED + standing re-pin (WALK ITEM A).")},
-    # Narrowed: farm optional REMOVED from the RED-defer set (nonfarm/church/clergy stay).
-    {"rule_id": "R-SE-OPTIONAL", "title": "Part II nonfarm optional / church-employee / clergy — RED-defer", "rule_type": "routing", "precedence": 12, "sort_order": 12,
-     "formula": "If se_minister_4361 OR se_church_employee_income_l5a > 0 OR the NONFARM optional method (lines 16/17) is elected -> D_SE_003 RED-defer. (The FARM optional method is now supported — R-SE-FARMOPT.)",
-     "inputs": ["se_minister_4361", "se_church_employee_income_l5a"], "outputs": [],
-     "description": "PER PROPRIETOR. NARROWED 2026-06-21: the farm optional method moved to R-SE-FARMOPT (supported). Nonfarm optional + church/clergy remain RED-defer."},
+    # Narrowed twice: farm optional removed 2026-06-21; CLERGY removed 2026-08-26 (it is computed, not deferred).
+    {"rule_id": "R-SE-OPTIONAL", "title": "Part II nonfarm optional / church-employee — RED-defer", "rule_type": "routing", "precedence": 12, "sort_order": 12,
+     "formula": "If se_church_employee_income_l5a > 0 OR the NONFARM optional method (lines 16/17) is elected -> D_SE_003 RED-defer. (The FARM optional method is supported — R-SE-FARMOPT; CLERGY is supported — MINISTER/R-MIN-SE -> R-SE-L2.)",
+     "inputs": ["se_church_employee_income_l5a"], "outputs": [],
+     "description": ("PER PROPRIETOR. NARROWED 2026-06-21 (farm optional -> R-SE-FARMOPT). "
+                     "NARROWED AGAIN 2026-08-26 (Ken, Gate-1 direct: \"Yes — seed both, four parked\") — THE "
+                     "EXEMPTION-PREDICATE FIX. The clergy trigger is REMOVED because the clergy case is computed, "
+                     "not deferred: MINISTER/R-MIN-SE has always produced the Pub 517 base and R-MIN-4361 zeroes it "
+                     "for an approved Form 4361. "
+                     "🔴 THE DEFECT THIS CORRECTS, and its direction is the point: the trigger keyed on the "
+                     "EXEMPTION (se_minister_4361), so it fired on the 4361-exempt minister — the SAFE case, where "
+                     "the exclusion only ever reduces tax — and was SILENT on the minister who never filed 4361, "
+                     "whose line 2 then omitted wages, housing allowance and parsonage. i1040sse (2025) closes off "
+                     "the escape route in as many words: 'Income from services you perform as a minister, member of "
+                     "a religious order, or Christian Science practitioner isn't church employee income', so the "
+                     "line-5a predicate could not catch him either. He tripped NEITHER predicate. "
+                     "⭐ AN AFFIRMATIVE PREDICATE DEGRADES TO 'NOT COMPUTED AND VISIBLE'; AN EXEMPTION-KEYED ONE "
+                     "DEGRADES TO 'COMPUTED WRONGLY AND INVISIBLE.' The shipped engine already gated affirmatively "
+                     "(per-W-2 is_minister; the 4361 flag only zeroes — delvio-tax compute_minister.py, read "
+                     "2026-08-26), so this amendment makes the SPEC describe the ENGINE. It is a conformance fix: "
+                     "no return was mis-taxed by the defect, which lived only in the spec.")},
+    {"rule_id": "R-SE-LINEA", "title": "Part I line A — the 4361-exempt minister's checkbox (COMPUTED)", "rule_type": "calculation", "precedence": 11, "sort_order": 11,
+     "formula": ("se_minister_4361 (line A checkbox) = min_4361_exempt AND line 4c >= $400. Face, verbatim: 'If you "
+                 "are a minister, member of a religious order, or Christian Science practitioner and you filed Form "
+                 "4361, but you had $400 or more of OTHER net earnings from self-employment, check here and continue "
+                 "with Part I.' With the ministerial amount already zeroed by R-MIN-4361, everything remaining in "
+                 "lines 1a/1b/2 IS the 'other' earnings, so line 4c is that test's figure."),
+     "inputs": ["min_4361_exempt"], "outputs": ["se_minister_4361", "A"],
+     "description": ("PER PROPRIETOR. NEW 2026-08-26, in the same Gate-1 pass as the R-SE-OPTIONAL narrowing — "
+                     "without it, dropping the clergy RED would have left se_minister_4361 as a fact READ BY "
+                     "NOTHING, which is precisely the unwired-mechanism defect this whole campaign has been "
+                     "cataloguing (delvio-states STATUS, the four-member defect family). "
+                     "⚠ ONE WORDING NOTE, flagged rather than smoothed over: the FACE says '$400 or more of other "
+                     "NET EARNINGS from self-employment', while i1040sse says 'other EARNINGS of $400 or more "
+                     "SUBJECT TO SE tax', and 'Who Must File' ties the $400 test to line 4c. Line 4c is the reading "
+                     "used here; the three phrasings pick out the same figure once ministerial earnings are zeroed, "
+                     "but the divergence is real and is recorded rather than resolved by assertion.")},
 ]
 
 SCHEDSE_LINES: list[dict] = [
@@ -853,17 +904,24 @@ SCHEDSE_LINES: list[dict] = [
     {"line_number": "15", "description": "Part II — farm optional method = min(2/3 x gross farm income, line 14) -> line 4b", "line_type": "calculated"},
     {"line_number": "16", "description": "Part II — line 14 minus line 15 (nonfarm cap; RED-defer)", "line_type": "input"},
     {"line_number": "17", "description": "Part II — nonfarm optional method amount (RED-defer)", "line_type": "input"},
+    {"line_number": "A", "description": "Part I line A — COMPUTED checkbox: 4361-exempt minister with $400+ of OTHER SE earnings (R-SE-LINEA)", "line_type": "calculated"},
+    {"line_number": "2", "description": "Line 2 — Sch C line 31 + clergy net ministerial earnings (MINISTER) (+ K-1 box 14A non-farm)", "line_type": "calculated"},
 ]
 
 SCHEDSE_DIAGNOSTICS: list[dict] = [
-    # Narrowed existing D_SE_003 (farm optional removed from the RED set).
-    {"diagnostic_id": "D_SE_003", "title": "Nonfarm optional / church-employee / clergy SE — not supported", "severity": "error",
-     "condition": "se_minister_4361 is True OR se_church_employee_income_l5a > 0 OR the NONFARM optional method is elected",
+    # Narrowed twice: farm optional 2026-06-21; clergy 2026-08-26 (computed, not deferred).
+    {"diagnostic_id": "D_SE_003", "title": "Nonfarm optional / church-employee SE — not supported", "severity": "error",
+     "condition": "se_church_employee_income_l5a > 0 OR the NONFARM optional method is elected",
      "message": ("Not supported — prepare manually: the Schedule SE NONFARM optional method (Part II lines "
-                 "16/17), church-employee income (line 5), and Form 4361 minister handling are not modeled. "
-                 "(The FARM optional method IS supported.) v1 computes the Part I standard method + the farm "
-                 "optional method only."),
-     "notes": "NARROWED 2026-06-21: farm optional removed from the RED set (now supported via R-SE-FARMOPT)."},
+                 "16/17) and church-employee income (line 5) are not modeled. (The FARM optional method IS "
+                 "supported; so is minister/clergy SE — see the MINISTER worksheet.) v1 computes the Part I "
+                 "standard method + the farm optional method + the clergy feed to line 2."),
+     "notes": ("NARROWED 2026-06-21: farm optional removed from the RED set (now supported via R-SE-FARMOPT). "
+               "NARROWED AGAIN 2026-08-26 (Ken, Gate-1 direct): the clergy trigger removed — it fired on the "
+               "4361-EXEMPT minister (the safe case) and was silent on the minister who never filed 4361 (the "
+               "unsafe one). The message no longer claims Form 4361 handling is unmodelled: MINISTER/R-MIN-SE "
+               "models it and R-SE-L2 now reads it. A diagnostic that says 'not modeled' about something the "
+               "library DOES model is itself a defect — it teaches the preparer to prepare by hand.")},
     {"diagnostic_id": "D_SE_FARMOPT_2026", "title": "Farm optional method for 2026 — constants unpublished", "severity": "error",
      "condition": "se_farm_optional_elected is True AND tax_year not in FARM_OPT_MAX_INCOME",
      "message": ("Not supported for 2026 — prepare manually: the farm optional method amounts (maximum "
@@ -901,6 +959,8 @@ SCHEDSE_RULE_LINKS: list[tuple[str, str, str, str]] = [
     ("R-SE-FARMOPT", "IRS_2025_SCHEDSE_FORM", "primary", "Part II farm optional method (lines 14/15; 2025 $7,240 / $10,860 / $7,840)"),
     ("R-SE-FARMOPT", "IRS_PUB_225", "secondary", "Pub 225 farm optional method narrative"),
     ("R-SE-OPTIONAL", "IRS_2025_SCHEDSE_FORM", "primary", "Part II nonfarm optional / church (RED-defer)"),
+    ("R-SE-LINEA", "IRS_2025_SCHEDSE_FORM", "primary",
+     "Part I line A — 'you filed Form 4361, but you had $400 or more of OTHER net earnings from self-employment, check here and continue with Part I'"),
 ]
 
 
