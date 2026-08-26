@@ -112,7 +112,8 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
      "over $13,500. Alternative to Form 8615."),
 ]
 
-EXISTING_SOURCES_TO_REFERENCE: list[str] = []
+EXISTING_SOURCES_TO_REFERENCE: list[str] = [    "IRC_1G",  # ownership -> load_1040_form_8615.py (A3/D-42, 2026-08-25)
+]
 
 AUTHORITY_SOURCES: list[dict] = [
     {
@@ -176,27 +177,26 @@ AUTHORITY_SOURCES: list[dict] = [
             "is_key_excerpt": True,
         }],
     },
-    {
-        "source_code": "IRC_1G", "source_type": "statute", "source_rank": "controlling",
-        "jurisdiction_code": "US", "title": "IRC §1(g)(7) — parents' election; §1(g) kiddie tax (Pub 929)",
-        "citation": "26 U.S.C. §1(g)(7); §1(g); IRS Pub. 929", "issuer": "U.S. Congress",
-        "official_url": "https://www.law.cornell.edu/uscode/text/26/1",
-        "current_status": "active", "is_substantive_authority": True, "trust_score": 9.2, "topics": ["parents_election_8814"],
-        "excerpts": [{
-            "excerpt_label": "§1(g)(7) election + relationship to Form 8615 (cited to §1(g)/Pub 929, NOT i8814)",
-            "excerpt_text": (
-                "§1(g)(7): if a child's gross income is only from interest and dividends, is more than the floor and "
-                "less than the ceiling amount, and no estimated payments/backup withholding are in the child's name, "
-                "the PARENT may ELECT to include the child's gross income on the parent's return - the child is then "
-                "treated as having no gross income and does not file. §1(g) otherwise imposes the 'kiddie tax' on a "
-                "child's net unearned income at the parent's rate, computed on FORM 8615 when the parent does NOT "
-                "make the 8814 election. NOTE: this 8814-vs-8615 relationship is cited to §1(g)/Pub 929 - the Form "
-                "8814 face and instructions do not themselves mention Form 8615 or 'kiddie tax'."
-            ),
-            "summary_text": "§1(g)(7): parent elects to report the child's int/div income (child doesn't file); the no-election alternative is the child's Form 8615 kiddie tax. Relationship cited to §1(g)/Pub 929, not i8814.",
-            "is_key_excerpt": True,
-        }],
-    },
+]
+
+# Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
+# available here. Empty: adding it changes nothing until an entry lands.
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_1G is DECLARED by load_1040_form_8615.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_1G", {
+                "excerpt_label": "§1(g)(7) election + relationship to Form 8615 (cited to §1(g)/Pub 929, NOT i8814)",
+                "excerpt_text": (
+                    "§1(g)(7): if a child's gross income is only from interest and dividends, is more than the floor and "
+                    "less than the ceiling amount, and no estimated payments/backup withholding are in the child's name, "
+                    "the PARENT may ELECT to include the child's gross income on the parent's return - the child is then "
+                    "treated as having no gross income and does not file. §1(g) otherwise imposes the 'kiddie tax' on a "
+                    "child's net unearned income at the parent's rate, computed on FORM 8615 when the parent does NOT "
+                    "make the 8814 election. NOTE: this 8814-vs-8615 relationship is cited to §1(g)/Pub 929 - the Form "
+                    "8814 face and instructions do not themselves mention Form 8615 or 'kiddie tax'."
+                ),
+                "summary_text": "§1(g)(7): parent elects to report the child's int/div income (child doesn't file); the no-election alternative is the child's Form 8615 kiddie tax. Relationship cited to §1(g)/Pub 929, not i8814.",
+                "is_key_excerpt": True,
+            }),
 ]
 
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
@@ -407,6 +407,9 @@ class Command(BaseCommand):
         # ⚠ D-42: these two lists existed and were NEVER READ. One module DECLARES a
         #   source, every other REFERENCES it (D-29) — that only works if both halves run.
         _wire.resolve_references(EXISTING_SOURCES_TO_REFERENCE, sources, self.stdout.write)
+        # ⚠ D-42: these two lists existed and were NEVER READ. One module DECLARES a
+        #   source, every other REFERENCES it (D-29) — that only works if both halves run.
+        _wire.apply_new_excerpts(NEW_EXCERPTS_ON_EXISTING, sources, self.stdout.write)
         self.stdout.write(f"Sources ready: {len(sources)}")
         return sources
 

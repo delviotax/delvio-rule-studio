@@ -95,7 +95,9 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
      "H.3368/OBBBA conformity live wire."),
 ]
 
-EXISTING_SOURCES_TO_REFERENCE: list[str] = []
+EXISTING_SOURCES_TO_REFERENCE: list[str] = [    "SC_2025_SC1120I",  # ownership -> load_sc_passthrough.py (A3/D-42, 2026-08-25)
+    "SC_ACT63_2025_CONFORMITY",  # ownership -> load_sc1040.py (A3/D-42, 2026-08-25)
+]
 
 AUTHORITY_SOURCES: list[dict] = [
     {
@@ -122,49 +124,6 @@ AUTHORITY_SOURCES: list[dict] = [
         }],
     },
     {
-        "source_code": "SC_2025_SC1120I", "source_type": "official_instructions", "source_rank": "primary_official",
-        "jurisdiction_code": "SC", "title": "2025 SC1120I — Instructions for C and S Corporation Income Tax Returns",
-        "citation": "SC1120I (2025)", "issuer": "South Carolina Department of Revenue",
-        "official_url": "https://dor.sc.gov/sites/dor/files/forms/SC1120I.pdf",
-        "current_status": "active", "is_substantive_authority": True, "trust_score": 9.4, "topics": ["sc_corp_tax"],
-        "excerpts": [{
-            "excerpt_label": "§168(k) decouple + conformity 12/31/2024 + H.3368 (SC1120I verbatim)",
-            "excerpt_text": (
-                "'South Carolina does not recognize any of the federal special depreciation allowances, "
-                "including bonus depreciation, provided in IRC Section 168(k) through (n)... Add back the "
-                "difference between federal depreciation and South Carolina depreciation for the tax year in "
-                "which the property was placed in service. You will be able to claim an additional depreciation "
-                "deduction for each remaining tax year of the property's depreciable life.' 'What's New?': "
-                "'South Carolina recognizes the Internal Revenue Code (IRC) as amended through December 31, "
-                "2024, except as otherwise provided' (§12-6-40; non-adopted sections §12-6-50). §179 is NOT on "
-                "the §12-6-50 non-adopted list -> SC conforms to §179 at the 12/31/2024 (pre-OBBBA) level = "
-                "$1,250,000 limit / $3,130,000 phaseout for 2025. LIVE WIRE: SC had not adopted OBBBA as of "
-                "early 2026; H.3368 (pending) would adopt full OBBBA conformity retroactive to TY2025; SCDOR "
-                "extended the TY2025 SC filing deadline to October 15, 2026 to await it."
-            ),
-            "summary_text": "SC decouples §168(k) (year-of-service add-back, recover over life); §179 conforms pre-OBBBA $1.25M/$3.13M; conformity 12/31/2024; H.3368 could flip it retroactively for TY2025.",
-            "is_key_excerpt": True,
-        }],
-    },
-    {
-        "source_code": "SC_ACT63_2025_CONFORMITY", "source_type": "statute", "source_rank": "controlling",
-        "jurisdiction_code": "SC", "title": "SC Act 63 of 2025 (S.507) — IRC conformity as amended through 12/31/2024",
-        "citation": "S.C. Code Ann. §12-6-40; §12-6-50", "issuer": "South Carolina General Assembly",
-        "official_url": "https://www.scstatehouse.gov/",
-        "current_status": "active", "is_substantive_authority": True, "trust_score": 9.3, "topics": ["sc_corp_tax"],
-        "excerpts": [{
-            "excerpt_label": "SC conformity 12/31/2024 + §12-6-50 non-adopted list (re-declared)",
-            "excerpt_text": (
-                "§12-6-40: South Carolina conforms to the IRC as amended through December 31, 2024, subject to "
-                "the exceptions in §12-6-50. §12-6-50 lists the non-adopted IRC sections — including §168(k) "
-                "bonus depreciation and §163(j). §179 is NOT on the non-adopted list, so SC conforms to §179 at "
-                "the 12/31/2024 (pre-OBBBA) level. Did NOT adopt OBBBA for TY2025."
-            ),
-            "summary_text": "§12-6-40 conformity 12/31/2024; §12-6-50 decouples §168(k)/§163(j) but not §179; OBBBA not adopted.",
-            "is_key_excerpt": True,
-        }],
-    },
-    {
         "source_code": "SC_CODE_CORP", "source_type": "statute", "source_rank": "controlling",
         "jurisdiction_code": "SC", "title": "S.C. Code §12-6-530 (5% rate) · §12-20-50 (license fee) · §12-6-2252 (apportionment)",
         "citation": "S.C. Code Ann. §12-6-530; §12-20-50/60; §12-6-2252/2290", "issuer": "South Carolina General Assembly",
@@ -187,7 +146,40 @@ AUTHORITY_SOURCES: list[dict] = [
 
 # Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
 # available here. Empty: adding it changes nothing until an entry lands.
-NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): SC_2025_SC1120I is DECLARED by load_sc_passthrough.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("SC_2025_SC1120I", {
+                "excerpt_label": "§168(k) decouple + conformity 12/31/2024 + H.3368 (SC1120I verbatim)",
+                "excerpt_text": (
+                    "'South Carolina does not recognize any of the federal special depreciation allowances, "
+                    "including bonus depreciation, provided in IRC Section 168(k) through (n)... Add back the "
+                    "difference between federal depreciation and South Carolina depreciation for the tax year in "
+                    "which the property was placed in service. You will be able to claim an additional depreciation "
+                    "deduction for each remaining tax year of the property's depreciable life.' 'What's New?': "
+                    "'South Carolina recognizes the Internal Revenue Code (IRC) as amended through December 31, "
+                    "2024, except as otherwise provided' (§12-6-40; non-adopted sections §12-6-50). §179 is NOT on "
+                    "the §12-6-50 non-adopted list -> SC conforms to §179 at the 12/31/2024 (pre-OBBBA) level = "
+                    "$1,250,000 limit / $3,130,000 phaseout for 2025. LIVE WIRE: SC had not adopted OBBBA as of "
+                    "early 2026; H.3368 (pending) would adopt full OBBBA conformity retroactive to TY2025; SCDOR "
+                    "extended the TY2025 SC filing deadline to October 15, 2026 to await it."
+                ),
+                "summary_text": "SC decouples §168(k) (year-of-service add-back, recover over life); §179 conforms pre-OBBBA $1.25M/$3.13M; conformity 12/31/2024; H.3368 could flip it retroactively for TY2025.",
+                "is_key_excerpt": True,
+            }),
+    # Re-homed 2026-08-25 (campaign A3/D-42): SC_ACT63_2025_CONFORMITY is DECLARED by load_sc1040.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("SC_ACT63_2025_CONFORMITY", {
+                "excerpt_label": "SC conformity 12/31/2024 + §12-6-50 non-adopted list (re-declared)",
+                "excerpt_text": (
+                    "§12-6-40: South Carolina conforms to the IRC as amended through December 31, 2024, subject to "
+                    "the exceptions in §12-6-50. §12-6-50 lists the non-adopted IRC sections — including §168(k) "
+                    "bonus depreciation and §163(j). §179 is NOT on the non-adopted list, so SC conforms to §179 at "
+                    "the 12/31/2024 (pre-OBBBA) level. Did NOT adopt OBBBA for TY2025."
+                ),
+                "summary_text": "§12-6-40 conformity 12/31/2024; §12-6-50 decouples §168(k)/§163(j) but not §179; OBBBA not adopted.",
+                "is_key_excerpt": True,
+            }),
+]
 
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
     ("SC_2025_SC1120", "SC1120", "governs"), ("SC_2025_SC1120I", "SC1120", "governs"),

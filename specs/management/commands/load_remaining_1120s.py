@@ -82,56 +82,6 @@ FRESH_SOURCES = [
         ],
     },
     {
-        "source_code": "IRS_2025_1125A_INSTR",
-        "source_type": "official_instruction",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "title": "Instructions for Form 1125-A (2025) — Cost of Goods Sold",
-        "citation": "Form 1125-A Instructions (2025)",
-        "issuer": "IRS",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "requires_human_review": False,
-        "trust_score": 9.5,
-        "topics": ["cogs", "inventory"],
-        "excerpts": [
-            {
-                "excerpt_label": "Who must file Form 1125-A",
-                "excerpt_text": "Filers of Form 1120, 1120-C, 1120-F, 1120-S, 1065, or 1065-B must complete and attach Form 1125-A if they report a deduction for cost of goods sold.",
-                "summary_text": "Required when COGS is deducted. Line 8 flows to the entity return.",
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "COGS computation and section 263A",
-                "excerpt_text": "Line 1: Inventory at beginning of year. Line 2: Purchases. Line 3: Cost of labor. Line 4: Additional section 263A costs (uniform capitalization). Line 5: Other costs. Line 6: Total (lines 1-5). Line 7: Inventory at end of year. Line 8: Cost of goods sold (line 6 minus line 7). Line 8 flows to Form 1120-S Page 1 Line 2. Section 263A requires certain indirect costs to be capitalized into inventory.",
-                "summary_text": "COGS = beginning inventory + purchases + labor + 263A costs + other - ending inventory. -> Page 1 Line 2.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
-    {
-        "source_code": "IRS_2025_1125E_INSTR",
-        "source_type": "official_instruction",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "title": "Instructions for Form 1125-E (2025) — Compensation of Officers",
-        "citation": "Form 1125-E Instructions (2025)",
-        "issuer": "IRS",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "requires_human_review": False,
-        "trust_score": 9.5,
-        "topics": ["officer_compensation", "1120s"],
-        "excerpts": [
-            {
-                "excerpt_label": "Filing requirement and total flow",
-                "excerpt_text": "Form 1125-E must be attached when total receipts are $500,000 or more and the entity deducts compensation for officers. Include salaries, commissions, bonuses, and taxable fringe benefits. For S corporations, include fringe benefits for >2% shareholders. Line 4 total flows to Form 1120-S Page 1 Line 7 (Compensation of officers).",
-                "summary_text": "Required when receipts >= $500K. Line 4 total -> Page 1 Line 7.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
-    {
         "source_code": "IRS_2025_8825_INSTR_FULL",
         "source_type": "official_instruction",
         "source_rank": "primary_official",
@@ -267,11 +217,35 @@ FRESH_SOURCES = [
 
 # Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
 # available here. Empty: adding it changes nothing until an entry lands.
-EXISTING_SOURCES_TO_REFERENCE: list[str] = []
+EXISTING_SOURCES_TO_REFERENCE: list[str] = [    "IRS_2025_1125A_INSTR",  # ownership -> forms_1120.py (A3/D-42, 2026-08-25)
+    "IRS_2025_1125E_INSTR",  # ownership -> load_1120s_family.py (A3/D-42, 2026-08-25)
+]
 
 # Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
 # available here. Empty: adding it changes nothing until an entry lands.
-NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): IRS_2025_1125A_INSTR is DECLARED by forms_1120.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRS_2025_1125A_INSTR", {
+                    "excerpt_label": "Who must file Form 1125-A",
+                    "excerpt_text": "Filers of Form 1120, 1120-C, 1120-F, 1120-S, 1065, or 1065-B must complete and attach Form 1125-A if they report a deduction for cost of goods sold.",
+                    "summary_text": "Required when COGS is deducted. Line 8 flows to the entity return.",
+                    "is_key_excerpt": True,
+                }),
+    ("IRS_2025_1125A_INSTR", {
+                    "excerpt_label": "COGS computation and section 263A",
+                    "excerpt_text": "Line 1: Inventory at beginning of year. Line 2: Purchases. Line 3: Cost of labor. Line 4: Additional section 263A costs (uniform capitalization). Line 5: Other costs. Line 6: Total (lines 1-5). Line 7: Inventory at end of year. Line 8: Cost of goods sold (line 6 minus line 7). Line 8 flows to Form 1120-S Page 1 Line 2. Section 263A requires certain indirect costs to be capitalized into inventory.",
+                    "summary_text": "COGS = beginning inventory + purchases + labor + 263A costs + other - ending inventory. -> Page 1 Line 2.",
+                    "is_key_excerpt": True,
+                }),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRS_2025_1125E_INSTR is DECLARED by load_1120s_family.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRS_2025_1125E_INSTR", {
+                    "excerpt_label": "Filing requirement and total flow",
+                    "excerpt_text": "Form 1125-E must be attached when total receipts are $500,000 or more and the entity deducts compensation for officers. Include salaries, commissions, bonuses, and taxable fringe benefits. For S corporations, include fringe benefits for >2% shareholders. Line 4 total flows to Form 1120-S Page 1 Line 7 (Compensation of officers).",
+                    "summary_text": "Required when receipts >= $500K. Line 4 total -> Page 1 Line 7.",
+                    "is_key_excerpt": True,
+                }),
+]
 
 EXISTING_SOURCES = [
     "IRS_2025_1120S_INSTR", "IRS_2025_1120S_INSTR_FULL",

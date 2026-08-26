@@ -108,205 +108,8 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
 
 AUTHORITY_SOURCES: list[dict] = [
     # ── 1. IRC §702 — distributive share + character conduit (why Schedule K exists) ──
-    {
-        "source_code": "IRC_702",
-        "source_type": "statute",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1065",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "IRC §702 — Income and Credits of Partner (separately stated distributive share; "
-                 "character conduit)",
-        "citation": "26 U.S.C. §702(a), (a)(8), (b)",
-        "issuer": "U.S. Congress",
-        "official_url": "https://www.law.cornell.edu/uscode/text/26/702",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "is_filing_authority": False,
-        "trust_score": 10.00,
-        "requires_human_review": False,
-        "notes": "The statute behind the Schedule K line structure: §702(a) requires each partner to "
-                 "take into account separately his distributive share of enumerated items (→ the "
-                 "separately-stated Schedule K lines); §702(a)(8) is the residual trade-or-business "
-                 "income (→ Sch K line 1); §702(b) is the character conduit (each item keeps its "
-                 "partnership-level character). §702(a)(8)/(b) quoted verbatim from the U.S. Code "
-                 "2026-07-01 (re-used); the §702(a) opening added verbatim 2026-07-04.",
-        "topics": ["partnership_1065_core"],
-        "excerpts": [
-            {
-                "excerpt_label": "§702(a) — separately stated distributive share (opening)",
-                "location_reference": "26 U.S.C. §702(a) (opening flush)",
-                "excerpt_text": (
-                    "In determining his income tax, each partner shall take into account separately his "
-                    "distributive share of the partnership's— (1) gains and losses from sales or exchanges "
-                    "of capital assets held for not more than 1 year, (2) gains and losses from sales or "
-                    "exchanges of capital assets held for more than 1 year, (3) gains and losses from sales "
-                    "or exchanges of property described in section 1231, (4) charitable contributions, "
-                    "(5) dividends with respect to which section 1(h)(11) or part VIII of subchapter B "
-                    "applies, (6) taxes, described in section 901, paid or accrued to foreign countries and "
-                    "to possessions of the United States, (7) other items of income, gain, loss, deduction, "
-                    "or credit, to the extent provided by regulations prescribed by the Secretary, and "
-                    "(8) taxable income or loss, exclusive of items requiring separate computation under "
-                    "other paragraphs of this subsection."
-                ),
-                "summary_text": "§702(a) requires each partner to separately state his distributive share of "
-                                "the enumerated items (capital gains ST/LT, §1231, charitable, dividends, "
-                                "foreign taxes, other regulatory items) plus (8) the residual trade/business "
-                                "income — this IS the Schedule K line structure.",
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "§702(a)(8) — taxable income/loss distributive share (→ Sch K line 1)",
-                "location_reference": "26 U.S.C. §702(a)(8)",
-                "excerpt_text": (
-                    "taxable income or loss, exclusive of items requiring separate computation under other "
-                    "paragraphs of this subsection."
-                ),
-                "summary_text": "§702(a)(8) is the residual ordinary trade-or-business income/loss — page-1 "
-                                "line 23 → Schedule K line 1.",
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "§702(b) — character determined at the partnership level",
-                "location_reference": "26 U.S.C. §702(b)",
-                "excerpt_text": (
-                    "The character of any item of income, gain, loss, deduction, or credit included in a "
-                    "partner's distributive share under paragraphs (1) through (7) of subsection (a) shall "
-                    "be determined as if such item were realized directly from the source from which "
-                    "realized by the partnership, or incurred in the same manner as incurred by the "
-                    "partnership."
-                ),
-                "summary_text": "Each separately-stated item keeps its partnership-level character in the "
-                                "partner's hands — the reason Schedule K lines 2-21 are broken out rather "
-                                "than folded into ordinary income.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
     # ── 2. IRC §703 — partnership taxable income (the page-1 computation) ──
-    {
-        "source_code": "IRC_703",
-        "source_type": "statute",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1065",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "IRC §703 — Partnership Computations (taxable income computed as an individual; "
-                 "separately-stated carve-outs; disallowed deductions)",
-        "citation": "26 U.S.C. §703(a), (a)(1), (a)(2), (b)",
-        "issuer": "U.S. Congress",
-        "official_url": "https://www.law.cornell.edu/uscode/text/26/703",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "is_filing_authority": False,
-        "trust_score": 10.00,
-        "requires_human_review": False,
-        "notes": "The page-1 computation basis: partnership taxable income is figured as for an individual "
-                 "EXCEPT (1) §702(a) items are separately stated (→ pulled off page 1 onto Schedule K) and "
-                 "(2) six deductions are disallowed at the entity level (personal exemptions, foreign "
-                 "taxes, charitable, NOL, individual itemized, oil/gas depletion). Text READ DIRECTLY and "
-                 "quoted VERBATIM 2026-07-04 from the U.S. Code.",
-        "topics": ["partnership_1065_core"],
-        "excerpts": [
-            {
-                "excerpt_label": "§703(a) — taxable income as an individual, with two exceptions",
-                "location_reference": "26 U.S.C. §703(a), (a)(1), (a)(2)",
-                "excerpt_text": (
-                    "The taxable income of a partnership shall be computed in the same manner as in the case "
-                    "of an individual except that— (1) the items described in section 702(a) shall be "
-                    "separately stated, and (2) the following deductions shall not be allowed to the "
-                    "partnership: (A) the deductions for personal exemptions provided in section 151, "
-                    "(B) the deduction for taxes provided in section 164(a) with respect to taxes, described "
-                    "in section 901, paid or accrued to foreign countries and to possessions of the United "
-                    "States, (C) the deduction for charitable contributions provided in section 170, "
-                    "(D) the net operating loss deduction provided in section 172, (E) the additional "
-                    "itemized deductions for individuals provided in part VII of subchapter B (sec. 211 and "
-                    "following), and (F) the deduction for depletion under section 611 with respect to oil "
-                    "and gas wells."
-                ),
-                "summary_text": "Page-1 ordinary business income is partnership taxable income computed as an "
-                                "individual, minus the §702(a) separately-stated items (which go to Sch K) "
-                                "and minus the six disallowed entity-level deductions.",
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "§703(b) — elections made at the partnership level",
-                "location_reference": "26 U.S.C. §703(b)",
-                "excerpt_text": (
-                    "Any election affecting the computation of taxable income derived from a partnership "
-                    "shall be made by the partnership, except that any election under— (1) subsection (b)(5) "
-                    "or (c)(3) of section 108 (relating to income from discharge of indebtedness), "
-                    "(2) section 617 (relating to deduction and recapture of certain mining exploration "
-                    "expenditures), or (3) section 901 (relating to taxes of foreign countries and "
-                    "possessions of the United States), shall be made by each partner separately."
-                ),
-                "summary_text": "Tax elections are made by the partnership (entity-level) except the three "
-                                "partner-level carve-outs (§108 COD, §617 mining, §901 foreign tax credit).",
-                "is_key_excerpt": False,
-            },
-        ],
-    },
     # ── 3. IRC §704 — distributive share allocation (STRUCTURE; math deferred per Decision C) ──
-    {
-        "source_code": "IRC_704",
-        "source_type": "statute",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1065",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "IRC §704 — Partner's Distributive Share (agreement controls; substantial-economic-"
-                 "effect fallback; §704(c) built-in gain)",
-        "citation": "26 U.S.C. §704(a), (b), (c)",
-        "issuer": "U.S. Congress",
-        "official_url": "https://www.law.cornell.edu/uscode/text/26/704",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "is_filing_authority": False,
-        "trust_score": 10.00,
-        "requires_human_review": False,
-        "notes": "The allocation STRUCTURE the K → K-1 split follows: §704(a) the partnership agreement "
-                 "controls the distributive share; §704(b) if the agreement is silent or an allocation "
-                 "lacks substantial economic effect, allocate by the partner's interest in the partnership; "
-                 "§704(c) built-in gain/loss on contributed property is allocated to the contributing "
-                 "partner (items M/N on the K-1). Per Ken Decision C (2026-07-04): encode this as cited "
-                 "structure + gating flags; the special-allocation MATH is deferred to the tts k1_allocator "
-                 "(the K-1 leg reconciles it). §704(a)/(b) quoted VERBATIM 2026-07-04 from the U.S. Code.",
-        "topics": ["partnership_1065_core"],
-        "excerpts": [
-            {
-                "excerpt_label": "§704(a) — the partnership agreement controls",
-                "location_reference": "26 U.S.C. §704(a)",
-                "excerpt_text": (
-                    "A partner's distributive share of income, gain, loss, deduction, or credit shall, "
-                    "except as otherwise provided in this chapter, be determined by the partnership "
-                    "agreement."
-                ),
-                "summary_text": "The default: distributive share is whatever the partnership agreement says "
-                                "(subject to §704(b)).",
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "§704(b) — partner's-interest fallback (no SEE)",
-                "location_reference": "26 U.S.C. §704(b)(1), (2)",
-                "excerpt_text": (
-                    "A partner's distributive share of income, gain, loss, deduction, or credit (or item "
-                    "thereof) shall be determined in accordance with the partner's interest in the "
-                    "partnership (determined by taking into account all facts and circumstances), if— "
-                    "(1) the partnership agreement does not provide as to the partner's distributive share "
-                    "of income, gain, loss, deduction, or credit (or item thereof), or (2) the allocation "
-                    "to a partner under the agreement of income, gain, loss, deduction, or credit (or item "
-                    "thereof) does not have substantial economic effect."
-                ),
-                "summary_text": "If the agreement is silent OR an allocation lacks substantial economic "
-                                "effect, allocate by the partner's interest in the partnership (facts and "
-                                "circumstances). The SEE test math is RED-deferred to k1_allocator.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
     # ── 4. IRC §707(c) — guaranteed payments (page-1 line 10, Sch K line 4a/4b/4c) ──
     {
         "source_code": "IRC_707C",
@@ -539,11 +342,133 @@ AUTHORITY_SOURCES: list[dict] = [
 
 # Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
 # available here. Empty: adding it changes nothing until an entry lands.
-EXISTING_SOURCES_TO_REFERENCE: list[str] = []
+EXISTING_SOURCES_TO_REFERENCE: list[str] = [    "IRC_702",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
+    "IRC_703",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
+    "IRC_704",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
+]
 
 # Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
 # available here. Empty: adding it changes nothing until an entry lands.
-NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_702 is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_702", {
+                    "excerpt_label": "§702(a) — separately stated distributive share (opening)",
+                    "location_reference": "26 U.S.C. §702(a) (opening flush)",
+                    "excerpt_text": (
+                        "In determining his income tax, each partner shall take into account separately his "
+                        "distributive share of the partnership's— (1) gains and losses from sales or exchanges "
+                        "of capital assets held for not more than 1 year, (2) gains and losses from sales or "
+                        "exchanges of capital assets held for more than 1 year, (3) gains and losses from sales "
+                        "or exchanges of property described in section 1231, (4) charitable contributions, "
+                        "(5) dividends with respect to which section 1(h)(11) or part VIII of subchapter B "
+                        "applies, (6) taxes, described in section 901, paid or accrued to foreign countries and "
+                        "to possessions of the United States, (7) other items of income, gain, loss, deduction, "
+                        "or credit, to the extent provided by regulations prescribed by the Secretary, and "
+                        "(8) taxable income or loss, exclusive of items requiring separate computation under "
+                        "other paragraphs of this subsection."
+                    ),
+                    "summary_text": "§702(a) requires each partner to separately state his distributive share of "
+                                    "the enumerated items (capital gains ST/LT, §1231, charitable, dividends, "
+                                    "foreign taxes, other regulatory items) plus (8) the residual trade/business "
+                                    "income — this IS the Schedule K line structure.",
+                    "is_key_excerpt": True,
+                }),
+    ("IRC_702", {
+                    "excerpt_label": "§702(a)(8) — taxable income/loss distributive share (→ Sch K line 1)",
+                    "location_reference": "26 U.S.C. §702(a)(8)",
+                    "excerpt_text": (
+                        "taxable income or loss, exclusive of items requiring separate computation under other "
+                        "paragraphs of this subsection."
+                    ),
+                    "summary_text": "§702(a)(8) is the residual ordinary trade-or-business income/loss — page-1 "
+                                    "line 23 → Schedule K line 1.",
+                    "is_key_excerpt": True,
+                }),
+    ("IRC_702", {
+                    "excerpt_label": "§702(b) — character determined at the partnership level",
+                    "location_reference": "26 U.S.C. §702(b)",
+                    "excerpt_text": (
+                        "The character of any item of income, gain, loss, deduction, or credit included in a "
+                        "partner's distributive share under paragraphs (1) through (7) of subsection (a) shall "
+                        "be determined as if such item were realized directly from the source from which "
+                        "realized by the partnership, or incurred in the same manner as incurred by the "
+                        "partnership."
+                    ),
+                    "summary_text": "Each separately-stated item keeps its partnership-level character in the "
+                                    "partner's hands — the reason Schedule K lines 2-21 are broken out rather "
+                                    "than folded into ordinary income.",
+                    "is_key_excerpt": True,
+                }),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_703 is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_703", {
+                    "excerpt_label": "§703(a) — taxable income as an individual, with two exceptions",
+                    "location_reference": "26 U.S.C. §703(a), (a)(1), (a)(2)",
+                    "excerpt_text": (
+                        "The taxable income of a partnership shall be computed in the same manner as in the case "
+                        "of an individual except that— (1) the items described in section 702(a) shall be "
+                        "separately stated, and (2) the following deductions shall not be allowed to the "
+                        "partnership: (A) the deductions for personal exemptions provided in section 151, "
+                        "(B) the deduction for taxes provided in section 164(a) with respect to taxes, described "
+                        "in section 901, paid or accrued to foreign countries and to possessions of the United "
+                        "States, (C) the deduction for charitable contributions provided in section 170, "
+                        "(D) the net operating loss deduction provided in section 172, (E) the additional "
+                        "itemized deductions for individuals provided in part VII of subchapter B (sec. 211 and "
+                        "following), and (F) the deduction for depletion under section 611 with respect to oil "
+                        "and gas wells."
+                    ),
+                    "summary_text": "Page-1 ordinary business income is partnership taxable income computed as an "
+                                    "individual, minus the §702(a) separately-stated items (which go to Sch K) "
+                                    "and minus the six disallowed entity-level deductions.",
+                    "is_key_excerpt": True,
+                }),
+    ("IRC_703", {
+                    "excerpt_label": "§703(b) — elections made at the partnership level",
+                    "location_reference": "26 U.S.C. §703(b)",
+                    "excerpt_text": (
+                        "Any election affecting the computation of taxable income derived from a partnership "
+                        "shall be made by the partnership, except that any election under— (1) subsection (b)(5) "
+                        "or (c)(3) of section 108 (relating to income from discharge of indebtedness), "
+                        "(2) section 617 (relating to deduction and recapture of certain mining exploration "
+                        "expenditures), or (3) section 901 (relating to taxes of foreign countries and "
+                        "possessions of the United States), shall be made by each partner separately."
+                    ),
+                    "summary_text": "Tax elections are made by the partnership (entity-level) except the three "
+                                    "partner-level carve-outs (§108 COD, §617 mining, §901 foreign tax credit).",
+                    "is_key_excerpt": False,
+                }),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_704 is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_704", {
+                    "excerpt_label": "§704(a) — the partnership agreement controls",
+                    "location_reference": "26 U.S.C. §704(a)",
+                    "excerpt_text": (
+                        "A partner's distributive share of income, gain, loss, deduction, or credit shall, "
+                        "except as otherwise provided in this chapter, be determined by the partnership "
+                        "agreement."
+                    ),
+                    "summary_text": "The default: distributive share is whatever the partnership agreement says "
+                                    "(subject to §704(b)).",
+                    "is_key_excerpt": True,
+                }),
+    ("IRC_704", {
+                    "excerpt_label": "§704(b) — partner's-interest fallback (no SEE)",
+                    "location_reference": "26 U.S.C. §704(b)(1), (2)",
+                    "excerpt_text": (
+                        "A partner's distributive share of income, gain, loss, deduction, or credit (or item "
+                        "thereof) shall be determined in accordance with the partner's interest in the "
+                        "partnership (determined by taking into account all facts and circumstances), if— "
+                        "(1) the partnership agreement does not provide as to the partner's distributive share "
+                        "of income, gain, loss, deduction, or credit (or item thereof), or (2) the allocation "
+                        "to a partner under the agreement of income, gain, loss, deduction, or credit (or item "
+                        "thereof) does not have substantial economic effect."
+                    ),
+                    "summary_text": "If the agreement is silent OR an allocation lacks substantial economic "
+                                    "effect, allocate by the partner's interest in the partnership (facts and "
+                                    "circumstances). The SEE test math is RED-deferred to k1_allocator.",
+                    "is_key_excerpt": True,
+                }),
+]
 
 # (source_code, form_code, link_type)
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [

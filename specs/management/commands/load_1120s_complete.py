@@ -289,59 +289,46 @@ FRESH_SOURCES = [
             },
         ],
     },
-    {
-        "source_code": "IRS_2025_8283_INSTR",
-        "source_type": "official_instruction",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "title": "Instructions for Form 8283 — Noncash Charitable Contributions (2025)",
-        "citation": "Form 8283 Instructions (2025)",
-        "issuer": "IRS",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "requires_human_review": True,
-        "trust_score": 9.0,
-        "topics": ["charitable_contributions", "noncash_contributions"],
-        "excerpts": [
-            {
-                "excerpt_label": "Form 8283 — filing requirement and sections",
-                "excerpt_text": (
-                    "Form 8283 is required when the total deduction claimed for all noncash "
-                    "charitable contributions exceeds $500. Section A covers items (or groups of "
-                    "similar items) for which the deduction is $5,000 or less — requires description, "
-                    "date of contribution, date acquired, donor's cost or basis, FMV, and method of "
-                    "determining FMV. Section B covers items for which the deduction is more than "
-                    "$5,000 (except publicly traded securities) — requires a qualified appraisal by "
-                    "a qualified appraiser. Publicly traded securities use FMV on date of "
-                    "contribution regardless of amount and do not require an appraisal."
-                ),
-                "summary_text": "Required if noncash contributions > $500. Section A: <= $5K. Section B: > $5K (appraisal required).",
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "Form 8283 — S-Corp passthrough and special rules",
-                "excerpt_text": (
-                    "For S corporations, the charitable contribution deduction is not taken at the "
-                    "entity level — it passes through to shareholders on Schedule K-1 Box 12a. The "
-                    "S corporation must still file Form 8283 if total noncash contributions exceed "
-                    "$500. Special rules apply for vehicles (Form 1098-C required), art valued over "
-                    "$20,000 (attach appraisal), and intellectual property (basis limitation applies "
-                    "in year of contribution, additional deductions in later years based on income)."
-                ),
-                "summary_text": "S-Corp: contributions pass through to K-1 Box 12a. Entity still files 8283 if > $500.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
 ]
 
 # Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
 # available here. Empty: adding it changes nothing until an entry lands.
-EXISTING_SOURCES_TO_REFERENCE: list[str] = []
+EXISTING_SOURCES_TO_REFERENCE: list[str] = [    "IRS_2025_8283_INSTR",  # ownership -> load_1040_form_8283.py (A3/D-42, 2026-08-25)
+]
 
 # Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
 # available here. Empty: adding it changes nothing until an entry lands.
-NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): IRS_2025_8283_INSTR is DECLARED by load_1040_form_8283.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRS_2025_8283_INSTR", {
+                    "excerpt_label": "Form 8283 — filing requirement and sections",
+                    "excerpt_text": (
+                        "Form 8283 is required when the total deduction claimed for all noncash "
+                        "charitable contributions exceeds $500. Section A covers items (or groups of "
+                        "similar items) for which the deduction is $5,000 or less — requires description, "
+                        "date of contribution, date acquired, donor's cost or basis, FMV, and method of "
+                        "determining FMV. Section B covers items for which the deduction is more than "
+                        "$5,000 (except publicly traded securities) — requires a qualified appraisal by "
+                        "a qualified appraiser. Publicly traded securities use FMV on date of "
+                        "contribution regardless of amount and do not require an appraisal."
+                    ),
+                    "summary_text": "Required if noncash contributions > $500. Section A: <= $5K. Section B: > $5K (appraisal required).",
+                    "is_key_excerpt": True,
+                }),
+    ("IRS_2025_8283_INSTR", {
+                    "excerpt_label": "Form 8283 — S-Corp passthrough and special rules",
+                    "excerpt_text": (
+                        "For S corporations, the charitable contribution deduction is not taken at the "
+                        "entity level — it passes through to shareholders on Schedule K-1 Box 12a. The "
+                        "S corporation must still file Form 8283 if total noncash contributions exceed "
+                        "$500. Special rules apply for vehicles (Form 1098-C required), art valued over "
+                        "$20,000 (attach appraisal), and intellectual property (basis limitation applies "
+                        "in year of contribution, additional deductions in later years based on income)."
+                    ),
+                    "summary_text": "S-Corp: contributions pass through to K-1 Box 12a. Entity still files 8283 if > $500.",
+                    "is_key_excerpt": True,
+                }),
+]
 
 # ═══════════════════════════════════════════════════════════════════════════
 # Form 6198 — verbatim i6198 (Rev. November 2025) excerpts, pymupdf-extracted

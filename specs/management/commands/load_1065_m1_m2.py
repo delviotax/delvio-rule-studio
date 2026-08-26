@@ -99,89 +99,7 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
 
 AUTHORITY_SOURCES: list[dict] = [
     # ── IRC §705 — partner's basis (M-2 tax-basis capital roll-forward) ──
-    {
-        "source_code": "IRC_705",
-        "source_type": "statute",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1065",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "IRC §705 — Determination of Basis of Partner's Interest (transactional roll-forward)",
-        "citation": "26 U.S.C. §705(a)",
-        "issuer": "U.S. Congress",
-        "official_url": "https://www.law.cornell.edu/uscode/text/26/705",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "is_filing_authority": False,
-        "trust_score": 10.00,
-        "requires_human_review": False,
-        "notes": "The transactional roll-forward behind M-2 (tax-basis partners' capital): beginning + "
-                 "contributions + distributive-share income (incl. tax-exempt) − distributions − loss/"
-                 "nondeductible share = ending. M-2 line 3 (net income) = Analysis line 1 = M-1 line 9. "
-                 "Re-used from the K-1 load; verbatim.",
-        "topics": ["partnership_1065_core"],
-        "excerpts": [
-            {
-                "excerpt_label": "§705(a) — basis increased by income, decreased by distributions/losses",
-                "location_reference": "26 U.S.C. §705(a)(1), (2)",
-                "excerpt_text": (
-                    "The adjusted basis of a partner's interest in a partnership shall, except as provided "
-                    "in subsection (b), be the basis of such interest determined under section 722 or "
-                    "section 742— (1) increased by the sum of his distributive share for the taxable year "
-                    "and prior taxable years of— (A) taxable income of the partnership as determined under "
-                    "section 703(a), (B) income of the partnership exempt from tax, and (C) the excess of "
-                    "the deductions for depletion over the basis of the property subject to depletion; "
-                    "(2) decreased (but not below zero) by distributions by the partnership as provided in "
-                    "section 733 and by the sum of his distributive share of— (A) losses of the "
-                    "partnership, and (B) expenditures of the partnership not deductible in computing its "
-                    "taxable income and not properly chargeable to capital account."
-                ),
-                "summary_text": "M-2 tax-basis capital roll-forward: BOY + income share (incl. tax-exempt) − "
-                                "distributions − loss/nondeductible share = EOY (transactional, §705/§733).",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
     # ── IRC §702 — separately-stated items (M-1 book↔return differences) ──
-    {
-        "source_code": "IRC_702",
-        "source_type": "statute",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1065",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "IRC §702 — Income and Credits of Partner (separately stated items; character conduit)",
-        "citation": "26 U.S.C. §702(a), (b)",
-        "issuer": "U.S. Congress",
-        "official_url": "https://www.law.cornell.edu/uscode/text/26/702",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "is_filing_authority": False,
-        "trust_score": 10.00,
-        "requires_human_review": False,
-        "notes": "M-1 reconciles book net income to the §702(a) separately-stated Schedule K items making "
-                 "up Analysis line 1 — the book↔return timing/permanent differences (lines 2/4/6/7). "
-                 "Re-used; verbatim.",
-        "topics": ["partnership_1065_core"],
-        "excerpts": [
-            {
-                "excerpt_label": "§702(b) — character determined at the partnership level",
-                "location_reference": "26 U.S.C. §702(b)",
-                "excerpt_text": (
-                    "The character of any item of income, gain, loss, deduction, or credit included in a "
-                    "partner's distributive share under paragraphs (1) through (7) of subsection (a) shall "
-                    "be determined as if such item were realized directly from the source from which "
-                    "realized by the partnership, or incurred in the same manner as incurred by the "
-                    "partnership."
-                ),
-                "summary_text": "The Schedule K separately-stated items (which Analysis line 1 combines) keep "
-                                "partnership-level character — the return side of the M-1 reconciliation.",
-                "is_key_excerpt": False,
-            },
-        ],
-    },
     # ── 2025 Form 1065 page 6 — M-1/M-2 face (filing authority, verbatim) ──
     {
         "source_code": "IRS_2025_F1065",
@@ -292,11 +210,50 @@ AUTHORITY_SOURCES: list[dict] = [
 
 # Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
 # available here. Empty: adding it changes nothing until an entry lands.
-EXISTING_SOURCES_TO_REFERENCE: list[str] = []
+EXISTING_SOURCES_TO_REFERENCE: list[str] = [    "IRC_702",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
+    "IRC_705",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
+]
 
 # Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
 # available here. Empty: adding it changes nothing until an entry lands.
-NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_702 is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_702", {
+                    "excerpt_label": "§702(b) — character determined at the partnership level",
+                    "location_reference": "26 U.S.C. §702(b)",
+                    "excerpt_text": (
+                        "The character of any item of income, gain, loss, deduction, or credit included in a "
+                        "partner's distributive share under paragraphs (1) through (7) of subsection (a) shall "
+                        "be determined as if such item were realized directly from the source from which "
+                        "realized by the partnership, or incurred in the same manner as incurred by the "
+                        "partnership."
+                    ),
+                    "summary_text": "The Schedule K separately-stated items (which Analysis line 1 combines) keep "
+                                    "partnership-level character — the return side of the M-1 reconciliation.",
+                    "is_key_excerpt": False,
+                }),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_705 is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_705", {
+                    "excerpt_label": "§705(a) — basis increased by income, decreased by distributions/losses",
+                    "location_reference": "26 U.S.C. §705(a)(1), (2)",
+                    "excerpt_text": (
+                        "The adjusted basis of a partner's interest in a partnership shall, except as provided "
+                        "in subsection (b), be the basis of such interest determined under section 722 or "
+                        "section 742— (1) increased by the sum of his distributive share for the taxable year "
+                        "and prior taxable years of— (A) taxable income of the partnership as determined under "
+                        "section 703(a), (B) income of the partnership exempt from tax, and (C) the excess of "
+                        "the deductions for depletion over the basis of the property subject to depletion; "
+                        "(2) decreased (but not below zero) by distributions by the partnership as provided in "
+                        "section 733 and by the sum of his distributive share of— (A) losses of the "
+                        "partnership, and (B) expenditures of the partnership not deductible in computing its "
+                        "taxable income and not properly chargeable to capital account."
+                    ),
+                    "summary_text": "M-2 tax-basis capital roll-forward: BOY + income share (incl. tax-exempt) − "
+                                    "distributions − loss/nondeductible share = EOY (transactional, §705/§733).",
+                    "is_key_excerpt": True,
+                }),
+]
 
 # (source_code, form_code, link_type)
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [

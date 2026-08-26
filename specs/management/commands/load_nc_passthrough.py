@@ -121,7 +121,8 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
      "85% bonus/§179 $25k/$200k decouple, CD-401S net-worth franchise."),
 ]
 
-EXISTING_SOURCES_TO_REFERENCE: list[str] = []
+EXISTING_SOURCES_TO_REFERENCE: list[str] = [    "NC_GS_105_CORP",  # ownership -> load_nc_cd405.py (A3/D-42, 2026-08-25)
+]
 
 AUTHORITY_SOURCES: list[dict] = [
     {
@@ -177,32 +178,27 @@ AUTHORITY_SOURCES: list[dict] = [
             "is_key_excerpt": True,
         }],
     },
-    {
-        "source_code": "NC_GS_105_CORP", "source_type": "statute", "source_rank": "controlling",
-        "jurisdiction_code": "NC", "title": "N.C. Gen. Stat. §105-130.5B + §105-153.6 (bonus/§179) · §105-122 (franchise) · §105-130.4 (apportionment)",
-        "citation": "N.C. Gen. Stat. §105-130.5B; §105-153.6; §105-122; §105-130.4", "issuer": "North Carolina General Assembly",
-        "official_url": "https://www.ncleg.gov/",
-        "current_status": "active", "is_substantive_authority": True, "trust_score": 9.2, "topics": ["nc_passthrough_ptet"],
-        "excerpts": [{
-            "excerpt_label": "Bonus/§179 add-back + franchise + single sales factor (re-declared, as CD-405)",
-            "excerpt_text": (
-                "§105-130.5B (corporate) and §105-153.6 (AGI-side — the pass-through/individual authority, where "
-                "the $25,000/$200,000 figures are codified): 85% bonus/§179 add-back (20%/yr recovery). §105-122: "
-                "franchise tax on net worth ($1.50/$1,000, first $1M cap $500, $200 minimum, holding cap "
-                "$150,000; net-worth-only base per S.L. 2021-180; TY2025 CD-401S mechanic: $200 for the first $1M "
-                "+ .0015 x the excess, $200 minimum [D-16/NC-2]). §105-130.4: "
-                "single sales factor, market-based sourcing, four decimals. Conformity: IRC as of January 1, "
-                "2023 (OBBBA not adopted)."
-            ),
-            "summary_text": "§105-130.5B/§105-153.6 85% add-back + §179 $25k/$200k; §105-122 net-worth franchise ($200 first $1M + .0015 excess); §105-130.4 single sales factor; conformity Jan 1 2023.",
-            "is_key_excerpt": True,
-        }],
-    },
 ]
 
 # Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
 # available here. Empty: adding it changes nothing until an entry lands.
-NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): NC_GS_105_CORP is DECLARED by load_nc_cd405.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("NC_GS_105_CORP", {
+                "excerpt_label": "Bonus/§179 add-back + franchise + single sales factor (re-declared, as CD-405)",
+                "excerpt_text": (
+                    "§105-130.5B (corporate) and §105-153.6 (AGI-side — the pass-through/individual authority, where "
+                    "the $25,000/$200,000 figures are codified): 85% bonus/§179 add-back (20%/yr recovery). §105-122: "
+                    "franchise tax on net worth ($1.50/$1,000, first $1M cap $500, $200 minimum, holding cap "
+                    "$150,000; net-worth-only base per S.L. 2021-180; TY2025 CD-401S mechanic: $200 for the first $1M "
+                    "+ .0015 x the excess, $200 minimum [D-16/NC-2]). §105-130.4: "
+                    "single sales factor, market-based sourcing, four decimals. Conformity: IRC as of January 1, "
+                    "2023 (OBBBA not adopted)."
+                ),
+                "summary_text": "§105-130.5B/§105-153.6 85% add-back + §179 $25k/$200k; §105-122 net-worth franchise ($200 first $1M + .0015 excess); §105-130.4 single sales factor; conformity Jan 1 2023.",
+                "is_key_excerpt": True,
+            }),
+]
 
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
     ("NC_2025_PTE_RETURNS", "NC_D403", "governs"), ("NC_SL_2021_180", "NC_D403", "governs"),

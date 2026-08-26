@@ -39,6 +39,8 @@ SAFETY GUARD — READY_TO_SEED stays False until Ken approves the review walk (W
 ═══════════════════════════════════════════════════════════════════════════
 """
 from django.core.management.base import BaseCommand, CommandError
+
+from . import _authority_wiring as _wire
 from django.db import transaction
 
 from sources.models import (
@@ -86,71 +88,49 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
      "unappropriated retained-earnings analysis, and the Schedule K Q13 $250k / Schedule M-3 $10M gates."),
 ]
 
-EXISTING_SOURCES_TO_REFERENCE: list[str] = []
+EXISTING_SOURCES_TO_REFERENCE: list[str] = [    "IRS_2025_F1120",  # ownership -> load_1120_spine.py (A3/D-42, 2026-08-25)
+    "IRS_2025_I1120",  # ownership -> load_1120_spine.py (A3/D-42, 2026-08-25)
+]
 
 AUTHORITY_SOURCES: list[dict] = [
-    {
-        "source_code": "IRS_2025_F1120",
-        "source_type": "federal_form",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "US",
-        "title": "2025 Form 1120 — U.S. Corporation Income Tax Return",
-        "citation": "Form 1120 (2025), OMB No. 1545-0123, Created 9/26/25",
-        "issuer": "Internal Revenue Service",
-        "official_url": "https://www.irs.gov/pub/irs-pdf/f1120.pdf",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "trust_score": 9.6,
-        "topics": ["c_corp_balance_recon"],
-        "excerpts": [
-            {
-                "excerpt_label": "Schedule L / M-1 / M-2 (2025 verbatim)",
-                "excerpt_text": (
-                    "Schedule L Balance Sheets per Books: Assets L1-15 (L15 = Total assets); Liabilities and "
-                    "Shareholders' Equity L16-28 (L25 = Retained earnings—Unappropriated; L28 = Total). "
-                    "Schedule M-1 Reconciliation of Income per Books with Income per Return: L1 net income per "
-                    "books; L2 federal income tax per books; L3 excess capital losses; L4 income subject to tax "
-                    "not on books; L5 book expenses not deducted (a depreciation, b charitable, c T&E); L6 add "
-                    "1-5; L7 book income not on return (tax-exempt interest); L8 return deductions not on books "
-                    "(a depreciation, b charitable); L9 add 7+8; L10 = L6 - L9 (equals page-1 L28). Schedule M-2 "
-                    "Analysis of Unappropriated Retained Earnings (Schedule L L25): L1 beginning balance; L2 net "
-                    "income per books; L3 other increases; L4 add 1+2+3; L5 distributions (a cash, b stock, c "
-                    "property); L6 other decreases; L7 add 5+6; L8 ending balance = L4 - L7. Schedule K Q13: if "
-                    "total receipts and total assets are both under $250,000, Schedule L, M-1, and M-2 are not "
-                    "required."
-                ),
-                "summary_text": "Sch L assets L1-15/L15 total, liab+equity L16-28/L28 total, L25 unapprop R/E. M-1 L10=L6-L9=page-1 L28. M-2 L8=L4-L7 ties to L25. Q13 $250k skip gate.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
-    {
-        "source_code": "IRS_2025_I1120",
-        "source_type": "official_instructions",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "US",
-        "title": "2025 Instructions for Form 1120",
-        "citation": "Instructions for Form 1120 (2025)",
-        "issuer": "Internal Revenue Service",
-        "official_url": "https://www.irs.gov/pub/irs-pdf/i1120.pdf",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "trust_score": 9.5,
-        "topics": ["c_corp_balance_recon"],
-        "excerpts": [
-            {
-                "excerpt_label": "Schedule M-3 $10M threshold (i1120 / iSchM-3 verbatim substance)",
-                "excerpt_text": (
-                    "A corporation with total assets of $10 million or more on the last day of the tax year must "
-                    "complete Schedule M-3 (Form 1120) in place of Schedule M-1. A corporation with total assets "
-                    "of less than $10 million may voluntarily file Schedule M-3. When Schedule M-3 is required, "
-                    "Schedule M-1 is not completed."
-                ),
-                "summary_text": "Schedule M-3 required when total assets >= $10M (replaces M-1). i1120.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
+]
+
+# Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
+# available here. Empty: adding it changes nothing until an entry lands.
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): IRS_2025_F1120 is DECLARED by load_1120_spine.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRS_2025_F1120", {
+                    "excerpt_label": "Schedule L / M-1 / M-2 (2025 verbatim)",
+                    "excerpt_text": (
+                        "Schedule L Balance Sheets per Books: Assets L1-15 (L15 = Total assets); Liabilities and "
+                        "Shareholders' Equity L16-28 (L25 = Retained earnings—Unappropriated; L28 = Total). "
+                        "Schedule M-1 Reconciliation of Income per Books with Income per Return: L1 net income per "
+                        "books; L2 federal income tax per books; L3 excess capital losses; L4 income subject to tax "
+                        "not on books; L5 book expenses not deducted (a depreciation, b charitable, c T&E); L6 add "
+                        "1-5; L7 book income not on return (tax-exempt interest); L8 return deductions not on books "
+                        "(a depreciation, b charitable); L9 add 7+8; L10 = L6 - L9 (equals page-1 L28). Schedule M-2 "
+                        "Analysis of Unappropriated Retained Earnings (Schedule L L25): L1 beginning balance; L2 net "
+                        "income per books; L3 other increases; L4 add 1+2+3; L5 distributions (a cash, b stock, c "
+                        "property); L6 other decreases; L7 add 5+6; L8 ending balance = L4 - L7. Schedule K Q13: if "
+                        "total receipts and total assets are both under $250,000, Schedule L, M-1, and M-2 are not "
+                        "required."
+                    ),
+                    "summary_text": "Sch L assets L1-15/L15 total, liab+equity L16-28/L28 total, L25 unapprop R/E. M-1 L10=L6-L9=page-1 L28. M-2 L8=L4-L7 ties to L25. Q13 $250k skip gate.",
+                    "is_key_excerpt": True,
+                }),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRS_2025_I1120 is DECLARED by load_1120_spine.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRS_2025_I1120", {
+                    "excerpt_label": "Schedule M-3 $10M threshold (i1120 / iSchM-3 verbatim substance)",
+                    "excerpt_text": (
+                        "A corporation with total assets of $10 million or more on the last day of the tax year must "
+                        "complete Schedule M-3 (Form 1120) in place of Schedule M-1. A corporation with total assets "
+                        "of less than $10 million may voluntarily file Schedule M-3. When Schedule M-3 is required, "
+                        "Schedule M-1 is not completed."
+                    ),
+                    "summary_text": "Schedule M-3 required when total assets >= $10M (replaces M-1). i1120.",
+                    "is_key_excerpt": True,
+                }),
 ]
 
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
@@ -413,6 +393,10 @@ class Command(BaseCommand):
                 sources[code] = src
             else:
                 self.stdout.write(self.style.WARNING(f"  existing source {code} NOT FOUND — links to it will be skipped"))
+        # ⚠ D-42: these two lists existed and were NEVER READ. One module DECLARES a
+        #   source, every other REFERENCES it (D-29) — that only works if both halves run.
+        _wire.resolve_references(EXISTING_SOURCES_TO_REFERENCE, sources, self.stdout.write)
+        _wire.apply_new_excerpts(NEW_EXCERPTS_ON_EXISTING, sources, self.stdout.write)
         self.stdout.write(f"Sources ready: {len(sources)}")
         return sources
 

@@ -97,6 +97,7 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
 EXISTING_SOURCES_TO_REFERENCE: list[str] = [
     "IRS_2025_1040_FORM",   # 1040 lines 8/10/17/20/23/31 name the schedule totals
     "IRS_2025_1040_INSTR",  # i1040gi carries the Schedule 1-3 line instructions
+    "IRC_62",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
 ]
 
 
@@ -318,39 +319,6 @@ AUTHORITY_SOURCES: list[dict] = [
             },
         ],
     },
-    {
-        "source_code": "IRC_62",
-        "source_type": "code_section",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1040",
-        "title": "IRC §62 — Adjusted gross income defined",
-        "citation": "26 U.S.C. §62",
-        "issuer": "U.S. Congress",
-        "official_url": "https://uscode.house.gov/view.xhtml?req=granuleid:USC-prelim-title26-section62",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "is_filing_authority": False,
-        "trust_score": 10.00,
-        "requires_human_review": True,
-        "notes": "Substantive basis for Schedule 1 Part II (above-the-line deductions).",
-        "topics": ["schedules_123"],
-        "excerpts": [
-            {
-                "excerpt_label": "§62(a) AGI definition",
-                "location_reference": "26 U.S.C. §62(a)",
-                "excerpt_text": (
-                    "For purposes of this subtitle, the term 'adjusted gross income' means, in "
-                    "the case of an individual, gross income minus the following deductions: ... "
-                    "[enumerated above-the-line deductions]"
-                ),
-                "summary_text": ("AGI = gross income minus the §62(a)-listed deductions — the law behind "
-                                 "Schedule 1 Part II. PENDING VERBATIM CONFIRMATION (source-level "
-                                 "requires_human_review=True; excerpt model has no such field)."),
-                "is_key_excerpt": True,
-            },
-        ],
-    },
 ]
 
 NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [
@@ -369,6 +337,21 @@ NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [
             "is_key_excerpt": True,
         },
     ),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_62 is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_62", {
+                    "excerpt_label": "§62(a) AGI definition",
+                    "location_reference": "26 U.S.C. §62(a)",
+                    "excerpt_text": (
+                        "For purposes of this subtitle, the term 'adjusted gross income' means, in "
+                        "the case of an individual, gross income minus the following deductions: ... "
+                        "[enumerated above-the-line deductions]"
+                    ),
+                    "summary_text": ("AGI = gross income minus the §62(a)-listed deductions — the law behind "
+                                     "Schedule 1 Part II. PENDING VERBATIM CONFIRMATION (source-level "
+                                     "requires_human_review=True; excerpt model has no such field)."),
+                    "is_key_excerpt": True,
+                }),
 ]
 
 

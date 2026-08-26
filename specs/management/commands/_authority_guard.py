@@ -92,8 +92,9 @@ POPULATION_NAMES = ("specs", "sources", "federal_data")
 MATERIAL_FIELDS = ("source_type", "source_rank", "title", "citation", "issuer", "official_url")
 
 # ---------------------------------------------------------------------------
-# ACKNOWLEDGED collisions — the remaining worklist after campaign A3/D-42 ratified
-# ownership on 20 of them (2026-08-25). It was 53; entries LEAVE this list as Ken rules. Regenerated with
+# ACKNOWLEDGED collisions — the remaining worklist. Campaign A3 (D-42/D-44) ratified
+# ownership on 44 of the original 53 over 2026-08-25. NINE remain, in THREE groups, each
+# with a stated remedy — see delvio-states STATUS. Entries LEAVE this list as Ken rules. Regenerated with
 # `python manage.py check_authority_owners --regenerate-acknowledged`, never typed.
 #
 # ⚠ Each entry is a KNOWN defect awaiting an ownership ruling from Ken, NOT an
@@ -111,44 +112,18 @@ MATERIAL_FIELDS = ("source_type", "source_rank", "title", "citation", "issuer", 
 #     while its unseen third writer disagreed on six fields.
 # ---------------------------------------------------------------------------
 ACKNOWLEDGED: dict[str, tuple[tuple[str, ...], str]] = {
-    # --- writers DISAGREE: live last-writer-wins rows (28) ---
+    # --- writers DISAGREE: live last-writer-wins rows (4) ---
     "AL_CODE_40_18":             (('specs/load_al_form20c.py', 'specs/load_al_passthrough.py'), 'differs: title,citation'),
-    "IRC_1":                     (('federal_data/irc_sections.py', 'specs/load_1040_spine.py'), 'differs: source_rank,title,citation,official_url'),
-    "IRC_11":                    (('federal_data/irc_sections.py', 'specs/load_1120_spine.py'), 'differs: source_type,title,citation,issuer,official_url'),
-    "IRC_1402":                  (('federal_data/irc_sections.py', 'specs/load_1065_se.py'), 'differs: source_type,source_rank,title,citation,issuer,official_url'),
-    "IRC_163":                   (('federal_data/irc_sections.py', 'specs/load_sch_1a.py'), 'differs: title,citation'),
-    "IRC_163J":                  (('specs/load_1120_spine.py', 'specs/load_8990.py'), 'differs: title,citation'),
-    "IRC_165":                   (('federal_data/irc_sections.py', 'specs/load_4684.py'), 'differs: source_type,title,citation,issuer,official_url'),
-    "IRC_168":                   (('sources/load_1120s_family.py', 'specs/_1120s_sources.py', 'specs/load_4797.py'), 'differs: source_type,source_rank,title,citation,issuer,official_url'),
-    "IRC_172":                   (('specs/load_1040_form_172.py', 'specs/load_1120_spine.py'), 'differs: source_type,title,citation,official_url'),
-    "IRC_1G":                    (('specs/load_1040_form_8615.py', 'specs/load_8814.py'), 'differs: source_rank,title,citation'),
-    "IRC_41":                    (('federal_data/irc_sections.py', 'specs/load_6765.py'), 'differs: source_type,source_rank,issuer,official_url'),
-    "IRC_62":                    (('federal_data/irc_sections.py', 'specs/load_1040_sch123.py'), 'differs: source_rank,title,issuer,official_url'),
-    "IRC_702":                   (('federal_data/irc_sections.py', 'specs/load_1065_m1_m2.py', 'specs/load_1065_schedule_k.py', 'specs/load_1065_schedule_k1.py', 'specs/load_1065_se.py'), 'differs: source_type,source_rank,title,citation,issuer,official_url'),
-    "IRC_703":                   (('federal_data/irc_sections.py', 'specs/load_1065_schedule_k.py'), 'differs: source_type,source_rank,title,citation,issuer,official_url'),
-    "IRC_704":                   (('federal_data/irc_sections.py', 'specs/load_1065_schedule_k.py', 'specs/load_1065_schedule_k1.py'), 'differs: source_type,source_rank,title,citation,issuer,official_url'),
-    "IRC_705":                   (('federal_data/irc_sections.py', 'specs/load_1065_l_b.py', 'specs/load_1065_m1_m2.py', 'specs/load_1065_schedule_k1.py'), 'differs: source_type,source_rank,title,citation,issuer,official_url'),
-    "IRC_752":                   (('federal_data/irc_sections.py', 'specs/load_1065_schedule_k1.py'), 'differs: source_type,source_rank,title,citation,issuer,official_url'),
-    "IRS_2025_1125A_INSTR":      (('federal_data/forms_1120.py', 'specs/load_remaining_1120s.py'), 'differs: title,official_url'),
-    "IRS_2025_1125E_INSTR":      (('sources/load_1120s_family.py', 'specs/load_remaining_1120s.py'), 'differs: title,official_url'),
-    "IRS_2025_8283_INSTR":       (('specs/load_1040_form_8283.py', 'specs/load_1120s_complete.py'), 'differs: title,citation,official_url'),
-    "IRS_2025_8949_INSTR":       (('sources/load_1120s_family.py', 'specs/_1120s_sources.py', 'specs/load_1040_schedule_d.py'), 'differs: source_type,title,citation,official_url'),
+    "IRC_168":                   (('sources/load_1120s_family.py', 'specs/_1120s_sources.py'), 'differs: title'),
     "IRS_2025_F1065":            (('specs/load_1065_l_b.py', 'specs/load_1065_m1_m2.py', 'specs/load_1065_schedule_k.py'), 'differs: title,citation'),
     "IRS_2025_I1065":            (('specs/load_1065_l_b.py', 'specs/load_1065_m1_m2.py', 'specs/load_1065_schedule_k.py'), 'differs: title,citation'),
-    "IRS_PUB_544":               (('specs/load_4797.py', 'specs/load_8824.py'), 'differs: official_url'),
-    "NC_GS_105_CORP":            (('specs/load_nc_cd405.py', 'specs/load_nc_passthrough.py'), 'differs: title,citation'),
-    "RP_2024_40":                (('specs/load_1040_spine.py', 'specs/load_1041_spine.py'), 'differs: source_type,title,citation,issuer'),
-    "SC_2025_SC1120I":           (('specs/load_sc1120.py', 'specs/load_sc_passthrough.py'), 'differs: source_type,title'),
-    "SC_ACT63_2025_CONFORMITY":  (('specs/load_sc1040.py', 'specs/load_sc1120.py'), 'differs: source_type,citation,official_url'),
 
-    # --- writers AGREE today: benign, but still two writers (7) ---
+    # --- writers AGREE today: benign, but still two writers (5) ---
     "IRC_1222":                  (('sources/load_1120s_family.py', 'specs/_1120s_sources.py'), 'identical today'),
     "IRC_179":                   (('sources/load_1120s_family.py', 'specs/_1120s_sources.py'), 'identical today'),
-    "IRC_707C":                  (('specs/load_1065_schedule_k.py', 'specs/load_1065_schedule_k1.py', 'specs/load_1065_se.py'), 'identical today'),
     "IRS_2025_1120S_SCHD_INSTR": (('sources/load_1120s_family.py', 'specs/_1120s_sources.py'), 'identical today'),
     "IRS_2025_4562_INSTR":       (('sources/load_1120s_family.py', 'specs/_1120s_sources.py'), 'identical today'),
-    "IRS_2025_F1120":            (('specs/load_1120_schl.py', 'specs/load_1120_spine.py'), 'identical today'),
-    "IRS_2025_I1120":            (('specs/load_1120_schl.py', 'specs/load_1120_spine.py'), 'identical today'),
+    "IRS_2025_8949_INSTR":       (('sources/load_1120s_family.py', 'specs/_1120s_sources.py'), 'identical today'),
 }
 
 

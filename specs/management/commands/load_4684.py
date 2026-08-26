@@ -129,7 +129,8 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
      "safe harbor / Section D §165(i) election."),
 ]
 
-EXISTING_SOURCES_TO_REFERENCE: list[str] = []
+EXISTING_SOURCES_TO_REFERENCE: list[str] = [    "IRC_165",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
+]
 
 AUTHORITY_SOURCES: list[dict] = [
     {
@@ -196,28 +197,6 @@ AUTHORITY_SOURCES: list[dict] = [
         }],
     },
     {
-        "source_code": "IRC_165", "source_type": "statute", "source_rank": "controlling",
-        "jurisdiction_code": "US", "title": "IRC §165 — casualty and theft losses (§165(c)/(h)/(i))",
-        "citation": "26 U.S.C. §165(c),(h)(1)-(5),(i); P.L. 119-21 (OBBBA)", "issuer": "U.S. Congress",
-        "official_url": "https://www.law.cornell.edu/uscode/text/26/165",
-        "current_status": "active", "is_substantive_authority": True, "trust_score": 9.3, "topics": ["casualty_theft_loss"],
-        "excerpts": [{
-            "excerpt_label": "§165(h) personal casualty limits + FDD-only limitation (verbatim substance)",
-            "excerpt_text": (
-                "§165(c): an individual's deductible losses are limited to trade/business, transactions entered "
-                "into for profit, and (§165(c)(3)) casualty/theft losses. §165(h)(1): each personal casualty/theft "
-                "loss is allowed only to the extent it exceeds $100. §165(h)(2): aggregate net personal casualty "
-                "losses are allowed only to the extent they exceed 10% of AGI (after netting personal casualty "
-                "gains). §165(h)(5): for 2018-2025, a personal casualty loss is deductible ONLY if attributable to "
-                "a federally declared disaster (except to the extent of personal casualty gains). §165(i): a "
-                "taxpayer may elect to deduct a disaster loss in the taxable year immediately preceding the "
-                "disaster year."
-            ),
-            "summary_text": "§165(h)(1) $100 floor; (h)(2) 10% AGI; (h)(5) FDD-only 2018-2025; (i) preceding-year election; (c)(3) personal casualty/theft.",
-            "is_key_excerpt": True,
-        }],
-    },
-    {
         "source_code": "REVPROC_2009_20", "source_type": "official_guidance", "source_rank": "primary_official",
         "jurisdiction_code": "US", "title": "Rev. Proc. 2009-20 — Ponzi-type theft loss safe harbor",
         "citation": "Rev. Proc. 2009-20 (95%/75% safe-harbor deduction factors)", "issuer": "Internal Revenue Service",
@@ -240,7 +219,24 @@ AUTHORITY_SOURCES: list[dict] = [
 
 # Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
 # available here. Empty: adding it changes nothing until an entry lands.
-NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_165 is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_165", {
+                "excerpt_label": "§165(h) personal casualty limits + FDD-only limitation (verbatim substance)",
+                "excerpt_text": (
+                    "§165(c): an individual's deductible losses are limited to trade/business, transactions entered "
+                    "into for profit, and (§165(c)(3)) casualty/theft losses. §165(h)(1): each personal casualty/theft "
+                    "loss is allowed only to the extent it exceeds $100. §165(h)(2): aggregate net personal casualty "
+                    "losses are allowed only to the extent they exceed 10% of AGI (after netting personal casualty "
+                    "gains). §165(h)(5): for 2018-2025, a personal casualty loss is deductible ONLY if attributable to "
+                    "a federally declared disaster (except to the extent of personal casualty gains). §165(i): a "
+                    "taxpayer may elect to deduct a disaster loss in the taxable year immediately preceding the "
+                    "disaster year."
+                ),
+                "summary_text": "§165(h)(1) $100 floor; (h)(2) 10% AGI; (h)(5) FDD-only 2018-2025; (i) preceding-year election; (c)(3) personal casualty/theft.",
+                "is_key_excerpt": True,
+            }),
+]
 
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
     ("IRS_2025_F4684", "4684", "governs"), ("IRS_2025_I4684", "4684", "governs"),

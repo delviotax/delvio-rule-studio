@@ -93,177 +93,8 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
 
 AUTHORITY_SOURCES: list[dict] = [
     # ── 1. IRC §1402 — the SE definition statute (distributive share + exclusions) ──
-    {
-        "source_code": "IRC_1402",
-        "source_type": "statute",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1065",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "IRC §1402 — Net Earnings From Self-Employment (partner distributive share; "
-                 "rental/portfolio exclusions; limited-partner exclusion)",
-        "citation": "26 U.S.C. §1402(a), (a)(1), (a)(2), (a)(3), (a)(13)",
-        "issuer": "U.S. Congress",
-        "official_url": "https://www.law.cornell.edu/uscode/text/26/1402",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "is_filing_authority": False,
-        "trust_score": 10.00,
-        "requires_human_review": False,
-        "notes": "The controlling statute. §1402(a)(13) limited-partner exclusion is the classification "
-                 "axis; resolved by functional analysis post-Soroban (see CASELAW_SE_LP). Text quoted "
-                 "verbatim from the U.S. Code 2026-07-01.",
-        "topics": ["se_1402_partner"],
-        "excerpts": [
-            {
-                "excerpt_label": "§1402(a) — distributive share in the SE base",
-                "location_reference": "26 U.S.C. §1402(a) (opening)",
-                "excerpt_text": (
-                    "the gross income derived by an individual from any trade or business carried on by "
-                    "such individual, less the deductions allowed by this subtitle which are attributable "
-                    "to such trade or business, plus his distributive share (whether or not distributed) "
-                    "of income or loss described in section 702(a)(8)"
-                ),
-                "summary_text": "Net earnings from self-employment include the partner's distributive share "
-                                "(income OR loss) of §702(a)(8) trade-or-business income.",
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "§1402(a)(1) — rentals from real estate excluded",
-                "location_reference": "26 U.S.C. §1402(a)(1)",
-                "excerpt_text": (
-                    "there shall be excluded rentals from real estate and from personal property leased "
-                    "with the real estate (including such rentals paid in crop shares, and including "
-                    "payments under section 1233(a)(2) of the Food Security Act of 1985 (16 U.S.C. "
-                    "3833(a)(2)) to individuals receiving benefits under section 202 or 223 of the Social "
-                    "Security Act) together with the deductions attributable thereto, unless such rentals "
-                    "are received in the course of a trade or business as a real estate dealer"
-                ),
-                "summary_text": "Rental real estate (box 2) is excluded from SE unless received as a "
-                                "real-estate dealer.",
-                "is_key_excerpt": False,
-            },
-            {
-                "excerpt_label": "§1402(a)(2)/(a)(3) — dividends, interest, and capital gains excluded",
-                "location_reference": "26 U.S.C. §1402(a)(2), (a)(3)",
-                "excerpt_text": (
-                    "(2) there shall be excluded dividends on any share of stock, and interest on any bond, "
-                    "debenture, note, or certificate, or other evidence of indebtedness, issued with interest "
-                    "coupons or in registered form by any corporation (including one issued by a government "
-                    "or political subdivision thereof), unless such dividends and interest are received in "
-                    "the course of a trade or business as a dealer in stocks or securities; (3) there shall "
-                    "be excluded any gain or loss— (A) which is considered as gain or loss from the sale or "
-                    "exchange of a capital asset"
-                ),
-                "summary_text": "Portfolio interest/dividends (non-dealer) and capital gains (boxes 5/6/8/9) "
-                                "are excluded from SE.",
-                "is_key_excerpt": False,
-            },
-            {
-                "excerpt_label": "§1402(a)(13) — limited-partner exclusion (services-only carve-back)",
-                "location_reference": "26 U.S.C. §1402(a)(13)",
-                "excerpt_text": (
-                    "there shall be excluded the distributive share of any item of income or loss of a "
-                    "limited partner, as such, other than guaranteed payments described in section 707(c) "
-                    "to that partner for services actually rendered to or on behalf of the partnership to "
-                    "the extent that those payments are established to be in the nature of remuneration for "
-                    "those services"
-                ),
-                "summary_text": "A limited partner 'as such' excludes the distributive share, EXCEPT §707(c) "
-                                "guaranteed payments for services — the carve-back is services-only "
-                                "(so capital GP of a limited partner is excluded).",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
     # ── 2. IRC §702 — distributive share + character ──
-    {
-        "source_code": "IRC_702",
-        "source_type": "statute",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1065",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "IRC §702 — Income and Credits of Partner (distributive share; character conduit)",
-        "citation": "26 U.S.C. §702(a)(8), (b)",
-        "issuer": "U.S. Congress",
-        "official_url": "https://www.law.cornell.edu/uscode/text/26/702",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "is_filing_authority": False,
-        "trust_score": 10.00,
-        "requires_human_review": False,
-        "notes": "§702(a)(8) is the trade-or-business distributive share that §1402(a) pulls into the SE "
-                 "base; §702(b) is the character conduit. Quoted verbatim 2026-07-01.",
-        "topics": ["se_1402_partner"],
-        "excerpts": [
-            {
-                "excerpt_label": "§702(a)(8) — taxable income/loss distributive share",
-                "location_reference": "26 U.S.C. §702(a)(8)",
-                "excerpt_text": (
-                    "taxable income or loss, exclusive of items requiring separate computation under other "
-                    "paragraphs of this subsection."
-                ),
-                "summary_text": "§702(a)(8) is the residual trade-or-business income/loss distributive share "
-                                "referenced by §1402(a).",
-                "is_key_excerpt": False,
-            },
-            {
-                "excerpt_label": "§702(b) — character determined at the partnership level",
-                "location_reference": "26 U.S.C. §702(b)",
-                "excerpt_text": (
-                    "The character of any item of income, gain, loss, deduction, or credit included in a "
-                    "partner's distributive share under paragraphs (1) through (7) of subsection (a) shall "
-                    "be determined as if such item were realized directly from the source from which "
-                    "realized by the partnership, or incurred in the same manner as incurred by the "
-                    "partnership."
-                ),
-                "summary_text": "Each item keeps its partnership-level character in the partner's hands "
-                                "(rental stays rental, portfolio stays portfolio).",
-                "is_key_excerpt": False,
-            },
-        ],
-    },
     # ── 3. IRC §707(c) — guaranteed payments ──
-    {
-        "source_code": "IRC_707C",
-        "source_type": "statute",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1065",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "IRC §707(c) — Guaranteed Payments (services or use of capital)",
-        "citation": "26 U.S.C. §707(c)",
-        "issuer": "U.S. Congress",
-        "official_url": "https://www.law.cornell.edu/uscode/text/26/707",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "is_filing_authority": False,
-        "trust_score": 10.00,
-        "requires_human_review": False,
-        "notes": "Defines guaranteed payments for services OR use of capital — the two GP components the "
-                 "classification splits for SE. Quoted verbatim 2026-07-01.",
-        "topics": ["se_1402_partner"],
-        "excerpts": [
-            {
-                "excerpt_label": "§707(c) — guaranteed payments for services or use of capital",
-                "location_reference": "26 U.S.C. §707(c)",
-                "excerpt_text": (
-                    "To the extent determined without regard to the income of the partnership, payments to "
-                    "a partner for services or the use of capital shall be considered as made to one who is "
-                    "not a member of the partnership, but only for the purposes of section 61(a) (relating "
-                    "to gross income) and, subject to section 263, for purposes of section 162(a) (relating "
-                    "to trade or business expenses)."
-                ),
-                "summary_text": "Guaranteed payments are for services OR the use of capital — the split that "
-                                "drives R-SE-GPSVC (always SE) vs. R-SE-GPCAP (SE iff active).",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
     # ── 4. Treas. Reg. §1.1402(a)-1 — CFR TEXT READ DIRECTLY, quoted verbatim ──
     {
         "source_code": "TREAS_REG_1402A1",
@@ -566,11 +397,118 @@ AUTHORITY_SOURCES: list[dict] = [
 
 # Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
 # available here. Empty: adding it changes nothing until an entry lands.
-EXISTING_SOURCES_TO_REFERENCE: list[str] = []
+EXISTING_SOURCES_TO_REFERENCE: list[str] = [    "IRC_1402",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
+    "IRC_702",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
+    "IRC_707C",  # ownership -> load_1065_schedule_k.py (A3/D-42, 2026-08-25)
+]
 
 # Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
 # available here. Empty: adding it changes nothing until an entry lands.
-NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_1402 is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_1402", {
+                    "excerpt_label": "§1402(a) — distributive share in the SE base",
+                    "location_reference": "26 U.S.C. §1402(a) (opening)",
+                    "excerpt_text": (
+                        "the gross income derived by an individual from any trade or business carried on by "
+                        "such individual, less the deductions allowed by this subtitle which are attributable "
+                        "to such trade or business, plus his distributive share (whether or not distributed) "
+                        "of income or loss described in section 702(a)(8)"
+                    ),
+                    "summary_text": "Net earnings from self-employment include the partner's distributive share "
+                                    "(income OR loss) of §702(a)(8) trade-or-business income.",
+                    "is_key_excerpt": True,
+                }),
+    ("IRC_1402", {
+                    "excerpt_label": "§1402(a)(1) — rentals from real estate excluded",
+                    "location_reference": "26 U.S.C. §1402(a)(1)",
+                    "excerpt_text": (
+                        "there shall be excluded rentals from real estate and from personal property leased "
+                        "with the real estate (including such rentals paid in crop shares, and including "
+                        "payments under section 1233(a)(2) of the Food Security Act of 1985 (16 U.S.C. "
+                        "3833(a)(2)) to individuals receiving benefits under section 202 or 223 of the Social "
+                        "Security Act) together with the deductions attributable thereto, unless such rentals "
+                        "are received in the course of a trade or business as a real estate dealer"
+                    ),
+                    "summary_text": "Rental real estate (box 2) is excluded from SE unless received as a "
+                                    "real-estate dealer.",
+                    "is_key_excerpt": False,
+                }),
+    ("IRC_1402", {
+                    "excerpt_label": "§1402(a)(2)/(a)(3) — dividends, interest, and capital gains excluded",
+                    "location_reference": "26 U.S.C. §1402(a)(2), (a)(3)",
+                    "excerpt_text": (
+                        "(2) there shall be excluded dividends on any share of stock, and interest on any bond, "
+                        "debenture, note, or certificate, or other evidence of indebtedness, issued with interest "
+                        "coupons or in registered form by any corporation (including one issued by a government "
+                        "or political subdivision thereof), unless such dividends and interest are received in "
+                        "the course of a trade or business as a dealer in stocks or securities; (3) there shall "
+                        "be excluded any gain or loss— (A) which is considered as gain or loss from the sale or "
+                        "exchange of a capital asset"
+                    ),
+                    "summary_text": "Portfolio interest/dividends (non-dealer) and capital gains (boxes 5/6/8/9) "
+                                    "are excluded from SE.",
+                    "is_key_excerpt": False,
+                }),
+    ("IRC_1402", {
+                    "excerpt_label": "§1402(a)(13) — limited-partner exclusion (services-only carve-back)",
+                    "location_reference": "26 U.S.C. §1402(a)(13)",
+                    "excerpt_text": (
+                        "there shall be excluded the distributive share of any item of income or loss of a "
+                        "limited partner, as such, other than guaranteed payments described in section 707(c) "
+                        "to that partner for services actually rendered to or on behalf of the partnership to "
+                        "the extent that those payments are established to be in the nature of remuneration for "
+                        "those services"
+                    ),
+                    "summary_text": "A limited partner 'as such' excludes the distributive share, EXCEPT §707(c) "
+                                    "guaranteed payments for services — the carve-back is services-only "
+                                    "(so capital GP of a limited partner is excluded).",
+                    "is_key_excerpt": True,
+                }),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_702 is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_702", {
+                    "excerpt_label": "§702(a)(8) — taxable income/loss distributive share",
+                    "location_reference": "26 U.S.C. §702(a)(8)",
+                    "excerpt_text": (
+                        "taxable income or loss, exclusive of items requiring separate computation under other "
+                        "paragraphs of this subsection."
+                    ),
+                    "summary_text": "§702(a)(8) is the residual trade-or-business income/loss distributive share "
+                                    "referenced by §1402(a).",
+                    "is_key_excerpt": False,
+                }),
+    ("IRC_702", {
+                    "excerpt_label": "§702(b) — character determined at the partnership level",
+                    "location_reference": "26 U.S.C. §702(b)",
+                    "excerpt_text": (
+                        "The character of any item of income, gain, loss, deduction, or credit included in a "
+                        "partner's distributive share under paragraphs (1) through (7) of subsection (a) shall "
+                        "be determined as if such item were realized directly from the source from which "
+                        "realized by the partnership, or incurred in the same manner as incurred by the "
+                        "partnership."
+                    ),
+                    "summary_text": "Each item keeps its partnership-level character in the partner's hands "
+                                    "(rental stays rental, portfolio stays portfolio).",
+                    "is_key_excerpt": False,
+                }),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_707C is DECLARED by load_1065_schedule_k.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_707C", {
+                    "excerpt_label": "§707(c) — guaranteed payments for services or use of capital",
+                    "location_reference": "26 U.S.C. §707(c)",
+                    "excerpt_text": (
+                        "To the extent determined without regard to the income of the partnership, payments to "
+                        "a partner for services or the use of capital shall be considered as made to one who is "
+                        "not a member of the partnership, but only for the purposes of section 61(a) (relating "
+                        "to gross income) and, subject to section 263, for purposes of section 162(a) (relating "
+                        "to trade or business expenses)."
+                    ),
+                    "summary_text": "Guaranteed payments are for services OR the use of capital — the split that "
+                                    "drives R-SE-GPSVC (always SE) vs. R-SE-GPCAP (SE iff active).",
+                    "is_key_excerpt": True,
+                }),
+]
 
 # (source_code, form_code, link_type)
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [

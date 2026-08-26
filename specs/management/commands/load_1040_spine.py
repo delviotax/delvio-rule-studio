@@ -136,6 +136,7 @@ EXISTING_SOURCES_TO_REFERENCE: list[str] = [
     "IRC_151",              # exemptions/dependents (cross-ref)
     "IRC_152",              # dependent definition (cross-ref)
     "IRS_2025_8812_FORM",   # Sch 8812 lines 14/27 feed 1040 lines 19/28
+    "IRC_1",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
 ]
 
 
@@ -598,40 +599,6 @@ AUTHORITY_SOURCES += [
         ],
     },
     # ─── IRC §1 (tax imposed; rate schedules) ───
-    {
-        "source_code": "IRC_1",
-        "source_type": "code_section",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1040",
-        "tax_year_start": None,
-        "tax_year_end": None,
-        "title": "IRC §1 — Tax imposed",
-        "citation": "26 U.S.C. §1; §1(j) (TCJA rates); §1(f) (inflation adjustment)",
-        "issuer": "Congress",
-        "official_url": "https://uscode.house.gov/view.xhtml?req=(title:26%20section:1)",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "is_filing_authority": False,
-        "trust_score": 10.00,
-        "requires_human_review": True,
-        "notes": "Imposes the income tax by filing status; §1(j) seven-rate structure; §1(f) indexing.",
-        "topics": ["tax_computation", "filing_status"],
-        "excerpts": [
-            {
-                "excerpt_label": "§1(a)-(d), (j) — rates by filing status",
-                "location_reference": "26 U.S.C. §1(a)-(d), (j)",
-                "excerpt_text": (
-                    "Tax imposed on married individuals filing jointly and surviving spouses "
-                    "(§1(a)); heads of households (§1(b)); unmarried individuals (§1(c)); "
-                    "married filing separately (§1(d)). §1(j) sets the 10/12/22/24/32/35/37% "
-                    "structure for 2018+ (made permanent by OBBBA §70101)."
-                ),
-                "summary_text": "Statutory basis for the four rate schedules; QSS taxed under §1(a).",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
     # ─── IRC §3 (tax tables) ───
     {
         "source_code": "IRC_3",
@@ -882,6 +849,20 @@ NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [
             "is_key_excerpt": True,
         },
     ),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_1 is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_1", {
+                    "excerpt_label": "§1(a)-(d), (j) — rates by filing status",
+                    "location_reference": "26 U.S.C. §1(a)-(d), (j)",
+                    "excerpt_text": (
+                        "Tax imposed on married individuals filing jointly and surviving spouses "
+                        "(§1(a)); heads of households (§1(b)); unmarried individuals (§1(c)); "
+                        "married filing separately (§1(d)). §1(j) sets the 10/12/22/24/32/35/37% "
+                        "structure for 2018+ (made permanent by OBBBA §70101)."
+                    ),
+                    "summary_text": "Statutory basis for the four rate schedules; QSS taxed under §1(a).",
+                    "is_key_excerpt": True,
+                }),
 ]
 
 

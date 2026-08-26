@@ -46,7 +46,10 @@ INTENDED_REMOVALS = {("load_4562_destination_rounding.py", "EXISTING_SOURCES_TO_
 POP_B = ["load_1065_schedule_k1.py", "load_1065_schedule_k.py", "load_1065_se.py",
          "load_1065_m1_m2.py", "load_1065_l_b.py", "load_1120_spine.py",
          "load_1041_spine.py", "load_1120s_complete.py", "load_remaining_1120s.py",
-         "load_sc1120.py", "load_6765.py", "load_4684.py", "load_nc_passthrough.py"]
+         "load_sc1120.py", "load_6765.py", "load_4684.py", "load_nc_passthrough.py",
+         # added in the A3-ii pass: these two can reference but have no
+         # NEW_EXCERPTS_ON_EXISTING, and their conversions carry one excerpt each.
+         "load_8814.py", "load_1120_schl.py"]
 
 
 def module_state(path):
@@ -149,9 +152,16 @@ def apply_one(path, work):
             call += "%s_wire.resolve_references(EXISTING_SOURCES_TO_REFERENCE, sources, self.stdout.write)\n" % indent
         if nm == "NEW_EXCERPTS_ON_EXISTING" and nm in src:
             call += "%s_wire.apply_new_excerpts(NEW_EXCERPTS_ON_EXISTING, sources, self.stdout.write)\n" % indent
-    if "_wire.resolve_references" in src or "_wire.apply_new_excerpts" in src:
+    # ⚠ Per-LIST, not per-module. The first version asked "is this module wired at
+    #   all?", which refused to add the SECOND list to a module that already had the
+    #   first - exactly load_8814.py's case. A coarse check that silently declines is
+    #   worse than no check: it reports success and does nothing.
+    existing = [x.strip() for x in src.splitlines()]
+    kept = [l for l in call.splitlines()
+            if not (l.strip().startswith("_wire.") and l.strip() in existing)]
+    if not [l for l in kept if l.strip().startswith("_wire.")]:
         return {"status": "already wired"}
-    src = src[:pos] + call + src[pos:]
+    src = src[:pos] + "\n".join(kept) + "\n" + src[pos:]
 
     ast.parse(src)                                   # never write something unparseable
     if src != orig:

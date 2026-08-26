@@ -256,6 +256,7 @@ EXISTING_SOURCES_TO_REFERENCE: list[str] = [
     "RP_2025_32",            # §4.03 TY2026 breakpoints (intdiv) + §4.01 brackets (spine)
     "IRS_2025_1040_FORM",    # 1040 line 7a/7b
     "IRS_2025_1040_INSTR",   # QDCGT worksheet (line 16) — the line-20 YES path
+    "IRS_2025_8949_INSTR",  # ownership -> load_1120s_family.py (A3/D-42, 2026-08-25)
 ]
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -615,140 +616,6 @@ AUTHORITY_SOURCES: list[dict] = [
             },
         ],
     },
-    {
-        "source_code": "IRS_2025_8949_INSTR",
-        "source_type": "official_instructions",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1040",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "2025 Instructions for Form 8949 — boxes A-L, Exceptions 1/2, the column (f)/(g) code table",
-        "citation": "i8949 (2025)",
-        "issuer": "IRS",
-        "official_url": "https://www.irs.gov/pub/irs-pdf/i8949.pdf",
-        "current_status": "active",
-        "is_substantive_authority": False,
-        "is_filing_authority": False,
-        "trust_score": 9.00,
-        "requires_human_review": False,
-        "notes": "All 13 pages transcribed 2026-06-13 (server/.scratch/i8949_2025_dump.txt). The full code table feeds the Decision-5 dropdown data list (the adj_code_* facts).",
-        "topics": ["form_8949_reporting"],
-        "excerpts": [
-            {
-                "excerpt_label": "Box definitions A-L incl. digital assets (verbatim, condensed)",
-                "location_reference": "i8949 (2025), Specific Instructions, Parts I-II box text",
-                "excerpt_text": (
-                    "Box A or Box G: all short-term transactions reported to you on Form "
-                    "1099-B or Form 1099-DA (or substitute statement) with an amount shown for "
-                    "cost or other basis unless the statement indicates that amount wasn't "
-                    "reported to the IRS. Box B or Box H: ... without an amount shown for cost "
-                    "or other basis or showing that cost or other basis wasn't reported to the "
-                    "IRS. Box C or Box I: all short-term transactions for which you can't check "
-                    "box A, B, G or H because you didn't receive a Form 1099-B or Form 1099-DA. "
-                    "Do not use box C to report digital asset transactions. Use box I. Part II: "
-                    "Box D or Box J / Box E or Box K / Box F or Box L mirror the above for "
-                    "long-term. Digital asset transactions should not be reported using box C "
-                    "or F. Instead, digital asset transactions should be reported using box G, "
-                    "H, or I for short-term transactions. Box J, K, or L should be used to "
-                    "report long-term transactions."
-                ),
-                "summary_text": (
-                    "WALK ITEM 2: A-F = securities (1099-B), G-L = digital assets (1099-DA), "
-                    "NEW for 2025. Routing is pairwise identical — the box is one enum on "
-                    "CapitalTransaction. Basis-reported test: 1099-B box 12 / 1099-DA box 2."
-                ),
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "Exception 2 — broker summary rows / code M (verbatim)",
-                "location_reference": "i8949 (2025), Exceptions to reporting each transaction on a separate row",
-                "excerpt_text": (
-                    "Exception 2. Instead of reporting each of your transactions on a separate "
-                    "row of Part I or II, you can report them on an attached statement "
-                    "containing all the same information as Parts I and II and in a similar "
-                    "format. Use as many attached statements as you need. Enter the combined "
-                    "totals from all your attached statements on Parts I and II with the "
-                    "appropriate box checked. For example, report on Part I with box B or box H "
-                    "checked all short-term gains and losses from transactions your broker "
-                    "reported to you on a statement showing basis wasn't reported to the IRS. "
-                    "Enter the name of the broker followed by the words 'see attached "
-                    "statement' in column (a). Leave columns (b) and (c) blank. Enter 'M' in "
-                    "column (f). If other codes also apply, enter all of them in column (f). "
-                    "Enter the totals that apply in columns (d), (e), (g), and (h). If you have "
-                    "statements from more than one broker, report the totals from each broker "
-                    "on a separate row. Caution: Exception 2 is not available for the election "
-                    "to defer eligible gain by investing in a QOF."
-                ),
-                "summary_text": (
-                    "Ken Decision 2: is_summary rows = one row per broker per box, code M, "
-                    "columns (b)/(c) blank, attached-statement flag (D_8949_004 reminds). A "
-                    "100-transaction statement = one line per box."
-                ),
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "Column (f)/(g) mechanics — multi-code + net adjustment (verbatim)",
-                "location_reference": "i8949 (2025), Columns (f) and (g)",
-                "excerpt_text": (
-                    "Enter in column (g) any necessary adjustments to gain (or loss). Enter "
-                    "negative amounts in parentheses. Also, enter a code in column (f) to "
-                    "explain the adjustment. More than one code: If you entered more than one "
-                    "code in column (f) on the same row, enter the net adjustment in column "
-                    "(g). For example, if one adjustment is $5,000 and another is ($1,000), "
-                    "enter $4,000 ($5,000 - $1,000). [Codes on the same row are listed "
-                    "alphabetically with no separators, e.g. 'BOQ'.] Column (h): First, "
-                    "subtract the cost or other basis in column (e) from the proceeds (sales "
-                    "price) in column (d). Then take into account any adjustments in column "
-                    "(g). Enter the gain (or loss) in column (h)."
-                ),
-                "summary_text": (
-                    "h = d - e + g per row; multi-code rows carry ONE net (g) amount, codes "
-                    "alphabetical (e.g. 'BW'). An amount in (g) with no code in (f) is invalid "
-                    "(D_8949_002)."
-                ),
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "Adjustment-code table B..Z (verbatim, condensed per code)",
-                "location_reference": "i8949 (2025), How To Complete Form 8949, Columns (f) and (g) (pages 8-11)",
-                "excerpt_text": (
-                    "B: basis shown in box 1e (1099-B) / box 1g (1099-DA) is incorrect — "
-                    "correct it in column (e) with -0- in (g) if basis was NOT reported to the "
-                    "IRS (boxes B/E/H/K); if basis WAS reported (boxes A/D/G/J), keep the "
-                    "reported basis in (e) and adjust in (g) per the Worksheet for Basis "
-                    "Adjustments. C: you disposed of collectibles — enter -0- in (g) [feeds "
-                    "the 28% Rate Gain Worksheet line 1]. D: accrued market discount in box "
-                    "1f/1h — adjustment per worksheet; also report as interest. E: selling "
-                    "expenses, option premiums, or digital asset transaction costs not "
-                    "reflected — negative for amounts paid, positive for option premium "
-                    "received. H: main-home gain exclusion — excluded gain as a negative "
-                    "number. L: nondeductible loss other than a wash sale — positive. M: "
-                    "multiple transactions on a single row (Exception 2) — -0- unless another "
-                    "code applies. N: received as nominee — offsetting adjustment so (h) is "
-                    "zero. O: adjustment not explained elsewhere — appropriate amount. P: "
-                    "nonresident alien sale of a U.S. trade/business partnership interest "
-                    "(§864(c)(8)). Q: QSB §1202 exclusion — the exclusion as a negative number "
-                    "[the 50%/(2/3 of 60%)/(1/3 of 75%) add-back goes on the 28% Rate Gain "
-                    "Worksheet line 2]. R: postponing gain (rollover) — postponed gain as a "
-                    "negative number. S: §1244 small-business stock loss exceeding the "
-                    "ordinary-loss maximum. T: type of gain (term) shown in box 2 / box 6 "
-                    "incorrect — report on the correct part, -0- in (g). W: nondeductible "
-                    "wash-sale loss — a POSITIVE number in (g). X: DC Zone / qualified "
-                    "community asset exclusion — negative. Y: gain previously deferred in a "
-                    "QOF now reported. Z: electing to defer eligible gain invested in a QOF. "
-                    "[None apply: leave columns (f) and (g) blank.]"
-                ),
-                "summary_text": (
-                    "The Decision-5 dropdown data list (18 codes, authored as the adj_code_* "
-                    "facts with sign conventions). Sign pins (D_8949_003): W/L positive; "
-                    "H/Q/R/X negative. Y/Z (QOF) = RED-defer (D_SCHD_007); Q checks the 28%-WS "
-                    "add-back fact (D_SCHD_009)."
-                ),
-                "is_key_excerpt": True,
-            },
-        ],
-    },
 ]
 
 
@@ -780,6 +647,120 @@ NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [
             "is_key_excerpt": True,
         },
     ),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRS_2025_8949_INSTR is DECLARED by load_1120s_family.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRS_2025_8949_INSTR", {
+                    "excerpt_label": "Box definitions A-L incl. digital assets (verbatim, condensed)",
+                    "location_reference": "i8949 (2025), Specific Instructions, Parts I-II box text",
+                    "excerpt_text": (
+                        "Box A or Box G: all short-term transactions reported to you on Form "
+                        "1099-B or Form 1099-DA (or substitute statement) with an amount shown for "
+                        "cost or other basis unless the statement indicates that amount wasn't "
+                        "reported to the IRS. Box B or Box H: ... without an amount shown for cost "
+                        "or other basis or showing that cost or other basis wasn't reported to the "
+                        "IRS. Box C or Box I: all short-term transactions for which you can't check "
+                        "box A, B, G or H because you didn't receive a Form 1099-B or Form 1099-DA. "
+                        "Do not use box C to report digital asset transactions. Use box I. Part II: "
+                        "Box D or Box J / Box E or Box K / Box F or Box L mirror the above for "
+                        "long-term. Digital asset transactions should not be reported using box C "
+                        "or F. Instead, digital asset transactions should be reported using box G, "
+                        "H, or I for short-term transactions. Box J, K, or L should be used to "
+                        "report long-term transactions."
+                    ),
+                    "summary_text": (
+                        "WALK ITEM 2: A-F = securities (1099-B), G-L = digital assets (1099-DA), "
+                        "NEW for 2025. Routing is pairwise identical — the box is one enum on "
+                        "CapitalTransaction. Basis-reported test: 1099-B box 12 / 1099-DA box 2."
+                    ),
+                    "is_key_excerpt": True,
+                }),
+    ("IRS_2025_8949_INSTR", {
+                    "excerpt_label": "Exception 2 — broker summary rows / code M (verbatim)",
+                    "location_reference": "i8949 (2025), Exceptions to reporting each transaction on a separate row",
+                    "excerpt_text": (
+                        "Exception 2. Instead of reporting each of your transactions on a separate "
+                        "row of Part I or II, you can report them on an attached statement "
+                        "containing all the same information as Parts I and II and in a similar "
+                        "format. Use as many attached statements as you need. Enter the combined "
+                        "totals from all your attached statements on Parts I and II with the "
+                        "appropriate box checked. For example, report on Part I with box B or box H "
+                        "checked all short-term gains and losses from transactions your broker "
+                        "reported to you on a statement showing basis wasn't reported to the IRS. "
+                        "Enter the name of the broker followed by the words 'see attached "
+                        "statement' in column (a). Leave columns (b) and (c) blank. Enter 'M' in "
+                        "column (f). If other codes also apply, enter all of them in column (f). "
+                        "Enter the totals that apply in columns (d), (e), (g), and (h). If you have "
+                        "statements from more than one broker, report the totals from each broker "
+                        "on a separate row. Caution: Exception 2 is not available for the election "
+                        "to defer eligible gain by investing in a QOF."
+                    ),
+                    "summary_text": (
+                        "Ken Decision 2: is_summary rows = one row per broker per box, code M, "
+                        "columns (b)/(c) blank, attached-statement flag (D_8949_004 reminds). A "
+                        "100-transaction statement = one line per box."
+                    ),
+                    "is_key_excerpt": True,
+                }),
+    ("IRS_2025_8949_INSTR", {
+                    "excerpt_label": "Column (f)/(g) mechanics — multi-code + net adjustment (verbatim)",
+                    "location_reference": "i8949 (2025), Columns (f) and (g)",
+                    "excerpt_text": (
+                        "Enter in column (g) any necessary adjustments to gain (or loss). Enter "
+                        "negative amounts in parentheses. Also, enter a code in column (f) to "
+                        "explain the adjustment. More than one code: If you entered more than one "
+                        "code in column (f) on the same row, enter the net adjustment in column "
+                        "(g). For example, if one adjustment is $5,000 and another is ($1,000), "
+                        "enter $4,000 ($5,000 - $1,000). [Codes on the same row are listed "
+                        "alphabetically with no separators, e.g. 'BOQ'.] Column (h): First, "
+                        "subtract the cost or other basis in column (e) from the proceeds (sales "
+                        "price) in column (d). Then take into account any adjustments in column "
+                        "(g). Enter the gain (or loss) in column (h)."
+                    ),
+                    "summary_text": (
+                        "h = d - e + g per row; multi-code rows carry ONE net (g) amount, codes "
+                        "alphabetical (e.g. 'BW'). An amount in (g) with no code in (f) is invalid "
+                        "(D_8949_002)."
+                    ),
+                    "is_key_excerpt": True,
+                }),
+    ("IRS_2025_8949_INSTR", {
+                    "excerpt_label": "Adjustment-code table B..Z (verbatim, condensed per code)",
+                    "location_reference": "i8949 (2025), How To Complete Form 8949, Columns (f) and (g) (pages 8-11)",
+                    "excerpt_text": (
+                        "B: basis shown in box 1e (1099-B) / box 1g (1099-DA) is incorrect — "
+                        "correct it in column (e) with -0- in (g) if basis was NOT reported to the "
+                        "IRS (boxes B/E/H/K); if basis WAS reported (boxes A/D/G/J), keep the "
+                        "reported basis in (e) and adjust in (g) per the Worksheet for Basis "
+                        "Adjustments. C: you disposed of collectibles — enter -0- in (g) [feeds "
+                        "the 28% Rate Gain Worksheet line 1]. D: accrued market discount in box "
+                        "1f/1h — adjustment per worksheet; also report as interest. E: selling "
+                        "expenses, option premiums, or digital asset transaction costs not "
+                        "reflected — negative for amounts paid, positive for option premium "
+                        "received. H: main-home gain exclusion — excluded gain as a negative "
+                        "number. L: nondeductible loss other than a wash sale — positive. M: "
+                        "multiple transactions on a single row (Exception 2) — -0- unless another "
+                        "code applies. N: received as nominee — offsetting adjustment so (h) is "
+                        "zero. O: adjustment not explained elsewhere — appropriate amount. P: "
+                        "nonresident alien sale of a U.S. trade/business partnership interest "
+                        "(§864(c)(8)). Q: QSB §1202 exclusion — the exclusion as a negative number "
+                        "[the 50%/(2/3 of 60%)/(1/3 of 75%) add-back goes on the 28% Rate Gain "
+                        "Worksheet line 2]. R: postponing gain (rollover) — postponed gain as a "
+                        "negative number. S: §1244 small-business stock loss exceeding the "
+                        "ordinary-loss maximum. T: type of gain (term) shown in box 2 / box 6 "
+                        "incorrect — report on the correct part, -0- in (g). W: nondeductible "
+                        "wash-sale loss — a POSITIVE number in (g). X: DC Zone / qualified "
+                        "community asset exclusion — negative. Y: gain previously deferred in a "
+                        "QOF now reported. Z: electing to defer eligible gain invested in a QOF. "
+                        "[None apply: leave columns (f) and (g) blank.]"
+                    ),
+                    "summary_text": (
+                        "The Decision-5 dropdown data list (18 codes, authored as the adj_code_* "
+                        "facts with sign conventions). Sign pins (D_8949_003): W/L positive; "
+                        "H/Q/R/X negative. Y/Z (QOF) = RED-defer (D_SCHD_007); Q checks the 28%-WS "
+                        "add-back fact (D_SCHD_009)."
+                    ),
+                    "is_key_excerpt": True,
+                }),
 ]
 
 

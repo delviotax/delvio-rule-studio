@@ -38,26 +38,33 @@ SNAP = os.path.join(os.path.dirname(os.path.abspath(__file__)), "a3_contribution
 
 # (loser module basename, source_code, owner label) — from a3_feasible.py, generated not typed.
 CONVERSIONS = [
-    ("load_8824.py", "IRC_1031", "federal_data/irc_sections.py"),
-    ("load_1040_minister.py", "IRC_1402", "federal_data/irc_sections.py"),
-    ("load_1040_schedule_k1.py", "IRC_1402", "federal_data/irc_sections.py"),
-    ("load_1040_8960.py", "IRC_1411", "federal_data/irc_sections.py"),
-    ("load_1040_schedule_a.py", "IRC_170", "federal_data/irc_sections.py"),
-    ("load_1040_schedule_k1.py", "IRC_199A", "federal_data/irc_sections.py"),
-    ("load_1040_form_8863.py", "IRC_25A", "federal_data/irc_sections.py"),
-    ("load_1040_form_8829.py", "IRC_280A", "federal_data/irc_sections.py"),
-    ("load_1040_form_8962.py", "IRC_36B", "federal_data/irc_sections.py"),
-    ("load_6252.py", "IRC_453", "federal_data/irc_sections.py"),
-    ("load_1040_schedule_e.py", "IRC_465", "federal_data/irc_sections.py"),
-    ("load_1040_schedule_e.py", "IRC_469", "federal_data/irc_sections.py"),
-    ("load_1040_w2g.py", "IRC_61", "federal_data/irc_sections.py"),
-    ("load_1040_2210.py", "IRC_6654", "specs/load_1040_spine.py"),
-    ("load_4797.py", "IRS_2025_1065_INSTR", "federal_data/forms_1065.py"),
-    ("load_1040_schedule_k1.py", "IRS_2025_1065_K1_INSTR", "federal_data/forms_1065.py"),
-    ("load_1040_schedule_k1.py", "IRS_2025_1120S_K1_INSTR", "federal_data/forms_1120s.py"),
-    ("load_1040_schedule_c.py", "IRS_2025_8959_INSTR", "federal_data/forms_supporting.py"),
-    ("load_1040_schedule_c.py", "IRS_2025_8995_INSTR", "federal_data/forms_supporting.py"),
-    ("load_1040_form_7206.py", "IRS_2025_F7206_INSTR", "specs/load_1040_retirement.py"),
+    # ── A3-ii, 2026-08-25 — the 16 the objective criteria could not decide.
+    #
+    # ⭐ THEY RESOLVE ON ONE PRINCIPLE, NOT SIXTEEN RULINGS:
+    #    A SOURCE ROW DESCRIBES A DOCUMENT. The consumer's SLICE of that document
+    #    belongs in its EXCERPT, which is per-consumer by design. Every one of these
+    #    disagreements is a writer having put its own slice into the shared row -
+    #    IRC §168's citation varying by which subsections a loader cites, Form 1065's
+    #    title varying by which schedule it cares about. The writer whose title and
+    #    citation describe the WHOLE DOCUMENT owns it; the slice-writers reference it
+    #    and keep their slice where it always belonged.
+    #
+    # ⭐ AND ONE STRUCTURAL CALL settles six of them: specs/_1120s_sources.py and
+    #    sources/load_1120s_family.py are two halves of one intent. The sources app
+    #    runs in seed_all PHASE 1, before every specs loader - which is the dependency
+    #    order the whole library already uses. The sources side owns.
+    ("load_1040_spine.py", "IRC_1", "federal_data/irc_sections.py"),
+    ("load_1040_sch123.py", "IRC_62", "federal_data/irc_sections.py"),
+    ("load_sch_1a.py", "IRC_163", "federal_data/irc_sections.py"),
+    ("load_1120_spine.py", "IRC_163J", "specs/load_8990.py"),
+    ("load_8814.py", "IRC_1G", "specs/load_1040_form_8615.py"),
+    ("load_4797.py", "IRC_168", "sources/load_1120s_family.py"),
+    ("load_1040_schedule_d.py", "IRS_2025_8949_INSTR", "sources/load_1120s_family.py"),
+    ("load_4797.py", "IRS_PUB_544", "specs/load_8824.py"),
+    ("load_1065_schedule_k1.py", "IRC_707C", "specs/load_1065_schedule_k.py"),
+    ("load_1065_se.py", "IRC_707C", "specs/load_1065_schedule_k.py"),
+    ("load_1120_schl.py", "IRS_2025_F1120", "specs/load_1120_spine.py"),
+    ("load_1120_schl.py", "IRS_2025_I1120", "specs/load_1120_spine.py"),
 ]
 
 

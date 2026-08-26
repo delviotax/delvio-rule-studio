@@ -104,6 +104,7 @@ FORM_NOTES = (
 EXISTING_SOURCES_TO_REFERENCE: list[str] = [
     "IRC_151",  # §151(d)(5) enhanced senior deduction (Part V)
     "IRC_63",   # §63(b)(7) non-itemizer below-the-line treatment (Part IV / shared)
+    "IRC_163",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
 ]
 
 
@@ -306,48 +307,6 @@ AUTHORITY_SOURCES: list[dict] = [
         ],
     },
     # ─── IRC §163 — Car loan / QPVLI ───
-    {
-        "source_code": "IRC_163",
-        "source_type": "code_section",
-        "source_rank": "controlling",
-        "jurisdiction_code": "FED",
-        "title": "IRC §163(h)(4) — Qualified Passenger Vehicle Loan Interest (QPVLI)",
-        "citation": "26 U.S.C. §163(h)(4) (added by P.L. 119-21 §70203(a))",
-        "issuer": "Congress",
-        "current_status": "active",
-        "effective_date_start": "2025-01-01",
-        "effective_date_end": "2028-12-31",
-        "is_substantive_authority": True,
-        "trust_score": 10.00,
-        "requires_human_review": True,
-        "notes": "QPVLI deduction added by OBBBA §70203(a). Effective TY 2025–2028.",
-        "topics": ["car_loan_interest_deduction", "obbba"],
-        "excerpts": [
-            {
-                "excerpt_label": "§163(h)(4) — Cap and MAGI phaseout",
-                "location_reference": "26 U.S.C. §163(h)(4)",
-                "excerpt_text": (
-                    "Deduction for qualified passenger vehicle loan interest. Cap $10,000. Phaseout begins "
-                    "at MAGI $100,000 ($200,000 MFJ); reduced $200 for each $1,000 (rounded UP) of excess."
-                ),
-                "summary_text": "Cap $10,000; phaseout over $100,000/$200,000 at $200 per $1,000 (round UP).",
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "§163(h)(4) — Vehicle and loan conditions",
-                "location_reference": "26 U.S.C. §163(h)(4)",
-                "excerpt_text": (
-                    "Conditions: new vehicle (original use begins with taxpayer); final assembly in U.S.; "
-                    "≥2 wheels, primarily for public roads, GVWR < 14,000 lbs, motor vehicle under the "
-                    "Clean Air Act; personal use; loan incurred after 12/31/2024, first lien secured by the "
-                    "vehicle, not owed to a related party; leases excluded; refinance eligible up to the "
-                    "balance still owed if it remains a first lien; VIN reported on the return."
-                ),
-                "summary_text": "New US-assembled personal vehicle; post-2024 first-lien loan, non-related-party; leases out; VIN reported.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
     # ─── IRC §911 — FEIE / housing (MAGI add-back) ───
     {
         "source_code": "IRC_911",
@@ -805,6 +764,31 @@ NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [
         "summary_text": "§63(b)(7): Schedule 1-A deductions allowed below-the-line for non-itemizers.",
         "is_key_excerpt": True,
     }),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_163 is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_163", {
+                    "excerpt_label": "§163(h)(4) — Cap and MAGI phaseout",
+                    "location_reference": "26 U.S.C. §163(h)(4)",
+                    "excerpt_text": (
+                        "Deduction for qualified passenger vehicle loan interest. Cap $10,000. Phaseout begins "
+                        "at MAGI $100,000 ($200,000 MFJ); reduced $200 for each $1,000 (rounded UP) of excess."
+                    ),
+                    "summary_text": "Cap $10,000; phaseout over $100,000/$200,000 at $200 per $1,000 (round UP).",
+                    "is_key_excerpt": True,
+                }),
+    ("IRC_163", {
+                    "excerpt_label": "§163(h)(4) — Vehicle and loan conditions",
+                    "location_reference": "26 U.S.C. §163(h)(4)",
+                    "excerpt_text": (
+                        "Conditions: new vehicle (original use begins with taxpayer); final assembly in U.S.; "
+                        "≥2 wheels, primarily for public roads, GVWR < 14,000 lbs, motor vehicle under the "
+                        "Clean Air Act; personal use; loan incurred after 12/31/2024, first lien secured by the "
+                        "vehicle, not owed to a related party; leases excluded; refinance eligible up to the "
+                        "balance still owed if it remains a first lien; VIN reported on the return."
+                    ),
+                    "summary_text": "New US-assembled personal vehicle; post-2024 first-lien loan, non-related-party; leases out; VIN reported.",
+                    "is_key_excerpt": True,
+                }),
 ]
 
 

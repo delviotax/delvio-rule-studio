@@ -154,7 +154,10 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
      "screened special regimes (§163(j), §55 CAMT, §541 PHC, §531 AET, §59A, §1062)."),
 ]
 
-EXISTING_SOURCES_TO_REFERENCE: list[str] = []
+EXISTING_SOURCES_TO_REFERENCE: list[str] = [    "IRC_11",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
+    "IRC_172",  # ownership -> load_1040_form_172.py (A3/D-42, 2026-08-25)
+    "IRC_163J",  # ownership -> load_8990.py (A3/D-42, 2026-08-25)
+]
 
 AUTHORITY_SOURCES: list[dict] = [
     {
@@ -240,28 +243,6 @@ AUTHORITY_SOURCES: list[dict] = [
         ],
     },
     {
-        "source_code": "IRC_11",
-        "source_type": "statute",
-        "source_rank": "controlling",
-        "jurisdiction_code": "US",
-        "title": "IRC §11 — Tax imposed on corporations (flat 21%)",
-        "citation": "26 U.S.C. §11(b)",
-        "issuer": "U.S. Congress",
-        "official_url": "https://www.law.cornell.edu/uscode/text/26/11",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "trust_score": 9.5,
-        "topics": ["c_corp_income_tax"],
-        "excerpts": [
-            {
-                "excerpt_label": "§11(b) flat rate (verbatim)",
-                "excerpt_text": "§11(b): 'The amount of the tax imposed by subsection (a) shall be 21 percent of taxable income.' Flat; no graduated brackets (TCJA, unchanged by OBBBA for TY2025).",
-                "summary_text": "§11(b): corporate income tax = 21% of taxable income, flat.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
-    {
         "source_code": "IRC_243_246",
         "source_type": "statute",
         "source_rank": "controlling",
@@ -290,63 +271,6 @@ AUTHORITY_SOURCES: list[dict] = [
                     "§246A: debt-financed portfolio stock reduces the DRD by (50/65%) x (average indebtedness %)."
                 ),
                 "summary_text": "§243 DRD 50/65/100%; §245A 100% foreign-source; §246(b) TI limit (65/50%) with the NOL loss exception; §246(c) holding period; §246A debt-financed reduction.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
-    {
-        "source_code": "IRC_172",
-        "source_type": "statute",
-        "source_rank": "controlling",
-        "jurisdiction_code": "US",
-        "title": "IRC §172 — Net operating loss deduction (80% limit, no carryback)",
-        "citation": "26 U.S.C. §172(a)(2), (b)(1)(A)",
-        "issuer": "U.S. Congress",
-        "official_url": "https://www.law.cornell.edu/uscode/text/26/172",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "trust_score": 9.4,
-        "topics": ["c_corp_income_tax"],
-        "excerpts": [
-            {
-                "excerpt_label": "§172(a)(2) 80% limitation (verbatim)",
-                "excerpt_text": (
-                    "§172(a)(2): the NOL deduction = the lesser of the aggregate NOL carryovers, or '80 percent "
-                    "of the excess (if any) of— (I) taxable income computed without regard to the deductions "
-                    "under this section and sections 199A and 250...' §172(b)(1)(A): post-2017 NOLs carry "
-                    "forward to each following year with no time limit (indefinite); no carryback for ordinary "
-                    "corporate NOLs (TCJA §13302). OBBBA did not change the core corporate NOL mechanics."
-                ),
-                "summary_text": "§172(a)(2): NOL deduction = min(carryovers, 80% of taxable income before NOL/§199A/§250). No carryback; indefinite carryforward.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
-    {
-        "source_code": "IRC_163J",
-        "source_type": "statute",
-        "source_rank": "controlling",
-        "jurisdiction_code": "US",
-        "title": "IRC §163(j) — business interest limitation (OBBBA EBITDA basis for TY2025)",
-        "citation": "26 U.S.C. §163(j)(1),(8); §448(c)",
-        "issuer": "U.S. Congress",
-        "official_url": "https://www.law.cornell.edu/uscode/text/26/163",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "trust_score": 9.2,
-        "topics": ["c_corp_income_tax"],
-        "excerpts": [
-            {
-                "excerpt_label": "§163(j) 30% ATI + OBBBA EBITDA restoration (verbatim substance)",
-                "excerpt_text": (
-                    "§163(j)(1): business interest deduction limited to business interest income + 30% of "
-                    "adjusted taxable income (ATI) + floor-plan financing interest. §163(j)(8) (current text, "
-                    "OBBBA): ATI is computed on an EBITDA basis — depreciation, amortization, and depletion are "
-                    "added back (excluded), RESTORED AND MADE PERMANENT for tax years beginning after Dec. 31, "
-                    "2024 (i.e., TY2025). §448(c) small-business exemption: average annual gross receipts <= "
-                    "$31,000,000 (2025-indexed); tax shelters excluded. Filing vehicle = Form 8990."
-                ),
-                "summary_text": "§163(j): 30% ATI, EBITDA basis RESTORED for TY2025 (OBBBA); $31M §448(c) exemption; Form 8990. Compute deferred to Form 8990; 1120 gates on Sch K Q24.",
                 "is_key_excerpt": True,
             },
         ],
@@ -412,7 +336,44 @@ AUTHORITY_SOURCES: list[dict] = [
 
 # Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
 # available here. Empty: adding it changes nothing until an entry lands.
-NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_11 is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_11", {
+                    "excerpt_label": "§11(b) flat rate (verbatim)",
+                    "excerpt_text": "§11(b): 'The amount of the tax imposed by subsection (a) shall be 21 percent of taxable income.' Flat; no graduated brackets (TCJA, unchanged by OBBBA for TY2025).",
+                    "summary_text": "§11(b): corporate income tax = 21% of taxable income, flat.",
+                    "is_key_excerpt": True,
+                }),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_172 is DECLARED by load_1040_form_172.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_172", {
+                    "excerpt_label": "§172(a)(2) 80% limitation (verbatim)",
+                    "excerpt_text": (
+                        "§172(a)(2): the NOL deduction = the lesser of the aggregate NOL carryovers, or '80 percent "
+                        "of the excess (if any) of— (I) taxable income computed without regard to the deductions "
+                        "under this section and sections 199A and 250...' §172(b)(1)(A): post-2017 NOLs carry "
+                        "forward to each following year with no time limit (indefinite); no carryback for ordinary "
+                        "corporate NOLs (TCJA §13302). OBBBA did not change the core corporate NOL mechanics."
+                    ),
+                    "summary_text": "§172(a)(2): NOL deduction = min(carryovers, 80% of taxable income before NOL/§199A/§250). No carryback; indefinite carryforward.",
+                    "is_key_excerpt": True,
+                }),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_163J is DECLARED by load_8990.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_163J", {
+                    "excerpt_label": "§163(j) 30% ATI + OBBBA EBITDA restoration (verbatim substance)",
+                    "excerpt_text": (
+                        "§163(j)(1): business interest deduction limited to business interest income + 30% of "
+                        "adjusted taxable income (ATI) + floor-plan financing interest. §163(j)(8) (current text, "
+                        "OBBBA): ATI is computed on an EBITDA basis — depreciation, amortization, and depletion are "
+                        "added back (excluded), RESTORED AND MADE PERMANENT for tax years beginning after Dec. 31, "
+                        "2024 (i.e., TY2025). §448(c) small-business exemption: average annual gross receipts <= "
+                        "$31,000,000 (2025-indexed); tax shelters excluded. Filing vehicle = Form 8990."
+                    ),
+                    "summary_text": "§163(j): 30% ATI, EBITDA basis RESTORED for TY2025 (OBBBA); $31M §448(c) exemption; Form 8990. Compute deferred to Form 8990; 1120 gates on Sch K Q24.",
+                    "is_key_excerpt": True,
+                }),
+]
 
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
     ("IRS_2025_F1120", "1120", "governs"),

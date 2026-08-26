@@ -180,7 +180,8 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
      "tax (rate schedule, ESBT L4, §1411 NIIT); §1(e) rate schedule + §642(b) exemptions."),
 ]
 
-EXISTING_SOURCES_TO_REFERENCE: list[str] = []  # spine is self-owned; K-1 leg reuses these
+EXISTING_SOURCES_TO_REFERENCE: list[str] = [    "RP_2024_40",  # ownership -> load_1040_spine.py (A3/D-42, 2026-08-25)
+]  # spine is self-owned; K-1 leg reuses these
 
 AUTHORITY_SOURCES: list[dict] = [
     {
@@ -436,40 +437,26 @@ AUTHORITY_SOURCES: list[dict] = [
             },
         ],
     },
-    {
-        "source_code": "RP_2024_40",
-        "source_type": "revenue_procedure",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "US",
-        "title": "Rev. Proc. 2024-40 — 2025 inflation-adjusted amounts (estates & trusts)",
-        "citation": "Rev. Proc. 2024-40, §§2.03, 2.35, Table 5",
-        "issuer": "Internal Revenue Service",
-        "official_url": "https://www.irs.gov/pub/irs-drop/rp-24-40.pdf",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "trust_score": 9.5,
-        "topics": ["fiduciary_income_tax"],
-        "excerpts": [
-            {
-                "excerpt_label": "Governs TY2025 (NOT Rev. Proc. 2025-32, which is TY2026)",
-                "excerpt_text": (
-                    "Rev. Proc. 2024-40 provides the TY2025 inflation adjustments: Table 5 (§1(j)(2)(E) "
-                    "estates & trusts) the 10/24/35/37% schedule with breakpoints $3,150/$11,450/$15,650; "
-                    "§2.03 the estate/trust maximum capital gains rate amounts $3,250 (0% ceiling) / $15,900 "
-                    "(15% ceiling); §2.35 the §642(b)(2)(C)(i) qualified disability trust exemption $5,100. "
-                    "Rev. Proc. 2025-32 (issued after OBBBA) provides the TY2026 figures and does NOT alter "
-                    "these 2025 amounts — the FINAL 2025 Form 1041 instructions re-confirm them verbatim."
-                ),
-                "summary_text": "Rev. Proc. 2024-40 is the governing TY2025 procedure for the rate schedule, cap-gain breakpoints, and QDisT exemption; 2025-32 is TY2026 and leaves 2025 unchanged.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
 ]
 
 # Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
 # available here. Empty: adding it changes nothing until an entry lands.
-NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): RP_2024_40 is DECLARED by load_1040_spine.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("RP_2024_40", {
+                    "excerpt_label": "Governs TY2025 (NOT Rev. Proc. 2025-32, which is TY2026)",
+                    "excerpt_text": (
+                        "Rev. Proc. 2024-40 provides the TY2025 inflation adjustments: Table 5 (§1(j)(2)(E) "
+                        "estates & trusts) the 10/24/35/37% schedule with breakpoints $3,150/$11,450/$15,650; "
+                        "§2.03 the estate/trust maximum capital gains rate amounts $3,250 (0% ceiling) / $15,900 "
+                        "(15% ceiling); §2.35 the §642(b)(2)(C)(i) qualified disability trust exemption $5,100. "
+                        "Rev. Proc. 2025-32 (issued after OBBBA) provides the TY2026 figures and does NOT alter "
+                        "these 2025 amounts — the FINAL 2025 Form 1041 instructions re-confirm them verbatim."
+                    ),
+                    "summary_text": "Rev. Proc. 2024-40 is the governing TY2025 procedure for the rate schedule, cap-gain breakpoints, and QDisT exemption; 2025-32 is TY2026 and leaves 2025 unchanged.",
+                    "is_key_excerpt": True,
+                }),
+]
 
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
     ("IRS_2025_F1041", "1041", "governs"),

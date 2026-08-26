@@ -373,6 +373,8 @@ EXISTING_SOURCES_TO_REFERENCE: list[str] = [
     "IRS_2025_1040_INSTR",
     "IRS_2025_1120S_INSTR",   # entity pass-through leg (2026-07-08): line 4 + code K excerpts added below
     "IRS_2025_1065_INSTR",  # ownership -> forms_1065.py (A3/D-42, 2026-08-25)
+    "IRC_168",  # ownership -> load_1120s_family.py (A3/D-42, 2026-08-25)
+    "IRS_PUB_544",  # ownership -> load_8824.py (A3/D-42, 2026-08-25)
 ]
 
 AUTHORITY_SOURCES: list[dict] = [
@@ -480,70 +482,6 @@ AUTHORITY_SOURCES: list[dict] = [
              "summary_text": "§1250 property = depreciable REAL property not §1245 (character test, not "
                              "recovery period). Additional depreciation = actual adjustments over the "
                              "straight-line equivalent — bonus/150DB create it; true SL does not.",
-             "is_key_excerpt": True},
-        ],
-    },
-    {
-        "source_code": "IRC_168",
-        "source_type": "statute", "source_rank": "primary_official", "jurisdiction_code": "FED",
-        "title": "IRC §168 — Accelerated Cost Recovery System (MACRS: the §1245(a)(3) cross-refs + 150DB)",
-        "citation": "26 U.S.C. §168(i)(13), (e)(4), (b)(2)(A), (b)(3)(G)/(e)(6), (k)", "issuer": "U.S. Congress",
-        "official_url": "https://uscode.house.gov/view.xhtml?req=(title:26%20section:168%20edition:prelim)",
-        "current_status": "active", "is_substantive_authority": True, "is_filing_authority": False,
-        "trust_score": 10.0, "requires_human_review": True,
-        "notes": "NUANCE LEG (2026-07-03): §1245(a)(3) cross-references §168 for the definitions of the "
-                 "real-property exceptions ((D) single-purpose ag §168(i)(13), (F) railroad grading "
-                 "§168(e)(4), (G) QPP §168(n)(2)) and for the MACRS methods that create §1250 additional "
-                 "depreciation ((b)(2)(A) 150DB for 15/20-yr land improvements; (k) special allowance/bonus). "
-                 "Verified verbatim 2026-07-03 (Cornell LII).",
-        "topics": ["depreciation_recapture"],
-        "excerpts": [
-            {"excerpt_label": "§168(i)(13) — single purpose agricultural or horticultural structure",
-             "location_reference": "26 U.S.C. §168(i)(13) (verified 2026-07-03)",
-             "excerpt_text": (
-                 "The term 'single purpose agricultural or horticultural structure' means (A) a single "
-                 "purpose livestock structure, and (B) a single purpose horticultural structure. A single "
-                 "purpose livestock structure is any enclosure or structure specifically designed, "
-                 "constructed, and used for housing, raising, and feeding a particular type of livestock; a "
-                 "single purpose horticultural structure is a greenhouse specifically designed, constructed, "
-                 "and used for the commercial production of plants."),
-             "summary_text": "Single-purpose ag/hort structure = a livestock enclosure or a commercial "
-                             "greenhouse — §1245 property under §1245(a)(3)(D).",
-             "is_key_excerpt": True},
-            {"excerpt_label": "§168(e)(4) — railroad grading or tunnel bore",
-             "location_reference": "26 U.S.C. §168(e)(4) (verified 2026-07-03)",
-             "excerpt_text": (
-                 "The term 'railroad grading or tunnel bore' means all improvements resulting from "
-                 "excavations (including tunneling), construction of embankments, clearings, diversions of "
-                 "roads and streams, sodding of slopes, and from similar work necessary to provide, "
-                 "construct, reconstruct, alter, protect, improve, replace, or restore a roadbed or "
-                 "right-of-way for railroad track."),
-             "summary_text": "Railroad grading/tunnel bore (§168(e)(4)) — §1245 property under §1245(a)(3)(F).",
-             "is_key_excerpt": True},
-            {"excerpt_label": "§168(b)(2)(A) + (b)(3)/(e)(6) — 150DB for 15/20-yr; QIP is SL 15-yr",
-             "location_reference": "26 U.S.C. §168(b)(2)(A), (b)(3)(G), (e)(6) (verified 2026-07-03)",
-             "excerpt_text": (
-                 "Paragraph (2) (the 150 percent declining balance method) applies to any 15-year or "
-                 "20-year property not referred to in paragraph (3). Land improvements are 15-year property "
-                 "→ 150DB, so their actual depreciation exceeds straight line and creates §1250 additional "
-                 "depreciation. Qualified improvement property (§168(e)(6)) is depreciated under the "
-                 "straight line method (§168(b)(3)(G)) over a 15-year recovery period, but is bonus-eligible "
-                 "(§168(k)) — the bonus, not the method, creates its additional depreciation."),
-             "summary_text": "15-yr land improvements = 150DB (> SL → additional depreciation exists); QIP = "
-                             "SL 15-yr, additional depreciation only from bonus.",
-             "is_key_excerpt": True},
-            {"excerpt_label": "§168(k) special (bonus) allowance is a depreciation adjustment (§1250(b)(3))",
-             "location_reference": "26 U.S.C. §168(k) (cf. §1250(b)(3), verified 2026-07-03)",
-             "excerpt_text": (
-                 "The §168(k) special depreciation allowance ('bonus depreciation') is an additional "
-                 "first-year depreciation deduction. It is a depreciation adjustment reflected in adjusted "
-                 "basis; §1250(b)(3) excludes from 'depreciation adjustments' only amortization under the "
-                 "PRE-1976 section 168 (and §169/§185/§188/§190/§193), NOT the current §168(k). Bonus on "
-                 "§1250 realty (e.g., QIP) is therefore additional depreciation to the extent it exceeds "
-                 "straight line — confirming the i4797 line-26a 'including any special depreciation "
-                 "allowance' instruction."),
-             "summary_text": "§168(k) bonus IS a depreciation adjustment → §1250 additional depreciation "
-                             "(the (b)(3) carve-out is pre-1976 §168 only).",
              "is_key_excerpt": True},
         ],
     },
@@ -716,29 +654,6 @@ AUTHORITY_SOURCES: list[dict] = [
              "is_key_excerpt": True},
         ],
     },
-    {
-        "source_code": "IRS_PUB_544",
-        "source_type": "official_publication", "source_rank": "primary_official", "jurisdiction_code": "FED",
-        "tax_year_start": 2025, "tax_year_end": 2025,
-        "title": "IRS Publication 544 — Sales and Other Dispositions of Assets",
-        "citation": "Publication 544 (2025)", "issuer": "IRS",
-        "official_url": "https://www.irs.gov/publications/p544",
-        "current_status": "active", "is_substantive_authority": False, "is_filing_authority": False,
-        "trust_score": 9.0, "requires_human_review": False,
-        "notes": "Background on ordinary-vs-capital, holding period, and the recapture sections.",
-        "topics": ["4797", "section_1231", "depreciation_recapture"],
-        "excerpts": [
-            {"excerpt_label": "Ordinary vs capital; holding period",
-             "location_reference": "Pub 544 — Ordinary or Capital Gain and Loss",
-             "excerpt_text": (
-                 "Whether a gain or loss on business property is ordinary or capital depends on the "
-                 "property type and the holding period (more than 1 year for §1231). §1245 recaptures all "
-                 "depreciation as ordinary; §1250 recaptures only excess over straight line; the §1231 "
-                 "netting rule then determines whether the remaining gain is capital or ordinary."),
-             "summary_text": "Property type + >1-year holding drive §1231/recapture treatment.",
-             "is_key_excerpt": True},
-        ],
-    },
 ]
 
 NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [
@@ -798,6 +713,66 @@ NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [
                      "line 6, earlier)."),
                  "summary_text": "The partnership-side statement obligation (item list parallels the "
                                  "i1120s code-K list quoted on IRS_2025_1120S_INSTR).",
+                 "is_key_excerpt": True}),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_168 is DECLARED by load_1120s_family.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_168", {"excerpt_label": "§168(i)(13) — single purpose agricultural or horticultural structure",
+                 "location_reference": "26 U.S.C. §168(i)(13) (verified 2026-07-03)",
+                 "excerpt_text": (
+                     "The term 'single purpose agricultural or horticultural structure' means (A) a single "
+                     "purpose livestock structure, and (B) a single purpose horticultural structure. A single "
+                     "purpose livestock structure is any enclosure or structure specifically designed, "
+                     "constructed, and used for housing, raising, and feeding a particular type of livestock; a "
+                     "single purpose horticultural structure is a greenhouse specifically designed, constructed, "
+                     "and used for the commercial production of plants."),
+                 "summary_text": "Single-purpose ag/hort structure = a livestock enclosure or a commercial "
+                                 "greenhouse — §1245 property under §1245(a)(3)(D).",
+                 "is_key_excerpt": True}),
+    ("IRC_168", {"excerpt_label": "§168(e)(4) — railroad grading or tunnel bore",
+                 "location_reference": "26 U.S.C. §168(e)(4) (verified 2026-07-03)",
+                 "excerpt_text": (
+                     "The term 'railroad grading or tunnel bore' means all improvements resulting from "
+                     "excavations (including tunneling), construction of embankments, clearings, diversions of "
+                     "roads and streams, sodding of slopes, and from similar work necessary to provide, "
+                     "construct, reconstruct, alter, protect, improve, replace, or restore a roadbed or "
+                     "right-of-way for railroad track."),
+                 "summary_text": "Railroad grading/tunnel bore (§168(e)(4)) — §1245 property under §1245(a)(3)(F).",
+                 "is_key_excerpt": True}),
+    ("IRC_168", {"excerpt_label": "§168(b)(2)(A) + (b)(3)/(e)(6) — 150DB for 15/20-yr; QIP is SL 15-yr",
+                 "location_reference": "26 U.S.C. §168(b)(2)(A), (b)(3)(G), (e)(6) (verified 2026-07-03)",
+                 "excerpt_text": (
+                     "Paragraph (2) (the 150 percent declining balance method) applies to any 15-year or "
+                     "20-year property not referred to in paragraph (3). Land improvements are 15-year property "
+                     "→ 150DB, so their actual depreciation exceeds straight line and creates §1250 additional "
+                     "depreciation. Qualified improvement property (§168(e)(6)) is depreciated under the "
+                     "straight line method (§168(b)(3)(G)) over a 15-year recovery period, but is bonus-eligible "
+                     "(§168(k)) — the bonus, not the method, creates its additional depreciation."),
+                 "summary_text": "15-yr land improvements = 150DB (> SL → additional depreciation exists); QIP = "
+                                 "SL 15-yr, additional depreciation only from bonus.",
+                 "is_key_excerpt": True}),
+    ("IRC_168", {"excerpt_label": "§168(k) special (bonus) allowance is a depreciation adjustment (§1250(b)(3))",
+                 "location_reference": "26 U.S.C. §168(k) (cf. §1250(b)(3), verified 2026-07-03)",
+                 "excerpt_text": (
+                     "The §168(k) special depreciation allowance ('bonus depreciation') is an additional "
+                     "first-year depreciation deduction. It is a depreciation adjustment reflected in adjusted "
+                     "basis; §1250(b)(3) excludes from 'depreciation adjustments' only amortization under the "
+                     "PRE-1976 section 168 (and §169/§185/§188/§190/§193), NOT the current §168(k). Bonus on "
+                     "§1250 realty (e.g., QIP) is therefore additional depreciation to the extent it exceeds "
+                     "straight line — confirming the i4797 line-26a 'including any special depreciation "
+                     "allowance' instruction."),
+                 "summary_text": "§168(k) bonus IS a depreciation adjustment → §1250 additional depreciation "
+                                 "(the (b)(3) carve-out is pre-1976 §168 only).",
+                 "is_key_excerpt": True}),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRS_PUB_544 is DECLARED by load_8824.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRS_PUB_544", {"excerpt_label": "Ordinary vs capital; holding period",
+                 "location_reference": "Pub 544 — Ordinary or Capital Gain and Loss",
+                 "excerpt_text": (
+                     "Whether a gain or loss on business property is ordinary or capital depends on the "
+                     "property type and the holding period (more than 1 year for §1231). §1245 recaptures all "
+                     "depreciation as ordinary; §1250 recaptures only excess over straight line; the §1231 "
+                     "netting rule then determines whether the remaining gain is capital or ordinary."),
+                 "summary_text": "Property type + >1-year holding drive §1231/recapture treatment.",
                  "is_key_excerpt": True}),
 ]
 

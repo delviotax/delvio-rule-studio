@@ -113,64 +113,6 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
 
 AUTHORITY_SOURCES: list[dict] = [
     # ── IRC §704 — allocation (agreement; SEE fallback; §704(c) built-in gain) ──
-    {
-        "source_code": "IRC_704",
-        "source_type": "statute",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1065",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "IRC §704 — Partner's Distributive Share (agreement controls; substantial-economic-"
-                 "effect fallback; §704(c) built-in gain)",
-        "citation": "26 U.S.C. §704(a), (b), (c)",
-        "issuer": "U.S. Congress",
-        "official_url": "https://www.law.cornell.edu/uscode/text/26/704",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "is_filing_authority": False,
-        "trust_score": 10.00,
-        "requires_human_review": False,
-        "notes": "The allocation statute the K-1 split follows. §704(a) agreement controls; §704(b) "
-                 "partner's-interest fallback if silent or an allocation lacks substantial economic "
-                 "effect; §704(c) built-in gain to the contributing partner (item M/N). tts "
-                 "k1_allocator implements per-category pro-rata (profit/loss %) + PartnerAllocation "
-                 "overrides; §704(b) SEE testing and §704(c) math are ABSENT → RED-deferred "
-                 "(Decision C). §704(a)/(b) quoted verbatim 2026-07-04.",
-        "topics": ["partnership_1065_core", "partner_k1_allocation"],
-        "excerpts": [
-            {
-                "excerpt_label": "§704(a) — the partnership agreement controls",
-                "location_reference": "26 U.S.C. §704(a)",
-                "excerpt_text": (
-                    "A partner's distributive share of income, gain, loss, deduction, or credit shall, "
-                    "except as otherwise provided in this chapter, be determined by the partnership "
-                    "agreement."
-                ),
-                "summary_text": "Distributive share = whatever the partnership agreement provides "
-                                "(subject to §704(b)). The engine's profit/loss % + PartnerAllocation "
-                                "overrides encode 'the agreement.'",
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "§704(b) — partner's-interest fallback (no substantial economic effect)",
-                "location_reference": "26 U.S.C. §704(b)(1), (2)",
-                "excerpt_text": (
-                    "A partner's distributive share of income, gain, loss, deduction, or credit (or item "
-                    "thereof) shall be determined in accordance with the partner's interest in the "
-                    "partnership (determined by taking into account all facts and circumstances), if— "
-                    "(1) the partnership agreement does not provide as to the partner's distributive "
-                    "share of income, gain, loss, deduction, or credit (or item thereof), or (2) the "
-                    "allocation to a partner under the agreement of income, gain, loss, deduction, or "
-                    "credit (or item thereof) does not have substantial economic effect."
-                ),
-                "summary_text": "If the agreement is silent OR an allocation lacks substantial economic "
-                                "effect, allocate by the partner's interest. SEE testing is RED-deferred "
-                                "(D_K1_SPECIAL_ALLOC surfaces a PartnerAllocation override for review).",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
     # ── IRC §706(d) — varying interest (mid-year interest change) ──
     {
         "source_code": "IRC_706D",
@@ -214,185 +156,9 @@ AUTHORITY_SOURCES: list[dict] = [
         ],
     },
     # ── IRC §752 — partnership liabilities (item K) ──
-    {
-        "source_code": "IRC_752",
-        "source_type": "statute",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1065",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "IRC §752 — Treatment of Certain Liabilities (share of liabilities as contribution/"
-                 "distribution of money)",
-        "citation": "26 U.S.C. §752(a), (b)",
-        "issuer": "U.S. Congress",
-        "official_url": "https://www.law.cornell.edu/uscode/text/26/752",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "is_filing_authority": False,
-        "trust_score": 10.00,
-        "requires_human_review": False,
-        "notes": "A partner's share of partnership liabilities (K-1 item K: recourse / qualified "
-                 "nonrecourse / nonrecourse) is treated as a money contribution (increase) or "
-                 "distribution (decrease) affecting outside basis. tts Partner models the three "
-                 "liability buckets (data-entry). Quoted verbatim 2026-07-04.",
-        "topics": ["partner_k1_allocation"],
-        "excerpts": [
-            {
-                "excerpt_label": "§752(a) — increase in liabilities = contribution of money",
-                "location_reference": "26 U.S.C. §752(a)",
-                "excerpt_text": (
-                    "Any increase in a partner's share of the liabilities of a partnership, or any "
-                    "increase in a partner's individual liabilities by reason of the assumption by such "
-                    "partner of partnership liabilities, shall be considered as a contribution of money "
-                    "by such partner to the partnership."
-                ),
-                "summary_text": "An increase in a partner's liability share = a money contribution "
-                                "(raises outside basis). Item K reports the shares.",
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "§752(b) — decrease in liabilities = distribution of money",
-                "location_reference": "26 U.S.C. §752(b)",
-                "excerpt_text": (
-                    "Any decrease in a partner's share of the liabilities of a partnership, or any "
-                    "decrease in a partner's individual liabilities by reason of the assumption by the "
-                    "partnership of such individual liabilities, shall be considered as a distribution of "
-                    "money to the partner by the partnership."
-                ),
-                "summary_text": "A decrease in a partner's liability share = a money distribution "
-                                "(reduces outside basis). Item K basis effect (why item L tax-basis "
-                                "capital 'might not equal' outside basis).",
-                "is_key_excerpt": False,
-            },
-        ],
-    },
     # ── IRC §705 — partner's basis (item L tax-basis capital) ──
-    {
-        "source_code": "IRC_705",
-        "source_type": "statute",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1065",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "IRC §705 — Determination of Basis of Partner's Interest (transactional roll-forward)",
-        "citation": "26 U.S.C. §705(a)",
-        "issuer": "U.S. Congress",
-        "official_url": "https://www.law.cornell.edu/uscode/text/26/705",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "is_filing_authority": False,
-        "trust_score": 10.00,
-        "requires_human_review": False,
-        "notes": "The transactional roll-forward behind item L tax-basis capital: basis (from §722/§742) "
-                 "increased by the distributive share of income (incl. tax-exempt) and decreased (not "
-                 "below zero) by distributions (§733) and the share of losses / nondeductible "
-                 "expenditures. tts stores item-L fields but does NOT compute the roll-forward → "
-                 "RED-deferred (D_K1_ITEML); M-2 line 1 cannot auto-derive. Key phrases quoted 2026-07-04.",
-        "topics": ["partner_k1_allocation"],
-        "excerpts": [
-            {
-                "excerpt_label": "§705(a) — basis increased by income, decreased by distributions/losses",
-                "location_reference": "26 U.S.C. §705(a)(1), (2)",
-                "excerpt_text": (
-                    "The adjusted basis of a partner's interest in a partnership shall, except as provided "
-                    "in subsection (b), be the basis of such interest determined under section 722 "
-                    "(relating to contributions to a partnership) or section 742 (relating to transfers of "
-                    "partnership interests)— (1) increased by the sum of his distributive share for the "
-                    "taxable year and prior taxable years of— (A) taxable income of the partnership as "
-                    "determined under section 703(a), (B) income of the partnership exempt from tax, and "
-                    "(C) the excess of the deductions for depletion over the basis of the property subject "
-                    "to depletion; (2) decreased (but not below zero) by distributions by the partnership "
-                    "as provided in section 733 and by the sum of his distributive share for the taxable "
-                    "year and prior taxable years of— (A) losses of the partnership, and (B) expenditures "
-                    "of the partnership not deductible in computing its taxable income and not properly "
-                    "chargeable to capital account."
-                ),
-                "summary_text": "The item-L transactional roll-forward: BOY + income share (incl. "
-                                "tax-exempt) − distributions − loss/nondeductible share = EOY. §733 "
-                                "distributions; not below zero.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
     # ── IRC §707(c) — guaranteed payments (boxes 4a/4b/4c, direct) ──
-    {
-        "source_code": "IRC_707C",
-        "source_type": "statute",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1065",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "IRC §707(c) — Guaranteed Payments (services or use of capital)",
-        "citation": "26 U.S.C. §707(c)",
-        "issuer": "U.S. Congress",
-        "official_url": "https://www.law.cornell.edu/uscode/text/26/707",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "is_filing_authority": False,
-        "trust_score": 10.00,
-        "requires_human_review": False,
-        "notes": "Guaranteed payments are per-partner amounts (not ratio-allocated): tts writes boxes "
-                 "4a=gp_services, 4b=gp_capital, 4c=sum DIRECTLY from the Partner model. Re-used from "
-                 "the vetted 1065_SE / spine loads; verbatim 2026-07-01.",
-        "topics": ["partner_k1_allocation"],
-        "excerpts": [
-            {
-                "excerpt_label": "§707(c) — guaranteed payments for services or use of capital",
-                "location_reference": "26 U.S.C. §707(c)",
-                "excerpt_text": (
-                    "To the extent determined without regard to the income of the partnership, payments to "
-                    "a partner for services or the use of capital shall be considered as made to one who is "
-                    "not a member of the partnership, but only for the purposes of section 61(a) (relating "
-                    "to gross income) and, subject to section 263, for purposes of section 162(a) (relating "
-                    "to trade or business expenses)."
-                ),
-                "summary_text": "Guaranteed payments (services 4a / capital 4b, total 4c) are per-partner "
-                                "direct amounts, not a pro-rata split of an entity total.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
     # ── IRC §702(b) — character conduit (each box keeps character) ──
-    {
-        "source_code": "IRC_702",
-        "source_type": "statute",
-        "source_rank": "primary_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1065",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "IRC §702 — Income and Credits of Partner (separately stated share; character conduit)",
-        "citation": "26 U.S.C. §702(a), (b)",
-        "issuer": "U.S. Congress",
-        "official_url": "https://www.law.cornell.edu/uscode/text/26/702",
-        "current_status": "active",
-        "is_substantive_authority": True,
-        "is_filing_authority": False,
-        "trust_score": 10.00,
-        "requires_human_review": False,
-        "notes": "The K-1 boxes ARE the §702(a) separately-stated items, each retaining partnership-level "
-                 "character in the partner's hands (§702(b)). Re-used from the spine load; verbatim.",
-        "topics": ["partner_k1_allocation"],
-        "excerpts": [
-            {
-                "excerpt_label": "§702(b) — character determined at the partnership level",
-                "location_reference": "26 U.S.C. §702(b)",
-                "excerpt_text": (
-                    "The character of any item of income, gain, loss, deduction, or credit included in a "
-                    "partner's distributive share under paragraphs (1) through (7) of subsection (a) shall "
-                    "be determined as if such item were realized directly from the source from which "
-                    "realized by the partnership, or incurred in the same manner as incurred by the "
-                    "partnership."
-                ),
-                "summary_text": "Each K-1 box keeps its partnership-level character (capital stays capital, "
-                                "portfolio stays portfolio) — the reason boxes are separately stated.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
     # ── 2025 Schedule K-1 (Form 1065) — the face (items J-N + Part III boxes) ──
     {
         "source_code": "IRS_2025_F1065SK1",
@@ -726,11 +492,133 @@ AUTHORITY_SOURCES: list[dict] = [
 
 # Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
 # available here. Empty: adding it changes nothing until an entry lands.
-EXISTING_SOURCES_TO_REFERENCE: list[str] = []
+EXISTING_SOURCES_TO_REFERENCE: list[str] = [    "IRC_702",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
+    "IRC_704",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
+    "IRC_705",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
+    "IRC_752",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
+    "IRC_707C",  # ownership -> load_1065_schedule_k.py (A3/D-42, 2026-08-25)
+]
 
 # Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
 # available here. Empty: adding it changes nothing until an entry lands.
-NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_702 is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_702", {
+                    "excerpt_label": "§702(b) — character determined at the partnership level",
+                    "location_reference": "26 U.S.C. §702(b)",
+                    "excerpt_text": (
+                        "The character of any item of income, gain, loss, deduction, or credit included in a "
+                        "partner's distributive share under paragraphs (1) through (7) of subsection (a) shall "
+                        "be determined as if such item were realized directly from the source from which "
+                        "realized by the partnership, or incurred in the same manner as incurred by the "
+                        "partnership."
+                    ),
+                    "summary_text": "Each K-1 box keeps its partnership-level character (capital stays capital, "
+                                    "portfolio stays portfolio) — the reason boxes are separately stated.",
+                    "is_key_excerpt": True,
+                }),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_704 is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_704", {
+                    "excerpt_label": "§704(a) — the partnership agreement controls",
+                    "location_reference": "26 U.S.C. §704(a)",
+                    "excerpt_text": (
+                        "A partner's distributive share of income, gain, loss, deduction, or credit shall, "
+                        "except as otherwise provided in this chapter, be determined by the partnership "
+                        "agreement."
+                    ),
+                    "summary_text": "Distributive share = whatever the partnership agreement provides "
+                                    "(subject to §704(b)). The engine's profit/loss % + PartnerAllocation "
+                                    "overrides encode 'the agreement.'",
+                    "is_key_excerpt": True,
+                }),
+    ("IRC_704", {
+                    "excerpt_label": "§704(b) — partner's-interest fallback (no substantial economic effect)",
+                    "location_reference": "26 U.S.C. §704(b)(1), (2)",
+                    "excerpt_text": (
+                        "A partner's distributive share of income, gain, loss, deduction, or credit (or item "
+                        "thereof) shall be determined in accordance with the partner's interest in the "
+                        "partnership (determined by taking into account all facts and circumstances), if— "
+                        "(1) the partnership agreement does not provide as to the partner's distributive "
+                        "share of income, gain, loss, deduction, or credit (or item thereof), or (2) the "
+                        "allocation to a partner under the agreement of income, gain, loss, deduction, or "
+                        "credit (or item thereof) does not have substantial economic effect."
+                    ),
+                    "summary_text": "If the agreement is silent OR an allocation lacks substantial economic "
+                                    "effect, allocate by the partner's interest. SEE testing is RED-deferred "
+                                    "(D_K1_SPECIAL_ALLOC surfaces a PartnerAllocation override for review).",
+                    "is_key_excerpt": True,
+                }),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_705 is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_705", {
+                    "excerpt_label": "§705(a) — basis increased by income, decreased by distributions/losses",
+                    "location_reference": "26 U.S.C. §705(a)(1), (2)",
+                    "excerpt_text": (
+                        "The adjusted basis of a partner's interest in a partnership shall, except as provided "
+                        "in subsection (b), be the basis of such interest determined under section 722 "
+                        "(relating to contributions to a partnership) or section 742 (relating to transfers of "
+                        "partnership interests)— (1) increased by the sum of his distributive share for the "
+                        "taxable year and prior taxable years of— (A) taxable income of the partnership as "
+                        "determined under section 703(a), (B) income of the partnership exempt from tax, and "
+                        "(C) the excess of the deductions for depletion over the basis of the property subject "
+                        "to depletion; (2) decreased (but not below zero) by distributions by the partnership "
+                        "as provided in section 733 and by the sum of his distributive share for the taxable "
+                        "year and prior taxable years of— (A) losses of the partnership, and (B) expenditures "
+                        "of the partnership not deductible in computing its taxable income and not properly "
+                        "chargeable to capital account."
+                    ),
+                    "summary_text": "The item-L transactional roll-forward: BOY + income share (incl. "
+                                    "tax-exempt) − distributions − loss/nondeductible share = EOY. §733 "
+                                    "distributions; not below zero.",
+                    "is_key_excerpt": True,
+                }),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_752 is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_752", {
+                    "excerpt_label": "§752(a) — increase in liabilities = contribution of money",
+                    "location_reference": "26 U.S.C. §752(a)",
+                    "excerpt_text": (
+                        "Any increase in a partner's share of the liabilities of a partnership, or any "
+                        "increase in a partner's individual liabilities by reason of the assumption by such "
+                        "partner of partnership liabilities, shall be considered as a contribution of money "
+                        "by such partner to the partnership."
+                    ),
+                    "summary_text": "An increase in a partner's liability share = a money contribution "
+                                    "(raises outside basis). Item K reports the shares.",
+                    "is_key_excerpt": True,
+                }),
+    ("IRC_752", {
+                    "excerpt_label": "§752(b) — decrease in liabilities = distribution of money",
+                    "location_reference": "26 U.S.C. §752(b)",
+                    "excerpt_text": (
+                        "Any decrease in a partner's share of the liabilities of a partnership, or any "
+                        "decrease in a partner's individual liabilities by reason of the assumption by the "
+                        "partnership of such individual liabilities, shall be considered as a distribution of "
+                        "money to the partner by the partnership."
+                    ),
+                    "summary_text": "A decrease in a partner's liability share = a money distribution "
+                                    "(reduces outside basis). Item K basis effect (why item L tax-basis "
+                                    "capital 'might not equal' outside basis).",
+                    "is_key_excerpt": False,
+                }),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_707C is DECLARED by load_1065_schedule_k.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_707C", {
+                    "excerpt_label": "§707(c) — guaranteed payments for services or use of capital",
+                    "location_reference": "26 U.S.C. §707(c)",
+                    "excerpt_text": (
+                        "To the extent determined without regard to the income of the partnership, payments to "
+                        "a partner for services or the use of capital shall be considered as made to one who is "
+                        "not a member of the partnership, but only for the purposes of section 61(a) (relating "
+                        "to gross income) and, subject to section 263, for purposes of section 162(a) (relating "
+                        "to trade or business expenses)."
+                    ),
+                    "summary_text": "Guaranteed payments (services 4a / capital 4b, total 4c) are per-partner "
+                                    "direct amounts, not a pro-rata split of an entity total.",
+                    "is_key_excerpt": True,
+                }),
+]
 
 # (source_code, form_code, link_type)
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [

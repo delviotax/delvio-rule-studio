@@ -147,39 +147,10 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
     ("research_credit", "§41 research credit — regular/ASC methods, §280C reduced-credit election, QRE definitions"),
 ]
 
-EXISTING_SOURCES_TO_REFERENCE: list[str] = []
+EXISTING_SOURCES_TO_REFERENCE: list[str] = [    "IRC_41",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
+]
 
 AUTHORITY_SOURCES: list[dict] = [
-    {
-        "source_code": "IRC_41",
-        "source_type": "statute", "source_rank": "primary_official", "jurisdiction_code": "FED",
-        "title": "IRC §41 — Credit for Increasing Research Activities",
-        "citation": "26 U.S.C. §41", "issuer": "U.S. Congress",
-        "official_url": "https://uscode.house.gov/view.xhtml?req=(title:26%20section:41%20edition:prelim)",
-        "current_status": "active", "is_substantive_authority": True, "is_filing_authority": False,
-        "trust_score": 10.0, "requires_human_review": True,
-        "notes": "§41(a) 20% incremental credit over the base amount + 20% basic-research + energy-"
-                 "consortium amounts; §41(c)(4) alternative simplified credit (14% of QREs over 50% of "
-                 "the prior-3-year average; 6% when no QREs in any of those years); §41(c)(3)(C) 16% "
-                 "fixed-base-percentage cap; §41(b)(3) contract research applicable percentages "
-                 "(65%/75%/100%); §41(d) 4-part qualified-research test.",
-        "topics": ["research_credit"],
-        "excerpts": [
-            {"excerpt_label": "§41(c)(4) — the ASC mechanics",
-             "location_reference": "§41(c)(4)(A)-(B)",
-             "excerpt_text": (
-                 "At the election of the taxpayer, the credit determined under subsection (a)(1) shall "
-                 "be equal to 14 percent of so much of the qualified research expenses for the taxable "
-                 "year as exceeds 50 percent of the average qualified research expenses for the 3 "
-                 "taxable years preceding the taxable year for which the credit is being determined. "
-                 "In the case of a taxpayer who has no qualified research expenses in any one of the 3 "
-                 "taxable years preceding the taxable year for which the credit is being determined, "
-                 "the amount determined under subparagraph (A) shall be equal to 6 percent of the "
-                 "qualified research expenses for the taxable year."),
-             "summary_text": "ASC = 14% × (QRE − 50% of prior-3-yr average); 6% × QRE when any prior year had none. The face's ÷6.0 IS the 50%-of-3-year-average in one step.",
-             "is_key_excerpt": True},
-        ],
-    },
     {
         "source_code": "IRC_280C_41",
         "source_type": "statute", "source_rank": "primary_official", "jurisdiction_code": "FED",
@@ -327,7 +298,22 @@ AUTHORITY_SOURCES: list[dict] = [
 
 # Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
 # available here. Empty: adding it changes nothing until an entry lands.
-NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = []
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): IRC_41 is DECLARED by irc_sections.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRC_41", {"excerpt_label": "§41(c)(4) — the ASC mechanics",
+                 "location_reference": "§41(c)(4)(A)-(B)",
+                 "excerpt_text": (
+                     "At the election of the taxpayer, the credit determined under subsection (a)(1) shall "
+                     "be equal to 14 percent of so much of the qualified research expenses for the taxable "
+                     "year as exceeds 50 percent of the average qualified research expenses for the 3 "
+                     "taxable years preceding the taxable year for which the credit is being determined. "
+                     "In the case of a taxpayer who has no qualified research expenses in any one of the 3 "
+                     "taxable years preceding the taxable year for which the credit is being determined, "
+                     "the amount determined under subparagraph (A) shall be equal to 6 percent of the "
+                     "qualified research expenses for the taxable year."),
+                 "summary_text": "ASC = 14% × (QRE − 50% of prior-3-yr average); 6% × QRE when any prior year had none. The face's ÷6.0 IS the 50%-of-3-year-average in one step.",
+                 "is_key_excerpt": True}),
+]
 
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
     ("IRS_2024_6765_FORM", "6765", "governs"),
