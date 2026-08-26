@@ -256,157 +256,14 @@ AUTHORITY_SOURCES: list[dict] = [
         ],
     },
     # ── 2025 Form 1065 page 6 — Schedule L face (filing authority, verbatim) ──
-    {
-        "source_code": "IRS_2025_F1065",
-        "source_type": "official_form",
-        "source_rank": "implementation_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1065",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "Form 1065 (2025) — Schedule L (page 6, balance sheet) + Schedule B (pages 2-4, other "
-                 "information, 33 questions)",
-        "citation": "Form 1065 (2025), Cat. No. 11390Z, page 6 Schedule L lines 1-22; pages 2-4 Schedule B "
-                    "questions 1-33",
-        "issuer": "IRS",
-        "official_url": "https://www.irs.gov/pub/irs-pdf/f1065.pdf",
-        "current_status": "active",
-        "is_substantive_authority": False,
-        "is_filing_authority": True,
-        "trust_score": 9.50,
-        "requires_human_review": True,
-        "notes": "Schedule L + Schedule B line/question structure extracted VERBATIM 2026-07-04 from the "
-                 "FINAL 2025 f1065.pdf (page 6 = Schedule L; pages 2-4 = Schedule B 33 Qs; pymupdf). Key: "
-                 "L14 total assets, L22 total liab & capital, L21 partners' capital; Q4 four-condition "
-                 "small-partnership exemption, Q24 §163(j) $31M test. REQUIRES HUMAN REVIEW.",
-        "topics": ["partnership_1065_core"],
-        "excerpts": [
-            {
-                "excerpt_label": "Schedule L Assets lines 1-14 (verbatim, f1065 2025 p.6)",
-                "location_reference": "f1065 (2025) page 6, Schedule L — Assets",
-                "excerpt_text": (
-                    "Schedule L Balance Sheets per Books. Beginning of tax year (a)(b) / End of tax year "
-                    "(c)(d). Assets: 1 Cash. 2a Trade notes and accounts receivable, b Less allowance for "
-                    "bad debts. 3 Inventories. 4 U.S. Government obligations. 5 Tax-exempt securities. 6 "
-                    "Other current assets (attach statement). 7a Loans to partners (or persons related to "
-                    "partners), b Mortgage and real estate loans. 8 Other investments (attach statement). "
-                    "9a Buildings and other depreciable assets, b Less accumulated depreciation. 10a "
-                    "Depletable assets, b Less accumulated depletion. 11 Land (net of any amortization). "
-                    "12a Intangible assets (amortizable only), b Less accumulated amortization. 13 Other "
-                    "assets (attach statement). 14 Total assets."
-                ),
-                "summary_text": "Sch L Assets 1-14: paired lines 2a/2b, 9a/9b, 10a/10b, 12a/12b net to the "
-                                "column; 14 total assets = Σ net asset lines (contra accounts netted).",
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "Schedule L Liabilities & Capital lines 15-22 (verbatim, f1065 2025 p.6)",
-                "location_reference": "f1065 (2025) page 6, Schedule L — Liabilities and Capital",
-                "excerpt_text": (
-                    "Liabilities and Capital: 15 Accounts payable. 16 Mortgages, notes, bonds payable in "
-                    "less than 1 year. 17 Other current liabilities (attach statement). 18 All nonrecourse "
-                    "loans. 19a Loans from partners (or persons related to partners), b Mortgages, notes, "
-                    "bonds payable in 1 year or more. 20 Other liabilities (attach statement). 21 Partners' "
-                    "capital accounts. 22 Total liabilities and capital."
-                ),
-                "summary_text": "Sch L Liab & Capital 15-22: 21 partners' capital (tax-basis → M-2 line 9); "
-                                "22 total liab & capital = Σ lines 15-21. Balance: line 14 == line 22.",
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "Schedule B Q4 small-partnership exemption (verbatim, f1065 2025 p.2)",
-                "location_reference": "f1065 (2025) page 2, Schedule B question 4",
-                "excerpt_text": (
-                    "4 Does the partnership satisfy all four of the following conditions? a The "
-                    "partnership's total receipts for the tax year were less than $250,000. b The "
-                    "partnership's total assets at the end of the tax year were less than $1 million. c "
-                    "Schedules K-1 are filed with the return and furnished to the partners on or before the "
-                    "due date (including extensions) for the partnership return. d The partnership is not "
-                    "filing and is not required to file Schedule M-3. If 'Yes,' the partnership is not "
-                    "required to complete Schedules L, M-1, and M-2; item F on page 1 of Form 1065; or item "
-                    "L on Schedule K-1."
-                ),
-                "summary_text": "Q4 all-four (receipts < $250k AND assets < $1M AND timely K-1s AND not-M-3) → "
-                                "Schedules L, M-1, M-2, item F, K-1 item L NOT required. The gating fact.",
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "Schedule B Q23/Q24 §163(j) + Q10 §754 + Q30/Q32/Q33 (verbatim, f1065 2025 pp.2-4)",
-                "location_reference": "f1065 (2025) pages 2-4, Schedule B questions 10, 23, 24, 30, 32, 33",
-                "excerpt_text": (
-                    "10a Is the partnership making, or had it previously made (and not revoked), a section "
-                    "754 election? ... b ... optional basis adjustment under section 743(b)? ... c ... "
-                    "section 734(b)? ... d ... substantial built-in loss (section 743(d)) or substantial "
-                    "basis reduction (section 734(d))? 23 Did the partnership have an election under section "
-                    "163(j) for any real property trade or business or any farming business in effect during "
-                    "the tax year? 24 Does the partnership satisfy one or more of the following? ... b The "
-                    "partnership's aggregate average annual gross receipts (determined under section 448(c)) "
-                    "for the 3 tax years preceding the current tax year are more than $31 million and the "
-                    "partnership has business interest expense. ... If 'Yes' to any, complete and attach "
-                    "Form 8990. 30 At any time during this tax year, did the partnership (a) receive ... or "
-                    "(b) sell, exchange, or otherwise dispose of a digital asset ...? 32 Check this box if an "
-                    "election out of subchapter K under section 761 is being made. 33 Is the partnership "
-                    "electing out of the centralized partnership audit regime under section 6221(b)? If "
-                    "'Yes,' the partnership must complete Schedule B-2 (Form 1065). ... If 'No,' complete "
-                    "Designation of Partnership Representative below."
-                ),
-                "summary_text": "Sch B load-bearing Qs: 10 §754/§743(b)/§734(b) (basis-adjust math RED-defer); "
-                                "23/24 §163(j) $31M → Form 8990; 30 digital asset; 32 §761 out; 33 §6221(b) "
-                                "audit election out → Sch B-2 / else PR designation.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
     # ── 2025 Instructions — the balance-sheet-must-balance rule + M-3 threshold ──
-    {
-        "source_code": "IRS_2025_I1065",
-        "source_type": "official_instructions",
-        "source_rank": "implementation_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1065",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "2025 Instructions for Form 1065 — Schedule L (tax-basis/book balance sheet, M-2 tie) + "
-                 "the Schedule M-3 threshold + the Schedule B Q4 exemption",
-        "citation": "Instructions for Form 1065 (2025), Cat. No. 11392V, Schedule L + Schedules M-1/M-2/M-3 "
-                    "+ Schedule B question 4",
-        "issuer": "IRS",
-        "official_url": "https://www.irs.gov/pub/irs-pdf/i1065.pdf",
-        "current_status": "active",
-        "is_substantive_authority": False,
-        "is_filing_authority": True,
-        "trust_score": 9.50,
-        "requires_human_review": True,
-        "notes": "Schedule L must balance (line 14 total assets = line 22 total liab & capital); line 21 "
-                 "partners' capital ties to Schedule M-2 line 9 when L is on the tax basis. Schedule M-3 "
-                 "replaces M-1 at total assets ≥ $10M (or adjusted total assets ≥ $10M / total receipts ≥ "
-                 "$35M / a reportable-entity-partner ≥ 50%) — Decision F RED-defer, flagged. Q4 exemption "
-                 "per the brief §4.1/§4.3 verbatim. REQUIRES HUMAN REVIEW.",
-        "topics": ["partnership_1065_core"],
-        "excerpts": [
-            {
-                "excerpt_label": "Schedule M-3 threshold (Decision F RED-defer)",
-                "location_reference": "i1065 (2025), Schedule L / Schedule M-3 who-must-file",
-                "excerpt_text": (
-                    "A partnership must complete Schedule M-3 (Form 1065) instead of Schedule M-1 if any of "
-                    "the following apply: total assets at the end of the tax year (Schedule L, line 14, "
-                    "column (d)) are $10 million or more; adjusted total assets are $10 million or more; "
-                    "total receipts for the tax year are $35 million or more; or an entity that is a "
-                    "reportable entity partner owns or is deemed to own, directly or indirectly, an interest "
-                    "of 50% or more in the partnership's capital, profit, or loss."
-                ),
-                "summary_text": "M-3 replaces M-1 at ≥$10M total (or adjusted) assets / ≥$35M receipts / a "
-                                "≥50% reportable-entity-partner. Season-one RED-defer (Decision F) — flagged "
-                                "via R-L-M3 / D_L_M3, not built. Per the brief §4.3 transcription.",
-                "is_key_excerpt": False,
-            },
-        ],
-    },
 ]
 
 # Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
 # available here. Empty: adding it changes nothing until an entry lands.
 EXISTING_SOURCES_TO_REFERENCE: list[str] = [    "IRC_705",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
+    "IRS_2025_F1065",  # ownership -> load_1065_schedule_k.py (A3/D-42, 2026-08-25)
+    "IRS_2025_I1065",  # ownership -> load_1065_schedule_k.py (A3/D-42, 2026-08-25)
 ]
 
 # Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
@@ -431,6 +288,100 @@ NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (c
                     "summary_text": "Tax-basis capital roll-forward behind Schedule L line 21 = M-2 line 9: BOY + "
                                     "income share − distributions − loss/nondeductible = EOY (§705/§733).",
                     "is_key_excerpt": True,
+                }),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRS_2025_F1065 is DECLARED by load_1065_schedule_k.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRS_2025_F1065", {
+                    "excerpt_label": "Schedule L Assets lines 1-14 (verbatim, f1065 2025 p.6)",
+                    "location_reference": "f1065 (2025) page 6, Schedule L — Assets",
+                    "excerpt_text": (
+                        "Schedule L Balance Sheets per Books. Beginning of tax year (a)(b) / End of tax year "
+                        "(c)(d). Assets: 1 Cash. 2a Trade notes and accounts receivable, b Less allowance for "
+                        "bad debts. 3 Inventories. 4 U.S. Government obligations. 5 Tax-exempt securities. 6 "
+                        "Other current assets (attach statement). 7a Loans to partners (or persons related to "
+                        "partners), b Mortgage and real estate loans. 8 Other investments (attach statement). "
+                        "9a Buildings and other depreciable assets, b Less accumulated depreciation. 10a "
+                        "Depletable assets, b Less accumulated depletion. 11 Land (net of any amortization). "
+                        "12a Intangible assets (amortizable only), b Less accumulated amortization. 13 Other "
+                        "assets (attach statement). 14 Total assets."
+                    ),
+                    "summary_text": "Sch L Assets 1-14: paired lines 2a/2b, 9a/9b, 10a/10b, 12a/12b net to the "
+                                    "column; 14 total assets = Σ net asset lines (contra accounts netted).",
+                    "is_key_excerpt": True,
+                }),
+    ("IRS_2025_F1065", {
+                    "excerpt_label": "Schedule L Liabilities & Capital lines 15-22 (verbatim, f1065 2025 p.6)",
+                    "location_reference": "f1065 (2025) page 6, Schedule L — Liabilities and Capital",
+                    "excerpt_text": (
+                        "Liabilities and Capital: 15 Accounts payable. 16 Mortgages, notes, bonds payable in "
+                        "less than 1 year. 17 Other current liabilities (attach statement). 18 All nonrecourse "
+                        "loans. 19a Loans from partners (or persons related to partners), b Mortgages, notes, "
+                        "bonds payable in 1 year or more. 20 Other liabilities (attach statement). 21 Partners' "
+                        "capital accounts. 22 Total liabilities and capital."
+                    ),
+                    "summary_text": "Sch L Liab & Capital 15-22: 21 partners' capital (tax-basis → M-2 line 9); "
+                                    "22 total liab & capital = Σ lines 15-21. Balance: line 14 == line 22.",
+                    "is_key_excerpt": True,
+                }),
+    ("IRS_2025_F1065", {
+                    "excerpt_label": "Schedule B Q4 small-partnership exemption (verbatim, f1065 2025 p.2)",
+                    "location_reference": "f1065 (2025) page 2, Schedule B question 4",
+                    "excerpt_text": (
+                        "4 Does the partnership satisfy all four of the following conditions? a The "
+                        "partnership's total receipts for the tax year were less than $250,000. b The "
+                        "partnership's total assets at the end of the tax year were less than $1 million. c "
+                        "Schedules K-1 are filed with the return and furnished to the partners on or before the "
+                        "due date (including extensions) for the partnership return. d The partnership is not "
+                        "filing and is not required to file Schedule M-3. If 'Yes,' the partnership is not "
+                        "required to complete Schedules L, M-1, and M-2; item F on page 1 of Form 1065; or item "
+                        "L on Schedule K-1."
+                    ),
+                    "summary_text": "Q4 all-four (receipts < $250k AND assets < $1M AND timely K-1s AND not-M-3) → "
+                                    "Schedules L, M-1, M-2, item F, K-1 item L NOT required. The gating fact.",
+                    "is_key_excerpt": True,
+                }),
+    ("IRS_2025_F1065", {
+                    "excerpt_label": "Schedule B Q23/Q24 §163(j) + Q10 §754 + Q30/Q32/Q33 (verbatim, f1065 2025 pp.2-4)",
+                    "location_reference": "f1065 (2025) pages 2-4, Schedule B questions 10, 23, 24, 30, 32, 33",
+                    "excerpt_text": (
+                        "10a Is the partnership making, or had it previously made (and not revoked), a section "
+                        "754 election? ... b ... optional basis adjustment under section 743(b)? ... c ... "
+                        "section 734(b)? ... d ... substantial built-in loss (section 743(d)) or substantial "
+                        "basis reduction (section 734(d))? 23 Did the partnership have an election under section "
+                        "163(j) for any real property trade or business or any farming business in effect during "
+                        "the tax year? 24 Does the partnership satisfy one or more of the following? ... b The "
+                        "partnership's aggregate average annual gross receipts (determined under section 448(c)) "
+                        "for the 3 tax years preceding the current tax year are more than $31 million and the "
+                        "partnership has business interest expense. ... If 'Yes' to any, complete and attach "
+                        "Form 8990. 30 At any time during this tax year, did the partnership (a) receive ... or "
+                        "(b) sell, exchange, or otherwise dispose of a digital asset ...? 32 Check this box if an "
+                        "election out of subchapter K under section 761 is being made. 33 Is the partnership "
+                        "electing out of the centralized partnership audit regime under section 6221(b)? If "
+                        "'Yes,' the partnership must complete Schedule B-2 (Form 1065). ... If 'No,' complete "
+                        "Designation of Partnership Representative below."
+                    ),
+                    "summary_text": "Sch B load-bearing Qs: 10 §754/§743(b)/§734(b) (basis-adjust math RED-defer); "
+                                    "23/24 §163(j) $31M → Form 8990; 30 digital asset; 32 §761 out; 33 §6221(b) "
+                                    "audit election out → Sch B-2 / else PR designation.",
+                    "is_key_excerpt": True,
+                }),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRS_2025_I1065 is DECLARED by load_1065_schedule_k.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRS_2025_I1065", {
+                    "excerpt_label": "Schedule M-3 threshold (Decision F RED-defer)",
+                    "location_reference": "i1065 (2025), Schedule L / Schedule M-3 who-must-file",
+                    "excerpt_text": (
+                        "A partnership must complete Schedule M-3 (Form 1065) instead of Schedule M-1 if any of "
+                        "the following apply: total assets at the end of the tax year (Schedule L, line 14, "
+                        "column (d)) are $10 million or more; adjusted total assets are $10 million or more; "
+                        "total receipts for the tax year are $35 million or more; or an entity that is a "
+                        "reportable entity partner owns or is deemed to own, directly or indirectly, an interest "
+                        "of 50% or more in the partnership's capital, profit, or loss."
+                    ),
+                    "summary_text": "M-3 replaces M-1 at ≥$10M total (or adjusted) assets / ≥$35M receipts / a "
+                                    "≥50% reportable-entity-partner. Season-one RED-defer (Decision F) — flagged "
+                                    "via R-L-M3 / D_L_M3, not built. Per the brief §4.3 transcription.",
+                    "is_key_excerpt": False,
                 }),
 ]
 

@@ -24,7 +24,9 @@ from specs.models import (
     TestScenario,
 )
 
-from ._1120s_sources import EXISTING_SOURCE_CODES, NEW_INSTRUCTION_SOURCES, NEW_IRC_SOURCES
+from . import _authority_wiring as _wire
+from ._1120s_sources import (EXISTING_SOURCE_CODES, NEW_EXCERPTS_ON_EXISTING,
+                             NEW_INSTRUCTION_SOURCES, NEW_IRC_SOURCES)
 
 
 class Command(BaseCommand):
@@ -75,6 +77,12 @@ class Command(BaseCommand):
             src = AuthoritySource.objects.filter(source_code=code).first()
             if src:
                 sources[code] = src
+
+        # ⚠ D-45: excerpts this spec contributes to rows it does NOT own. Six codes moved
+        #   into EXISTING_SOURCE_CODES when sources/load_1120s_family.py was ratified their
+        #   owner; their excerpts still belong here, and without this call they would be
+        #   silently dropped — the exact failure D-38 caught on GA-500.
+        _wire.apply_new_excerpts(NEW_EXCERPTS_ON_EXISTING, sources, self.stdout.write)
 
         self.stdout.write(f"Sources ready: {len(sources)} ({len(NEW_IRC_SOURCES) + len(NEW_INSTRUCTION_SOURCES)} new/updated)")
         return sources

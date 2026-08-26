@@ -154,8 +154,13 @@ AUTHORITY_SOURCES: list[dict] = [
     },
     {
         "source_code": "AL_CODE_40_18", "source_type": "statute", "source_rank": "controlling",
-        "jurisdiction_code": "AL", "title": "Code of Ala. §40-18-1.1 (conformity) · §40-18-33 (AL TI) · §40-18-35.2 (GILTI) · §40-18-62 (§174)",
-        "citation": "Code of Ala. §40-18-1.1; §40-18-33; §40-18-35.2; §40-18-62", "issuer": "Alabama Legislature",
+        # ⭐ D-45: RE-TITLED to the CHAPTER. Two loaders declared this row and each titled it
+        #    by its own section-set (C-corp vs pass-through), which is why the objective
+        #    criteria could not separate them - both were right about different things. The
+        #    row is the chapter; the sections live in the excerpt and in the rule-authority
+        #    links, which already name them (§40-18-35.2 GILTI / §40-18-62 §174, etc.).
+        "jurisdiction_code": "AL", "title": "Code of Ala. Title 40, Chapter 18 — Income Taxes",
+        "citation": "Code of Ala. Title 40, Ch. 18 (2025)", "issuer": "Alabama Legislature",
         "official_url": "https://law.justia.com/codes/alabama/title-40/",
         "current_status": "active", "is_substantive_authority": True, "trust_score": 9.2, "topics": ["al_corp_tax"],
         "excerpts": [{

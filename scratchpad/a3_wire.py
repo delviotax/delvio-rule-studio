@@ -49,7 +49,9 @@ POP_B = ["load_1065_schedule_k1.py", "load_1065_schedule_k.py", "load_1065_se.py
          "load_sc1120.py", "load_6765.py", "load_4684.py", "load_nc_passthrough.py",
          # added in the A3-ii pass: these two can reference but have no
          # NEW_EXCERPTS_ON_EXISTING, and their conversions carry one excerpt each.
-         "load_8814.py", "load_1120_schl.py"]
+         "load_8814.py", "load_1120_schl.py",
+         # D-45: its AL_CODE_40_18 conversion carries an excerpt.
+         "load_al_passthrough.py"]
 
 
 def module_state(path):

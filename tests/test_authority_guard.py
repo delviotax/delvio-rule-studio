@@ -85,11 +85,26 @@ def test_acknowledgement_is_of_a_writer_set_not_a_code():
 
     ⚠ Six of the pre-A1 acknowledgements recorded an incomplete writer set, so this is
     the property that had actually been failing rather than a hypothetical one.
+
+    ⚠⚠ This test USED to read the first real entry out of ACKNOWLEDGED. That worked
+    until campaign A3 resolved every collision and the list went EMPTY on 2026-08-25 —
+    at which point it raised StopIteration and went red on SUCCESS. That is exactly the
+    failure D-38 warned about and that every other test in this file was written to
+    avoid: a check pinned to today's data. Fixed to use a synthetic entry, so it tests
+    the MECHANISM and survives the list being empty, which is now the correct state.
     """
-    code, (writers, _note) = next(iter(sorted(G.ACKNOWLEDGED.items())))
-    assert G.is_acknowledged(code, list(writers))
-    assert not G.is_acknowledged(code, list(writers) + ["specs/load_newcomer.py"])
-    assert not G.is_acknowledged(code, list(writers)[:-1])
+    code, writers = "ZZ_ACK_FIXTURE", ["specs/load_a.py", "federal_data/zz.py"]
+    assert code not in G.ACKNOWLEDGED
+    G.ACKNOWLEDGED[code] = (tuple(writers), "synthetic")
+    try:
+        assert G.is_acknowledged(code, list(writers))
+        assert G.is_acknowledged(code, list(reversed(writers)))          # order-insensitive
+        assert not G.is_acknowledged(code, writers + ["specs/load_newcomer.py"])
+        assert not G.is_acknowledged(code, writers[:-1])
+        assert not G.is_acknowledged("ZZ_NOT_LISTED", writers)
+    finally:
+        G.ACKNOWLEDGED.pop(code, None)
+    assert code not in G.ACKNOWLEDGED
 
 
 def test_guard_does_not_scan_its_own_fixtures():

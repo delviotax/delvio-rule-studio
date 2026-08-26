@@ -1,361 +1,122 @@
 {
- "load_1040_sch123.py": {
-  "IRS_2025_1040_FORM": [
-   "1040 lines that consume the Schedule 1/2/3 totals"
+ "_1120s_sources.py": {
+  "IRS_2025_6251_INSTR": [],
+  "IRS_2025_1120S_INSTR": [],
+  "IRS_2025_1120S_K1_INSTR": [],
+  "IRS_2025_7203_INSTR": [],
+  "IRS_2025_1040SD_INSTR": [],
+  "IRC_1366": [],
+  "IRC_1363": [],
+  "IRC_1367": [],
+  "IRC_1374": [],
+  "IRC_199A": [],
+  "IRC_469": [],
+  "IRC_465": [],
+  "IRC_1211": [],
+  "IRC_1221": [],
+  "IRC_170": [],
+  "IRC_167": [],
+  "IRC_197": [],
+  "IRC_179": [
+   "\u00a7179(a)-(b) \u2014 Election and limitations",
+   "\u00a7179(b)(5) \u2014 SUV limitation and exceptions",
+   "\u00a7179(d)(4) \u2014 S-Corp/partnership passthrough"
   ],
-  "IRS_2025_1040_INSTR": [],
-  "IRS_2025_SCH1_FORM": [
-   "1099-K unnumbered entry box (memo)",
-   "Alimony date/SSN sub-lines",
-   "Line 25 / line 26 totals (verbatim)",
-   "Line 9 / line 10 totals (verbatim)",
-   "Negative-entry lines (parentheses on the face)"
+  "IRC_280F": [
+   "\u00a7280F(a), (d)(5) \u2014 caps apply to passenger automobiles (\u22646,000 lbs GVW)"
   ],
-  "IRS_2025_SCH2_FORM": [
-   "Checkbox sets (1e/1f, line 4, line 8)",
-   "Line 18 subtotal (verbatim)",
-   "Line 21 total \u2014 line 20 EXCLUDED (verbatim)",
-   "Line 7 subtotal (verbatim)",
-   "Part I totals (verbatim)"
+  "IRC_168": [
+   "\u00a7168(a)-(b) \u2014 MACRS general rules",
+   "\u00a7168(k) \u2014 Bonus depreciation (OBBBA 2025)"
   ],
-  "IRS_2025_SCH3_FORM": [
-   "Part I totals (verbatim)",
-   "Part II totals (verbatim)"
+  "IRC_1222": [
+   "\u00a71222 \u2014 ST/LT definitions"
   ],
-  "IRC_62": [
-   "\u00a762(a) AGI definition"
-  ]
- },
- "load_1040_schedule_d.py": {
-  "RP_2024_40": [],
-  "RP_2025_32": [
-   "\u00a74.01 32%-bracket starts (SDTW line 19, TY2026 \u2014 derived)"
+  "IRC_1377": [
+   "\u00a71377(a) \u2014 Pro rata share allocation"
   ],
-  "IRS_2025_1040_FORM": [],
-  "IRS_2025_1040_INSTR": [],
-  "IRS_2025_SCHEDD_FORM": [
-   "Page-1 QOF disposal question (verbatim)",
-   "Part III summary + line-16 routing + line-21 loss limit (verbatim)",
-   "Parts I-II netting structure (lines 1a-15, verbatim line list)"
-  ],
-  "IRS_2025_SCHEDD_INSTR": [
-   "28% Rate Gain Worksheet lines 1-7 (verbatim)",
-   "Capital Loss Carryover Worksheet lines 1-13 (verbatim)",
-   "Capital gain distributions \u2014 1099-DIV boxes 2a/2b/2c/2d routing (verbatim)",
-   "Schedule D Tax Worksheet lines 1-47 (verbatim, condensed)",
-   "Unrecaptured Section 1250 Gain Worksheet lines 1-18 (verbatim, v1 path)"
-  ],
-  "IRS_2025_8949_FORM": [
-   "Part I/II structure + the 12-box system (verbatim)"
+  "IRS_2025_1120S_SCHD_INSTR": [
+   "General Instructions \u2014 who must file",
+   "Part I \u2014 Short-term and Part II \u2014 Long-term",
+   "Part III \u2014 Built-in gains tax"
   ],
   "IRS_2025_8949_INSTR": [
-   "Adjustment-code table B..Z (verbatim, condensed per code)",
-   "Box definitions A-L incl. digital assets (verbatim, condensed)",
-   "Column (f)/(g) mechanics \u2014 multi-code + net adjustment (verbatim)",
-   "Exception 2 \u2014 broker summary rows / code M (verbatim)"
+   "Adjustment codes and column (g)",
+   "Purpose and reporting categories"
+  ],
+  "IRS_2025_4562_INSTR": [
+   "Election out \u2014 \u00a7168(k)(7) (verbatim, p.7)",
+   "Part I \u2014 \u00a7179 election",
+   "Part II \u2014 Bonus depreciation \u00a7168(k)",
+   "Part III \u2014 MACRS depreciation",
+   "Part V \u2014 Amortization",
+   "Qualified property acquired after 1/19/2025 \u2014 100% + the 40%/60% transitional election (verbatim, p.6)"
+  ],
+  "IRS_PUB_946": [
+   "Chart 1 \u2014 MACRS Percentage Table Guide (method \u2192 table routing)",
+   "MACRS percentage tables",
+   "Table A-14 \u2014 150% DB Half-Year (3/5/7/10-year columns, verbatim)",
+   "Table A-7 \u2014 Nonresidential Real 31.5-Year SL/MM (legacy, verbatim)",
+   "Tables A-13 / A-13a \u2014 ADS real property SL/MM 30-Year and 40-Year (verbatim)",
+   "Tables A-15..A-18 \u2014 150% DB Mid-Quarter (3/5/7/10-year columns, verbatim)",
+   "Tables A-2..A-5 \u2014 200% DB Mid-Quarter (all columns, verbatim)"
+  ],
+  "IRS_RP_2025_16": [
+   "Table 1 \u2014 \u00a7168(k) bonus applies (verbatim)",
+   "Table 2 \u2014 no \u00a7168(k) bonus (verbatim)",
+   "\u00a73.03 \u2014 when Table 2 applies (incl. \u00a7168(k)(7) election out)"
+  ],
+  "IRS_RP_2024_40": [
+   "\u00a72.25 \u2014 \u00a7179(b)(5)(A) SUV limitation for 2025 (verbatim)"
   ]
  },
- "load_1040_spine.py": {
-  "IRS_2025_1040_INSTR": [
-   "Line 16 \u2014 amounts included via checkboxes",
-   "Line 16 \u2014 method routing",
-   "Lines 36-38 \u2014 applied election, owe, penalty",
-   "Standard deduction \u2014 exceptions 1-3"
+ "load_1065_l_b.py": {
+  "IRC_705": [
+   "\u00a7705(a) \u2014 basis increased by income, decreased by distributions/losses"
   ],
-  "IRC_63": [
-   "\u00a763(c)(5)/(c)(6)/(f) \u2014 dependent cap, ineligibles, aged/blind"
+  "IRC_754": [
+   "\u00a7754 \u2014 the election (verbatim)"
   ],
-  "IRC_151": [],
-  "IRC_152": [],
-  "IRS_2025_8812_FORM": [],
-  "IRS_2025_1040_FORM": [
-   "Dependents block (columns 1-7)",
-   "Filing status block + special checkboxes",
-   "Income lines 1a-9",
-   "Lines 10-15 (AGI through taxable income)",
-   "Lines 16-24 (tax and credits)",
-   "Lines 25-33 (payments)",
-   "Lines 34-38 (refund / amount owed)"
+  "IRC_448C": [
+   "\u00a7448(c)(1) \u2014 the $25M base + (c)(4) inflation adjustment (verbatim)"
   ],
-  "IRS_2025_1040_TT": [
-   "2025 Tax Computation Worksheet (TI >= $100,000)",
-   "Midpoint + round-half-up convention (verified inference)",
-   "Tax Table row structure"
+  "IRC_6221": [
+   "\u00a76221(a) partnership-level determination + (b)(1) election out (verbatim)"
   ],
-  "PUB_501_2025": [
-   "Age-65 attainment + decedent rule",
-   "Table 6 \u2014 base standard deduction (TY2025)",
-   "Table 7 \u2014 aged/blind chart (TY2025)",
-   "Table 8 \u2014 dependent worksheet (TY2025)"
+  "IRS_2025_F1065": [
+   "Schedule B Q23/Q24 \u00a7163(j) + Q10 \u00a7754 + Q30/Q32/Q33 (verbatim, f1065 2025 pp.2-4)",
+   "Schedule B Q4 small-partnership exemption (verbatim, f1065 2025 p.2)",
+   "Schedule L Assets lines 1-14 (verbatim, f1065 2025 p.6)",
+   "Schedule L Liabilities & Capital lines 15-22 (verbatim, f1065 2025 p.6)"
   ],
-  "RP_2024_40": [
-   "\u00a72.01 TY2025 rate schedule breakpoints"
-  ],
-  "RP_2025_32": [
-   "\u00a74.01 TY2026 rate schedule breakpoints",
-   "\u00a74.14 TY2026 standard deduction set"
-  ],
-  "PL_119_21_70102": [
-   "\u00a770102 TY2025 amounts"
-  ],
-  "IRC_1": [
-   "\u00a71(a)-(d), (j) \u2014 rates by filing status"
-  ],
-  "IRC_3": [
-   "\u00a73(a)-(b) \u2014 table tax in lieu of \u00a71 computation"
-  ],
-  "IRC_2": [
-   "\u00a72(a)/(b) \u2014 QSS and HOH definitions"
-  ],
-  "IRC_7703": [
-   "\u00a77703(a)-(b) \u2014 year-end status; lived-apart rule"
-  ],
-  "IRC_6654": [
-   "\u00a76654 \u2014 quarterly installments"
+  "IRS_2025_I1065": [
+   "Schedule M-3 threshold (Decision F RED-defer)"
   ]
  },
- "load_1065_schedule_k1.py": {
+ "load_1065_m1_m2.py": {
   "IRC_702": [
    "\u00a7702(b) \u2014 character determined at the partnership level"
-  ],
-  "IRC_704": [
-   "\u00a7704(a) \u2014 the partnership agreement controls",
-   "\u00a7704(b) \u2014 partner's-interest fallback (no substantial economic effect)"
   ],
   "IRC_705": [
    "\u00a7705(a) \u2014 basis increased by income, decreased by distributions/losses"
   ],
-  "IRC_752": [
-   "\u00a7752(a) \u2014 increase in liabilities = contribution of money",
-   "\u00a7752(b) \u2014 decrease in liabilities = distribution of money"
+  "IRS_2025_F1065": [
+   "Schedule M-1 lines 1-9 (verbatim, f1065 2025 p.6)",
+   "Schedule M-2 lines 1-9 (verbatim, f1065 2025 p.6)"
   ],
-  "IRC_706D": [
-   "\u00a7706(d)(1) \u2014 varying interests general rule"
-  ],
-  "IRC_707C": [
-   "\u00a7707(c) \u2014 guaranteed payments for services or use of capital"
-  ],
-  "IRS_2025_F1065SK1": [
-   "Part II items J-N (verbatim labels)",
-   "Part III boxes 1-23 (verbatim labels)"
-  ],
-  "IRS_2025_I1065SK1": [
-   "Allocation mechanics + special allocations (verbatim)",
-   "Box 11 \u2014 Other income (loss): full code list (verbatim)",
-   "Box 13 \u2014 Other deductions: full code list (verbatim)",
-   "Box 14 \u2014 Self-employment earnings (loss): full code list (verbatim)",
-   "Box 15 \u2014 Credits: full code list (verbatim)",
-   "Box 17 \u2014 AMT items: full code list (verbatim)",
-   "Box 18 \u2014 Tax-exempt income and nondeductible expenses: full code list (verbatim)",
-   "Box 19 \u2014 Distributions: full code list (verbatim)",
-   "Box 20 \u2014 Other information: full code list (verbatim)",
-   "Load-bearing coded boxes (15/20/13) \u2014 notable codes"
+  "IRS_2025_I1065": [
+   "Schedule B Q4 \u2014 small-partnership exemption (verbatim)"
   ]
  },
- "load_1065_se.py": {
-  "IRC_1402": [
-   "\u00a71402(a) \u2014 distributive share in the SE base",
-   "\u00a71402(a)(1) \u2014 rentals from real estate excluded",
-   "\u00a71402(a)(13) \u2014 limited-partner exclusion (services-only carve-back)",
-   "\u00a71402(a)(2)/(a)(3) \u2014 dividends, interest, and capital gains excluded"
+ "load_al_passthrough.py": {
+  "AL_2025_PTE_RETURNS": [
+   "Form 65 / 20S structure + Electing PTE + composite (2025 substance)"
   ],
-  "IRC_702": [
-   "\u00a7702(a)(8) \u2014 taxable income/loss distributive share",
-   "\u00a7702(b) \u2014 character determined at the partnership level"
+  "AL_ACT_2021_1": [
+   "Electing PTE \u2014 5% + owner REFUNDABLE CREDIT (ALDOR verbatim)"
   ],
-  "IRC_707C": [
-   "\u00a7707(c) \u2014 guaranteed payments for services or use of capital"
-  ],
-  "TREAS_REG_1402A1": [
-   "\u00a71.1402(a)-1(a)(2) \u2014 distributive share of partnership trade/business",
-   "\u00a71.1402(a)-1(b) \u2014 payments for services or use of capital are business income"
-  ],
-  "TREAS_REG_1402A4": [
-   "\u00a71.1402(a)-4(a) \u2014 rentals from real estate excluded (general rule)"
-  ],
-  "CASELAW_SE_LP": [
-   "Denham, T.C. Memo. 2024-114 (Dec 23 2024) \u2014 functional analysis applied",
-   "Renkemeyer, 136 T.C. 137 (2011) \u2014 functional analysis established",
-   "Sirius (CONTRA), No. 24-60240 (5th Cir. Jan 16 2026) \u2014 state-law text test",
-   "Soroban I, 161 T.C. No. 12 (Nov 28 2023) \u2014 functional test required",
-   "Soroban II, T.C. Memo. 2025-52 (May 28 2025) \u2014 test applied, LPs taxable"
-  ],
-  "IRS_2025_1065_SEWKST": [
-   "K-1 box 14 \u2014 no entry for non-individual partners (Code A instructions)",
-   "Line 1b \u2014 dealer / services-to-occupants rentals (Worksheet Instructions)",
-   "Line 4a \u2014 GP from a \u00a71402(c) trade or business; \u00a7179 partner-level",
-   "SE Worksheet base (lines 1a-3a)",
-   "\u00a71402(a)(13) split + entity 14a (lines 3b/4b/3c/4c \u2192 14a)"
-  ]
- },
- "load_1120_schl.py": {
-  "IRS_2025_F1120": [
-   "Schedule L / M-1 / M-2 (2025 verbatim)"
-  ],
-  "IRS_2025_I1120": [
-   "Schedule M-3 $10M threshold (i1120 / iSchM-3 verbatim substance)"
-  ]
- },
- "load_1120_spine.py": {
-  "IRC_11": [
-   "\u00a711(b) flat rate (verbatim)"
-  ],
-  "IRC_172": [
-   "\u00a7172(a)(2) 80% limitation (verbatim)"
-  ],
-  "IRS_2025_F1120": [
-   "Page-1 line flow + Schedule J restructure (2025 verbatim)",
-   "Schedule C DRD percentages + Schedule K gates (2025 verbatim)"
-  ],
-  "IRS_2025_I1120": [
-   "21% rate + 80% NOL limitation + due date (i1120 verbatim)"
-  ],
-  "IRC_243_246": [
-   "DRD percentages + \u00a7246(b) limit + loss exception (verbatim)"
-  ],
-  "IRC_163J": [
-   "\u00a7163(j) 30% ATI + OBBBA EBITDA restoration (verbatim substance)"
-  ],
-  "IRC_55_CAMT": [
-   "\u00a755/\u00a759 CAMT 15% / $1B threshold (verbatim)"
-  ],
-  "IRC_541_531": [
-   "PHC + AET rates and tests (verbatim)"
-  ]
- },
- "load_4797.py": {
-  "IRS_2025_1040_FORM": [],
-  "IRS_2025_1040_INSTR": [],
-  "IRS_2025_1120S_INSTR": [
-   "Box 17 code K \u2014 the shareholder statement item list (verbatim)",
-   "Line 4 \u2014 corporations shouldn't use Form 4797 for \u00a7179-passed-through property (verbatim)"
-  ],
-  "IRS_2025_1065_INSTR": [
-   "Box 20 code L \u2014 dispositions of property with section 179 deductions (verbatim)",
-   "Line 6 \u2014 partnerships shouldn't use Form 4797 for \u00a7179-passed-through property (verbatim)"
-  ],
-  "IRC_1231": [
-   "\u00a71231(a) netting; \u00a71231(c) 5-year lookback"
-  ],
-  "IRC_1245": [
-   "\u00a71245(a)(1) \u2014 recapture of all depreciation",
-   "\u00a71245(a)(3) \u2014 what IS \u00a71245 property (the classification)"
-  ],
-  "IRC_1250": [
-   "\u00a71250(a) \u2014 additional-depreciation recapture",
-   "\u00a71250(c) + (b)(1) \u2014 property definition + additional depreciation (verbatim)"
-  ],
-  "IRC_168": [
-   "\u00a7168(b)(2)(A) + (b)(3)/(e)(6) \u2014 150DB for 15/20-yr; QIP is SL 15-yr",
-   "\u00a7168(e)(4) \u2014 railroad grading or tunnel bore",
-   "\u00a7168(i)(13) \u2014 single purpose agricultural or horticultural structure",
-   "\u00a7168(k) special (bonus) allowance is a depreciation adjustment (\u00a71250(b)(3))"
-  ],
-  "IRC_1_H_1_E": [
-   "Unrecaptured \u00a71250 gain \u2014 max 25%"
-  ],
-  "IRC_1252_1254_1255": [
-   "\u00a71252 / \u00a71254 / \u00a71255 recapture \u2014 smaller-of pattern"
-  ],
-  "IRC_179D_280F": [
-   "\u00a7179(d)(10) / \u00a7280F(b)(2) \u2014 business-use-drop recapture"
-  ],
-  "IRS_2025_4797_INSTR": [
-   "Disposition by a Partnership or S Corporation of Section 179 Property (verbatim)",
-   "Line 26a \u2014 additional depreciation INCLUDES bonus (verbatim)",
-   "Part I lines 7-9 \u2014 net \u00a71231 + the 5-year lookback \u2192 Schedule D",
-   "Part II line 18 \u2014 individuals' split \u2192 Sch 1 L4 / Sch A L16",
-   "Part III \u2014 recapture \u2192 Part II L13; excess \u2192 Part I L6",
-   "Part IV \u2014 \u00a7179/\u00a7280F recapture; SE-tax note",
-   "\u00a71250 property + the line-26 carve-out classes (verbatim)"
-  ],
-  "IRS_PUB_544": [
-   "Ordinary vs capital; holding period"
-  ]
- },
- "load_8814.py": {
-  "IRS_2025_F8814": [
-   "Carries + caution + multiple children (verbatim substance)",
-   "Part I + Part II line map with 2025 figures (verbatim)"
-  ],
-  "IRS_2025_I8814": [
-   "Eligibility conditions (i8814 verbatim)"
-  ],
-  "IRC_1G": [
-   "\u00a71(g)(7) election + relationship to Form 8615 (cited to \u00a71(g)/Pub 929, NOT i8814)"
-  ]
- },
- "load_sch_1a.py": {
-  "IRC_151": [
-   "\u00a7151(d)(5) \u2014 Enhanced senior deduction (SCH_1A)"
-  ],
-  "IRC_63": [
-   "\u00a763(b)(7) \u2014 Non-itemizer below-the-line deductions (SCH_1A)"
-  ],
-  "IRS_2025_SCH_1A_FORM": [
-   "Part I \u2014 MAGI (lines 1\u20133)",
-   "Part II \u2014 Tips (lines 4\u201313)",
-   "Part III \u2014 Overtime (lines 14\u201321)",
-   "Part IV \u2014 Car Loan / QPVLI (lines 22\u201330)",
-   "Part V \u2014 Senior (lines 31\u201337)",
-   "Part VI \u2014 Total (line 38)"
-  ],
-  "IRC_224": [
-   "\u00a7224(b)(1) \u2014 Cap; \u00a7224(b)(2) \u2014 MAGI phaseout",
-   "\u00a7224(d)(1)\u2013(2) qualified tips/occupations; \u00a7224(e) SSN; SE limit"
-  ],
-  "IRC_225": [
-   "\u00a7225(b)(1) \u2014 Cap; \u00a7225(b)(2) \u2014 MAGI phaseout",
-   "\u00a7225(c)(1) \u2014 Qualified overtime = FLSA premium only"
-  ],
-  "IRC_163": [
-   "\u00a7163(h)(4) \u2014 Cap and MAGI phaseout",
-   "\u00a7163(h)(4) \u2014 Vehicle and loan conditions"
-  ],
-  "IRC_911": [
-   "\u00a7911 \u2014 FEIE and housing exclusion add-back"
-  ],
-  "IRC_931": [
-   "\u00a7931 \u2014 American Samoa exclusion add-back"
-  ],
-  "IRC_933": [
-   "\u00a7933 \u2014 Puerto Rico exclusion add-back"
-  ],
-  "IRC_6041": [
-   "\u00a76041(d)(4) \u2014 Overtime reporting"
-  ],
-  "IRC_6051": [
-   "\u00a76051(a)(19) \u2014 W-2 overtime reporting"
-  ],
-  "IRC_6050AA": [
-   "\u00a76050AA \u2014 QPVLI reporting"
-  ],
-  "USC_29_207": [
-   "29 U.S.C. \u00a7207 \u2014 Overtime premium over regular rate"
-  ],
-  "PL_119_21_70103": [
-   "\u00a770103 \u2014 Enhanced senior deduction"
-  ],
-  "PL_119_21_70201": [
-   "\u00a770201 \u2014 Adds IRC \u00a7224; occupation list"
-  ],
-  "PL_119_21_70202": [
-   "\u00a770202 \u2014 Adds IRC \u00a7225"
-  ],
-  "PL_119_21_70203": [
-   "\u00a770203 \u2014 QPVLI deduction, non-itemizer, reporting"
-  ],
-  "IRS_NOTICE_2025_69": [
-   "Notice 2025-69 \u2014 Tips/overtime interim guidance"
-  ],
-  "IRS_REG_110032_25": [
-   "REG-110032-25 \u2014 Qualified tipped occupations"
-  ],
-  "IRS_REG_113515_25": [
-   "REG-113515-25 \u2014 QPVLI implementation"
-  ],
-  "IRS_IR_2025_129": [
-   "IR-2025-129 \u2014 QPVLI announcement"
+  "AL_CODE_40_18": [
+   "AL conforms to \u00a7168(k)/\u00a7179 \u2014 item-by-item (ALDOR OBBBA summary, re-declared)"
   ]
  }
 }

@@ -49,7 +49,9 @@ from . import _authority_guard as AG
 #   NEVER raise it to make a seed pass. A new invalid value is a typo to fix,
 #   not a number to accommodate.
 #
-# Re-tightened again 2026-08-25 after A3-ii (D-44): 35 more conversions, source_type
+# Re-tightened a third time 2026-08-25 after D-45 closed the last nine: source_type
+# 233 -> 182 across the day, entirely as a SIDE EFFECT of resolving ownership.
+# Previously, after A3-ii (D-44): 35 more conversions, source_type
 # 213 -> 185. Ownership resolution keeps paying the vocabulary debt down for free.
 # Previously re-tightened 2026-08-25 after campaign A3/D-42: converting 20 non-owner declarations
 # into references DELETED their invalid values too — source_type 233 -> 213, rank 5 -> 4.
@@ -60,8 +62,8 @@ from . import _authority_guard as AG
 # Previous baseline, frozen 2026-08-16, totalled 234 source_type occurrences.
 # ---------------------------------------------------------------------------
 SOURCE_TYPE_DEBT: dict[str, int] = {
-    "statute":                 71,
-    "official_instructions":   51,
+    "statute":                 70,
+    "official_instructions":   49,
     "federal_form":            28,
     "official_guidance":       28,
     "form":                    2,

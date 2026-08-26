@@ -80,7 +80,8 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
      "§168(k)/§179, PTE-C 5% composite, Form 20S LIFO/BIG/excess-passive."),
 ]
 
-EXISTING_SOURCES_TO_REFERENCE: list[str] = []
+EXISTING_SOURCES_TO_REFERENCE: list[str] = [    "AL_CODE_40_18",  # ownership -> load_al_form20c.py (A3/D-42, 2026-08-25)
+]
 
 AUTHORITY_SOURCES: list[dict] = [
     {
@@ -130,26 +131,25 @@ AUTHORITY_SOURCES: list[dict] = [
             "is_key_excerpt": True,
         }],
     },
-    {
-        "source_code": "AL_CODE_40_18", "source_type": "statute", "source_rank": "controlling",
-        "jurisdiction_code": "AL", "title": "Code of Ala. §40-18-1.1 (rolling conformity) · §40-18-15(a) (bonus/§179 tied to federal)",
-        "citation": "Code of Ala. §40-18-1.1; §40-18-15(a)(8),(a)(21)", "issuer": "Alabama Legislature",
-        "official_url": "https://law.justia.com/codes/alabama/title-40/",
-        "current_status": "active", "is_substantive_authority": True, "trust_score": 9.2, "topics": ["al_passthrough_ept"],
-        "excerpts": [{
-            "excerpt_label": "AL conforms to §168(k)/§179 — item-by-item (ALDOR OBBBA summary, re-declared)",
-            "excerpt_text": (
-                "§40-18-1.1: the IRC is defined as in effect from time to time (rolling conformity). ALDOR OBBBA "
-                "Executive Summary (11/10/2025): §168(k) 100% bonus 'Tied to Federal: Yes' (§40-18-15(a)(8)); "
-                "§179 $2.5M/$4M 'Tied to Federal: Yes' (§40-18-15(a)(21)) — AL CONFORMS, no bonus/§179 add-back "
-                "on Form 65/20S (opposite of GA/SC/NC). Conformity is ITEM-BY-ITEM: several OBBBA items are "
-                "'Tied to Federal: No' (§224 tips, §225 overtime, enhanced §199A, §174 R&E). Do not encode a "
-                "blanket AL-conformity rule."
-            ),
-            "summary_text": "§40-18-1.1 rolling conformity; §168(k)/§179 tied to federal (AL conforms, no add-back); item-by-item — not blanket.",
-            "is_key_excerpt": True,
-        }],
-    },
+]
+
+# Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
+# available here. Empty: adding it changes nothing until an entry lands.
+NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (campaign A3/D-42): AL_CODE_40_18 is DECLARED by load_al_form20c.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("AL_CODE_40_18", {
+                "excerpt_label": "AL conforms to §168(k)/§179 — item-by-item (ALDOR OBBBA summary, re-declared)",
+                "excerpt_text": (
+                    "§40-18-1.1: the IRC is defined as in effect from time to time (rolling conformity). ALDOR OBBBA "
+                    "Executive Summary (11/10/2025): §168(k) 100% bonus 'Tied to Federal: Yes' (§40-18-15(a)(8)); "
+                    "§179 $2.5M/$4M 'Tied to Federal: Yes' (§40-18-15(a)(21)) — AL CONFORMS, no bonus/§179 add-back "
+                    "on Form 65/20S (opposite of GA/SC/NC). Conformity is ITEM-BY-ITEM: several OBBBA items are "
+                    "'Tied to Federal: No' (§224 tips, §225 overtime, enhanced §199A, §174 R&E). Do not encode a "
+                    "blanket AL-conformity rule."
+                ),
+                "summary_text": "§40-18-1.1 rolling conformity; §168(k)/§179 tied to federal (AL conforms, no add-back); item-by-item — not blanket.",
+                "is_key_excerpt": True,
+            }),
 ]
 
 AUTHORITY_FORM_LINKS: list[tuple[str, str, str]] = [
@@ -397,6 +397,9 @@ class Command(BaseCommand):
         # ⚠ D-42: these two lists existed and were NEVER READ. One module DECLARES a
         #   source, every other REFERENCES it (D-29) — that only works if both halves run.
         _wire.resolve_references(EXISTING_SOURCES_TO_REFERENCE, sources, self.stdout.write)
+        # ⚠ D-42: these two lists existed and were NEVER READ. One module DECLARES a
+        #   source, every other REFERENCES it (D-29) — that only works if both halves run.
+        _wire.apply_new_excerpts(NEW_EXCERPTS_ON_EXISTING, sources, self.stdout.write)
         self.stdout.write(f"Sources ready: {len(sources)}")
         return sources
 

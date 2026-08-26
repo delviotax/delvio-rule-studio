@@ -158,10 +158,13 @@ AUTHORITY_SOURCES: list[dict] = [
         "entity_type_code": "1065",
         "tax_year_start": 2025,
         "tax_year_end": 2025,
-        "title": "Form 1065 (2025) — U.S. Return of Partnership Income (page 1 income/deductions; "
-                 "page 5 Schedule K + Analysis of Net Income)",
-        "citation": "Form 1065 (2025), Cat. No. 11390Z (\"Created 11/25/25\"), page 1 lines 1a-32 + "
-                    "page 5 Schedule K lines 1-21 + Analysis",
+        # ⭐ D-45: RE-TITLED to document level. Three loaders declared this row and each
+        #    titled it by ITS OWN schedule - which is why no field-by-field comparison could
+        #    pick a winner: they were not better or worse, they were describing different
+        #    things. A source row describes a DOCUMENT; the slice belongs in the excerpt and
+        #    in the rule-authority link, both of which already carry it verbatim.
+        "title": "Form 1065 (2025) — U.S. Return of Partnership Income",
+        "citation": "Form 1065 (2025), Cat. No. 11390Z (\"Created 11/25/25\")",
         "issuer": "IRS",
         "official_url": "https://www.irs.gov/pub/irs-pdf/f1065.pdf",
         "current_status": "active",
@@ -245,10 +248,13 @@ AUTHORITY_SOURCES: list[dict] = [
         "entity_type_code": "1065",
         "tax_year_start": 2025,
         "tax_year_end": 2025,
-        "title": "2025 Instructions for Form 1065 — Analysis of Net Income (Loss), the K → K-1 "
-                 "correspondence, and the OBBBA (P.L. 119-21) What's New",
-        "citation": "Instructions for Form 1065 (2025), Cat. No. 11392V (dated Jan 14 2026), "
-                    "Analysis of Net Income + What's New + allocation (pp. 31/34)",
+        # ⭐ D-45: RE-TITLED to document level. Three loaders declared this row and each
+        #    titled it by ITS OWN schedule - which is why no field-by-field comparison could
+        #    pick a winner: they were not better or worse, they were describing different
+        #    things. A source row describes a DOCUMENT; the slice belongs in the excerpt and
+        #    in the rule-authority link, both of which already carry it verbatim.
+        "title": "2025 Instructions for Form 1065",
+        "citation": "Instructions for Form 1065 (2025), Cat. No. 11392V (dated Jan 14 2026)",
         "issuer": "IRS",
         "official_url": "https://www.irs.gov/pub/irs-pdf/i1065.pdf",
         "current_status": "active",

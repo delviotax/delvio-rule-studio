@@ -101,117 +101,15 @@ AUTHORITY_SOURCES: list[dict] = [
     # ── IRC §705 — partner's basis (M-2 tax-basis capital roll-forward) ──
     # ── IRC §702 — separately-stated items (M-1 book↔return differences) ──
     # ── 2025 Form 1065 page 6 — M-1/M-2 face (filing authority, verbatim) ──
-    {
-        "source_code": "IRS_2025_F1065",
-        "source_type": "official_form",
-        "source_rank": "implementation_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1065",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "Form 1065 (2025) page 6 — Schedule M-1 (book↔return reconciliation) + Schedule M-2 "
-                 "(partners' capital accounts)",
-        "citation": "Form 1065 (2025), Cat. No. 11390Z, page 6, Schedule M-1 lines 1-9 + Schedule M-2 "
-                    "lines 1-9",
-        "issuer": "IRS",
-        "official_url": "https://www.irs.gov/pub/irs-pdf/f1065.pdf",
-        "current_status": "active",
-        "is_substantive_authority": False,
-        "is_filing_authority": True,
-        "trust_score": 9.50,
-        "requires_human_review": True,
-        "notes": "M-1/M-2 line structure extracted VERBATIM 2026-07-04 from the FINAL 2025 f1065.pdf page 6 "
-                 "(pymupdf). Key: M-1 line 9 = 'Analysis of Net Income (Loss) per Return, line 1' (face "
-                 "verbatim); M-2 line 3 = 'Net income (loss) (see instructions)'. REQUIRES HUMAN REVIEW.",
-        "topics": ["partnership_1065_core"],
-        "excerpts": [
-            {
-                "excerpt_label": "Schedule M-1 lines 1-9 (verbatim, f1065 2025 p.6)",
-                "location_reference": "f1065 (2025) page 6, Schedule M-1",
-                "excerpt_text": (
-                    "Schedule M-1 Reconciliation of Income (Loss) per Books With Analysis of Net Income "
-                    "(Loss) per Return. Note: The partnership may be required to file Schedule M-3. "
-                    "1 Net income (loss) per books. 2 Income included on Schedule K, lines 1, 2, 3c, 5, 6a, "
-                    "7, 8, 9a, 10, and 11, not recorded on books this year (itemize). 3 Guaranteed payments "
-                    "(other than health insurance). 4 Expenses recorded on books this year not included on "
-                    "Schedule K, lines 1 through 13e, and 21 (itemize): a Depreciation, b Travel and "
-                    "entertainment. 5 Add lines 1 through 4. 6 Income recorded on books this year not "
-                    "included on Schedule K, lines 1 through 11 (itemize): a Tax-exempt interest. "
-                    "7 Deductions included on Schedule K, lines 1 through 13e, and 21, not charged against "
-                    "book income this year (itemize): a Depreciation. 8 Add lines 6 and 7. 9 Income (loss) "
-                    "(Analysis of Net Income (Loss) per Return, line 1). Subtract line 8 from line 5."
-                ),
-                "summary_text": "M-1: 5 = Σ(1-4); 8 = Σ(6-7); 9 = 5 − 8 = Analysis line 1. Face sublines "
-                                "4a/4b, 6a, 7a (tts adds 4c/7b catch-alls).",
-                "is_key_excerpt": True,
-            },
-            {
-                "excerpt_label": "Schedule M-2 lines 1-9 (verbatim, f1065 2025 p.6)",
-                "location_reference": "f1065 (2025) page 6, Schedule M-2",
-                "excerpt_text": (
-                    "Schedule M-2 Analysis of Partners' Capital Accounts. 1 Balance at beginning of year. "
-                    "2 Capital contributed: a Cash, b Property. 3 Net income (loss) (see instructions). "
-                    "4 Other increases (itemize). 5 Add lines 1 through 4. 6 Distributions: a Cash, "
-                    "b Property. 7 Other decreases (itemize). 8 Add lines 6 and 7. 9 Balance at end of "
-                    "year. Subtract line 8 from line 5."
-                ),
-                "summary_text": "M-2 (tax basis): 5 = Σ(1-4); 8 = Σ(6-7); 9 = 5 − 8 = ending capital. Line 3 "
-                                "'(see instructions)' = Analysis line 1 = M-1 line 9 (per return).",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
     # ── 2025 Instructions — M-2 line 3 tie + the small-partnership exemption (Q4) ──
-    {
-        "source_code": "IRS_2025_I1065",
-        "source_type": "official_instructions",
-        "source_rank": "implementation_official",
-        "jurisdiction_code": "FED",
-        "entity_type_code": "1065",
-        "tax_year_start": 2025,
-        "tax_year_end": 2025,
-        "title": "2025 Instructions for Form 1065 — Schedule M-2 line 3 (= Analysis line 1) + the "
-                 "Schedule B Q4 small-partnership exemption + the M-3 threshold",
-        "citation": "Instructions for Form 1065 (2025), Cat. No. 11392V, Schedules M-1/M-2 + Schedule B "
-                    "question 4",
-        "issuer": "IRS",
-        "official_url": "https://www.irs.gov/pub/irs-pdf/i1065.pdf",
-        "current_status": "active",
-        "is_substantive_authority": False,
-        "is_filing_authority": True,
-        "trust_score": 9.50,
-        "requires_human_review": True,
-        "notes": "M-2 line 3 net income ties to Analysis of Net Income line 1 (per return, tax basis). The "
-                 "Schedule B Q4 four-condition test suppresses L/M-1/M-2 + K-1 item L. M-3 replaces M-1 at "
-                 "≥$10M assets / ≥$35M receipts (Decision B RED-defer). Per the brief §4.3 verbatim "
-                 "transcription. REQUIRES HUMAN REVIEW.",
-        "topics": ["partnership_1065_core"],
-        "excerpts": [
-            {
-                "excerpt_label": "Schedule B Q4 — small-partnership exemption (verbatim)",
-                "location_reference": "i1065 (2025), Schedule B question 4",
-                "excerpt_text": (
-                    "Does the partnership satisfy all four of the following conditions? (a) The "
-                    "partnership's total receipts for the tax year were less than $250,000. (b) The "
-                    "partnership's total assets at the end of the tax year were less than $1 million. "
-                    "(c) Schedules K-1 are filed with the return and furnished to the partners on or before "
-                    "the due date (including extensions) for the partnership return. (d) The partnership is "
-                    "not filing and is not required to file Schedule M-3. If 'Yes,' the partnership is not "
-                    "required to complete Schedules L, M-1, and M-2; item F on page 1 of Form 1065; or item "
-                    "L on Schedule K-1."
-                ),
-                "summary_text": "Q4 all-four (receipts < $250k AND assets < $1M AND timely K-1s AND not-M-3) "
-                                "→ Schedules L, M-1, M-2, item F, K-1 item L NOT required. Gating fact.",
-                "is_key_excerpt": True,
-            },
-        ],
-    },
 ]
 
 # Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
 # available here. Empty: adding it changes nothing until an entry lands.
 EXISTING_SOURCES_TO_REFERENCE: list[str] = [    "IRC_702",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
     "IRC_705",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
+    "IRS_2025_F1065",  # ownership -> load_1065_schedule_k.py (A3/D-42, 2026-08-25)
+    "IRS_2025_I1065",  # ownership -> load_1065_schedule_k.py (A3/D-42, 2026-08-25)
 ]
 
 # Added 2026-08-25 (campaign D-42) so the D-29 ownership remedy is
@@ -251,6 +149,61 @@ NEW_EXCERPTS_ON_EXISTING: list[tuple[str, dict]] = [    # Re-homed 2026-08-25 (c
                     ),
                     "summary_text": "M-2 tax-basis capital roll-forward: BOY + income share (incl. tax-exempt) − "
                                     "distributions − loss/nondeductible share = EOY (transactional, §705/§733).",
+                    "is_key_excerpt": True,
+                }),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRS_2025_F1065 is DECLARED by load_1065_schedule_k.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRS_2025_F1065", {
+                    "excerpt_label": "Schedule M-1 lines 1-9 (verbatim, f1065 2025 p.6)",
+                    "location_reference": "f1065 (2025) page 6, Schedule M-1",
+                    "excerpt_text": (
+                        "Schedule M-1 Reconciliation of Income (Loss) per Books With Analysis of Net Income "
+                        "(Loss) per Return. Note: The partnership may be required to file Schedule M-3. "
+                        "1 Net income (loss) per books. 2 Income included on Schedule K, lines 1, 2, 3c, 5, 6a, "
+                        "7, 8, 9a, 10, and 11, not recorded on books this year (itemize). 3 Guaranteed payments "
+                        "(other than health insurance). 4 Expenses recorded on books this year not included on "
+                        "Schedule K, lines 1 through 13e, and 21 (itemize): a Depreciation, b Travel and "
+                        "entertainment. 5 Add lines 1 through 4. 6 Income recorded on books this year not "
+                        "included on Schedule K, lines 1 through 11 (itemize): a Tax-exempt interest. "
+                        "7 Deductions included on Schedule K, lines 1 through 13e, and 21, not charged against "
+                        "book income this year (itemize): a Depreciation. 8 Add lines 6 and 7. 9 Income (loss) "
+                        "(Analysis of Net Income (Loss) per Return, line 1). Subtract line 8 from line 5."
+                    ),
+                    "summary_text": "M-1: 5 = Σ(1-4); 8 = Σ(6-7); 9 = 5 − 8 = Analysis line 1. Face sublines "
+                                    "4a/4b, 6a, 7a (tts adds 4c/7b catch-alls).",
+                    "is_key_excerpt": True,
+                }),
+    ("IRS_2025_F1065", {
+                    "excerpt_label": "Schedule M-2 lines 1-9 (verbatim, f1065 2025 p.6)",
+                    "location_reference": "f1065 (2025) page 6, Schedule M-2",
+                    "excerpt_text": (
+                        "Schedule M-2 Analysis of Partners' Capital Accounts. 1 Balance at beginning of year. "
+                        "2 Capital contributed: a Cash, b Property. 3 Net income (loss) (see instructions). "
+                        "4 Other increases (itemize). 5 Add lines 1 through 4. 6 Distributions: a Cash, "
+                        "b Property. 7 Other decreases (itemize). 8 Add lines 6 and 7. 9 Balance at end of "
+                        "year. Subtract line 8 from line 5."
+                    ),
+                    "summary_text": "M-2 (tax basis): 5 = Σ(1-4); 8 = Σ(6-7); 9 = 5 − 8 = ending capital. Line 3 "
+                                    "'(see instructions)' = Analysis line 1 = M-1 line 9 (per return).",
+                    "is_key_excerpt": True,
+                }),
+    # Re-homed 2026-08-25 (campaign A3/D-42): IRS_2025_I1065 is DECLARED by load_1065_schedule_k.py.
+    # This spec still contributes these excerpts; it no longer rewrites the row.
+    ("IRS_2025_I1065", {
+                    "excerpt_label": "Schedule B Q4 — small-partnership exemption (verbatim)",
+                    "location_reference": "i1065 (2025), Schedule B question 4",
+                    "excerpt_text": (
+                        "Does the partnership satisfy all four of the following conditions? (a) The "
+                        "partnership's total receipts for the tax year were less than $250,000. (b) The "
+                        "partnership's total assets at the end of the tax year were less than $1 million. "
+                        "(c) Schedules K-1 are filed with the return and furnished to the partners on or before "
+                        "the due date (including extensions) for the partnership return. (d) The partnership is "
+                        "not filing and is not required to file Schedule M-3. If 'Yes,' the partnership is not "
+                        "required to complete Schedules L, M-1, and M-2; item F on page 1 of Form 1065; or item "
+                        "L on Schedule K-1."
+                    ),
+                    "summary_text": "Q4 all-four (receipts < $250k AND assets < $1M AND timely K-1s AND not-M-3) "
+                                    "→ Schedules L, M-1, M-2, item F, K-1 item L NOT required. Gating fact.",
                     "is_key_excerpt": True,
                 }),
 ]

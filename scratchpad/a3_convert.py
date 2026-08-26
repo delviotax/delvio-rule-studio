@@ -38,33 +38,31 @@ SNAP = os.path.join(os.path.dirname(os.path.abspath(__file__)), "a3_contribution
 
 # (loser module basename, source_code, owner label) — from a3_feasible.py, generated not typed.
 CONVERSIONS = [
-    # ── A3-ii, 2026-08-25 — the 16 the objective criteria could not decide.
+    # ── D-45, 2026-08-25 — the final nine. Ken: "finish the remaining nine".
     #
-    # ⭐ THEY RESOLVE ON ONE PRINCIPLE, NOT SIXTEEN RULINGS:
-    #    A SOURCE ROW DESCRIBES A DOCUMENT. The consumer's SLICE of that document
-    #    belongs in its EXCERPT, which is per-consumer by design. Every one of these
-    #    disagreements is a writer having put its own slice into the shared row -
-    #    IRC §168's citation varying by which subsections a loader cites, Form 1065's
-    #    title varying by which schedule it cares about. The writer whose title and
-    #    citation describe the WHOLE DOCUMENT owns it; the slice-writers reference it
-    #    and keep their slice where it always belonged.
-    #
-    # ⭐ AND ONE STRUCTURAL CALL settles six of them: specs/_1120s_sources.py and
-    #    sources/load_1120s_family.py are two halves of one intent. The sources app
-    #    runs in seed_all PHASE 1, before every specs loader - which is the dependency
-    #    order the whole library already uses. The sources side owns.
-    ("load_1040_spine.py", "IRC_1", "federal_data/irc_sections.py"),
-    ("load_1040_sch123.py", "IRC_62", "federal_data/irc_sections.py"),
-    ("load_sch_1a.py", "IRC_163", "federal_data/irc_sections.py"),
-    ("load_1120_spine.py", "IRC_163J", "specs/load_8990.py"),
-    ("load_8814.py", "IRC_1G", "specs/load_1040_form_8615.py"),
-    ("load_4797.py", "IRC_168", "sources/load_1120s_family.py"),
-    ("load_1040_schedule_d.py", "IRS_2025_8949_INSTR", "sources/load_1120s_family.py"),
-    ("load_4797.py", "IRS_PUB_544", "specs/load_8824.py"),
-    ("load_1065_schedule_k1.py", "IRC_707C", "specs/load_1065_schedule_k.py"),
-    ("load_1065_se.py", "IRC_707C", "specs/load_1065_schedule_k.py"),
-    ("load_1120_schl.py", "IRS_2025_F1120", "specs/load_1120_spine.py"),
-    ("load_1120_schl.py", "IRS_2025_I1120", "specs/load_1120_spine.py"),
+    # GROUP 1 (6) — the structural call from D-44 applied. sources/load_1120s_family.py
+    #   runs in seed_all PHASE 1 and owns; specs/_1120s_sources.py references. Its
+    #   reference list is spelled EXISTING_SOURCE_CODES, and it had no excerpt-rehoming
+    #   mechanism at all until this pass added one.
+    ("_1120s_sources.py", "IRC_1222", "sources/load_1120s_family.py"),
+    ("_1120s_sources.py", "IRC_168", "sources/load_1120s_family.py"),
+    ("_1120s_sources.py", "IRC_179", "sources/load_1120s_family.py"),
+    ("_1120s_sources.py", "IRS_2025_1120S_SCHD_INSTR", "sources/load_1120s_family.py"),
+    ("_1120s_sources.py", "IRS_2025_4562_INSTR", "sources/load_1120s_family.py"),
+    ("_1120s_sources.py", "IRS_2025_8949_INSTR", "sources/load_1120s_family.py"),
+
+    # GROUP 2 (2) — Form 1065 and its instructions. Three writers, each titling the
+    #   document by ITS OWN schedule. load_1065_schedule_k.py owns (page 1 + Schedule K,
+    #   the core return) and its row is RE-TITLED to document level in the same pass.
+    ("load_1065_l_b.py", "IRS_2025_F1065", "specs/load_1065_schedule_k.py"),
+    ("load_1065_m1_m2.py", "IRS_2025_F1065", "specs/load_1065_schedule_k.py"),
+    ("load_1065_l_b.py", "IRS_2025_I1065", "specs/load_1065_schedule_k.py"),
+    ("load_1065_m1_m2.py", "IRS_2025_I1065", "specs/load_1065_schedule_k.py"),
+
+    # GROUP 3 (1) — Code of Ala. Title 40 Chapter 18. Two writers, each titling the
+    #   chapter by ITS OWN section-set. load_al_form20c.py owns and is re-titled to the
+    #   chapter.
+    ("load_al_passthrough.py", "AL_CODE_40_18", "specs/load_al_form20c.py"),
 ]
 
 
@@ -94,7 +92,7 @@ def contribution(path):
             tgt, val = node.targets[0].id, node.value
         elif isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
             tgt, val = node.target.id, node.value
-        if tgt == "EXISTING_SOURCES_TO_REFERENCE" and val is not None:
+        if tgt in ("EXISTING_SOURCES_TO_REFERENCE", "EXISTING_SOURCE_CODES") and val is not None:
             for e in getattr(val, "elts", []):
                 if isinstance(e, ast.Constant):
                     out.setdefault(e.value, [])
@@ -157,7 +155,13 @@ def convert_one(path, code, owner):
     topics = [t.value for t in getattr(d.get("topics"), "elts", []) or []
               if isinstance(t, ast.Constant)]
 
-    ref_list = _find_list(tree, "EXISTING_SOURCES_TO_REFERENCE")
+    # ⚠ _1120s_sources.py spells its reference list EXISTING_SOURCE_CODES. A converter
+    #   that knows only one spelling would report "module lacks the target list" and the
+    #   six codes there would look unconvertible when they are not.
+    ref_name = ("EXISTING_SOURCES_TO_REFERENCE"
+                if _find_list(tree, "EXISTING_SOURCES_TO_REFERENCE") is not None
+                else "EXISTING_SOURCE_CODES")
+    ref_list = _find_list(tree, ref_name)
     exc_list = _find_list(tree, "NEW_EXCERPTS_ON_EXISTING")
     if ref_list is None or (excerpt_src and exc_list is None):
         return {"code": code, "status": "BLOCKED — module lacks the target list(s)"}

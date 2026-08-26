@@ -92,9 +92,8 @@ POPULATION_NAMES = ("specs", "sources", "federal_data")
 MATERIAL_FIELDS = ("source_type", "source_rank", "title", "citation", "issuer", "official_url")
 
 # ---------------------------------------------------------------------------
-# ACKNOWLEDGED collisions — the remaining worklist. Campaign A3 (D-42/D-44) ratified
-# ownership on 44 of the original 53 over 2026-08-25. NINE remain, in THREE groups, each
-# with a stated remedy — see delvio-states STATUS. Entries LEAVE this list as Ken rules. Regenerated with
+# ACKNOWLEDGED collisions — NONE. Campaign A3 resolved all 53 over 2026-08-25
+# (D-42 / D-44 / D-45). Regenerated with
 # `python manage.py check_authority_owners --regenerate-acknowledged`, never typed.
 #
 # ⚠ Each entry is a KNOWN defect awaiting an ownership ruling from Ken, NOT an
@@ -112,18 +111,17 @@ MATERIAL_FIELDS = ("source_type", "source_rank", "title", "citation", "issuer", 
 #     while its unseen third writer disagreed on six fields.
 # ---------------------------------------------------------------------------
 ACKNOWLEDGED: dict[str, tuple[tuple[str, ...], str]] = {
-    # --- writers DISAGREE: live last-writer-wins rows (4) ---
-    "AL_CODE_40_18":             (('specs/load_al_form20c.py', 'specs/load_al_passthrough.py'), 'differs: title,citation'),
-    "IRC_168":                   (('sources/load_1120s_family.py', 'specs/_1120s_sources.py'), 'differs: title'),
-    "IRS_2025_F1065":            (('specs/load_1065_l_b.py', 'specs/load_1065_m1_m2.py', 'specs/load_1065_schedule_k.py'), 'differs: title,citation'),
-    "IRS_2025_I1065":            (('specs/load_1065_l_b.py', 'specs/load_1065_m1_m2.py', 'specs/load_1065_schedule_k.py'), 'differs: title,citation'),
-
-    # --- writers AGREE today: benign, but still two writers (5) ---
-    "IRC_1222":                  (('sources/load_1120s_family.py', 'specs/_1120s_sources.py'), 'identical today'),
-    "IRC_179":                   (('sources/load_1120s_family.py', 'specs/_1120s_sources.py'), 'identical today'),
-    "IRS_2025_1120S_SCHD_INSTR": (('sources/load_1120s_family.py', 'specs/_1120s_sources.py'), 'identical today'),
-    "IRS_2025_4562_INSTR":       (('sources/load_1120s_family.py', 'specs/_1120s_sources.py'), 'identical today'),
-    "IRS_2025_8949_INSTR":       (('sources/load_1120s_family.py', 'specs/_1120s_sources.py'), 'identical today'),
+    # ⭐⭐ EMPTY, 2026-08-25. It began the day at 23 entries describing 41% of the problem,
+    #    grew to 53 when the guard's SCOPE was fixed (A1/D-40), and reached ZERO when Ken
+    #    ruled the ownership through (A3, D-42/D-44/D-45). EVERY collision in the library
+    #    is resolved: one module DECLARES each authority row, every other REFERENCES it.
+    #
+    # ⚠ The guard now REFUSES every collision, because there is no longer a pre-existing
+    #    population to tolerate. That is the state this list was always meant to reach —
+    #    it is a worklist, and a worklist that never empties is a backlog.
+    #
+    # ⚠ Do NOT add an entry to make a seed pass. There is nothing to grandfather now:
+    #    a collision here is new, and new collisions get FIXED (D-29), not acknowledged.
 }
 
 
