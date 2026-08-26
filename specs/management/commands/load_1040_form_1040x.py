@@ -290,12 +290,33 @@ X_FACTS: list[dict] = [
      "notes": "Line 1 NOL carryback. v1 RED-defers (D_1040X_001) — carryback claims are out of the common-case scope (Form 1045 territory)."},
     {"fact_key": "x_has_gbc_carryback", "label": "Amendment includes a general business credit carryback", "data_type": "boolean", "default_value": "false", "sort_order": 11,
      "notes": "Line 7 general-business-credit carryback. v1 RED-defers (D_1040X_002)."},
-    {"fact_key": "x_is_superseding", "label": "This is a superseding return (filed before the due date)", "data_type": "boolean", "default_value": "false", "sort_order": 12,
-     "notes": "A superseding return (filed before the original due date) is NOT a 1040-X — different mechanics. v1 RED-defers (D_1040X_003)."},
+    # ⚠⚠ x_is_superseding REMOVED 2026-08-25 (Ken, campaign D-46). It asked the preparer to
+    #    assert a CONCLUSION — D_1040X_003's condition literally read "the return is MARKED AS
+    #    superseding", which is the preparer-assertion language exactly. Whether a filing
+    #    supersedes is a matter of DATES, not discretion: a superseding return is one filed on
+    #    or before the due date INCLUDING EXTENSIONS. R-1040X-SUPERSED now derives it.
+    #    Deleted from prod via X_RETIRE_FACT_KEYS.
+    #    ⚠ The derivation needs the due date, and half of that is whether an extension was
+    #    filed — which is a REAL fact about the taxpayer, not a conclusion. It goes in here,
+    #    in the same amendment, because a derivation running without its inputs is the defect
+    #    family this campaign spent 2026-08-25 documenting.
+    {"fact_key": "x_extension_filed", "label": "Form 4868 extension filed for the amendment year", "data_type": "boolean", "default_value": "false", "sort_order": 12,
+     "notes": "Return-level, per amendment year. A genuine fact about the taxpayer: was an automatic extension obtained? It moves the due date, which is half the superseding test (R-1040X-SUPERSED). NOT a conclusion — nothing in the return determines it."},
     {"fact_key": "x_has_credit_cascade", "label": "Change re-adjudicates other credits (PTC/EIC/CTC cascade)", "data_type": "boolean", "default_value": "false", "sort_order": 13,
      "notes": "When a change forces re-running Form 8962 PTC reconciliation, a fresh EIC qualification, or a multi-form recompute chain beyond the common set. v1 RED-defers (D_1040X_008); the common case recomputes tax + refund/owe from the changed lines without re-adjudicating other-credit eligibility (W4)."},
-    {"fact_key": "x_baseline_captured", "label": "As-filed baseline snapshot exists (Column A source)", "data_type": "boolean", "default_value": "false", "sort_order": 14,
-     "notes": "True when a frozen as-filed baseline of the original return has been captured (tts AsFiledBaseline). Column A cannot be populated without it — D_1040X_005 (W1)."},
+    # ⚠⚠ x_baseline_captured REMOVED 2026-08-25 (Ken, campaign D-46), and NOTHING replaces it.
+    #    It asked the preparer to tick whether an `AsFiledBaseline` record EXISTS — which the
+    #    software knows: capture_as_filed_baseline runs on the transition to filed, and the
+    #    amendment lane's resolver already proves the baseline is there before it writes
+    #    (confirmed by the delvio-tax session, 2026-08-25). A tick was always a SHADOW of a
+    #    fact the code owns.
+    #    ⭐ Unlike every other removal in this campaign, no facts go in with it: the answer is
+    #    not in the return's data at all, so there is no derivation input to supply. The
+    #    diagnostic reads the system state directly.
+    #    ⚠⚠ THE FAILURE WAS ASYMMETRIC, which is what made this worth fixing: leaving it at its
+    #    `false` default produces a RED (safe), but ticking it WRONGLY populates Column A from
+    #    a baseline that does not exist. A preparer cannot verify it and should not be asked.
+    #    Deleted from prod via X_RETIRE_FACT_KEYS.
 ]
 
 
@@ -308,8 +329,14 @@ X_FACTS: list[dict] = [
 X_RULES: list[dict] = [
     {"rule_id": "R-1040X-COLA", "title": "Column A ← the as-filed baseline snapshot", "rule_type": "calculation", "precedence": 1, "sort_order": 1,
      "formula": "For every A/B/C line N, column A (N-A) = the value of the corresponding 1040 line in the FROZEN as-filed baseline snapshot of the original return (captured at 'mark as filed'). If the baseline is missing, D_1040X_005 fires and column A cannot be computed.",
-     "inputs": ["x_baseline_captured"], "outputs": ["1A", "2A", "3A", "5A", "6A", "7A", "8A", "10A", "11A", "12A", "13A", "14A", "15A"],
-     "description": "Column A is the original/as-filed amount — a frozen snapshot, never the live current return (snapshot-copy; W1)."},
+     "inputs": [], "outputs": ["1A", "2A", "3A", "5A", "6A", "7A", "8A", "10A", "11A", "12A", "13A", "14A", "15A"],
+     "description": ("Column A is the original/as-filed amount — a frozen snapshot, never the live current "
+                     "return (snapshot-copy; W1). ⚠⚠ 2026-08-25 (D-46): this rule used to take "
+                     "x_baseline_captured as an input — a PREPARER TICK asserting that the snapshot it "
+                     "reads from exists. ⭐ It reads the snapshot; if the snapshot is absent the read "
+                     "fails and D_1040X_005 fires on the SYSTEM STATE. Asking the preparer to promise the "
+                     "data is there, and then reading it anyway, protected nothing: a wrong tick populated "
+                     "Column A from a baseline that does not exist.")},
     {"rule_id": "R-1040X-COLC", "title": "Column C ← the amended (corrected) 1040", "rule_type": "calculation", "precedence": 2, "sort_order": 2,
      "formula": "For every A/B/C line N, column C (N-C) = the corresponding line of the amended (corrected) 1040: 1C←1040 AGI (line 11); 2C←1040 deduction (line 12); 4a-C←1040 QBI (line 13); 4b-C←1040 Sch 1-A deductions (line 13b); 5C←1040 taxable income (line 15); 6C←1040 tax (line 16+Sch 2 lines per the 1040-X mapping); 7C←nonrefundable credits; 10C←other taxes; 12C←withholding; 13C←estimated; 14C←EIC; 15C←refundable credits.",
      "inputs": [], "outputs": ["1C", "2C", "4aC", "4bC", "5C", "6C", "7C", "10C", "12C", "13C", "14C", "15C"],
@@ -342,9 +369,24 @@ X_RULES: list[dict] = [
     {"rule_id": "R-1040X-L21-OVERPAY", "title": "Line 21 — overpayment on this return (if line 11 col C < line 19)", "rule_type": "calculation", "precedence": 11, "sort_order": 11,
      "formula": "If line 11 column C < line 19: line 21 = line 19 − line 11-C. Else line 21 = 0. Line 21 = line 22 (refunded to you) + line 23 (applied to next year's estimated tax).",
      "inputs": [], "outputs": ["21"], "description": "Additional refund from the amendment, split between refund (22) and applied-forward (23) (W3)."},
+    {"rule_id": "R-1040X-SUPERSED", "title": "Superseding vs amending is DERIVED from dates", "rule_type": "calculation",
+     "precedence": 2, "sort_order": 11.5,
+     "formula": ("superseding = this filing is made ON OR BEFORE the due date for x_amendment_year, "
+                 "including the automatic extension when x_extension_filed; otherwise it is an "
+                 "AMENDMENT and Form 1040-X is the right instrument"),
+     "inputs": ["x_amendment_year", "x_extension_filed"], "outputs": ["x_is_superseding_derived"],
+     "description": ("⚠⚠ ADDED 2026-08-25 (Ken, campaign D-46), replacing the preparer box "
+                     "x_is_superseding. § 24-style discretion does not exist here either: whether a "
+                     "filing supersedes is a matter of DATES. ⭐ The filing date itself is SYSTEM "
+                     "state, not a fact — at preparation time the engine compares the intended or "
+                     "current date against the due date it derives from the amendment year and the "
+                     "extension. ⚠ The preparer supplies only x_extension_filed, which is a real "
+                     "fact about the taxpayer and is determined by nothing in the return. "
+                     "⚠ SCOPE: this rule DETERMINES which instrument applies; it does not compute a "
+                     "superseding return, which stays out of v1 scope and RED-defers via D_1040X_003.")},
     {"rule_id": "R-1040X-DEFER", "title": "RED-defer boundaries (no silent gap)", "rule_type": "validation", "precedence": 2, "sort_order": 12,
      "formula": "NOL carryback (D_1040X_001), general-business-credit carryback (D_1040X_002), superseding return (D_1040X_003), and other-credit cascades / PTC-EIC re-adjudication (D_1040X_008) are OUT of the v1 common case and each fire a RED 'prepare manually'. A missing as-filed baseline (D_1040X_005) blocks column A. A blank Part II explanation (D_1040X_004) errors.",
-     "inputs": ["x_has_nol_carryback", "x_has_gbc_carryback", "x_is_superseding", "x_has_credit_cascade", "x_baseline_captured", "x_explanation_of_changes"], "outputs": [],
+     "inputs": ["x_has_nol_carryback", "x_has_gbc_carryback", "x_is_superseding_derived", "x_has_credit_cascade", "x_explanation_of_changes"], "outputs": [],
      "description": "v1 boundaries — every unsupported path is a RED, never a wrong number computed quietly (W4)."},
 ]
 
@@ -415,7 +457,7 @@ X_DIAGNOSTICS: list[dict] = [
      "message": "Not supported — prepare manually: a general business credit carryback on Form 1040-X line 7 is not computed in this version.",
      "notes": "RED — GBC carrybacks are out of the v1 common case (W4)."},
     {"diagnostic_id": "D_1040X_003", "title": "Superseding return — not a 1040-X", "severity": "error",
-     "condition": "the return is marked as superseding (x_is_superseding)",
+     "condition": "the filing is DERIVED as superseding (R-1040X-SUPERSED: on or before the due date for x_amendment_year, extension included)",
      "message": "Not supported — prepare manually: a superseding return (filed before the original due date) is not a Form 1040-X and uses different mechanics. File a corrected original return instead.",
      "notes": "RED — superseding returns are out of scope (W4)."},
     {"diagnostic_id": "D_1040X_004", "title": "Explanation of changes (Part II) is required", "severity": "error",
@@ -423,7 +465,7 @@ X_DIAGNOSTICS: list[dict] = [
      "message": "Form 1040-X requires a Part II explanation of changes. Enter the reason for each change before filing.",
      "notes": "RED — Part II is mandatory on every 1040-X (W6)."},
     {"diagnostic_id": "D_1040X_005", "title": "No as-filed baseline — column A cannot be populated", "severity": "error",
-     "condition": "no frozen as-filed baseline snapshot exists for the original return (NOT x_baseline_captured)",
+     "condition": "no frozen as-filed baseline snapshot exists for the original return (SYSTEM STATE - the engine queries it; there is no preparer fact)",
      "message": "Not supported — prepare manually: this return has no captured as-filed baseline, so Form 1040-X column A (the original amounts) cannot be populated. Mark the original return as filed (capturing its baseline) first.",
      "notes": "RED — column A requires a frozen baseline (W1)."},
     {"diagnostic_id": "D_1040X_006", "title": "Attach the corrected 1040", "severity": "info",
@@ -557,6 +599,23 @@ class Command(BaseCommand):
         "leg is built only after approval."
     )
 
+    # ⚠⚠ Facts REMOVED as preparer inputs 2026-08-25 (Ken, campaign D-46). `_upsert_facts`
+    #    uses update_or_create and never deletes, so dropping a fact from X_FACTS leaves it
+    #    LIVE IN PRODUCTION. The removal has to be explicit, the way every other retirement
+    #    in this library is.
+    X_RETIRE_FACT_KEYS = ("x_is_superseding", "x_baseline_captured")
+
+    def _retire_derived_input_facts(self, form):
+        n, _ = FormFact.objects.filter(
+            tax_form=form, fact_key__in=self.X_RETIRE_FACT_KEYS,
+        ).delete()
+        if n:
+            self.stdout.write(self.style.WARNING(
+                f"  retired derived-input facts: {n} "
+                "(x_is_superseding -> R-1040X-SUPERSED derives it from dates; "
+                "x_baseline_captured -> system state, no preparer fact; Ken 2026-08-25)"
+            ))
+
     @transaction.atomic
     def handle(self, *args, **opts):
         self._guard_against_hollow_seed()
@@ -568,6 +627,7 @@ class Command(BaseCommand):
         self._load_new_excerpts_on_existing(sources)
         for spec in FORMS:
             form = self._upsert_form(spec["identity"])
+            self._retire_derived_input_facts(form)
             self._upsert_facts(form, spec["facts"])
             rules = self._upsert_rules(form, spec["rules"])
             self._upsert_authority_links(rules, sources, spec["rule_links"])
