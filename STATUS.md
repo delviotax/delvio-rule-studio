@@ -1,7 +1,7 @@
 ---
 type: project-status
 project: delvio-rule-studio
-last_updated: 2026-08-25
+last_updated: 2026-08-26
 ---
 
 # STATUS — delvio-rule-studio (renamed from sherpa-tax-rule-studio 2026-08-05; GitHub + local folder renamed, Render service name unchanged — see render.yaml note)
@@ -11,6 +11,68 @@ last_updated: 2026-08-25
 ---
 
 ## Current state
+
+### ✅ 2026-08-26 — THE CLERGY FEED IS WIRED, THE EXEMPTION PREDICATE IS FIXED, AND THE GA RIE SPLIT IS SPECIFIED (Ken, Gate-1 direct)
+
+Ken, unmediated, in the delvio-states session: **S-1 *"Yes — seed both, four parked"*** ·
+**S-8 *"Write it into `R-GA500-RIE`"***. Commit `79dc8d5`. **Suite 243 passed / 0 failed**, authority
+guard **0 collisions / 0 NEW**, enum ratchet at baseline, `seed_all --dry-run` clean, exports **200**
+(`SCHEDULE_SE`, `MINISTER`, `500`).
+
+⭐⭐ **`R-SE-L2` NOW READS `min_se_line2` — AND THE THING TO REMEMBER IS HOW LONG IT DIDN'T.**
+`MINISTER`/`R-MIN-SE` has produced that fact since **2026-06-16**, labelled *"clergy net ministerial
+earnings → Schedule SE line 2"*, seeded, Ken-approved — **and no loader read it.** `R-SE-L2`'s
+inputs were `["se_proprietor"]`.
+🔴 **`FA-1040-MIN-03` had been asserting `MINISTER.9 → SCH_SE.2` the entire time**, and the app runs
+and re-pins it. **The assertion and the engine agreed; only the rule's formula lagged** — which is
+exactly why nothing ever failed. ⚠⚠ **A flow assertion that names a destination does not verify that
+the destination reads it.** That is a new member of the D-36 family: not a test that cannot detect a
+change, but **a test that asserts a connection it never checks the far end of.**
+
+🔴🔴 **THE EXEMPTION-PREDICATE DEFECT, and its direction is the whole point.** `R-SE-OPTIONAL` keyed
+its clergy trigger on `se_minister_4361` — the **exemption**. So it fired on the 4361-**exempt**
+minister, the case where the exclusion only ever *reduces* tax, and was **silent** on the minister
+who never filed 4361, whose line 2 then omitted wages, housing allowance and parsonage.
+⚠ `i1040sse` (2025) closes the other escape route in as many words — *"Income from services you
+perform as a minister, member of a religious order, or Christian Science practitioner isn't church
+employee income"* — so the line-5a predicate could not catch him either. **He tripped NEITHER.**
+⭐⭐ **AN AFFIRMATIVE PREDICATE DEGRADES TO "NOT COMPUTED AND VISIBLE"; AN EXEMPTION-KEYED ONE
+DEGRADES TO "COMPUTED WRONGLY AND INVISIBLE."** Reuse that when writing the next guard.
+✅ **It was a SPEC defect only.** The shipped engine already gated affirmatively (per-W-2
+`is_minister`; the 4361 flag only zeroes — `compute_minister.py`, read directly 2026-08-26 after the
+freeze lifted). **No return was mis-taxed. This is a conformance fix**, and it was de-escalated on
+that basis rather than shipped as an emergency.
+
+✅ **New `R-SE-LINEA`** computes the Part I line-A checkbox from `min_4361_exempt` instead of taking
+it as a preparer box. ⭐ **Not optional tidying:** dropping the clergy RED without it would have left
+`se_minister_4361` a fact **read by nothing** — the very defect being fixed, recreated in the act of
+fixing it. It also removes a duplicate truth (two fields for "has an approved 4361") and honours
+D-43/D-46: a value a preparer cannot legitimately choose is not a field they can set.
+⚠ **Recorded, not smoothed over:** the face says *"$400 or more of other NET EARNINGS"*, `i1040sse`
+says *"other EARNINGS … SUBJECT TO SE tax"*, and *Who Must File* ties the $400 to line 4c. Line 4c is
+the reading used; the divergence is written into the rule.
+
+⚠ **PARKED, un-bundled, on Ken's explicit terms:** the §1402 13-item "other income" list — **which
+includes the Schedule 1 line 8z addend the ENGINE ALREADY SHIPS** — meals and lodging for the
+employer's convenience, Form 2031, and softening the statutory-employee RED. **The spec therefore
+still lags the engine by one addend, deliberately and on the record.** That is not an oversight and
+should not be "fixed" by a later session without a ruling.
+
+✅ **GA-500: `R-GA500-RIE` is vendor-aware.** It said *"split 50/50"* and **nothing else** — no
+granularity, no tie direction — so **two implementations printing different figures could both claim
+to conform.** ⭐ While the engine had one convention that was a tolerable omission; with the engine
+going per-vendor it becomes a **contradiction**. Now specified, **both branches conserving**: default
+(fresh returns + TaxWise imports) per RIE line, odd dollar to the **spouse** (s275); **Lacerte**
+imports per source row, largest-remainder, odd dollar to the **taxpayer**. New system-derived
+`g_rie_split_convention` — **explicitly not a preparer field** (the `x_is_superseding` precedent).
+W5's split half is closed; the rest still says CONFIRM. The engine build is delvio-tax's.
+
+🔴 **PRE-EXISTING, NOT MINE, AND NOW PROVEN:** `check_ga500_integrity.py` fails **4** Schedule 3
+scenarios — it computes the proration ratio at **full precision** while the scenarios encode the
+**D-36 printed-percentage** convention (the loader's own note says that scenario exists *to* fail the
+superseded reading). ⚠ **Proved by running the same gate in a throwaway worktree at HEAD — identical
+four failures**, rather than asserting it from the diff. **It is not in pytest, so the 243/0 green
+never covered it.** Staged for a ruling; not touched.
 
 ### ✅ 2026-08-25 — AL_FORM_40NR: the age-65 exclusion is WIRED INTO COLUMN B and SEEDED (Ken's direct word)
 
