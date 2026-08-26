@@ -176,6 +176,19 @@ def recompute(inp):
         else:
             ratio = c_agi / a_agi
         ratio = max(Decimal(0), min(Decimal(1), ratio))
+        # THE PRINTED-PERCENTAGE CONVENTION (campaign D-36, Ken-ruled 2026-08-23):
+        # "Where a state form PRINTS a percentage, the PRINTED percentage is what
+        # multiplies — never the full-precision ratio." Schedule 3 line 9 prints a
+        # percentage at TWO decimals, which is a FOUR-decimal ratio. R-GA500-S3 has
+        # said round(..., 4) since D-36; this gate was left on the superseded
+        # full-precision reading and has been failing 4 scenarios ever since —
+        # unnoticed, because it is not in pytest. Fixed 2026-08-26.
+        # Georgia's own printed arithmetic (IT-511 p.27, the loader's GA500-T0):
+        #   39,093 / 49,500 = 0.7897575758 -> PRINTED 78.98% -> x 16,000
+        #   = 12,636.80 -> 12,637, the booklet's own line 13.
+        # Full precision gives 12,636 — the wrong answer, and the reason that
+        # scenario exists.
+        ratio = ratio.quantize(Decimal("0.0001"), rounding=ROUND_HALF_UP)
         out["S3-9"] = ratio
         ded = ind_std(year, fs)  # scenarios use the standard deduction for the PY/NR path
         out["S3-10"] = ded
