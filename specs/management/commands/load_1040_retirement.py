@@ -1395,6 +1395,20 @@ F5329_FACTS: list[dict] = [
      "data_type": "decimal", "default_value": "0", "sort_order": 54, "notes": "Preparer."},
     {"fact_key": "f5329_line53b_dist_other", "label": "5329 line 53b: 2025 amount distributed from the other plans",
      "data_type": "decimal", "default_value": "0", "sort_order": 55, "notes": "Preparer."},
+    # ⚠⚠ REASONABLE-CAUSE WAIVER, added 2026-08-26 on Ken's direct Gate-1 approval.
+    #    These carry a SHORTFALL, not tax. The MeF schema says so in its own words —
+    #    waiveTaxOnExAccumQRPStmtAmt is "the distribution shortfall for which a waiver is
+    #    requested ('RC' amount), EXCLUDING ANY TAX CALCULATION" — and naming it explicitly
+    #    is the whole point, because the i5329 wording invites exactly the opposite reading.
+    {"fact_key": "f5329_rc_waiver_window", "label": "5329 line 54a: shortfall waived for reasonable cause (RC)",
+     "data_type": "decimal", "default_value": "0", "sort_order": 56,
+     "notes": ("Preparer. ⚠ A SHORTFALL, not a tax — it is subtracted from (52a - 53a) BEFORE the 10% "
+               "rate. Entered on the form as 'RC' plus the amount in parentheses on the dotted line "
+               "next to 54a. ⚠ A statement of explanation is REQUIRED and is not a compute fact.")},
+    {"fact_key": "f5329_rc_waiver_other", "label": "5329 line 54b: shortfall waived for reasonable cause (RC)",
+     "data_type": "decimal", "default_value": "0", "sort_order": 57,
+     "notes": ("Preparer. ⚠ A SHORTFALL, not a tax — subtracted from (52b - 53b) BEFORE the 25% rate. "
+               "Same 'RC' dotted-line convention next to 54b; same required explanation statement.")},
 ]
 
 F5329_RULES: list[dict] = [
@@ -1487,12 +1501,29 @@ F5329_RULES: list[dict] = [
     # ── Part IX — Excess accumulation / missed RMD (SECURE 2.0 10%/25%) ──
     {"rule_id": "R-5329-11", "title": "Part IX lines 54a/54b/55 (excess accumulation additional tax)",
      "rule_type": "calculation", "precedence": 11, "sort_order": 11,
-     "formula": ("L54a = 0.10 x max(0, L52a - L53a); L54b = 0.25 x max(0, L52b - L53b); L55 = L54a + L54b."),
+     "formula": ("L54a = 0.10 x max(0, L52a - L53a - f5329_rc_waiver_window); "
+                 "L54b = 0.25 x max(0, L52b - L53b - f5329_rc_waiver_other); L55 = L54a + L54b."),
      "inputs": ["f5329_line52a_rmd_window", "f5329_line53a_dist_window",
-                "f5329_line52b_rmd_other", "f5329_line53b_dist_other"],
+                "f5329_line52b_rmd_other", "f5329_line53b_dist_other",
+                "f5329_rc_waiver_window", "f5329_rc_waiver_other"],
      "outputs": ["L54a", "L54b", "L55"],
      "description": ("ONCE PER RETURN. Form 5329 Part IX verbatim. SECURE 2.0 §302: 10% for shortfalls fully "
-                     "corrected in the window (54a), 25% otherwise (54b). The window determination is preparer-asserted.")},
+                     "corrected in the window (54a), 25% otherwise (54b). The window determination is "
+                     "preparer-asserted. "
+                     "⚠⚠ REASONABLE-CAUSE WAIVER ADDED 2026-08-26 (Ken, Gate-1 direct). The waived "
+                     "amount is a SHORTFALL and is subtracted BEFORE the rate, so the line reports tax on the "
+                     "un-waived remainder. max(0, ...) must stay: a waiver exceeding the shortfall floors at "
+                     "zero, it does not create a refund. "
+                     "⚠⚠ READ THIS BEFORE TRUSTING THE INSTRUCTIONS. i5329 (2025) p.10 says to "
+                     "'subtract this amount from the total shortfall ... and enter the RESULT on line(s) 54a' "
+                     "— which describes a line holding a SHORTFALL. The 2025 FACE does not: 54a reads "
+                     "'Subtract line 53a from line 52a and MULTIPLY THE RESULT BY 10%'. The instruction is "
+                     "stale against its own form, carried over from the pre-SECURE-2.0 layout, and followed "
+                     "literally it understates the tax by a factor of 4-10. "
+                     "⭐ THE FACE GOVERNS WHAT THE LINE HOLDS — campaign D-32 applied to a federal "
+                     "form: an authority may outrank a form on the law without outranking it on what the form "
+                     "must show. Full three-authority verification: delvio-states "
+                     "research/f5329_part9_waiver_verification.md.")},
 
     # ── All-parts aggregate -> Schedule 2 line 8 ──
     {"rule_id": "R-5329-12", "title": "Schedule 2 line 8 = sum of all parts' additional taxes",
@@ -1739,6 +1770,18 @@ F5329_RULE_LINKS: list[tuple[str, str, str, str]] = [
     ("R-5329-10", "IRS_2025_5329_FORM", "primary", "Part VIII lines 50-51 verbatim (ABLE excess 6%)"),
     ("R-5329-11", "IRS_2025_5329_FORM", "primary", "Part IX lines 52-55 verbatim (excess accumulation 10%/25%)"),
     ("R-5329-11", "IRS_2025_5329_INSTR", "secondary", "SECURE 2.0 §302 correction-window split (Notice 2023-...)"),
+    # ⚠⚠ THE WAIVER'S AUTHORITY TRAIL, 2026-08-26. Three authorities, and they do NOT all say the
+    #    same thing — the annotation is deliberately explicit so the next reader is not bitten.
+    ("R-5329-11", "IRS_2025_5329_FORM", "primary",
+     "Part IX 54a/54b FACE — 'Subtract line 53a from line 52a and MULTIPLY THE RESULT BY 10% (0.10)'. "
+     "The face is what governs WHAT THE LINE HOLDS: line 54 is TAX, line 55 merely sums."),
+    ("R-5329-11", "IRS_2025_5329_INSTR", "secondary",
+     "i5329 (2025) p.10 'Waiver of tax for reasonable cause' — the RC amount is the SHORTFALL waived, "
+     "entered in parentheses on the dotted line, and a statement of explanation is REQUIRED. "
+     "⚠⚠ STALE ON ONE POINT: it says to 'enter the RESULT on line(s) 54a', describing a line that "
+     "holds a shortfall. Its own 2025 face does not — pre-SECURE-2.0 carryover. Followed literally "
+     "it understates the tax by 4-10x. Verified 2026-08-26; see delvio-states "
+     "research/f5329_part9_waiver_verification.md."),
     ("R-5329-12", "IRS_2025_5329_FORM", "primary", "Each part's additional tax includes on Schedule 2 line 8"),
 ]
 
