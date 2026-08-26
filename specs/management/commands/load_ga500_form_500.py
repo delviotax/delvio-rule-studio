@@ -682,7 +682,21 @@ GA500_FACTS: list[dict] = [
                "so it must not be a box they can set. If the provenance is unknown the value is 'default' — the "
                "conservative branch, because it is the convention every non-imported return already uses. "
                "NEW 2026-08-26 (Ken, Gate-1 direct: \"Write it into R-GA500-RIE\") — the derivation needs this "
-               "input, the same reason x_extension_filed was added alongside its derivation.")},
+               "input, the same reason x_extension_filed was added alongside its derivation. "
+               "ENGINE MAPPING, recorded after the build shipped (delvio-tax a79f638a, deploy verified) so that a "
+               "future reader does not mistake a VOCABULARY difference for a DISAGREEMENT. The engine carries "
+               "TaxReturn.import_vendor, whose back-entry enum is CLOSED at ('taxwise', 'lacerte') with "
+               "omitted/blank allowed. Mapping: 'lacerte' -> 'lacerte'; 'taxwise' OR blank/omitted -> 'default'. "
+               "The engine distinguishes taxwise from unknown where this fact folds both into 'default' — "
+               "BEHAVIOURALLY IDENTICAL, because both take the spouse branch. "
+               "These are NOT duplicate facts and neither should be 'corrected' to match the other: the engine "
+               "field records PROVENANCE (which package produced the return); this fact records the CONVENTION "
+               "that provenance selects. Chasing the mismatch rather than smoothing it over is the D-43 addendum "
+               "lesson applied early — there, a mere spelling difference turned out to hide a duplicate fact. "
+               "Chased here; it is only vocabulary. "
+               "Engine derivation, for the record: explicit source.vendor > the Lacerte pdf_filename convention "
+               "(^(Partial Return for|Organizer Forms-)) > blank. entry_method was REFUTED as a discriminator, "
+               "being identical across vendors.")},
     # — RIE: taxpayer —
     {"fact_key": "g_tp_rie_applies", "label": "Taxpayer qualifies for the retirement income exclusion", "data_type": "boolean", "default_value": "false", "sort_order": 50, "notes": "Age 62-64, or 65+, or <62 and permanently disabled. DOB required (date of disability if disability)."},
     {"fact_key": "g_tp_age_65_plus", "label": "Taxpayer is age 65 or older (→ $65,000 cap)", "data_type": "boolean", "default_value": "false", "sort_order": 51, "notes": "Selects the $65,000 vs $35,000 maximum allowable exclusion (worksheet line 16)."},
