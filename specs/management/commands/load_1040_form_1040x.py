@@ -302,6 +302,18 @@ X_FACTS: list[dict] = [
     #    family this campaign spent 2026-08-25 documenting.
     {"fact_key": "x_extension_filed", "label": "Form 4868 extension filed for the amendment year", "data_type": "boolean", "default_value": "false", "sort_order": 12,
      "notes": "Return-level, per amendment year. A genuine fact about the taxpayer: was an automatic extension obtained? It moves the due date, which is half the superseding test (R-1040X-SUPERSED). NOT a conclusion — nothing in the return determines it."},
+    # ⚠ ADDED 2026-08-26 (delvio-states S-10). D-46 introduced x_is_superseding_derived as the
+    #   OUTPUT of R-1040X-SUPERSED and an INPUT of R-1040X-DEFER, and never declared it as a
+    #   fact — so check_1040x_integrity reported "references unknown fact" from 2026-08-25 on.
+    #   Nobody saw it: no check_*_integrity gate is in pytest. Exactly the same omission the same
+    #   campaign then repeated on R-SE-L2 / R-SE-LINEA the following day.
+    {"fact_key": "x_is_superseding_derived", "label": "Filing supersedes rather than amends (DERIVED)", "data_type": "boolean", "default_value": "false", "sort_order": 12.5,
+     "notes": ("COMPUTED by R-1040X-SUPERSED — NOT a preparer field. True when the filing is made on or "
+               "before the due date for x_amendment_year, extension included. ⭐ It is the surviving half of "
+               "the box D-46 removed: x_is_superseding asked the preparer to assert a conclusion about dates, "
+               "and Ken ruled that a value a preparer cannot legitimately choose must not be a field they can "
+               "set. Consumed by R-1040X-DEFER, which RED-defers the superseding path (D_1040X_003) because "
+               "computing a superseding return is out of v1 scope.")},
     {"fact_key": "x_has_credit_cascade", "label": "Change re-adjudicates other credits (PTC/EIC/CTC cascade)", "data_type": "boolean", "default_value": "false", "sort_order": 13,
      "notes": "When a change forces re-running Form 8962 PTC reconciliation, a fresh EIC qualification, or a multi-form recompute chain beyond the common set. v1 RED-defers (D_1040X_008); the common case recomputes tax + refund/owe from the changed lines without re-adjudicating other-credit eligibility (W4)."},
     # ⚠⚠ x_baseline_captured REMOVED 2026-08-25 (Ken, campaign D-46), and NOTHING replaces it.

@@ -66,6 +66,14 @@ def ind_salt(line5d, magi, fs, year):
 
 
 def ind_charitable(agi, cash, fmv, capgain, carryover_in, year):
+    # ⚠ 2026-08-26 (delvio-states S-10): the contribution base is max(0, AGI) -- §170(b)(1)(H),
+    #   STATED by the rule and pinned by scenario SCHA-T25, whose note names the historical
+    #   defect exactly: "negative bucket ceilings put -3,223 on line 14 with a phantom carryover
+    #   of contributions never made". This recompute still used raw AGI, so it reproduced the
+    #   DEFECT the spec had already fixed and reported the corrected spec as wrong. The GA500
+    #   shape: gate stale against a ratified fix, red for months, invisible because no
+    #   check_*_integrity gate is in pytest.
+    agi = max(0, agi)
     cash_lim = min(cash, IND_CHAR["cash"] * agi)
     fmv_lim = min(fmv, IND_CHAR["fifty"] * agi)
     capgain_lim = min(capgain, IND_CHAR["capgain"] * agi)
@@ -158,7 +166,15 @@ for s in m.SCHA_SCENARIOS:
         l5d = (inp.get("scha_salt_income_or_sales", 0) + inp.get("scha_real_estate_taxes", 0)
                + inp.get("scha_personal_property_taxes", 0))
         got["scha_line5e"] = ind_salt(l5d, inp.get("magi", 0), fs, year)
-    if "scha_line14" in exp or "scha_charitable_carryover_out" in exp:
+    # ⚠ 2026-08-26 (delvio-states S-10): this gate CRASHED with KeyError 2027 on scenario
+    #   SCHA-T26, which is deliberately keyed to TY2027 and is marked PROVISIONAL in the loader
+    #   ("requires_human_review; re-verify against Pub 526 (2026) when published"). The crash
+    #   exited non-zero and read, in an exit-code sweep, exactly like a failing check.
+    #   It is NOT skipped silently: an unverifiable year is announced, because a gate that
+    #   quietly passes what it cannot compute is the failure mode this whole item is about.
+    #   The 2027 charitable floor is deliberately NOT invented here -- asserting a tax constant
+    #   for an unpublished year is precisely what the scenario's own PROVISIONAL flag forbids.
+    if ("scha_line14" in exp or "scha_charitable_carryover_out" in exp)             and year in IND_CHAR["floor"]:
         l14, co = ind_charitable(
             inp.get("agi", 0), inp.get("scha_charitable_cash", 0),
             inp.get("scha_charitable_noncash_fmv", 0), inp.get("scha_charitable_capgain_50org", 0),

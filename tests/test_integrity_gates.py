@@ -41,6 +41,7 @@ GATES = [
     "check_simplified_method_integrity.py",  # stale PRE-FLIP guard -> provenance check
     "check_topic9_integrity.py",             # stale PRE-FLIP guard -> provenance check
     "check_k1_basis_704d_integrity.py",      # stale PRE-FLIP guard -> provenance check
+    "check_1065_se_integrity.py",            # gate blind to EXISTING_SOURCES_TO_REFERENCE (D-42 fallout)
 ]
 
 

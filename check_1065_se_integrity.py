@@ -137,7 +137,16 @@ for r in m.RULES:
     if r["rule_id"] not in linked_rule_ids:
         err(f"UNCITED rule (no RULE_LINKS entry): {r['rule_id']}")
 
-known_sources = {s["source_code"] for s in m.AUTHORITY_SOURCES}
+# A source this loader DECLARES, or one it REFERENCES because another module owns it.
+# ⚠ WIDENED 2026-08-26 (delvio-states S-10). This read AUTHORITY_SOURCES alone, so campaign
+#   A3/D-42 (2026-08-25) turned it red the day it re-homed IRC_1402 / IRC_702 / IRC_707C to
+#   their owning modules and moved them into EXISTING_SOURCES_TO_REFERENCE -- the ownership
+#   fix was CORRECT and the gate simply did not know the referenced set existed. It reported
+#   11 "unknown source" failures for eleven links that were all fine, and stayed red and
+#   unnoticed because no check_*_integrity gate is in pytest.
+known_sources = ({s["source_code"] for s in m.AUTHORITY_SOURCES}
+                 | set(getattr(m, "EXISTING_SOURCES_TO_REFERENCE", []))
+                 | {code for code, _excerpt in getattr(m, "NEW_EXCERPTS_ON_EXISTING", [])})
 for rid, code, level, _note in m.RULE_LINKS:
     if code not in known_sources:
         err(f"RULE_LINKS references unknown source: {rid} -> {code}")
