@@ -38,6 +38,9 @@ GATES = [
     "check_spine_integrity.py",        # false red: no django bootstrap, ImproperlyConfigured
     "check_topic8_integrity.py",       # real: R-SE-L2 input undeclared (introduced 2026-08-26)
     "check_schedule_f_integrity.py",   # real: R-SE-LINEA input undeclared (same day, same cause)
+    "check_simplified_method_integrity.py",  # stale PRE-FLIP guard -> provenance check
+    "check_topic9_integrity.py",             # stale PRE-FLIP guard -> provenance check
+    "check_k1_basis_704d_integrity.py",      # stale PRE-FLIP guard -> provenance check
 ]
 
 

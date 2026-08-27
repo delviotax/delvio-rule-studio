@@ -556,8 +556,39 @@ for prefix, count in (("sdtw", 47), ("clc", 13), ("w28", 7), ("u1250", 18)):
 fa_ids = [a["assertion_id"] for a in m.FLOW_ASSERTIONS]
 if len(fa_ids) != len(set(fa_ids)):
     err("duplicate flow-assertion ids")
+# READY_TO_SEED provenance check (rewritten 2026-08-26, delvio-states S-10).
+# WAS a PRE-FLIP guard: "if READY_TO_SEED: error". Correct while the spec was unapproved,
+# and permanently red the moment Ken approved it -- which is why this gate had been failing
+# with nothing actually wrong. A gate that cannot go green after the event it guards is not
+# a gate; it is a countdown that already finished.
+# NOW: the flip is allowed, but it must CARRY ITS AUTHORISATION -- naming Ken and the date of
+# the Gate-1 walk, either inline on the flip line or in the comment block directly above it.
+# ⚠ THE WINDOW IS NOT DECORATION. The first version of this check read the flip LINE only,
+#   and immediately produced a FALSE ACCUSATION against load_1040_schedule_d.py, whose
+#   approval is a nine-line comment block above the line ("FLIPPED 2026-06-13 -- Ken APPROVED
+#   the review walk in-session (\"Looks good. Go.\")") enumerating all ten walk items. Two
+#   loaders annotate inline, one annotates above; encoding the first format as if it were the
+#   rule accused the best-documented of the three.
 if m.READY_TO_SEED:
-    err("READY_TO_SEED must be False until Ken's walk")
+    import io as _io
+    import re as _re
+    _lines = _io.open(m.__file__, encoding="utf-8").read().splitlines()
+    _annotated = False
+    for _i, _ln in enumerate(_lines):
+        if not _re.match(r"\s*READY_TO_SEED\s*=\s*True", _ln):
+            continue
+        _window = [_ln]
+        _j = _i - 1
+        while _j >= 0 and (_lines[_j].lstrip().startswith("#") or not _lines[_j].strip()):
+            _window.append(_lines[_j])
+            _j -= 1
+        _blob = "\n".join(_window)
+        if "Ken" in _blob and _re.search(r"20\d\d-\d\d-\d\d", _blob):
+            _annotated = True
+    if not _annotated:
+        err("READY_TO_SEED is True but the flip carries no approval annotation "
+            "(expected Ken's name and the Gate-1 walk date on the READY_TO_SEED line "
+            "or in the comment block directly above it)")
 
 # the 18-code data list is complete
 code_facts = {f["fact_key"][-1] for f in m.F8949_FACTS if f["fact_key"].startswith("adj_code_")}
