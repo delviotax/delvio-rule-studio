@@ -991,9 +991,15 @@ FORM_FACTS: list[dict] = [
      "data_type": "boolean", "sort_order": 30.5,
      "notes": ("Per-Dependent. ⚠⚠ THE CASE THAT LOOKS LIKE PREPARER DISCRETION AND IS NOT. A custodial "
                "parent may release the claim; the noncustodial parent then takes CTC/ODC while EIC, "
-               "head-of-household and the dependent-care credit STAY with the custodial parent. So the "
+               "head-of-household, the dependent-care credit AND THE EXCLUSION FOR DEPENDENT CARE BENEFITS "
+               "STAY with the custodial parent. So the "
                "same child yields different credits to two different filers — driven by this fact, "
-               "never by ticking a box.")},
+               "never by ticking a box. "
+               "⚠ 2026-08-27: the dependent-care BENEFITS exclusion was missing from this list and is named "
+               "by the instructions alongside the other three; added with the S-11 amendment. "
+               "⭐ THIS FLAG ASSERTS THAT THE §152(e) SPECIAL RULE APPLIES IN FULL — it does not derive the "
+               "rule's four conditions. Conditions 1-3 stay preparer-asserted like every other §152 test; "
+               "see R-DEP-03 for why adjudicating them only here would be the inconsistency.")},
 
     # ── Income inputs (lines 1-8) ──
     {"fact_key": "w2_box1_total", "label": "Sum of W-2 box 1 (line 1a)", "data_type": "decimal",
@@ -1097,6 +1103,22 @@ FORM_FACTS: list[dict] = [
      "default_value": "0", "sort_order": 95, "notes": "Return-level. Feeds line 26."},
     {"fact_key": "est_payment_q4", "label": "Estimated payment Q4 (due Jan 15)", "data_type": "decimal",
      "default_value": "0", "sort_order": 96, "notes": "Return-level. Feeds line 26."},
+    # RE-DECLARED from FORM_2210 (house convention: a rule's inputs must be declared facts on its OWN
+    # form). Content-identical marker; FORM_2210 remains the owner. Added 2026-08-27 with the S-16
+    # amendment, because R-PAY-04 now reads them and an undeclared input is the exact defect S-17/S-12
+    # were about.
+    {"fact_key": "t2210_payments_dated", "label": "Dated federal estimated payments entered?",
+     "data_type": "boolean", "default_value": "false", "sort_order": 63.1,
+     "notes": ("Marker: dated (amount, date_paid) rows exist (FederalEstimatedPayment). §6654-creditable "
+               "kinds only — estimate + prior_year_applied, which IS the 1040 line-26 set. When present "
+               "they REPLACE the flat quarter buckets, for line 26 (R-PAY-04) exactly as for the penalty "
+               "(R-2210-REG). Owned by FORM_2210; re-declared here because R-PAY-04 reads it.")},
+    {"fact_key": "est_payments_dated_total", "label": "Total of the §6654-creditable dated payment rows",
+     "data_type": "decimal", "default_value": "0", "sort_order": 63.2,
+     "notes": ("Sum of the dated FederalEstimatedPayment rows whose kind is estimate or prior_year_applied. "
+               "A prior-year overpayment applied rides a prior_year_applied ROW in this model, so the total "
+               "already includes it — do NOT add py_overpayment_applied on top when rows are present. "
+               "Added 2026-08-27 with S-16.")},
     {"fact_key": "py_overpayment_applied", "label": "Prior-year overpayment applied", "data_type": "decimal",
      "default_value": "0", "sort_order": 97, "notes": "Return-level. Feeds line 26."},
     {"fact_key": "former_spouse_ssn_for_estimates", "label": "Former spouse SSN (joint estimates literal)",
@@ -1219,7 +1241,19 @@ FORM_RULES: list[dict] = [
      "formula": ("per dependent: CTC iff age at Dec 31 of tax_year < 17 (§24(c)) AND dep_tin_type == 'valid_ssn' "
                  "(§24(h)(7): work-authorized and issued by the due date) AND dep_citizenship_status is "
                  "us_citizen/us_national/us_resident_alien (§152(b)(3)) AND the dependency test is met; "
-                 "ODC iff a dependent and NOT CTC-qualifying (§24(h)(4)); never both"),
+                 "ODC iff a dependent and NOT CTC-qualifying (§24(h)(4)); never both. "
+                 "§152(e) RELEASE BRANCH (dep_released_by_form_8332): where the custodial parent has released "
+                 "the claim, the child is TREATED AS the qualifying child of the NONCUSTODIAL parent — i1040 "
+                 "verbatim: 'A child will be treated as the qualifying child or qualifying relative of the "
+                 "child's noncustodial parent … if all of the following conditions apply.' So on the CLAIMING "
+                 "(noncustodial) return the residency test does not defeat CTC/ODC, and on the RELEASING "
+                 "(custodial) return CTC/ODC are EXCLUDED while head-of-household, the earned income credit, "
+                 "the child and dependent care credit AND the exclusion for dependent care benefits all STAY "
+                 "with the custodial parent — i1040 verbatim: 'only the noncustodial parent can claim the child "
+                 "for purposes of the child tax credit and credit for other dependents (lines 19 and 28). "
+                 "However, this doesn't allow the noncustodial parent to claim head of household filing status, "
+                 "the credit for child and dependent care expenses, the exclusion for dependent care benefits, "
+                 "or the earned income credit.'"),
      "inputs": ["dep_dob", "tax_year", "dep_tin_type", "dep_citizenship_status",
                 "dep_relationship", "dep_lived_with_taxpayer_majority", "dep_residence_in_us",
                 "dep_released_by_form_8332"],
@@ -1231,7 +1265,33 @@ FORM_RULES: list[dict] = [
                      "mutually-exclusive outputs replace the old 'CTC and ODC boxes are mutually exclusive' "
                      "consistency check - the exclusivity is now structural rather than asserted and then "
                      "verified. ⚠ SCH_8812 still adjudicates the CREDIT; this determines only which "
-                     "column-(7) classification a dependent falls in.")},
+                     "column-(7) classification a dependent falls in. "
+                     "⚠⚠ §152(e) BRANCH ADDED 2026-08-27 (Ken, Gate-1 direct: \"Yes — write it in\"). "
+                     "🔴 WHAT WAS WRONG: dep_released_by_form_8332 was DECLARED as an input here and in "
+                     "R-DEP-01 and appeared in NEITHER formula — the mechanics lived only in the fact's notes, "
+                     "which are not the normative statement. Read literally the rule was INVERTED ON BOTH "
+                     "SIDES: it turns on 'the dependency test is met' with dep_lived_with_taxpayer_majority "
+                     "among its own inputs, so the noncustodial CLAIMANT was denied CTC (the child did not live "
+                     "with them) while the custodial parent who RELEASED was granted it (every stated term "
+                     "satisfied, nothing excluding them). Exactly backwards. The engine implements both "
+                     "branches correctly, so this is a conformance fix and no return was mis-computed. "
+                     "⭐ TREATED-AS, NOT WAIVED-RESIDENCY: the mechanism is that the child is treated as the "
+                     "noncustodial parent's qualifying child, not that a term is waived. Verified against the "
+                     "2025 i1040 (print date Feb 25, 2026), 'Children of divorced or separated parents'. "
+                     "⚠ THE FLAG ASSERTS THE RULE'S CONDITIONS, IT DOES NOT DERIVE THEM. The instructions "
+                     "impose FOUR conditions; the Form 8332 release is only 4(a). Conditions 1-3 (parents "
+                     "divorced/separated or apart the last 6 months · parents provided over half the support · "
+                     "child in a parent's custody over half the year) are PREPARER-ASSERTED, by the same "
+                     "doctrine that keeps every §152 test with the preparer (R-DEP-01) — the engine adjudicates "
+                     "no support or custody facts anywhere in this chain, so adjudicating them only for "
+                     "releases would be the inconsistency. "
+                     "⚠ 4(b) — a pre-1985 decree plus ≥$600 support — is DELIBERATELY NOT WRITTEN: a child "
+                     "covered by a pre-1985 decree is 40+ in 2025, so no CTC path exists (CTC requires under "
+                     "17), and ODC never tests residency, so such a claim flows through "
+                     "dep_is_claimed_as_dependent without this flag. Recorded as sound in PRACTICE rather than "
+                     "proven from the statute — it rests on the child's AGE, not on §152(e) excluding 4(b) — "
+                     "which is enough to keep the branch out of the formula and not enough to claim 4(b) "
+                     "cannot arise.")},
 
     # ── Income (lines 1-11) ──
     {"rule_id": "R-INC-01", "title": "Line 1a = sum of W-2 box 1", "rule_type": "calculation",
@@ -1435,8 +1495,15 @@ FORM_RULES: list[dict] = [
      "description": "ONCE PER RETURN. Today's code sets 25d = 25a only — must include 25b + 25c."},
     {"rule_id": "R-PAY-04", "title": "Line 26 = estimated payments (4 quarters + PY applied)", "rule_type": "calculation",
      "precedence": 12, "sort_order": 63,
-     "formula": "L26 = est_payment_q1 + est_payment_q2 + est_payment_q3 + est_payment_q4 + py_overpayment_applied",
-     "inputs": ["est_payment_q1", "est_payment_q2", "est_payment_q3", "est_payment_q4", "py_overpayment_applied"],
+     "formula": ("DATED ROWS ELSE BUCKETS, matching R-2210-REG's own precedence so line 26 and the §6654 "
+                 "penalty can never read different payment records: "
+                 "IF any §6654-creditable dated FederalEstimatedPayment rows exist (kinds estimate / "
+                 "prior_year_applied) → L26 = est_payments_dated_total (the prior-year overpayment applied "
+                 "rides a prior_year_applied ROW, so it is already in that sum); "
+                 "ELSE → L26 = est_payment_q1 + est_payment_q2 + est_payment_q3 + est_payment_q4 + "
+                 "py_overpayment_applied (unchanged)."),
+     "inputs": ["t2210_payments_dated", "est_payments_dated_total",
+                "est_payment_q1", "est_payment_q2", "est_payment_q3", "est_payment_q4", "py_overpayment_applied"],
      "outputs": ["L26"],
      "description": ("ONCE PER RETURN. New input model (sprint DoD). The form shows only the total; the "
                      "four-quarter + PY-applied detail is the input UI (TaxWise convention) and feeds "
@@ -2134,11 +2201,17 @@ FLOW_ASSERTIONS: list[dict] = [
      "definition": {"kind": "sum_check", "form": "1040", "output": "L25d", "sum_of": ["L25a", "L25b", "L25c"]},
      "sort_order": 10},
     {"assertion_id": "FA-1040-SPINE-11", "assertion_type": "reconciliation", "entity_types": ["1040"],
-     "title": "L26 = four quarters + prior-year applied",
-     "description": "Validates R-PAY-04 (new estimated-payments input model).",
-     "definition": {"kind": "sum_check", "form": "1040", "output": "L26",
-                    "sum_of": ["est_payment_q1", "est_payment_q2", "est_payment_q3", "est_payment_q4",
-                               "py_overpayment_applied"]},
+     "title": "L26 = the dated rows when they exist, else four quarters + prior-year applied",
+     "description": ("Validates R-PAY-04. ⚠⚠ AMENDED 2026-08-27 with the S-16 precedence change — the old form "
+                     "asserted L26 == the sum of the five scalars UNCONDITIONALLY, which becomes FALSE the moment "
+                     "dated rows are present. An assertion that must fail on the corrected behaviour is worse "
+                     "than none: it would have made the fix look like a regression. "
+                     "Bug it catches: line 26 reading a different payment record than the §6654 penalty does."),
+     "definition": {"kind": "conditional_sum_check", "form": "1040", "output": "L26",
+                    "when": "t2210_payments_dated",
+                    "sum_of": ["est_payments_dated_total"],
+                    "otherwise_sum_of": ["est_payment_q1", "est_payment_q2", "est_payment_q3",
+                                         "est_payment_q4", "py_overpayment_applied"]},
      "sort_order": 11},
     {"assertion_id": "FA-1040-SPINE-12", "assertion_type": "reconciliation", "entity_types": ["1040"],
      "title": "Payments chain: 32 = 27a + 28 + 29 + 30 + 31; 33 = 25d + 26 + 32",

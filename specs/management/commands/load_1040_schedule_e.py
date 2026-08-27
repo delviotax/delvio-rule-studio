@@ -690,6 +690,24 @@ F8582_FACTS: list[dict] = [
     {"fact_key": "f8582_ptp_present", "label": "Publicly traded partnership (PTP) passive item present?",
      "data_type": "boolean", "default_value": "false", "sort_order": 27,
      "notes": "S-6 R2. §469(k). PTP passive items are NOT reported on this Form 8582 — computed separately per PTP. Drives R-8582-PTP + D_8582_PTP."},
+    # ── §469(g) COMPLETE-DISPOSITION TRIO (added 2026-08-27, Ken Gate-1: "Yes — fix it") ──
+    # Preparer ASSERTIONS, mirroring the delvio-tax K-1 model fields. All three are required for the
+    # release; the third BARS it. i8582 rule 4 defines "fully taxable" inline and that definition is
+    # carried here so the flag is not an undefined tick-box.
+    {"fact_key": "disposed_entire_interest", "label": "Entire interest in this PTP disposed of during the year?",
+     "data_type": "boolean", "default_value": "false", "sort_order": 29,
+     "notes": ("§469(g) condition 1 of 3. A PARTIAL disposition does not free suspended losses. "
+               "Preparer-asserted; the engine adjudicates no disposition facts.")},
+    {"fact_key": "disposition_fully_taxable", "label": "Disposition was a fully taxable transaction?",
+     "data_type": "boolean", "default_value": "false", "sort_order": 30,
+     "notes": ("§469(g) condition 2 of 3. i8582 defines it inline: 'A fully taxable transaction is one in "
+               "which you recognize all your realized gain or loss.' Carried verbatim so the assertion has a "
+               "stated meaning — it is the flag most likely to be ticked optimistically.")},
+    {"fact_key": "disposition_to_related_party", "label": "Disposed of to a RELATED party?",
+     "data_type": "boolean", "default_value": "false", "sort_order": 31,
+     "notes": ("§469(g) condition 3 of 3, and it BARS the release — i8582 rule 4 requires disposal 'to an "
+               "unrelated person'. TRUE means suspended losses stay suspended. This is the condition "
+               "R-8582-PTP omitted before 2026-08-27, which made the rule read more generously than the law.")},
     # ── S-6 R4 at-risk (§465) diagnostic ──
     {"fact_key": "f8582_at_risk_limited", "label": "A loss may be limited by the §465 at-risk rules (Form 6198)?",
      "data_type": "boolean", "default_value": "false", "sort_order": 28,
@@ -810,10 +828,32 @@ F8582_RULES: list[dict] = [
                  "PTP passive items are NOT entered on this Form 8582 (excluded from Parts I/IV/V). For each PTP: a "
                  "net passive LOSS offsets ONLY that same PTP's net passive income; any excess is suspended and "
                  "carried forward against THAT PTP's future income; PTP net income above the loss is treated as "
-                 "portfolio-like (included in MAGI). Suspended PTP losses are freed only on a fully taxable "
-                 "disposition of the ENTIRE interest in that PTP (§469(k)(3)/§469(g)). Tracked PER PTP, off-8582."),
-     "inputs": ["f8582_ptp_present"], "outputs": [],
-     "description": "S-6 R2. §469(k) — PTPs computed separately, per-PTP, and never mixed into the 8582 aggregate."},
+                 "portfolio-like (included in MAGI). "
+                 "RELEASE (§469(k)(3)/§469(g)), CORRECTED 2026-08-27 — all THREE conditions, not two: suspended PTP "
+                 "losses (including prior-year unallowed losses) are freed only where the taxpayer disposed of the "
+                 "ENTIRE interest in that PTP, in a FULLY TAXABLE transaction, and TO AN UNRELATED PERSON. "
+                 "i8582 'Special Instructions for PTPs' rule 4, verbatim: 'If you have an overall loss and you "
+                 "disposed of your entire interest in the PTP to an unrelated person in a fully taxable transaction "
+                 "during the year, your losses (including prior-year unallowed losses) allocable to the activity for "
+                 "the year aren't limited by the passive loss rules. A fully taxable transaction is one in which you "
+                 "recognize all your realized gain or loss.' "
+                 "Tracked PER PTP, off-8582."),
+     "inputs": ["f8582_ptp_present", "disposed_entire_interest", "disposition_fully_taxable",
+                "disposition_to_related_party"],
+     "outputs": [],
+     "description": ("S-6 R2. §469(k) — PTPs computed separately, per-PTP, and never mixed into the 8582 aggregate. "
+                     "⚠⚠ AMENDED 2026-08-27 (Ken, Gate-1 direct: \"Yes — fix it\"). THIS IS A CORRECTION, NOT AN "
+                     "ADDITION. The rule already stated the release and OMITTED the unrelated-person requirement, so "
+                     "as written it freed suspended losses on a RELATED-PARTY disposition — the one case "
+                     "§469(g)(1)(B) exists to prevent. The engine had it right because it was built from the i8582 "
+                     "PDF rather than from this rule; that is the pattern, and it is the argument for amending the "
+                     "spec rather than annotating it. "
+                     "⚠ BRANCH NAMED: rule 4 opens 'If you have an overall LOSS and…'. In an overall-GAIN year rule "
+                     "2 governs and also allows all losses, so the ALLOWED TOTAL is branch-invariant — but the "
+                     "REPORTING differs (rule 2 routes the net gain to Schedule E column (k) as NONPASSIVE), and the "
+                     "character split is not modelled in v1. "
+                     "⚠ The three facts are PREPARER ASSERTIONS, mirroring the delvio-tax K-1 model fields; 'fully "
+                     "taxable' carries the source's own definition so it is not an undefined tick-box.")},
     {"rule_id": "R-8582-ATRISK-ORDER", "title": "§465 at-risk applies BEFORE §469 (route to Form 6198)", "rule_type": "routing",
      "precedence": 14, "sort_order": 14,
      "formula": ("Ordering (Reg §1.469-2T(d)(6)): §465 at-risk → §469 passive → §461(l) EBL. If f8582_at_risk_limited, "

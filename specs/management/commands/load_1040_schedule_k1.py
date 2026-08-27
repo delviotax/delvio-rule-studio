@@ -447,6 +447,24 @@ K1_FACTS: list[dict] = [
     {"fact_key": "k1_is_ptp", "label": "Publicly traded partnership (1065 item D)?",
      "data_type": "boolean", "default_value": "false", "sort_order": 6,
      "notes": "PTP passive rules differ (per-PTP netting). v1 flags a PTP loss (D_K1_PTP) — not auto-netted."},
+    # ── §469(g) COMPLETE-DISPOSITION TRIO (added 2026-08-27, Ken Gate-1: "Yes — fix it") ──
+    # Preparer ASSERTIONS, mirroring the delvio-tax K-1 model fields. All three are required for the
+    # release; the third BARS it. i8582 rule 4 defines "fully taxable" inline and that definition is
+    # carried here so the flag is not an undefined tick-box.
+    {"fact_key": "disposed_entire_interest", "label": "Entire interest in this PTP disposed of during the year?",
+     "data_type": "boolean", "default_value": "false", "sort_order": 6.1,
+     "notes": ("§469(g) condition 1 of 3. A PARTIAL disposition does not free suspended losses. "
+               "Preparer-asserted; the engine adjudicates no disposition facts.")},
+    {"fact_key": "disposition_fully_taxable", "label": "Disposition was a fully taxable transaction?",
+     "data_type": "boolean", "default_value": "false", "sort_order": 6.2,
+     "notes": ("§469(g) condition 2 of 3. i8582 defines it inline: 'A fully taxable transaction is one in "
+               "which you recognize all your realized gain or loss.' Carried verbatim so the assertion has a "
+               "stated meaning — it is the flag most likely to be ticked optimistically.")},
+    {"fact_key": "disposition_to_related_party", "label": "Disposed of to a RELATED party?",
+     "data_type": "boolean", "default_value": "false", "sort_order": 6.3,
+     "notes": ("§469(g) condition 3 of 3, and it BARS the release — i8582 rule 4 requires disposal 'to an "
+               "unrelated person'. TRUE means suspended losses stay suspended. This is the condition "
+               "R-8582-PTP omitted before 2026-08-27, which made the rule read more generously than the law.")},
     # ── Schedule-E-bound boxes (semantic; per-source box in the label) ──
     {"fact_key": "k1_ordinary", "label": "Ordinary business income/(loss) [1065 b1 / 1120-S b1 / 1041 b6]",
      "data_type": "decimal", "default_value": "0", "sort_order": 10, "notes": "→ Sch E p2 (Part II col (i)/(h)/(k); 1041 Part III col (d)/(e)/(f))."},

@@ -162,6 +162,79 @@ AUTHORITY_TOPICS: list[tuple[str, str]] = [
 EXISTING_SOURCES_TO_REFERENCE: list[str] = []
 
 AUTHORITY_SOURCES: list[dict] = [
+    # ── The SUPERSEDING-RETURN authorities (added 2026-08-27, Gate 1) ──
+    # Ken supplied these when S-10a asked where R-1040X-SUPERSED's date test comes from. I VERIFIED
+    # the two load-bearing ones before seeding: the 2025 i1040x cannot support the rule — the word
+    # "superseding" appears ZERO times in it — so the sibling R-1040X-DEFER's existing citation of
+    # that document "for superseding" is re-pointed here too.
+    # ⚠ NOT seeded, because I have not read them: Treas. Reg. § 301.9100-2, Rev. Rul. 83-36,
+    #   CCA 202026002. Ken naming them settles SCOPE, not verification.
+    {
+        "source_code": "SCOTUS_HAGGAR_1940",
+        # ⚠⚠ TYPE IS A KNOWN MISFIT, STATED RATHER THAN HIDDEN. SourceType has NO case-law value —
+        #    its vocabulary covers IRS-issued documents, state-issued documents and our own internal
+        #    notes, and has no slot for a judicial decision. "official_publication" is the least-wrong
+        #    container (an officially published document); it is NOT a claim that this is an IRS
+        #    publication. The RANK is exact: a Supreme Court holding is controlling.
+        #    The vocabulary gap is staged for Ken — do not "fix" this by inventing an enum value,
+        #    which is what grew the D-41 ratchet when I first wrote it.
+        "source_type": "official_publication",
+        "source_rank": "controlling",
+        "jurisdiction_code": "FED",
+        "title": "Haggar Co. v. Helvering, 308 U.S. 389 (1940)",
+        "citation": "Haggar Co. v. Helvering, 308 U.S. 389 (1940)",
+        "issuer": "Supreme Court of the United States",
+        "official_url": "https://supreme.justia.com/cases/federal/us/308/389/",
+        "current_status": "active",
+        "is_substantive_authority": True,
+        "trust_score": 10.0,
+        "topics": ["amended_returns"],
+        "excerpts": [
+            {
+                "excerpt_label": "A timely second return IS the return — the superseding doctrine",
+                "excerpt_text": (
+                    "A timely amended return is as much a 'first return' ... as is a single return "
+                    "filed by the taxpayer. The Court noted it has long been the practice of the "
+                    "department, in the cases of other types of tax, to accept an amended return, "
+                    "filed within the period allowed for filing returns, as the return of the "
+                    "taxpayer for the taxable year."
+                ),
+                "summary_text": (
+                    "The origin of the superseding-return doctrine: a return filed within the "
+                    "filing period replaces the earlier one and is THE return. This is the date "
+                    "test R-1040X-SUPERSED applies."
+                ),
+            },
+        ],
+    },
+    {
+        "source_code": "IRM_21_6_7_4_10",
+        # ⚠ Same vocabulary gap: no IRM/internal-procedure value exists. "official_publication" is
+        #   the least-wrong container; "reference_only" is the honest rank — the IRM binds IRS
+        #   personnel, not taxpayers, and is not substantive authority.
+        "source_type": "official_publication",
+        "source_rank": "reference_only",
+        "jurisdiction_code": "FED",
+        "title": "IRM 21.6.7.4.10 — Superseding Returns",
+        "citation": "IRM 21.6.7.4.10 (10-01-2024)",
+        "issuer": "Internal Revenue Service",
+        "official_url": "https://www.irs.gov/irm/part21/irm_21-006-007r",
+        "current_status": "active",
+        "is_substantive_authority": False,
+        "trust_score": 8.0,
+        "topics": ["amended_returns"],
+        "excerpts": [
+            {
+                "excerpt_label": "IRM section title — Superseding Returns (rev. 10-01-2024)",
+                "excerpt_text": "21.6.7.4.10 (10-01-2024) Superseding Returns",
+                "summary_text": (
+                    "The IRS's own procedural treatment of a subsequent return received before the "
+                    "due date including extensions. Verified to exist and to carry this title; the "
+                    "subsection body was not retrieved and is NOT quoted here."
+                ),
+            },
+        ],
+    },
     {
         "source_code": "IRS_2025_FORM_1040X",
         "source_type": "official_form",
@@ -535,7 +608,13 @@ X_RULE_LINKS: list[tuple[str, str, str, str]] = [
     ("R-1040X-L19", "IRS_2025_FORM_1040X", "primary", "Line 19 = line 17 − line 18."),
     ("R-1040X-L20-OWE", "IRS_2025_FORM_1040X", "primary", "Line 20 = line 11 col C − line 19 (if positive)."),
     ("R-1040X-L21-OVERPAY", "IRS_2025_FORM_1040X", "primary", "Line 21 = line 19 − line 11 col C (if positive)."),
-    ("R-1040X-DEFER", "IRS_2025_INSTR_1040X", "primary", "Carrybacks / superseding / cascades are out of the v1 common case."),
+    ("R-1040X-DEFER", "IRS_2025_INSTR_1040X", "primary", "Carrybacks / cascades are out of the v1 common case."),
+    # ⚠ 2026-08-27: the note above no longer claims the 1040-X INSTRUCTIONS as authority for
+    #   "superseding" — the word does not occur in that document. The superseding half of this
+    #   rule now points at the doctrine itself, same as R-1040X-SUPERSED.
+    ("R-1040X-DEFER", "SCOTUS_HAGGAR_1940", "secondary", "Superseding returns are out of the v1 common case (D_1040X_003)."),
+    ("R-1040X-SUPERSED", "SCOTUS_HAGGAR_1940", "primary", "A return filed within the filing period is THE return — the date test."),
+    ("R-1040X-SUPERSED", "IRM_21_6_7_4_10", "secondary", "IRS procedural treatment of a return received before the due date incl. extensions."),
 ]
 
 
