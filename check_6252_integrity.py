@@ -8,6 +8,15 @@ basis (line 12), the Part III §453(e) related-party acceleration, and the §453
 deferred tax (Pub 537). The loader and this gate share NO math — both must agree with the
 authored expected_outputs.
 """
+# stdout forced to UTF-8 (2026-08-26, delvio-states S-10): this gate prints non-ASCII in its
+# SUCCESS summary, so on a cp1252 console it raised UnicodeEncodeError and exited 1 AFTER
+# passing every check -- a false red that an exit-code sweep cannot tell from a real one.
+import sys as _sys
+try:
+    _sys.stdout.reconfigure(encoding="utf-8")
+    _sys.stderr.reconfigure(encoding="utf-8")
+except Exception:
+    pass
 import os
 import sys
 from decimal import ROUND_HALF_UP, Decimal

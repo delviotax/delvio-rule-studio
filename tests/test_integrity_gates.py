@@ -32,7 +32,12 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 # Gates proven green and therefore pinned. Growing this list is the goal.
 GATES = [
-    "check_ga500_integrity.py",
+    "check_ga500_integrity.py",        # stale D-36 convention (fixed 2026-08-26)
+    "check_4562_recon_integrity.py",   # false red: UnicodeEncodeError in the SUCCESS print
+    "check_6252_integrity.py",         # false red: same
+    "check_spine_integrity.py",        # false red: no django bootstrap, ImproperlyConfigured
+    "check_topic8_integrity.py",       # real: R-SE-L2 input undeclared (introduced 2026-08-26)
+    "check_schedule_f_integrity.py",   # real: R-SE-LINEA input undeclared (same day, same cause)
 ]
 
 

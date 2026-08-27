@@ -830,6 +830,16 @@ SCHEDSE_FACTS: list[dict] = [
                "min_4361_exempt remains the ONE input; this is its printed consequence.")},
     {"fact_key": "se_church_employee_income_l5a", "label": "Line 5a — church employee income (W-2)", "data_type": "decimal", "default_value": "0", "sort_order": 5,
      "notes": "PER PROPRIETOR. Church-employee SE income -> RED-defer (D_SE_003); v1 line 5a/5b = 0."},
+    # RE-DECLARED from MINISTER, same convention as the facts above ("keeps the narrowed rule's
+    # inputs all-declared"). Content-identical update_or_create; MINISTER owns the value.
+    # ⚠ ADDED 2026-08-26 because R-SE-LINEA (added the same day) reads it, and
+    #   check_schedule_f_integrity caught the omission: "input 'min_4361_exempt' is not a declared
+    #   fact". That gate was already red for other reasons, so the new failure hid inside the old.
+    {"fact_key": "min_4361_exempt", "label": "Form 4361 exemption from SE tax approved?",
+     "data_type": "boolean", "default_value": "false", "sort_order": 6,
+     "notes": ("Person-level Taxpayer fact (clergy_4361_exempt), OWNED by MINISTER and CONSUMED here by "
+               "R-SE-LINEA to compute the Part I line-A checkbox. True → ministerial earnings omitted from SE; "
+               "preparer-asserted (no eligibility adjudication in v1). Re-declared, not redefined.")},
     # ── Farm optional method (new) ──
     {"fact_key": "se_farm_optional_elected", "label": "Part II — farm optional method elected (checkbox)", "data_type": "boolean", "sort_order": 40,
      "notes": "PER PROPRIETOR. Elective: report optional SE earnings to obtain/maintain SS coverage. 2026 -> D_SE_FARMOPT_2026 (constants unpublished)."},

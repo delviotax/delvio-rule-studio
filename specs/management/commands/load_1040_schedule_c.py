@@ -980,6 +980,20 @@ SCHEDSE_IDENTITY = {
 SCHEDSE_FACTS: list[dict] = [
     {"fact_key": "se_proprietor", "label": "Proprietor (taxpayer or spouse) for this Schedule SE", "data_type": "string", "sort_order": 1,
      "notes": "PER PROPRIETOR. taxpayer|spouse. Aggregates that person's Schedule C line 31 -> line 2."},
+    # RE-DECLARED from MINISTER (the house convention: a rule's inputs must be declared facts on
+    # its OWN form — see the same pattern in load_1040_schedule_f.py, "keeps the narrowed rule's
+    # inputs all-declared"). Content-identical update_or_create; MINISTER remains the owner and
+    # the only writer of the value.
+    # ⚠ ADDED 2026-08-26, same day as the R-SE-L2 clergy amendment and BECAUSE OF IT: R-SE-L2
+    #   gained min_se_line2 as an input without declaring it here, which check_topic8_integrity
+    #   caught ("input 'min_se_line2' is not a declared fact"). I had concluded no such check
+    #   existed after grepping tests/ — it lives in the integrity gates, which are not in pytest,
+    #   and that gate was ALREADY RED, so the new failure was invisible inside the old one.
+    {"fact_key": "min_se_line2", "label": "Line 9 — clergy net ministerial earnings → Schedule SE line 2 (pre-0.9235)",
+     "data_type": "decimal", "sort_order": 6,
+     "notes": ("OUTPUT of MINISTER/R-MIN-SE, CONSUMED here by R-SE-L2. = max(0, wages + housing allowance + "
+               "parsonage FRV − expenses); 0 if Form 4361 approved. The SE engine applies × 0.9235 + the SS cap. "
+               "Re-declared, not redefined — MINISTER owns it.")},
     {"fact_key": "se_net_farm_profit_l1a", "label": "Line 1a — net farm profit/(loss) (Sch F L34 / 1065 K-1 box 14 A)",
      "data_type": "decimal", "default_value": "0", "sort_order": 2,
      "notes": "PER PROPRIETOR. Schedule F (separate built form) / farm K-1. v1 may carry 0; wire if Schedule F present."},

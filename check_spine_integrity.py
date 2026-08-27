@@ -1,5 +1,19 @@
 """One-off integrity check for load_1040_spine.py content lists (no DB writes)."""
-from specs.management.commands import load_1040_spine as m
+# BOOTSTRAP added 2026-08-26 (delvio-states S-10). This gate imported the loader directly,
+# which needs Django configured, so running it standalone raised ImproperlyConfigured and
+# exited non-zero -- indistinguishable from a real failure in an exit-code sweep. It was
+# counted as one of the "12 failing gates" for exactly that reason. Same pattern as
+# check_ga500_integrity.py.
+import os
+import sys
+
+import django
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "server.settings")
+django.setup()
+
+from specs.management.commands import load_1040_spine as m  # noqa: E402
 
 rules = {r["rule_id"] for r in m.FORM_RULES}
 linked = {t[0] for t in m.RULE_AUTHORITY_LINKS}
