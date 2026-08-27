@@ -1006,7 +1006,10 @@ SCHEDSE_FACTS: list[dict] = [
      "notes": "PER PROPRIETOR. Church-employee SE income -> RED-defer (D_SE_003); v1 line 5a/5b = 0."},
     {"fact_key": "se_w2_ss_wages_l8a", "label": "Line 8a — W-2 social-security wages + tips (boxes 3 + 7) + RRTA tier 1",
      "data_type": "decimal", "default_value": "0", "sort_order": 6,
-     "notes": "PER PROPRIETOR. Consumes the SS wage base (line 9 = line 7 - line 8d). The W-2-SS-wage cap interaction."},
+     "notes": ("PER PROPRIETOR. Consumes the SS wage base (line 9 = line 7 - line 8d). The W-2-SS-wage cap "
+               "interaction. SOURCED 2026-08-27 (Ken, Gate-1): DERIVED as SUM(W-2 box 3 + box 7) for this "
+               "proprietor + RRTA tier-1, with a preparer-keyed value overriding. Before that it had no stated "
+               "source and nothing populated it — see R-SE-L8D-L9 for the $5,717 consequence.")},
     {"fact_key": "se_unreported_tips_l8b", "label": "Line 8b — unreported tips subject to SS tax (Form 4137 line 10)",
      "data_type": "decimal", "default_value": "0", "sort_order": 7, "notes": "PER PROPRIETOR. Part of line 8d."},
     {"fact_key": "se_wages_8919_l8c", "label": "Line 8c — wages subject to SS tax (Form 8919 line 10)",
@@ -1094,9 +1097,26 @@ SCHEDSE_RULES: list[dict] = [
      "inputs": ["se_wage_base_l7"], "outputs": ["7"],
      "description": "PER PROPRIETOR. _constants_for_year at the build leg. Caps the SS portion."},
     {"rule_id": "R-SE-L8D-L9", "title": "Lines 8d/9 — W-2 SS wages consume the wage base", "rule_type": "calculation", "precedence": 7, "sort_order": 7,
-     "formula": "L8d = L8a + L8b + L8c; L9 = max(0, L7 - L8d). If L8a >= L7, L9 = 0 (no SS portion).",
-     "inputs": [], "outputs": ["8d", "9"],
-     "description": "PER PROPRIETOR. The W-2-SS-wage cap interaction (D_SE_002): wages already taxed for SS reduce the SE SS base."},
+     "formula": ("L8a = SUM over this proprietor's W-2s of (box 3 social-security wages + box 7 social-security tips) "
+                 "+ RRTA tier-1 compensation; a preparer-keyed value OVERRIDES the derivation. "
+                 "L8d = L8a + L8b + L8c; L9 = max(0, L7 - L8d). If L8a >= L7, L9 = 0 (no SS portion)."),
+     "inputs": ["se_w2_ss_wages_l8a", "se_unreported_tips_l8b", "se_wages_8919_l8c", "se_proprietor"],
+     "outputs": ["8a", "8d", "9"],
+     "description": ("PER PROPRIETOR. The W-2-SS-wage cap interaction (D_SE_002): wages already taxed for SS reduce "
+                     "the SE SS base. "
+                     "AMENDED 2026-08-27 (Ken, Gate-1 direct: \"Yes — update it\"). "
+                     "🔴 WHAT WAS WRONG: this rule CONSUMED line 8a and declared `inputs: []`, and nothing in the "
+                     "spec said where 8a came from. In the app that gap was load-bearing — nothing carried W-2 box 3 "
+                     "into it, so a taxpayer whose wages had already exhausted the $176,100 base was charged the full "
+                     "15.3% on self-employment income instead of Medicare-only 2.9%. $5,717 of tax the filed return "
+                     "does not have, on one packet, in the OVERSTATING direction. "
+                     "⭐ NO ARITHMETIC CHANGED — only the missing input. The face's own instruction is the authority "
+                     "and it matches the existing max(0, ...): 'Total social security wages and tips (total of boxes "
+                     "3 and 7 on Form(s) W-2) and railroad retirement (tier 1) compensation. If $176,100 or more, "
+                     "skip lines 8b through 10, and go to line 11.' "
+                     "⚠ The keyed value WINS: 8a stays a preparer-enterable line (the face prints it), and the "
+                     "derivation only fills it. Engine reference: one shared helper across compute / print / MeF / "
+                     "diagnostics (delvio-tax s302d).")},
     {"rule_id": "R-SE-L10", "title": "Line 10 — SS portion (capped) x 12.4%", "rule_type": "calculation", "precedence": 8, "sort_order": 8,
      "formula": "L10 = round(min(L6, L9) x 0.124) (whole-dollar half-up per R-SE-ROUND).",
      "inputs": ["se_ss_rate"], "outputs": ["10"],
@@ -1133,7 +1153,7 @@ SCHEDSE_LINES: list[dict] = [
     {"line_number": "5b", "description": "Line 5a x 92.35% (if < $100, enter 0)", "line_type": "calculated"},
     {"line_number": "6", "description": "Add lines 4c and 5b (SE-tax base; -> Form 8959 line 8)", "line_type": "subtotal"},
     {"line_number": "7", "description": "Maximum SS wage base (year-keyed: $176,100 2025 / $184,500 2026)", "line_type": "calculated"},
-    {"line_number": "8a", "description": "W-2 social-security wages + tips (boxes 3 + 7) + RRTA tier 1", "line_type": "input"},
+    {"line_number": "8a", "description": "W-2 social-security wages + tips (boxes 3 + 7) + RRTA tier 1 — DERIVED from the W-2s, preparer-keyed value overrides", "line_type": "calculated"},
     {"line_number": "8b", "description": "Unreported tips subject to SS tax (Form 4137 line 10)", "line_type": "input"},
     {"line_number": "8c", "description": "Wages subject to SS tax (Form 8919 line 10)", "line_type": "input"},
     {"line_number": "8d", "description": "Add lines 8a, 8b, and 8c", "line_type": "subtotal"},

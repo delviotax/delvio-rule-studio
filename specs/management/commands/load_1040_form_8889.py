@@ -395,11 +395,36 @@ F8889_RULES: list[dict] = [
      "description": "§223(b)(8)(B). Decision 2 — Part III."},
     {"rule_id": "R-8889-EXCEPTIONS", "title": "RED-deferred (excess / IRA funding / non-spouse death)", "rule_type": "routing",
      "precedence": 6, "sort_order": 6,
-     "formula": ("If line 2 > line 13 → D_8889_EXCESS (the 6% excise / Form 5329 Part VII, not computed); a "
-                 "qualified IRA→HSA funding distribution → D_8889_FUNDING; a non-spouse death-of-beneficiary "
+     "formula": ("EXCESS = the TWO-COMPONENT SUM the instructions define, not a single comparison: "
+                 "(a) the TAXPAYER's excess = max(0, line 2 − line 12), PLUS "
+                 "(b) the EMPLOYER's excess = max(0, line 9 employer contributions − line 8 limitation). "
+                 "If (a) + (b) > 0 → D_8889_EXCESS. Both components carry to Form 5329 line 47, which is where "
+                 "the 6% excise IS computed (Part VII). "
+                 "A qualified IRA→HSA funding distribution → D_8889_FUNDING; a non-spouse death-of-beneficiary "
                  "→ a manual case."),
-     "inputs": [], "outputs": [],
-     "description": "Decision 2 — the rare cases out of v1 scope."},
+     "inputs": ["hsa_own_contributions", "hsa_employer_contributions"], "outputs": [],
+     "description": ("Decision 2 — the rare cases out of v1 scope. "
+                     "AMENDED 2026-08-27 (Ken, Gate-1 direct: \"yes\", read as the recommended scope: fix the "
+                     "CONDITION and the MESSAGE, do NOT derive line 47). "
+                     "🔴 WHAT WAS WRONG: the condition was 'line 2 > line 13' — the TAXPAYER's side only. i8889: "
+                     "'Excess employer contributions are the excess, if any, of your employer's contributions over "
+                     "your limitation on line 8.' i5329 line 47: 'Enter the excess of your contributions … from "
+                     "Form 8889, line 2 … over your contribution limit (Form 8889, line 12). Also include on line "
+                     "47 any excess contributions your employer made.' Line 47 is a SUM of two quantities measured "
+                     "against DIFFERENT lines — 12 for the taxpayer, 8 for the employer — and an employer-only "
+                     "excess leaves lines 2, 12 and 13 all at zero, so the old condition could not see it. "
+                     "⚠ MEASURED, not theoretical: of 70 HSA rows in prod, 6 carry an excess and ALL 6 are "
+                     "employer-only. The old condition has never fired on a real excess in this corpus. "
+                     "⭐ A THIRD DEFECT WAS SUSPECTED AND DISSOLVED: i5329 names line 12 where the old condition "
+                     "used line 13, but line 13 = min(line 2, line 12), so the comparison was arithmetically "
+                     "equivalent. The taxpayer-side test was sound; only the employer component was missing. "
+                     "⭐⭐ AND THE EXCISE IS DELIBERATELY NOT DERIVED. Measured 2026-08-27 against the filed "
+                     "returns: on the three returns whose Form 5329 line 47 is unkeyed, our computed total tax "
+                     "TIES the filed total tax to the dollar — so those filed returns carried NO HSA penalty "
+                     "either, consistent with a timely withdrawal (which kills the excise and is recorded nowhere "
+                     "in the return). Auto-deriving line 47 would have computed a penalty those returns do not "
+                     "have and would have BROKEN THREE TIES. Derivation would also need Form5329.hsa_curr_excess "
+                     "to become nullable first, so a keyed zero can be told from an unkeyed one.")},
 ]
 
 F8889_LINES: list[dict] = [
@@ -431,11 +456,18 @@ F8889_LINES: list[dict] = [
 
 F8889_DIAGNOSTICS: list[dict] = [
     {"diagnostic_id": "D_8889_EXCESS", "title": "Possible excess HSA contribution (6% excise)", "severity": "warning",
-     "condition": "line 2 (your contributions) > line 13 (the deduction)",
-     "message": ("Your HSA contributions exceed the deductible limit — the excess may be subject to the 6% "
-                 "excise tax (Form 5329 Part VII), which is not computed here. Withdraw the excess (plus "
-                 "earnings) by the return due date, or report the excise manually."),
-     "notes": "Decision 2. The 6% excise is RED-deferred."},
+     "condition": ("max(0, line 2 − line 12) + max(0, employer contributions − line 8) > 0 — the taxpayer's "
+                   "excess and the EMPLOYER's excess, each measured against its own line, summed"),
+     "message": ("HSA contributions exceed the limit — the excess may be subject to the 6% excise tax. Enter the "
+                 "total excess (yours plus any your employer made) on Form 5329 line 47, where the excise is "
+                 "computed. If the excess plus earnings was withdrawn by the return due date, no excise is due "
+                 "and line 47 is left blank."),
+     "notes": ("Decision 2. AMENDED 2026-08-27 (Ken, Gate-1). The condition was taxpayer-only and could not see "
+               "an employer-only excess — which is every excess in our corpus (6 of 6). The message previously "
+               "said the excise 'is not computed here' and told the preparer to report it manually; that stopped "
+               "being true when Form 5329 Part VII was built, so it was sending preparers to do by hand something "
+               "the engine does from line 47. It now names the field instead, and names the withdrawal case, "
+               "which is why a blank line 47 is a legitimate answer rather than an omission.")},
     {"diagnostic_id": "D_8889_FUNDING", "title": "IRA→HSA funding distribution — not computed", "severity": "warning",
      "condition": "line 10 (qualified HSA funding distribution) > 0",
      "message": ("A once-in-lifetime qualified HSA funding distribution from an IRA (§408(d)(9), Form 8889 "

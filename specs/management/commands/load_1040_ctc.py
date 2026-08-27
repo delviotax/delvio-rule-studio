@@ -1070,10 +1070,10 @@ class Command(BaseCommand):
              "notes": "Calculated. agi_line_11 + addbacks."},
             {"fact_key": "count_qualifying_children", "label": "Count of qualifying children for CTC (Line 4)",
              "data_type": "integer", "sort_order": 61,
-             "notes": "Calculated by aggregation over Dependents where dep_qualifies_ctc = True."},
+             "notes": "Calculated by aggregation over Dependents where dep_ctc_qualifying = True."},
             {"fact_key": "count_other_dependents", "label": "Count of other dependents for ODC (Line 6)",
              "data_type": "integer", "sort_order": 62,
-             "notes": "Calculated by aggregation over Dependents where dep_qualifies_odc = True."},
+             "notes": "Calculated by aggregation over Dependents where dep_odc_qualifying = True."},
             {"fact_key": "return_ssn_eligible_for_ctc_actc",
              "label": "Return is SSN-eligible for CTC/ACTC?",
              "data_type": "boolean", "sort_order": 63,
@@ -1105,7 +1105,7 @@ class Command(BaseCommand):
             {"rule_id": "R001", "title": "Dependent qualifies for CTC (7-test classification)",
              "rule_type": "classification", "precedence": 1, "sort_order": 1,
              "formula": (
-                 "dep_qualifies_ctc = (dep_age_at_eoy < 17 "
+                 "dep_ctc_qualifying = (dep_age_at_eoy < 17 "
                  "AND dep_relationship_code != 'other' "
                  "AND dep_months_resided_with_taxpayer > 6 "
                  "AND NOT dep_provided_over_half_own_support "
@@ -1117,23 +1117,34 @@ class Command(BaseCommand):
              "inputs": ["dep_age_at_eoy", "dep_relationship_code", "dep_months_resided_with_taxpayer",
                         "dep_provided_over_half_own_support", "dep_filed_joint_return",
                         "dep_citizenship_status", "dep_tin_type", "dep_is_claimed_as_dependent"],
-             "outputs": ["dep_qualifies_ctc"],
+             "outputs": ["dep_ctc_qualifying"],
              "description": (
                  "Iteration semantics: ONCE PER DEPENDENT. Tests all seven CTC qualifying-child conditions "
                  "per §24(c) + §152(c) + §24(h)(7) SSN. Tie-breaker rules (§152(c)(4)) and joint-return-only-"
-                 "for-refund exception assumed resolved upstream."
+                 "for-refund exception assumed resolved upstream. "
+                 "⚠⚠ RENAMED 2026-08-27 (Ken, Gate-1 direct: \"Yes — fix it\") from dep_qualifies_ctc to "
+                 "dep_ctc_qualifying. The D-43 amendment (2026-08-25) retired the old key from prod when it "
+                 "removed the preparer tick-boxes and made R-DEP-03 derive the classification — the PRODUCER was "
+                 "updated and this CONSUMER was left behind, so check_1040x-style gates saw a spec asserting a "
+                 "link (R-DEP-01: 'SCH_8812 consumes the CTC/ODC flags') whose two ends did not meet. "
+                 "🔴 FLAGGED, NOT RESOLVED HERE, because retiring a rule is a bigger call than a rename: this "
+                 "rule and R-DEP-03 BOTH determine CTC qualification, by different routes, and now write the "
+                 "same key. R-DEP-03's own description says SCH_8812 'still adjudicates the CREDIT; this "
+                 "determines only which column-(7) classification a dependent falls in' — so the intended split "
+                 "is classification here vs credit there, and TWO classifiers is one more than that split "
+                 "describes. Worth Ken's eye as a separate question."
              )},
             {"rule_id": "R002", "title": "Dependent qualifies for ODC",
              "rule_type": "classification", "precedence": 2, "sort_order": 2,
              "formula": (
-                 "dep_qualifies_odc = (dep_is_claimed_as_dependent "
-                 "AND NOT dep_qualifies_ctc "
+                 "dep_odc_qualifying = (dep_is_claimed_as_dependent "
+                 "AND NOT dep_ctc_qualifying "
                  "AND dep_citizenship_status IN ('us_citizen','us_national','us_resident_alien') "
                  "AND dep_tin_type IN ('valid_ssn','itin','atin'))"
              ),
-             "inputs": ["dep_is_claimed_as_dependent", "dep_qualifies_ctc", "dep_citizenship_status",
+             "inputs": ["dep_is_claimed_as_dependent", "dep_ctc_qualifying", "dep_citizenship_status",
                         "dep_tin_type"],
-             "outputs": ["dep_qualifies_odc"],
+             "outputs": ["dep_odc_qualifying"],
              "description": (
                  "Iteration semantics: ONCE PER DEPENDENT. Per §24(h)(4). Note: a QC without SSN drops "
                  "to ODC if has ITIN/ATIN (per Schedule 8812 Form Line 6 caution)."
@@ -1156,13 +1167,13 @@ class Command(BaseCommand):
             # ─── Group 3: Aggregation ───
             {"rule_id": "R004", "title": "Count qualifying children", "rule_type": "calculation",
              "precedence": 3, "sort_order": 4,
-             "formula": "count_qualifying_children = COUNT(dependents WHERE dep_qualifies_ctc == True)",
-             "inputs": ["dep_qualifies_ctc"], "outputs": ["count_qualifying_children", "L_4"],
+             "formula": "count_qualifying_children = COUNT(dependents WHERE dep_ctc_qualifying == True)",
+             "inputs": ["dep_ctc_qualifying"], "outputs": ["count_qualifying_children", "L_4"],
              "description": "Iteration semantics: AGGREGATE OVER DEPENDENTS. Schedule 8812 Line 4."},
             {"rule_id": "R005", "title": "Count other dependents", "rule_type": "calculation",
              "precedence": 3, "sort_order": 5,
-             "formula": "count_other_dependents = COUNT(dependents WHERE dep_qualifies_odc == True)",
-             "inputs": ["dep_qualifies_odc"], "outputs": ["count_other_dependents", "L_6"],
+             "formula": "count_other_dependents = COUNT(dependents WHERE dep_odc_qualifying == True)",
+             "inputs": ["dep_odc_qualifying"], "outputs": ["count_other_dependents", "L_6"],
              "description": "Iteration semantics: AGGREGATE OVER DEPENDENTS. Schedule 8812 Line 6."},
 
             # ─── Group 4: MAGI assembly ───
@@ -1883,9 +1894,9 @@ class Command(BaseCommand):
              "assertion_type": "flow_assertion", "entity_types": ["1040"],
              "definition": {
                  "kind": "per_record_contribution", "form": "SCH_8812",
-                 "record_type": "Dependent", "filter": "dep_qualifies_ctc == True",
+                 "record_type": "Dependent", "filter": "dep_ctc_qualifying == True",
                  "contribution_amount": 2200, "aggregates_to_line": "SCH_8812.L_5",
-                 "aggregate_formula": "count(dep_qualifies_ctc) * 2200",
+                 "aggregate_formula": "count(dep_ctc_qualifying) * 2200",
              },
              "sort_order": 1},
             {"assertion_id": "FA-1040-CTC-02",
@@ -1897,7 +1908,7 @@ class Command(BaseCommand):
              "assertion_type": "flow_assertion", "entity_types": ["1040"],
              "definition": {
                  "kind": "per_record_contribution", "form": "SCH_8812",
-                 "record_type": "Dependent", "filter": "dep_qualifies_odc == True",
+                 "record_type": "Dependent", "filter": "dep_odc_qualifying == True",
                  "contribution_amount": 500, "aggregates_to_line": "SCH_8812.L_7",
              },
              "sort_order": 2},
@@ -1960,7 +1971,7 @@ class Command(BaseCommand):
                  "kind": "per_record_gating", "form": "SCH_8812",
                  "record_type": "Dependent",
                  "trigger": "dep_tin_type != 'valid_ssn'",
-                 "implication": "dep_qualifies_ctc == False AND contributes 0 to SCH_8812.L_5",
+                 "implication": "dep_ctc_qualifying == False AND contributes 0 to SCH_8812.L_5",
              },
              "sort_order": 6},
             {"assertion_id": "FA-1040-CTC-07",
@@ -2053,7 +2064,7 @@ class Command(BaseCommand):
              },
              "sort_order": 12},
             {"assertion_id": "TI-1040-CTC-A",
-             "title": "Dependent classification mutually exclusive: NOT (dep_qualifies_ctc AND dep_qualifies_odc)",
+             "title": "Dependent classification mutually exclusive: NOT (dep_ctc_qualifying AND dep_odc_qualifying)",
              "description": (
                  "Table invariant on Dependent records. A single dependent cannot be both CTC-qualifying "
                  "and ODC-qualifying simultaneously (Sch 8812 Form Line 6 caution: 'do not include anyone "
@@ -2063,7 +2074,7 @@ class Command(BaseCommand):
              "definition": {
                  "table_name": "Dependent", "form": "SCH_8812",
                  "check": "mutual_exclusion",
-                 "params": {"flags": ["dep_qualifies_ctc", "dep_qualifies_odc"]},
+                 "params": {"flags": ["dep_ctc_qualifying", "dep_odc_qualifying"]},
              },
              "sort_order": 13},
             {"assertion_id": "FA-1040-CTC-13",
