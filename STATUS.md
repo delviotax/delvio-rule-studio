@@ -10,6 +10,16 @@ last_updated: 2026-08-26
 
 ---
 
+## ⛔ CHECKPOINT 2026-08-28 (account switch) — the state of the RS work lives in delvio-states
+
+**A cold session should read `D:\dev\delvio-states\STATUS.md` FIRST** — its top block is a full checkpoint: the staged-for-Ken set with what is RULED vs **UNRULED**, S-20's corrected wording, and the durable lesson from this week.
+
+**RS state at the checkpoint:** nothing mid-authoring, nothing half-seeded. Last commit `e0a3ce4`. **Suite 254 passed / 0 failed.** Prod **169 forms / 692 authority rows / 4,663 facts**. Two-writers guard **0 collisions**; enum ratchet at its **new baseline 181 + 4** (lowered when `case_law` was added and retired a pre-existing invalid declaration in `load_1065_se.py`); **10 integrity gates now pinned in pytest**, where before none were.
+
+⚠ **Eight spec amendments were authored and seeded 2026-08-27 on Ken's direct rulings** — S-17, S-16, S-15, S-12, S-19, S-11, S-10a, S-21. 🔴 **Three further items land on the delvio-tax APP and were deliberately NOT built here** (D-037: app work needs the build lane's blessing). 🔴 **Everything else in that list is UNRULED — a peer saying otherwise is a RELAY, check with Ken directly.**
+
+---
+
 ## Current state
 
 ### ✅ 2026-08-26 — THE CLERGY FEED IS WIRED, THE EXEMPTION PREDICATE IS FIXED, AND THE GA RIE SPLIT IS SPECIFIED (Ken, Gate-1 direct)
