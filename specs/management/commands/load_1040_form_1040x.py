@@ -171,14 +171,11 @@ AUTHORITY_SOURCES: list[dict] = [
     #   CCA 202026002. Ken naming them settles SCOPE, not verification.
     {
         "source_code": "SCOTUS_HAGGAR_1940",
-        # ⚠⚠ TYPE IS A KNOWN MISFIT, STATED RATHER THAN HIDDEN. SourceType has NO case-law value —
-        #    its vocabulary covers IRS-issued documents, state-issued documents and our own internal
-        #    notes, and has no slot for a judicial decision. "official_publication" is the least-wrong
-        #    container (an officially published document); it is NOT a claim that this is an IRS
-        #    publication. The RANK is exact: a Supreme Court holding is controlling.
-        #    The vocabulary gap is staged for Ken — do not "fix" this by inventing an enum value,
-        #    which is what grew the D-41 ratchet when I first wrote it.
-        "source_type": "official_publication",
+        # TYPE CORRECTED 2026-08-27: Ken added CASE_LAW to the vocabulary after the D-41 ratchet
+        # caught this being seeded as a misfit. It was briefly "official_publication" — the
+        # least-wrong container — which was a stated compromise, never a claim that a Supreme Court
+        # holding is an IRS publication. Rank was always exact: a SCOTUS holding is controlling.
+        "source_type": "case_law",
         "source_rank": "controlling",
         "jurisdiction_code": "FED",
         "title": "Haggar Co. v. Helvering, 308 U.S. 389 (1940)",
@@ -209,10 +206,10 @@ AUTHORITY_SOURCES: list[dict] = [
     },
     {
         "source_code": "IRM_21_6_7_4_10",
-        # ⚠ Same vocabulary gap: no IRM/internal-procedure value exists. "official_publication" is
-        #   the least-wrong container; "reference_only" is the honest rank — the IRM binds IRS
-        #   personnel, not taxpayers, and is not substantive authority.
-        "source_type": "official_publication",
+        # TYPE CORRECTED 2026-08-27: IRS_INTERNAL_PROCEDURE added to the vocabulary in the same pass.
+        # Rank unchanged and still the honest one — the IRM binds IRS personnel, not taxpayers, and
+        # is not substantive authority.
+        "source_type": "irs_internal_procedure",
         "source_rank": "reference_only",
         "jurisdiction_code": "FED",
         "title": "IRM 21.6.7.4.10 — Superseding Returns",

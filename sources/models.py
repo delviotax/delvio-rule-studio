@@ -11,6 +11,15 @@ from django.db import models
 class SourceType(models.TextChoices):
     CODE_SECTION = "code_section", "IRC Section"
     REGULATION = "regulation", "Treasury Regulation"
+    # ── Added 2026-08-27 (Ken, direct: "add case_law and irs_internal_procedure") ──
+    # Found by the D-41 enum ratchet catching a seeding attempt of mine: the vocabulary covered
+    # IRS-issued documents, state-issued documents and our own internal notes, and had NO slot for
+    # a judicial decision or for the IRM. Haggar Co. v. Helvering (308 U.S. 389) and IRM 21.6.7.4.10
+    # were seeded as OFFICIAL_PUBLICATION, a stated misfit — calling a Supreme Court holding an
+    # "IRS Publication" is the quiet overstatement D-39 corrected in the other direction. Expect
+    # more case law as the state campaign deepens.
+    CASE_LAW = "case_law", "Case Law"
+    IRS_INTERNAL_PROCEDURE = "irs_internal_procedure", "IRS Internal Procedure (IRM)"
     OFFICIAL_FORM = "official_form", "Official Form"
     OFFICIAL_INSTRUCTION = "official_instruction", "Form Instructions"
     OFFICIAL_PUBLICATION = "official_publication", "IRS Publication"

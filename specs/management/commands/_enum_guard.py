@@ -68,7 +68,12 @@ SOURCE_TYPE_DEBT: dict[str, int] = {
     "official_guidance":       28,
     "form":                    2,
     "instructions":            2,
-    "case_law":                1,
+    # "case_law" REMOVED from the debt 2026-08-27: Ken added CASE_LAW to SourceType
+    # ("add case_law and irs_internal_procedure"), so load_1065_se.py's long-standing
+    # case_law declaration became VALID rather than debt. Baseline lowered 182 -> 181 to
+    # lock the improvement in, per this guard's own instruction. ⭐ The addition was made
+    # for the 1040-X superseding authorities and paid off a pre-existing site as a side
+    # effect — the same shape as D-42, where resolving ownership shrank the label debt.
     "irs_guidance":            1,
     "revenue_procedure":       1,
 }
