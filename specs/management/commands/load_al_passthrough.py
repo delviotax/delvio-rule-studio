@@ -8,7 +8,8 @@ Two AL pass-through returns in one loader (mirrors load_sc_passthrough.py):
   • AL_FORM_65 — Alabama Partnership/LLC Return of Income (federal 1065 start).
   • AL_FORM_20S — Alabama S-Corporation Return (federal 1120-S start).
 THE HEADLINE: the Alabama Electing PTE tax (Act 2021-1). Unlike NC's 4.25%/deduction design, AL's is
-5% and the owner-side is a REFUNDABLE CREDIT (Schedule EPT-C). The EPT tax is computed/paid on Form
+5% and the owner-side is a REFUNDABLE CREDIT claimed on the OWNER's own AL return (NOT Schedule
+EPT-C, which is the electing ENTITY's incentive-credit schedule). The EPT tax is computed/paid on Form
 EPT — the Form 65/20S Schedule K only REFERENCES it (Form 65 Sch K L23 / Form 20S Sch K L25). AL
 CONFORMS to §168(k)/§179 (no depreciation add-back — the opposite of NC/SC/GA). Nonresident owners
 are covered by the Form PTE-C composite (5%). Reuses the AL Form 20C conformity work.
@@ -20,16 +21,18 @@ v1 SCOPE — LOCKED (Ken's Gate-1 walk 2026-07-05; DECISIONS D-15). See nc_al_pa
 ═══════════════════════════════════════════════════════════════════════════
 COMPUTES (Q1 full + Q2 owner side): the Electing-PTE tax (5%, Form EPT) with the owner REFUNDABLE CREDIT;
 the composite PTE-C (5%); single sales factor. AL conforms on depreciation (no add-back). Form 20S
-non-electing entity taxes (LIFO/BIG/excess-passive, Line 32) = diagnostic + direct-entry (Q3).
+entity taxes (LIFO/BIG/excess-passive, Line 32) = diagnostic + direct-entry (Q3).
 
 requires_human_review WALK ITEMS (W4-W6):
-W4. AL Electing PTE = 5% on AL taxable income (Form EPT); owner side = REFUNDABLE CREDIT (Sch EPT-C), NOT a
+W4. AL Electing PTE = 5% on AL taxable income (Form EPT); owner side = REFUNDABLE CREDIT on the OWNER's
+    own AL return (upper-tier PTE: Sch CP-B -> Form EPT L5d); NOT Sch EPT-C, and NOT a
     deduction (contrast NC). Election = checkbox on Form 65/20S + Form EPT + >50% owner consent. CONFIRM.
 W5. AL CONFORMS to §168(k)/§179 (no add-back; §179 flows from federal Sch K). Conformity item-by-item
     (§40-18-1.1), NOT blanket. Composite PTE-C = 5% on nonresidents' AL-source share. CONFIRM.
-W6. Form 20S non-electing entity taxes (Line 32) = LIFO recapture §40-18-161 / built-in gains §40-18-174 /
+W6. Form 20S entity taxes (Line 32; ANY 20S filer, electing or not) = LIFO recapture §40-18-161 / built-in gains §40-18-174 /
     excess net passive income §40-18-175 — diagnostic + direct-entry (the federal S-corp-level taxes). BPT
-    separate (Form PPT). Due Mar 15 (15th day of 3rd month), NOT the extra month. CONFIRM.
+    separate (Form PPT). Due 15th day of 3rd month, NOT the extra month; TY2025 calendar filers file
+    Mon Mar 16, 2026 (the 15th is a Sunday). CONFIRM.
 
 CARRIED [UNVERIFIED]: exact TY2025 Sch K line numbers (25f65instr/25f20sinstr when ALDOR posts; TY2024 rev
 used); encode OBBBA conformity item-by-item. Re-verify at TY2026.
@@ -101,11 +104,11 @@ AUTHORITY_SOURCES: list[dict] = [
                 "Form 65/20S + file Form EPT (the old Form PTE-E/MAT method is superseded); the EPT tax is "
                 "computed/paid on Form EPT and REFERENCED on Form 65 Sch K L23 / Form 20S Sch K L25; it is added "
                 "back as a non-deductible state tax on Schedule A. Composite: Form PTE-C, 5% on nonresidents' "
-                "AL-source share (§40-18-24.2). Form 20S Line 32 entity-level tax on a NON-electing S-corp = only "
+                "AL-source share (§40-18-24.2). Form 20S Line 32 entity-level tax (ANY 20S filer — an electing PTE completes lines 32-37 too if it has them) = only "
                 "LIFO recapture (§40-18-161), built-in gains (§40-18-174), excess net passive income "
-                "(§40-18-175). Business Privilege Tax is separate (Form PPT). Due 15th day of 3rd month (Mar 15, 2026)."
+                "(§40-18-175). Business Privilege Tax is separate (Form PPT). Due 15th day of 3rd month; for a TY2025 calendar-year filer that lands MONDAY MAR 16, 2026 (Mar 15, 2026 is a Sunday; instructions: “If the 15th falls on Saturday or Sunday, the following Monday”)."
             ),
-            "summary_text": "Form 65 from 1065 / 20S from 1120-S; §179 conforms; single sales factor; Electing PTE = checkbox + Form EPT (5%, referenced on Sch K L23/L25); PTE-C 5%; 20S L32 = LIFO/BIG/excess-passive; due Mar 15.",
+            "summary_text": "Form 65 from 1065 / 20S from 1120-S; §179 conforms; single sales factor; Electing PTE = checkbox + Form EPT (5%, referenced on Sch K L23/L25); PTE-C 5%; 20S L32 = LIFO/BIG/excess-passive (any 20S filer, electing or not); due 15th day of 3rd month (TY2025 calendar filers: Mon Mar 16, 2026).",
             "is_key_excerpt": True,
         }],
     },
@@ -122,12 +125,21 @@ AUTHORITY_SOURCES: list[dict] = [
                 "taxable income per §40-18-24 (partnerships) / §40-18-161-162 (S corps), apportioned, using Sch K "
                 "Alabama-column lines 1-17 (incl. guaranteed payments). OWNER SIDE: 'The owner ... shall be "
                 "entitled to a REFUNDABLE CREDIT in an amount equal to its pro rata or distributive share of the "
-                "Alabama income tax paid by the electing pass-through entity' (Schedule EPT-C) — a credit, NOT a "
+                "Alabama income tax paid by the electing pass-through entity' — a credit, NOT a "
                 "deduction (contrast NC). Election is annual, made by checking the Electing-PTE box on the "
                 "timely-filed Form 65/20S + filing Form EPT, and requires a vote/consent of owners holding >50% "
-                "of the voting control."
+                "of the voting control. "
+                "[SOURCE CONFLICT, recorded 2026-08-29 per D-16 AL-3] The 2025 Form EPT FACE "
+                "still prints 'Form PTE-E must be electronically filed via My Alabama "
+                "Taxes(MAT) prior to the filing of this form.' That is stale boilerplate "
+                "(both 25fept.pdf and 25feptc.pdf still carry the PDF title 'EPT 2021.qxp'). "
+                "CONTROLLING for TY2025 is the checkbox election -- ALDOR: 'For tax periods "
+                "beginning on or after January 1, 2025, the Electing Pass-Through Entity must "
+                "check the Electing PTE box on the timely filed Form 65 or Form 20S ... The "
+                "Electing PTE box must be checked each year the election is in effect.' Build "
+                "to the checkbox, not to the PTE-E line."
             ),
-            "summary_text": "Electing PTE 5% of AL taxable income (Form EPT); owner = REFUNDABLE CREDIT (Sch EPT-C), not a deduction; annual checkbox + Form EPT + >50% consent.",
+            "summary_text": "Electing PTE 5% of AL taxable income (Form EPT); owner = REFUNDABLE CREDIT on the owner's own AL return (NOT Sch EPT-C), not a deduction; annual checkbox + Form EPT + >50% consent.",
             "is_key_excerpt": True,
         }],
     },
@@ -180,9 +192,9 @@ _AL_APPORT = {
 _AL_EPT = {
     "rule_id": None, "title": "AL Electing PTE tax — 5% (Form EPT), owner REFUNDABLE CREDIT", "rule_type": "calculation",
     "formula": ("if is_electing_pte: ept_tax = al_taxable_income * 0.05 (Form EPT) ; "
-                "owner_side = each owner takes a REFUNDABLE CREDIT for its share of ept_tax (Schedule EPT-C)"),
+                "owner_side = each owner takes a REFUNDABLE CREDIT for its share of ept_tax, claimed on the owner's own AL return (upper-tier PTE owner: Schedule CP-B -> Form EPT line 5d)"),
     "inputs": ["is_electing_pte", "al_taxable_income"], "outputs": ["ept_tax"], "sort_order": 2,
-    "description": "W4. Act 2021-1. Electing PTE tax = 5% of the entity's Alabama taxable income, computed/paid on Form EPT (referenced on Form 65 Sch K L23 / Form 20S Sch K L25). Owner side = a REFUNDABLE CREDIT for the owner's share (Schedule EPT-C), NOT a deduction (contrast NC).",
+    "description": "W4. Act 2021-1. Electing PTE tax = 5% of the entity's Alabama taxable income, computed/paid on Form EPT (referenced on Form 65 Sch K L23 / Form 20S Sch K L25). Owner side = a REFUNDABLE CREDIT for the owner's share, claimed on the owner's OWN Alabama return (an upper-tier PTE owner carries it via Schedule CP-B -> Form EPT line 5d, verbatim: “Current Year's Composite Payment(s)/Electing Pass-Through Entity Credit(s) from Schedule CP-B, line 3”). NOT a deduction (contrast NC). [CORRECTED 2026-08-29 per D-16 AL-1] It is NOT Schedule EPT-C: the 2025 Schedule EPT-C is “Electing Pass-Through Credits ... ATTACH TO FORM EPT”, the ELECTING ENTITY's own incentive-credit schedule (2017 Historic Rehabilitation; Railroad Modernization Act of 2019), feeding Form EPT line 3 (Sec C) and line 5e (Sec D). [UNVERIFIED] the individual owner's exact Form 40 line — ALDOR's Electing-PTE page states the entitlement but does not name the line.",
 }
 _AL_COMPOSITE = {
     "rule_id": None, "title": "AL composite PTE-C — 5% on nonresidents", "rule_type": "calculation",
@@ -200,10 +212,10 @@ def _al_rules(prefix, entity_taxes=False):
         rules.append(r)
     if entity_taxes:
         rules.append({
-            "rule_id": f"{prefix}-ENTITY", "title": "Form 20S non-electing entity taxes (Line 32)", "rule_type": "calculation",
+            "rule_id": f"{prefix}-ENTITY", "title": "Form 20S entity taxes (Line 32) — LIFO / built-in gains / excess passive", "rule_type": "calculation",
             "formula": "entity_tax = lifo_recapture + builtin_gains + excess_net_passive  (direct-entry; the federal S-corp-level taxes)",
             "inputs": ["lifo_recapture", "builtin_gains", "excess_net_passive"], "outputs": ["entity_tax"], "sort_order": 4,
-            "description": "W6. Form 20S Line 32: the only AL entity-level tax on a NON-electing S-corp = LIFO recapture (§40-18-161) + built-in gains (§40-18-174) + excess net passive income (§40-18-175). Direct-entry (these are the federal S-corp-level taxes, not recomputed).",
+            "description": "W6. Form 20S Line 32: the only AL entity-level tax on an S corporation = LIFO recapture (§40-18-161) + built-in gains (§40-18-174) + excess net passive income (§40-18-175). Direct-entry (these are the federal S-corp-level taxes, not recomputed). [CORRECTED 2026-08-29 per D-16 AL-2] NOT confined to non-electing S corps — 2025 Form 20S instructions, verbatim: “NOTE: An EPT would fill out lines 32-37 ONLY IF they have Excessive net passive income, LIFO Recapture, or Built-in Gains Tax.”",
         })
     return rules
 
@@ -223,7 +235,7 @@ def _al_links(prefix, entity_taxes=False):
 _EPT_DIAG = lambda who: {
     "diagnostic_id": None, "title": "AL Electing PTE — 5%, owner REFUNDABLE CREDIT (not a deduction)", "severity": "info",
     "condition": "is_electing_pte",
-    "message": f"An electing {who} pays the Alabama Electing PTE tax at 5% of the entity's Alabama taxable income, computed on Form EPT. Each owner then takes a REFUNDABLE CREDIT for their pro-rata share of the tax (Schedule EPT-C) — a credit, NOT a deduction (contrast North Carolina). The election is annual, made by checking the Electing-PTE box on the timely-filed return + filing Form EPT, and requires consent of owners holding more than 50% of the voting control.",
+    "message": f"An electing {who} pays the Alabama Electing PTE tax at 5% of the entity's Alabama taxable income, computed on Form EPT. Each owner then takes a REFUNDABLE CREDIT for their pro-rata share of the tax on their OWN Alabama return — an upper-tier PTE owner carries it via Schedule CP-B to Form EPT line 5d. (It is NOT claimed on Schedule EPT-C, which is the electing ENTITY's own incentive-credit schedule.) A credit, NOT a deduction (contrast North Carolina). The election is annual, made by checking the Electing-PTE box on the timely-filed return + filing Form EPT, and requires consent of owners holding more than 50% of the voting control.",
     "notes": "W4.",
 }
 _DEPR_DIAG = {
@@ -259,7 +271,7 @@ F65_DIAG = [
 F65_SCEN = [
     {"scenario_name": "F65-A — Electing PTE 5%", "scenario_type": "normal", "sort_order": 1,
      "inputs": {"is_electing_pte": True, "al_taxable_income": 1000000},
-     "expected_outputs": {"ept_tax": 50000}, "notes": "1,000,000 x 5% = 50,000 (Form EPT). Owners take a refundable credit for their share (Sch EPT-C)."},
+     "expected_outputs": {"ept_tax": 50000}, "notes": "1,000,000 x 5% = 50,000 (Form EPT). Owners take a refundable credit for their share on their own AL return (not Sch EPT-C)."},
     {"scenario_name": "F65-B — composite PTE-C 5%", "scenario_type": "normal", "sort_order": 2,
      "inputs": {"nonresident_al_source_share": 300000},
      "expected_outputs": {"composite_tax": 15000}, "notes": "300,000 AL-source x 5% = 15,000 (PTE-C)."},
@@ -288,7 +300,7 @@ F20S_DIAG = [
     _named(_EPT_DIAG("S corporation"), "D_AL20S_EPT"),
     {"diagnostic_id": "D_AL20S_ENTITY", "title": "AL 20S entity taxes (Line 32) — LIFO / built-in gains / excess passive", "severity": "info",
      "condition": "lifo_recapture > 0 or builtin_gains > 0 or excess_net_passive > 0",
-     "message": "The only Alabama entity-level tax on a non-electing S-corporation (Form 20S Line 32) is the sum of the federal S-corp-level taxes: LIFO recapture (§40-18-161), built-in gains (§40-18-174), and excess net passive income (§40-18-175). Enter these directly (they are computed on the federal 1120-S). All other income passes through to shareholders.",
+     "message": "The only Alabama entity-level tax on an S corporation (Form 20S Line 32) is the sum of the federal S-corp-level taxes: LIFO recapture (§40-18-161), built-in gains (§40-18-174), and excess net passive income (§40-18-175). Enter these directly (they are computed on the federal 1120-S). All other income passes through to shareholders. This applies to ANY Form 20S filer: an electing PTE completes lines 32-37 as well, if it has any of the three (2025 Form 20S instructions).",
      "notes": "W6."},
     _named(_DEPR_DIAG, "D_AL20S_DEPR"),
     {"diagnostic_id": "D_AL20S_BPT", "title": "AL Business Privilege Tax is a separate return (Form PPT)", "severity": "info",
@@ -299,10 +311,10 @@ F20S_DIAG = [
 F20S_SCEN = [
     {"scenario_name": "F20S-A — Electing PTE 5%", "scenario_type": "normal", "sort_order": 1,
      "inputs": {"is_electing_pte": True, "al_taxable_income": 800000},
-     "expected_outputs": {"ept_tax": 40000}, "notes": "800,000 x 5% = 40,000 (Form EPT); shareholders take a refundable credit (Sch EPT-C)."},
+     "expected_outputs": {"ept_tax": 40000}, "notes": "800,000 x 5% = 40,000 (Form EPT); shareholders take a refundable credit on their own AL return (not Sch EPT-C)."},
     {"scenario_name": "F20S-B — Line 32 entity taxes (LIFO/BIG/excess-passive)", "scenario_type": "edge", "sort_order": 2,
      "inputs": {"lifo_recapture": 10000, "builtin_gains": 5000, "excess_net_passive": 3000},
-     "expected_outputs": {"entity_tax": 18000}, "notes": "10,000 + 5,000 + 3,000 = 18,000 (Line 32). The only entity-level AL tax on a non-electing S-corp."},
+     "expected_outputs": {"entity_tax": 18000}, "notes": "10,000 + 5,000 + 3,000 = 18,000 (Line 32). The only entity-level AL tax on an S corp — electing or not."},
     {"scenario_name": "F20S-C — composite PTE-C 5%", "scenario_type": "normal", "sort_order": 3,
      "inputs": {"nonresident_al_source_share": 200000},
      "expected_outputs": {"composite_tax": 10000}, "notes": "200,000 x 5% = 10,000 (PTE-C)."},
@@ -314,22 +326,22 @@ F20S_SCEN = [
 FORMS: list[dict] = [
     {"identity": {"form_number": "AL_FORM_65", "entity_types": ["1065"],
                   "form_title": "Alabama Form 65 — Partnership/LLC Return of Income (TY2025)",
-                  "notes": "WO-13 (DECISIONS D-15). AL partnership: federal 1065 start; AL conforms to §168(k)/§179 (no add-back); single sales factor (Act 2021-1); the Electing PTE tax (5% of AL taxable income on Form EPT, owner-side REFUNDABLE CREDIT via Sch EPT-C — NOT a deduction); composite PTE-C 5% on nonresidents. Due Mar 15."},
+                  "notes": "WO-13 (DECISIONS D-15). AL partnership: federal 1065 start; AL conforms to §168(k)/§179 (no add-back); single sales factor (Act 2021-1); the Electing PTE tax (5% of AL taxable income on Form EPT, owner-side REFUNDABLE CREDIT on the owner's own AL return, NOT via Sch EPT-C — and NOT a deduction); composite PTE-C 5% on nonresidents. Due 15th day of 3rd month (TY2025 calendar: Mon Mar 16, 2026)."},
      "facts": F65_FACTS, "rules": F65_RULES, "rule_links": F65_LINKS, "lines": F65_LINES, "diagnostics": F65_DIAG, "scenarios": F65_SCEN},
     {"identity": {"form_number": "AL_FORM_20S", "entity_types": ["1120S"],
                   "form_title": "Alabama Form 20S — S Corporation Return (TY2025)",
-                  "notes": "WO-13 (DECISIONS D-15). AL S-corp: federal 1120-S start; AL conforms to §168(k)/§179; single sales factor; the Electing PTE tax (5%, Form EPT, owner refundable credit); Line 32 non-electing entity taxes = LIFO recapture (§40-18-161) + built-in gains (§40-18-174) + excess net passive income (§40-18-175), direct-entry; composite PTE-C 5%; BPT separate (Form PPT). Due Mar 15."},
+                  "notes": "WO-13 (DECISIONS D-15). AL S-corp: federal 1120-S start; AL conforms to §168(k)/§179; single sales factor; the Electing PTE tax (5%, Form EPT, owner refundable credit); Line 32 entity taxes (any 20S filer, electing or not) = LIFO recapture (§40-18-161) + built-in gains (§40-18-174) + excess net passive income (§40-18-175), direct-entry; composite PTE-C 5%; BPT separate (Form PPT). Due 15th day of 3rd month (TY2025 calendar: Mon Mar 16, 2026)."},
      "facts": F20S_FACTS, "rules": F20S_RULES, "rule_links": F20S_LINKS, "lines": F20S_LINES, "diagnostics": F20S_DIAG, "scenarios": F20S_SCEN},
 ]
 
 FLOW_ASSERTIONS: list[dict] = [
     {"assertion_id": "FA-AL65-EPT", "title": "AL Electing PTE tax = 5% of AL taxable income (owner credit)", "assertion_type": "reconciliation",
      "entity_types": ["1065"], "status": "draft", "sort_order": 1,
-     "description": "Electing PTE tax (Form EPT) = AL taxable income × 5%; each owner takes a refundable credit for their share (Sch EPT-C).",
+     "description": "Electing PTE tax (Form EPT) = AL taxable income × 5%; each owner takes a refundable credit for their share on their own AL return (not Sch EPT-C).",
      "definition": {"rule": "R-AL65-EPT", "check": "ept_tax = al_taxable_income * 0.05"}},
     {"assertion_id": "FA-AL20S-ENTITY", "title": "AL 20S Line 32 = LIFO + built-in gains + excess passive", "assertion_type": "reconciliation",
      "entity_types": ["1120S"], "status": "draft", "sort_order": 2,
-     "description": "The non-electing S-corp entity tax (Line 32) = LIFO recapture + built-in gains + excess net passive income.",
+     "description": "The S-corp entity tax (Line 32; any 20S filer, electing or not) = LIFO recapture + built-in gains + excess net passive income.",
      "definition": {"rule": "R-AL20S-ENTITY", "check": "entity_tax = lifo + builtin_gains + excess_net_passive"}},
 ]
 
