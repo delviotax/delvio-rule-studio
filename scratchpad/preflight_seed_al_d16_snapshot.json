@@ -1,0 +1,221 @@
+{
+ "AL_FORM_65": {
+  "form_title": "Alabama Form 65 — Partnership/LLC Return of Income (TY2025)",
+  "notes": "WO-13 (DECISIONS D-15). AL partnership: federal 1065 start; AL conforms to §168(k)/§179 (no add-back); single sales factor (Act 2021-1); the Electing PTE tax (5% of AL taxable income on Form EPT, owner-side REFUNDABLE CREDIT via Sch EPT-C — NOT a deduction); composite PTE-C 5% on nonresidents. Due Mar 15.",
+  "counts": {
+   "facts": 9,
+   "rules": 3,
+   "lines": 3,
+   "diagnostics": 3,
+   "scenarios": 4
+  },
+  "rules": {
+   "R-AL65-APPORT": {
+    "title": "Single sales factor apportionment (Schedule C)",
+    "description": "W5. Alabama Sales / Everywhere Sales (Act 2021-1, single sales factor, four decimals).",
+    "formula": "al_ratio = 1.0 if not is_multistate else round(sales_al / sales_everywhere, 4)"
+   },
+   "R-AL65-EPT": {
+    "title": "AL Electing PTE tax — 5% (Form EPT), owner REFUNDABLE CREDIT",
+    "description": "W4. Act 2021-1. Electing PTE tax = 5% of the entity's Alabama taxable income, computed/paid on Form EPT (referenced on Form 65 Sch K L23 / Form 20S Sch K L25). Owner side = a REFUNDABLE CREDIT for the owner's share (Schedule EPT-C), NOT a deduction (contrast NC).",
+    "formula": "if is_electing_pte: ept_tax = al_taxable_income * 0.05 (Form EPT) ; owner_side = each owner takes a REFUNDABLE CREDIT for its share of ept_tax (Schedule EPT-C)"
+   },
+   "R-AL65-COMPOSITE": {
+    "title": "AL composite PTE-C — 5% on nonresidents",
+    "description": "W5. §40-18-24.2. The PTE files Form PTE-C and pays 5% on nonresidents' AL-source share, unless relieved (PTE-R) or the nonresident opts out (Schedule NRC-Exempt / QIP).",
+    "formula": "if not composite_exempt: composite_tax = nonresident_al_source_share * 0.05 (Form PTE-C)"
+   }
+  },
+  "diagnostics": {
+   "D_AL65_COMPOSITE": "The PTE files Form PTE-C and pays a 5% composite tax on nonresident owners' Alabama-source share (§40-18-24.2), unless relieved (Form PTE-R filed ≥30 days before the due date) or the nonresident opts out (Schedule NRC-Exempt / qualified investment partnership).",
+   "D_AL65_DEPR": "Alabama conforms to federal §168(k) bonus depreciation and §179 (rolling conformity, §40-18-1.1; OBBBA flows through — §179 $2.5M/$4M). §179 flows straight from the federal return; there is NO bonus/§179 add-back (opposite of GA/SC/NC). Only the historical 2008 Economic Stimulus Act basis difference decouples. Note: AL conformity is ITEM-BY-ITEM — several other OBBBA items (tips/overtime/§199A/§174) are NOT tied to federal.",
+   "D_AL65_EPT": "An electing partnership pays the Alabama Electing PTE tax at 5% of the entity's Alabama taxable income, computed on Form EPT. Each owner then takes a REFUNDABLE CREDIT for their pro-rata share of the tax (Schedule EPT-C) — a credit, NOT a deduction (contrast North Carolina). The election is annual, made by checking the Electing-PTE box on the timely-filed return + filing Form EPT, and requires consent of owners holding more than 50% of the voting control."
+  },
+  "lines": [
+   "F65-APPT",
+   "F65-EPT",
+   "F65-PTEC"
+  ],
+  "facts": [
+   "al_taxable_income",
+   "composite_exempt",
+   "federal_income",
+   "federal_section_179",
+   "is_electing_pte",
+   "is_multistate",
+   "nonresident_al_source_share",
+   "sales_al",
+   "sales_everywhere"
+  ]
+ },
+ "AL_FORM_20S": {
+  "form_title": "Alabama Form 20S — S Corporation Return (TY2025)",
+  "notes": "WO-13 (DECISIONS D-15). AL S-corp: federal 1120-S start; AL conforms to §168(k)/§179; single sales factor; the Electing PTE tax (5%, Form EPT, owner refundable credit); Line 32 non-electing entity taxes = LIFO recapture (§40-18-161) + built-in gains (§40-18-174) + excess net passive income (§40-18-175), direct-entry; composite PTE-C 5%; BPT separate (Form PPT). Due Mar 15.",
+  "counts": {
+   "facts": 12,
+   "rules": 4,
+   "lines": 3,
+   "diagnostics": 4,
+   "scenarios": 4
+  },
+  "rules": {
+   "R-AL20S-APPORT": {
+    "title": "Single sales factor apportionment (Schedule C)",
+    "description": "W5. Alabama Sales / Everywhere Sales (Act 2021-1, single sales factor, four decimals).",
+    "formula": "al_ratio = 1.0 if not is_multistate else round(sales_al / sales_everywhere, 4)"
+   },
+   "R-AL20S-EPT": {
+    "title": "AL Electing PTE tax — 5% (Form EPT), owner REFUNDABLE CREDIT",
+    "description": "W4. Act 2021-1. Electing PTE tax = 5% of the entity's Alabama taxable income, computed/paid on Form EPT (referenced on Form 65 Sch K L23 / Form 20S Sch K L25). Owner side = a REFUNDABLE CREDIT for the owner's share (Schedule EPT-C), NOT a deduction (contrast NC).",
+    "formula": "if is_electing_pte: ept_tax = al_taxable_income * 0.05 (Form EPT) ; owner_side = each owner takes a REFUNDABLE CREDIT for its share of ept_tax (Schedule EPT-C)"
+   },
+   "R-AL20S-COMPOSITE": {
+    "title": "AL composite PTE-C — 5% on nonresidents",
+    "description": "W5. §40-18-24.2. The PTE files Form PTE-C and pays 5% on nonresidents' AL-source share, unless relieved (PTE-R) or the nonresident opts out (Schedule NRC-Exempt / QIP).",
+    "formula": "if not composite_exempt: composite_tax = nonresident_al_source_share * 0.05 (Form PTE-C)"
+   },
+   "R-AL20S-ENTITY": {
+    "title": "Form 20S non-electing entity taxes (Line 32)",
+    "description": "W6. Form 20S Line 32: the only AL entity-level tax on a NON-electing S-corp = LIFO recapture (§40-18-161) + built-in gains (§40-18-174) + excess net passive income (§40-18-175). Direct-entry (these are the federal S-corp-level taxes, not recomputed).",
+    "formula": "entity_tax = lifo_recapture + builtin_gains + excess_net_passive  (direct-entry; the federal S-corp-level taxes)"
+   }
+  },
+  "diagnostics": {
+   "D_AL20S_BPT": "The Alabama Business Privilege Tax is a separate filing (Form PPT for pass-throughs) and is not computed on Form 20S. The minimum BPT for pass-throughs was repealed for tax years beginning on/after Jan 1, 2024. Do not compute the privilege tax here.",
+   "D_AL20S_DEPR": "Alabama conforms to federal §168(k) bonus depreciation and §179 (rolling conformity, §40-18-1.1; OBBBA flows through — §179 $2.5M/$4M). §179 flows straight from the federal return; there is NO bonus/§179 add-back (opposite of GA/SC/NC). Only the historical 2008 Economic Stimulus Act basis difference decouples. Note: AL conformity is ITEM-BY-ITEM — several other OBBBA items (tips/overtime/§199A/§174) are NOT tied to federal.",
+   "D_AL20S_ENTITY": "The only Alabama entity-level tax on a non-electing S-corporation (Form 20S Line 32) is the sum of the federal S-corp-level taxes: LIFO recapture (§40-18-161), built-in gains (§40-18-174), and excess net passive income (§40-18-175). Enter these directly (they are computed on the federal 1120-S). All other income passes through to shareholders.",
+   "D_AL20S_EPT": "An electing S corporation pays the Alabama Electing PTE tax at 5% of the entity's Alabama taxable income, computed on Form EPT. Each owner then takes a REFUNDABLE CREDIT for their pro-rata share of the tax (Schedule EPT-C) — a credit, NOT a deduction (contrast North Carolina). The election is annual, made by checking the Electing-PTE box on the timely-filed return + filing Form EPT, and requires consent of owners holding more than 50% of the voting control."
+  },
+  "lines": [
+   "F20S-EPT",
+   "F20S-L32",
+   "F20S-PTEC"
+  ],
+  "facts": [
+   "al_taxable_income",
+   "builtin_gains",
+   "composite_exempt",
+   "excess_net_passive",
+   "federal_income",
+   "federal_section_179",
+   "is_electing_pte",
+   "is_multistate",
+   "lifo_recapture",
+   "nonresident_al_source_share",
+   "sales_al",
+   "sales_everywhere"
+  ]
+ },
+ "AL_FORM_40": {
+  "form_title": "AL Form 40 — Alabama Individual Income Tax Return (TY2025)",
+  "notes": "3rd state individual spec. Builds AL gross income from scratch; the federal income tax deduction (L12) is the defining feature; 2/4/5% rate; sliding-scale std ded + dependent exemption. v1 covers full-year + part-year residents.",
+  "counts": {
+   "facts": 22,
+   "rules": 9,
+   "lines": 20,
+   "diagnostics": 6,
+   "scenarios": 5
+  },
+  "rules": {
+   "R-AL-INCOME": {
+    "title": "AL gross income build → total income (L8) and AL AGI (L10)",
+    "description": "AL builds gross income from scratch (no federal-AGI start). §414(j)/SS/government-pension/state-refund income is excluded at source (not in other_income).",
+    "formula": "L8 = wages_al + interest_dividends + other_income ; L10 = L8 - total_adjustments"
+   },
+   "R-AL-FIT": {
+    "title": "Federal income tax deduction (L12) — worksheet + PY apportionment",
+    "description": "Dec B. THE QUIRK. (1040 L22 + NIIT) − refundable credits, floored 0; separate from the L11 election. PY: × (AL AGI ÷ federal AGI). W3: liability-based (worksheet), not cash/accrued.",
+    "formula": "fed_tax = fed_1040_line22 + fed_niit_8960_l17 ; refundable = fed_eic_27a + fed_actc_28 + fed_aoc_29 + fed_refundable_adoption_30 + fed_form_2439 ; L12 = max(0, fed_tax - refundable) ; if is_part_year: L12 = round(L12 * (L10 / federal_agi))  [ratio ≤ 1]"
+   },
+   "R-AL-STD-DED": {
+    "title": "Standard deduction (L11) — sliding by AL AGI",
+    "description": "Dec C / W1. Encoded as a formula (sidesteps the OCR-suspect MFJ cell). If deduction_election=itemized, L11 = itemized_deduction instead.",
+    "formula": "by filing_status {max, max_band_top, step, band, floor}: L11 = max(floor, max - step * ceil(max(0, L10 - max_band_top) / band)) ; MFJ 8500/25999/175/500/5000 · MFS 4250/12999/88/250/2500 · HOF 5200/25999/135/500/2500 · single 3000/25999/25/500/2500"
+   },
+   "R-AL-PERS-EXEMPT": {
+    "title": "Personal exemption (L13)",
+    "description": "",
+    "formula": "L13 = {single:1500, MFJ:3000, MFS:1500, HOF:3000}[filing_status]"
+   },
+   "R-AL-DEP-EXEMPT": {
+    "title": "Dependent exemption (L14) — sliding by AL AGI",
+    "description": "Dec C. $1,000 (≤$50k) / $500 ($50k-$100k) / $300 (>$100k) per dependent, by AL AGI.",
+    "formula": "per_dep = 1000 if L10<=50000 else (500 if L10<=100000 else 300) ; L14 = per_dep * num_dependents"
+   },
+   "R-AL-TAXABLE": {
+    "title": "Total deductions (L15) and taxable income (L16)",
+    "description": "",
+    "formula": "L15 = L11 + L12 + L13 + L14 ; L16 = max(0, L10 - L15)"
+   },
+   "R-AL-TAX": {
+    "title": "Income tax (L17) — 2/4/5% graduated",
+    "description": "W2. §40-18-5. Tax table for the exact rounding; brackets as above.",
+    "formula": "single/MFS/HOF: 2% to 500, 4% 500-3000, 5% over 3000 ; MFJ: 2% to 1000, 4% 1000-6000, 5% over 6000 ; on L16 (per the DOR tax table)"
+   },
+   "R-AL-NET-TAX": {
+    "title": "Net tax (L18) and total liability (L21)",
+    "description": "Dec D: Schedule OC nonrefundable direct-entry; Schedule ATP additional taxes RED-deferred (direct-entry input).",
+    "formula": "L18 = max(0, L17 - schedule_oc_nonrefundable) ; L21 = L18 + additional_taxes_atp"
+   },
+   "R-AL-PAYMENTS": {
+    "title": "Total payments (L27) and refund/owe (L30/L35)",
+    "description": "",
+    "formula": "L27 = al_withholding + estimated_extension_payments + schedule_oc_refundable ; if L21 > L27: L30 amount owed ; else L35 refund = L27 - L21"
+   }
+  },
+  "diagnostics": {
+   "D_AL40_40NR": "True nonresidents with AL-source income file Form 40NR, not Form 40. Form 40NR is not computed in v1.",
+   "D_AL40_ATP": "Schedule ATP additional taxes (L19) + penalties (L31) are not computed in v1 — prepare Schedule ATP manually.",
+   "D_AL40_EXCLUSIONS": "Do NOT include §414(j) defined-benefit pension distributions, Social Security, US/AL government retirement, or state tax refunds in AL income — Alabama fully excludes them (no line; simply omit). No general age-65 exclusion exists.",
+   "D_AL40_FIT": "L12 = (1040 L22 + NIIT) − refundable credits (EIC/ACTC/AOC/refundable adoption/2439), floored 0. Do NOT use federal tax withheld. Part-year: apportioned by AL AGI ÷ federal AGI.",
+   "D_AL40_NOL": "The Form NOL-85A net operating loss alternative to the L17 tax table is not computed in v1.",
+   "D_AL40_STDDED": "The standard deduction sliding scale is encoded as a formula (max − step×band, floored), reproducing the DOR chart and sidestepping the one OCR-suspect MFJ cell. Verify at a couple of AGI points."
+  },
+  "lines": [
+   "10",
+   "11",
+   "12",
+   "13",
+   "14",
+   "15",
+   "16",
+   "17",
+   "18",
+   "19",
+   "21",
+   "25",
+   "27",
+   "30",
+   "35",
+   "5b",
+   "6",
+   "7",
+   "8",
+   "9"
+  ],
+  "facts": [
+   "additional_taxes_atp",
+   "al_withholding",
+   "deduction_election",
+   "estimated_extension_payments",
+   "fed_1040_line22",
+   "fed_actc_28",
+   "fed_aoc_29",
+   "fed_eic_27a",
+   "fed_form_2439",
+   "fed_niit_8960_l17",
+   "fed_refundable_adoption_30",
+   "federal_agi",
+   "filing_status",
+   "interest_dividends",
+   "is_part_year",
+   "itemized_deduction",
+   "num_dependents",
+   "other_income",
+   "schedule_oc_nonrefundable",
+   "schedule_oc_refundable",
+   "total_adjustments",
+   "wages_al"
+  ]
+ }
+}

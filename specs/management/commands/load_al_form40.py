@@ -371,6 +371,8 @@ AL40_FACTS: list[dict] = [
     {"fact_key": "additional_taxes_atp", "label": "Additional taxes (Schedule ATP, L19, RED-defer)", "data_type": "decimal", "required": False, "sort_order": 42},
     {"fact_key": "al_withholding", "label": "Alabama income tax withheld (L22)", "data_type": "decimal", "required": False, "sort_order": 50},
     {"fact_key": "estimated_extension_payments", "label": "Estimated + extension payments (L23)", "data_type": "decimal", "required": False, "sort_order": 51},
+    {"fact_key": "pte_credit_schedule_cp", "label": "L26 Composite tax payments / Electing PTE credit (Schedule CP)", "data_type": "decimal", "required": False, "sort_order": 52,
+     "notes": "Gate 1 (Ken, direct, 2026-08-30). Schedule CP (Form 40 or 40NR), headed “Composite Payments/Electing PTE Credits”, Section B line 1: “Total of Column G enter here and on Form 40, page 1, line 26 or Form 40NR, page 1, line 23.” Column G = “Amount of payment made by the S Corporation, Partnership, Estate or Trust on your behalf”, keyed per K-1. ⚠ NOT Schedule OC line 25: Schedule OC Section F is a CLOSED list of five refundable credits and F6 = F1+F2+F3+F4+F5, with no slot for the PTE credit. Key name matches load_al_40nr.py deliberately so the resident and nonresident forms carry ONE fact key. Source: 2025 Form 40 booklet, 25f40.pdf, ModDate 2026-02-26."},
 ]
 
 AL40_RULES: list[dict] = [
@@ -413,9 +415,11 @@ AL40_RULES: list[dict] = [
      "inputs": ["schedule_oc_nonrefundable", "additional_taxes_atp"], "outputs": ["L18", "L21"], "sort_order": 17,
      "description": "Dec D: Schedule OC nonrefundable direct-entry; Schedule ATP additional taxes RED-deferred (direct-entry input)."},
     {"rule_id": "R-AL-PAYMENTS", "title": "Total payments (L27) and refund/owe (L30/L35)", "rule_type": "calculation",
-     "formula": ("L27 = al_withholding + estimated_extension_payments + schedule_oc_refundable ; "
+     "formula": ("L27 = al_withholding + estimated_extension_payments + schedule_oc_refundable "
+                 "+ pte_credit_schedule_cp ; "
                  "if L21 > L27: L30 amount owed ; else L35 refund = L27 - L21"),
-     "inputs": ["al_withholding", "estimated_extension_payments", "schedule_oc_refundable"], "outputs": ["L27", "L30", "L35"], "sort_order": 18},
+     "inputs": ["al_withholding", "estimated_extension_payments", "schedule_oc_refundable", "pte_credit_schedule_cp"], "outputs": ["L27", "L30", "L35"], "sort_order": 18,
+     "description": "Gate 1 (Ken, direct, 2026-08-30): L26 (Schedule CP) JOINS the L27 sum. The form face reads “27 Total payments. Add lines 22, 23, 24, 25, and 26.” ⚠ A fact that nothing sums is the unmapped-input defect — adding the fact without the term would have shipped exactly the shape diagnosed at S-10b. ⚠ CARRIED GAP, deliberately out of scope: line 24 (Amended Returns Only — previous payments) is still unmodelled, so L27 here is the four-term sum, not the face’s five."},
 ]
 
 AL40_RULE_LINKS: list[tuple[str, str, str, str]] = [
@@ -447,7 +451,8 @@ AL40_LINES: list[dict] = [
     {"line_number": "19", "description": "Additional taxes (Schedule ATP) — RED-defer", "line_type": "input", "source_facts": ["additional_taxes_atp"], "sort_order": 15},
     {"line_number": "21", "description": "Total tax liability", "line_type": "subtotal", "source_rules": ["R-AL-NET-TAX"], "sort_order": 16},
     {"line_number": "25", "description": "Refundable credits (Schedule OC F6) — direct-entry", "line_type": "input", "source_facts": ["schedule_oc_refundable"], "sort_order": 17},
-    {"line_number": "27", "description": "Total payments", "line_type": "subtotal", "source_rules": ["R-AL-PAYMENTS"], "sort_order": 18},
+    {"line_number": "26", "description": "Payments from Schedule CP, Section B, Line 1 — composite payments / Electing PTE credit (direct-entry)", "line_type": "input", "source_facts": ["pte_credit_schedule_cp"], "sort_order": 18},
+    {"line_number": "27", "description": "Total payments", "line_type": "subtotal", "source_rules": ["R-AL-PAYMENTS"], "sort_order": 19},
     {"line_number": "30", "description": "Amount you owe", "line_type": "total", "source_rules": ["R-AL-PAYMENTS"], "sort_order": 19},
     {"line_number": "35", "description": "Refunded to you", "line_type": "total", "source_rules": ["R-AL-PAYMENTS"], "sort_order": 20},
 ]
@@ -490,6 +495,10 @@ AL40_SCENARIOS: list[dict] = [
      "inputs": {"filing_status": "MFJ", "wages_al": 30000, "deduction_election": "standard"},
      "expected_outputs": {"L11": 6925},
      "notes": "MFJ std ded at AGI 30000: band = ceil((30000−25999)/500) = ceil(8.002) = 9; L11 = 8500 − 175×9 = 6925. (W1: verify the band count vs the DOR chart at $30,000.)"},
+    {"scenario_name": "Electing-PTE owner: Schedule CP credit turns owed into refund", "scenario_type": "edge", "sort_order": 6,
+     "inputs": {"L21": 3000, "al_withholding": 1000, "estimated_extension_payments": 500, "schedule_oc_refundable": 0, "pte_credit_schedule_cp": 2000},
+     "expected_outputs": {"L27": 3500, "L35": 500},
+     "notes": "Gate 1 (Ken, direct, 2026-08-30). L27 = 1000 + 500 + 0 + 2000 = 3500; L21 = 3000, so L35 refund = 500. \u2b50 DISCRIMINATING BY CONSTRUCTION: drop the Schedule CP term and L27 = 1500 against a 3000 liability, i.e. 1500 OWED \u2014 the sign flips, so this fixture cannot pass against a spec that carries the fact but never sums it. That is the whole failure mode being guarded (S-10b: a gate that cannot see an input reports 0 as though it were an answer)."},
     {"scenario_name": "Dependent exemption slide at $100k AGI", "scenario_type": "edge", "sort_order": 5,
      "inputs": {"filing_status": "MFJ", "wages_al": 100000, "num_dependents": 3, "deduction_election": "standard"},
      "expected_outputs": {"L10": 100000, "L14": 1500},
