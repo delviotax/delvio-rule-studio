@@ -707,7 +707,7 @@ GA500_FACTS: list[dict] = [
     {"fact_key": "g_tp_rie_dividends", "label": "TP RIE worksheet L7 — dividend income", "data_type": "decimal", "default_value": "0", "sort_order": 56, "notes": "RIE worksheet line 7 (unearned)."},
     {"fact_key": "g_tp_rie_alimony", "label": "TP RIE worksheet L8 — alimony", "data_type": "decimal", "default_value": "0", "sort_order": 57, "notes": "RIE worksheet line 8 (unearned)."},
     {"fact_key": "g_tp_rie_capital_gains", "label": "TP RIE worksheet L9 — capital gains (losses)", "data_type": "decimal", "default_value": "0", "sort_order": 58, "notes": "RIE worksheet line 9 (unearned)."},
-    {"fact_key": "g_tp_rie_other_income", "label": "TP RIE worksheet L10 — other income (losses)", "data_type": "decimal", "default_value": "0", "sort_order": 59, "notes": "RIE worksheet line 10 (unearned)."},
+    {"fact_key": "g_tp_rie_other_income", "label": "TP RIE worksheet L10 — other income (losses)", "data_type": "decimal", "default_value": "0", "sort_order": 59, "notes": "RIE worksheet line 10 (unearned). COMPONENTS DEFINED 2026-08-30 (Ken, Gate-1 direct: “approve the GA RIE amendment, statute primary”): the §111 taxable state-tax refund AND unemployment compensation, each at its GEORGIA-TAXABLE amount. ⚠ The refund enters at the federal Schedule 1 line 1 figure — the §111 benefit-limited amount — NEVER gross 1099-G box 2. Unemployment enters at box 1 NET of any same-year repayment (the Schedule 1 line 7 quantity). ⚠ “line 10” here is the RIE WORKSHEET line 10, not Form 500 line 10 (Georgia AGI) and not Schedule 1 line 10 (U.S.-obligation interest) — three different line 10s live in this spec. Owner: unemployment follows the 1099-G row’s owner; the refund is JOINT on an MFJ return whose prior-year return was joint, so the 50/50 split below governs it, else it is the taxpayer’s."},
     {"fact_key": "g_tp_rie_taxable_ira", "label": "TP RIE worksheet L11 — taxable IRA distributions", "data_type": "decimal", "default_value": "0", "sort_order": 60, "notes": "RIE worksheet line 11 (← 1040 4b portion)."},
     {"fact_key": "g_tp_rie_taxable_pension", "label": "TP RIE worksheet L12 — taxable pensions", "data_type": "decimal", "default_value": "0", "sort_order": 61, "notes": "RIE worksheet line 12 (← 1040 5b portion)."},
     {"fact_key": "g_tp_rie_rental_etc", "label": "TP RIE worksheet L13 — rental/royalty/partnership/S-corp (non-material-participation)", "data_type": "decimal", "default_value": "0", "sort_order": 62, "notes": "RIE worksheet line 13 (unearned). W5."},
@@ -722,7 +722,7 @@ GA500_FACTS: list[dict] = [
     {"fact_key": "g_sp_rie_dividends", "label": "Spouse RIE L7 — dividend income", "data_type": "decimal", "default_value": "0", "sort_order": 76, "notes": "Spouse RIE worksheet line 7."},
     {"fact_key": "g_sp_rie_alimony", "label": "Spouse RIE L8 — alimony", "data_type": "decimal", "default_value": "0", "sort_order": 77, "notes": "Spouse RIE worksheet line 8."},
     {"fact_key": "g_sp_rie_capital_gains", "label": "Spouse RIE L9 — capital gains (losses)", "data_type": "decimal", "default_value": "0", "sort_order": 78, "notes": "Spouse RIE worksheet line 9."},
-    {"fact_key": "g_sp_rie_other_income", "label": "Spouse RIE L10 — other income (losses)", "data_type": "decimal", "default_value": "0", "sort_order": 79, "notes": "Spouse RIE worksheet line 10."},
+    {"fact_key": "g_sp_rie_other_income", "label": "Spouse RIE L10 — other income (losses)", "data_type": "decimal", "default_value": "0", "sort_order": 79, "notes": "Spouse RIE worksheet line 10. RIE worksheet line 10 (unearned). COMPONENTS DEFINED 2026-08-30 (Ken, Gate-1 direct: “approve the GA RIE amendment, statute primary”): the §111 taxable state-tax refund AND unemployment compensation, each at its GEORGIA-TAXABLE amount. ⚠ The refund enters at the federal Schedule 1 line 1 figure — the §111 benefit-limited amount — NEVER gross 1099-G box 2. Unemployment enters at box 1 NET of any same-year repayment (the Schedule 1 line 7 quantity). ⚠ “line 10” here is the RIE WORKSHEET line 10, not Form 500 line 10 (Georgia AGI) and not Schedule 1 line 10 (U.S.-obligation interest) — three different line 10s live in this spec."},
     {"fact_key": "g_sp_rie_taxable_ira", "label": "Spouse RIE L11 — taxable IRA distributions", "data_type": "decimal", "default_value": "0", "sort_order": 80, "notes": "Spouse RIE worksheet line 11."},
     {"fact_key": "g_sp_rie_taxable_pension", "label": "Spouse RIE L12 — taxable pensions", "data_type": "decimal", "default_value": "0", "sort_order": 81, "notes": "Spouse RIE worksheet line 12."},
     {"fact_key": "g_sp_rie_rental_etc", "label": "Spouse RIE L13 — rental/royalty/partnership/S-corp", "data_type": "decimal", "default_value": "0", "sort_order": 82, "notes": "Spouse RIE worksheet line 13."},
@@ -804,6 +804,9 @@ GA500_RULES: list[dict] = [
     {"rule_id": "R-GA500-RIE", "title": "Schedule 1 line 7 — Retirement Income Exclusion (standard worksheet)", "rule_type": "calculation", "precedence": 2, "sort_order": 5,
      "formula": ("Per qualifying person: L5 = min(salary+other earned, $5,000); L14 = max(0, Σ unearned "
                  "[interest+dividends+alimony+cap gains+other+IRA+pension+rental]); L15 = L5 + L14; "
+                 "WORKSHEET LINE 10 (‘other’) = the §111 taxable state-tax refund (at the Schedule 1 "
+                 "line 1 benefit-limited amount, NEVER gross 1099-G box 2) + unemployment compensation "
+                 "(box 1 net of same-year repayment). Ken, Gate-1 direct 2026-08-30. "
                  "L17 = min(L15, max allowable [$35,000 age 62-64/disabled, $65,000 age 65+]). "
                  "Taxpayer L17 → Sch 1 L7a (or L7c disability); spouse L17 → L7d (or L7f). "
                  "Each spouse qualifies separately; jointly-owned income split 50/50. "
@@ -832,7 +835,37 @@ GA500_RULES: list[dict] = [
                      "premise was withdrawn after two sessions independently re-read the printed page. "
                      "The recognition signature, worth keeping: THE TOTAL TIES WHILE THE TWO PER-SPOUSE COLUMNS "
                      "DISAGREE BY $1. "
-                     "The delvio-tax engine build (split_conserving going vendor-aware) is tracked there, not here.")},
+                     "The delvio-tax engine build (split_conserving going vendor-aware) is tracked there, not here. "
+                     "─── WORKSHEET LINE 10 DEFINED 2026-08-30 (Ken, Gate-1 direct to the states session: "
+                     "“approve the GA RIE amendment, statute primary”). Line 10 ‘Other income (losses)’ "
+                     "INCLUDES the §111 taxable state-tax refund and unemployment compensation. "
+                     "AUTHORITY, RANKED ON HIS INSTRUCTION — PRIMARY: O.C.G.A. §48-7-27(a)(5)(E)(i), which "
+                     "provides that retirement income ‘shall include BUT NOT BE LIMITED TO’ its enumerated "
+                     "list. That is an EXPRESS OPEN-ENDED GRANT and it does not constrain by similarity. "
+                     "SECONDARY: Ga. Comp. R. & Regs. r. 560-7-4-.02(4)(b)1, whose unearned list closes ‘and "
+                     "other similar income’. "
+                     "⚠⚠ WHY THE REG IS SECOND AND NOT FIRST, because this is the part a later reader will "
+                     "otherwise undo: (i) ‘other SIMILAR income’ invites EJUSDEM GENERIS against a list that is "
+                     "entirely INVESTMENT income (interest, dividends, rents, royalties, capital gains, "
+                     "pensions/annuities), and NEITHER ruled component is investment income — a §111 recovery "
+                     "is a recovery of a prior deduction and unemployment is wage replacement; and (ii) THE SAME "
+                     "REG SENTENCE IS PROVABLY STALE, capping earned income at $4,000 where the statute, the "
+                     "printed 2025 worksheet line 4 and this spec’s GA_RIE_EARNED_CAP all say $5,000. A "
+                     "sentence wrong about its own adjacent figure is weak footing for a new inclusion. "
+                     "⭐ The statute reaches the same result without either problem, which is why it leads. "
+                     "⚠ THIS IS A JUDGEMENT INSIDE AN OPEN-ENDED STATUTE, NOT A TEXT THAT NAMES THESE ITEMS. "
+                     "No source found says ‘state tax refund’ or ‘unemployment’ is retirement income; the "
+                     "statute permits their inclusion and KEN RULED THAT THEY ARE INCLUDED. The rule says so "
+                     "plainly rather than implying the sources settle it. "
+                     "⚠ (3) IS A FILTER, NOT A GRANT — ‘Only retirement income that is included in Georgia "
+                     "taxable income shall be included’ fixes the AMOUNT each component enters at; it never "
+                     "admits anything. "
+                     "⚠ (4)(b)2 USES ‘similar income’ A SECOND TIME, TO EXCLUDE (lotteries, gambling, illegal "
+                     "sources). Never cite the phrase without saying which of the two occurrences is meant. "
+                     "⚠ NOT RULED, RECORDED AS AN OPEN SPEC/ENGINE GAP: the delvio-tax engine also routes "
+                     "1099-PATR patronage and 1099-MISC box 3 (both federal Schedule 1 line 8z) to this same "
+                     "worksheet line. That is engine behaviour this spec has never stated and it was NOT part of "
+                     "this ruling — flagged, not adopted.")},
 
     {"rule_id": "R-GA500-MIL", "title": "Schedule 1 line 7 — Military Retirement Exclusion worksheet", "rule_type": "calculation", "precedence": 2, "sort_order": 6,
      "formula": "Under 62 only. L3 = min(military retirement, $17,500). STOP branches (military retirement < $17,501 OR GA earned income < $17,501): exclusion = L3, entered on Sch 1 L7b/7e. Proceed branch: L7 = $35,000 (the worksheet's PREPRINTED total cap) and L8 = min(military retirement, L7); exclusion = L8 ALONE — NEVER L3 + L8 (IT-511: the additional $17,500 is claimed 'against the total military retirement income they received', so the total exclusion can never exceed the retirement actually received). → Sch 1 L7b/7e, entered on Sch 1 L9 as a subtraction. Max $35,000.",
