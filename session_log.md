@@ -180,7 +180,10 @@
 - **KEN ACTIONS**: (1) ~~Render cron setup~~ DONE in-session via API. (2) Triage CR-2026-001
   (likely a routine IRS PDF refresh — but the 5 rules + delvio-tax field map need the diff checked;
   delvio-tax's own manifest sha is now stale for f6252 → update_irs_forms path). (3) Open decisions
-  from the plan: editorial subscription (Parker recommended), Lacerte cross-check formality.
+  from the plan: editorial subscription (a tax-research publisher was recommended; vendor name
+  removed 2026-08-31 for a mirror-sync PII blocklist collision — it is a PUBLISHER name that
+  happens to match a client surname, NOT a client reference; the name itself was relayed to Ken
+  so the open decision does not lose its content), Lacerte cross-check formality.
 - **RENAME (same session, earlier)**: repo+folder+session-store renamed sherpa-tax-rule-studio →
   delvio-rule-studio; Render service name + onrender URL DELIBERATELY unchanged (blueprint would
   spawn a new service) — the URL fix is a rules.delviotax.com custom domain (Ken, pending). Poetry
