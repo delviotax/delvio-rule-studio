@@ -429,6 +429,22 @@ N_FACTS: list[dict] = [
     {"fact_key": "min_4361_exempt", "label": "Form 4361 exemption from SE tax approved?",
      "data_type": "boolean", "default_value": "false", "sort_order": 7,
      "notes": "Person-level Taxpayer fact (clergy_4361_exempt). True → ministerial earnings omitted from SE; preparer-asserted (no eligibility adjudication in v1)."},
+    # ─── ADDED 2026-09-05 (delvio s333, 1040 BATCH-296 #70): the SELF-EMPLOYED minister. Pub 517
+    # (2025), "Exemption From Self-Employment (SE) Tax": "If you have an approved exemption ... don't
+    # include the income or deductions from ministerial services in figuring your net earnings from
+    # self-employment"; and under self-employed ministerial expenses: "Deduct these expenses on
+    # Schedule C (Form 1040), and carry the net amount to line 2 of Schedule SE (Form 1040)". The
+    # exemption "doesn't apply to any other self-employment income". So a Schedule C whose activity
+    # is the exercise of ministry is a PER-BUSINESS fact that, with min_4361_exempt, removes THAT
+    # business from Schedule SE line 2 (R-SE-L2) and nothing else. Witness: a 4361 minister whose
+    # only ministerial income was a PREACHER Schedule C (net 3,211); the filed return had no SE.
+    {"fact_key": "min_schc_ministerial", "label": "Schedule C activity is the exercise of ministry (per business)?",
+     "data_type": "boolean", "default_value": "false", "sort_order": 8,
+     "notes": ("PER BUSINESS (delvio ScheduleC.is_ministerial). Pub 517: a self-employed minister's fees and "
+               "offerings are reported on Schedule C and carried to Schedule SE line 2. With min_4361_exempt "
+               "the business is EXCLUDED from Schedule SE line 2 (R-MIN-4361 / R-SE-L2) while its line 31 "
+               "still reaches Schedule 1 line 3 and QBI; without the 4361 the fact routes nothing (SE applies "
+               "as to any Schedule C). Never combined with a statutory-employee Schedule C.")},
     # ── Outputs ──
     {"fact_key": "min_housing_exclusion", "label": "Line 5 — §107 housing exclusion = least of (line 2, 3, 4)",
      "data_type": "decimal", "sort_order": 30, "notes": "OUTPUT (income tax). Substantiation; the excluded amount was never in Box 1."},
@@ -459,9 +475,17 @@ N_RULES: list[dict] = [
      "description": "§1402(a)(8): the §107-excluded housing/parsonage value is in net SE earnings; the existing SE engine applies × 0.9235, the SS cap, ½-SE-tax (Sch 1 L15), and SE tax (Sch 2 L4)."},
     {"rule_id": "R-MIN-4361", "title": "Form 4361 approved → Schedule SE line 2 ministerial amount = 0 (§1402(e))", "rule_type": "calculation",
      "precedence": 4, "sort_order": 4,
-     "formula": "If Form 4361 exemption approved: line 9 (Schedule SE line 2) = 0 — ministerial earnings + deductions omitted from net SE earnings.",
-     "inputs": ["min_4361_exempt"], "outputs": ["min_se_line2"],
-     "description": "§1402(e): an approved exemption removes ministerial earnings from SE tax entirely (ministerial only; irrevocable)."},
+     "formula": ("If Form 4361 exemption approved: line 9 (Schedule SE line 2) = 0 — ministerial earnings + deductions "
+                 "omitted from net SE earnings. AMENDED 2026-09-05 (1040 BATCH-296 #70): AND every Schedule C with "
+                 "min_schc_ministerial = true is EXCLUDED from that proprietor's Schedule SE line 2 aggregation "
+                 "(R-SE-L2) — its line 31 still flows to Schedule 1 line 3 and to QBI unreduced (no ½-SE deduction "
+                 "to allocate). Any Schedule C NOT marked ministerial stays in line 2 — Pub 517: the exemption "
+                 "\"doesn't apply to any other self-employment income\"."),
+     "inputs": ["min_4361_exempt", "min_schc_ministerial"], "outputs": ["min_se_line2"],
+     "description": ("§1402(e): an approved exemption removes ministerial earnings from SE tax entirely (ministerial "
+                     "only; irrevocable) — whether the earnings arrive on a W-2 (line 9) or on a Schedule C "
+                     "(min_schc_ministerial; Pub 517 \"Deduct these expenses on Schedule C ... and carry the net "
+                     "amount to line 2 of Schedule SE\" is the feed the exemption removes).")},
 ]
 
 N_LINES: list[dict] = [
@@ -495,9 +519,10 @@ N_DIAGNOSTICS: list[dict] = [
     {"diagnostic_id": "D_MIN_4361", "title": "Form 4361 exemption applied — ministerial earnings excluded from SE tax", "severity": "warning",
      "condition": "min_4361_exempt is True",
      "message": ("An approved Form 4361 exemption is applied: ministerial wages and the housing/parsonage "
-                 "allowance are excluded from self-employment tax. Confirm the IRS-approved Form 4361 is "
-                 "on file — the exemption is irrevocable and applies only to ministerial earnings (other "
-                 "self-employment income is still subject to SE tax)."),
+                 "allowance — and any Schedule C marked ministerial (min_schc_ministerial) — are excluded "
+                 "from self-employment tax. Confirm the IRS-approved Form 4361 is on file — the exemption is "
+                 "irrevocable and applies only to ministerial earnings (other self-employment income, "
+                 "including any Schedule C not marked ministerial, is still subject to SE tax — Pub 517)."),
      "notes": "§1402(e). v1 is preparer-asserted; no eligibility adjudication (the two-year window)."},
     {"diagnostic_id": "D_MIN_SECA", "title": "Clergy wages are subject to SE tax (SECA), not FICA", "severity": "info",
      "condition": "min_se_line2 > 0 (no Form 4361 exemption)",
@@ -556,6 +581,8 @@ N_RULE_LINKS: list[tuple[str, str, str, str]] = [
     ("R-MIN-SE", "IRS_2025_PUB517", "secondary", "Schedule SE line 2 clergy feed (no Schedule C)"),
     ("R-MIN-4361", "IRC_1402", "primary", "§1402(e) Form 4361 exemption"),
     ("R-MIN-4361", "IRS_2025_F4361", "secondary", "Form 4361 application — ministerial only, irrevocable"),
+    # ADDED 2026-09-05 (s333, BATCH-296 #70): Pub 517 governs the Schedule C branch of the exemption.
+    ("R-MIN-4361", "IRS_2025_PUB517", "primary", "Approved exemption → omit ministerial income/deductions from net SE earnings, however reported (Schedule C branch)"),
 ]
 
 

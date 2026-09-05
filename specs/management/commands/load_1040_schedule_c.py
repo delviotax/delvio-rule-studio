@@ -1071,7 +1071,15 @@ SCHEDSE_RULES: list[dict] = [
                      "⭐ THE SPEC WAS ALREADY ASSERTING THIS FLOW: FA-1040-MIN-03 ('Clergy SE base (line 9) ... → "
                      "Schedule SE line 2') has asserted MINISTER.9 -> SCH_SE.2 since 2026-06-16, and the app runs "
                      "and re-pins it. The ASSERTION and the ENGINE agreed; only this rule's formula lagged, which "
-                     "is why the gap never surfaced as a failure anywhere.")},
+                     "is why the gap never surfaced as a failure anywhere. "
+                     "AMENDED 2026-09-05 (delvio s333, 1040 BATCH-296 #70): a Schedule C whose activity is the "
+                     "exercise of ministry (MINISTER/min_schc_ministerial, per business) is EXCLUDED from line 2 "
+                     "when the proprietor's Form 4361 is approved (MINISTER/R-MIN-4361; Pub 517: 'don't include "
+                     "the income or deductions from ministerial services in figuring your net earnings from "
+                     "self-employment' — and the self-employed minister's Schedule C net is exactly the feed "
+                     "that instruction removes). Its line 31 still reaches Schedule 1 line 3 and QBI. A Schedule "
+                     "C not so marked stays in line 2 (the exemption 'doesn't apply to any other self-employment "
+                     "income'). Witness: a 4361 minister with a PREACHER Schedule C (net 3,211), filed with no SE.")},
     # NOTE (2026-08-26): R-SE-OPTIONAL and D_SE_003 are ALSO written by load_1040_schedule_f.py,
     # which sorts AFTER this file in seed_all's alphabetical phase-2 order and therefore DECIDES
     # what production holds. The copies below are the pre-2026-06-21 text and are immediately
