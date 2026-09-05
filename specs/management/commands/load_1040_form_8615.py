@@ -412,13 +412,15 @@ F8615_FACTS: list[dict] = [
      "notes": "For the Line 5 Worksheets + the QDCGT on lines 15/17. = qualified dividends + net LT cap gain over net ST loss (Sch D). Sourced from Topic-3 / Sch D at compute."},
     # ── Part II — parent data (PREPARER-ASSERTED) ──
     {"fact_key": "k_parent_taxable_income", "label": "Line 6 — parent's taxable income (parent's 1040 line 15)",
-     "data_type": "decimal", "default_value": "0", "sort_order": 20,
-     "notes": "PREPARER FACT (the parent's return is not linked in v1). The taxpayer-parent if MFJ; the parent with the greater taxable income if the parents file separately / are unmarried (i8615)."},
+     "data_type": "decimal", "default_value": None, "sort_order": 20,
+     "notes": ("PREPARER FACT (the parent's return is not linked in v1). The taxpayer-parent if MFJ; the parent with the greater "
+               "taxable income if the parents file separately / are unmarried (i8615). AMENDED 2026-09-05 (Ken ruling, delvio s333): "
+               "NO default — blank = unkeyed (D_8615_005); a keyed 0 is the parent's figure ('If zero or less, enter -0-').")},
     {"fact_key": "k_parent_filing_status", "label": "Parent's filing status (for the line-9 rate schedule)",
      "data_type": "string", "default_value": "mfj", "sort_order": 21,
      "notes": "PREPARER FACT. Drives the line-9 rate schedule / QDCGT breakpoints (the parent's bracket). single / mfj / mfs / hoh / qss."},
     {"fact_key": "k_parent_tax", "label": "Line 10 — parent's tax (parent's 1040 line 16)",
-     "data_type": "decimal", "default_value": "0", "sort_order": 22,
+     "data_type": "decimal", "default_value": None, "sort_order": 22,
      "notes": "Line 10. PREPARER FACT = the parent's actual tax on the parent's taxable income (their 1040 line 16). Subtracted from line 9 to isolate the marginal tax on the children's net unearned income."},
     {"fact_key": "k_parent_qualified_dividends", "label": "Parent's qualified dividends (for the line-9 QDCGT split)",
      "data_type": "decimal", "default_value": "0", "sort_order": 23,
@@ -605,7 +607,10 @@ F8615_DIAGNOSTICS: list[dict] = [
                  "form (not built this version) — verify the election and prepare Form 8814 manually if used."),
      "notes": "Routing — Form 8814 (parental election) is mutually exclusive with Form 8615; a different (unbuilt) form."},
     {"diagnostic_id": "D_8615_005", "title": "Form 8615 elected but parent data is missing", "severity": "error",
-     "condition": "k_applies True AND line 5 > 0 AND (parent taxable income (line 6) is 0 / parent tax (line 10) is 0 with a positive line 9 base)",
+     "condition": ("k_applies True AND line 5 > 0 AND (k_parent_taxable_income is UNKEYED (blank) OR k_parent_tax is UNKEYED (blank)). "
+                   "AMENDED 2026-09-05 (Ken ruling, delvio s333): a KEYED 0 is the parent's figure, not missing data — "
+                   "Form 8615 line 6 reads 'If zero or less, enter -0-'; the first witness was a parent with no taxable "
+                   "income (line 6 = 0, line 10 = 0) whose line 9 is the tax on the child's line 5 alone."),
      "message": ("The kiddie tax applies (net unearned income over $2,700), but required parent data is missing: the "
                  "parent's taxable income (line 6) and the parent's tax (line 10) are needed to figure the tax at the "
                  "parent's rate (lines 9-13). Enter the parent's Form 1040 line 15 (taxable income) and line 16 (tax)."),

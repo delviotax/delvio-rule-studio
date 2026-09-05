@@ -439,7 +439,17 @@ NCD400_FACTS: list[dict] = [
      "notes": "Dec B. 20% of the 2020-2024 add-backs; needs historical records."},
     {"fact_key": "depr_recovery_179", "label": "§179 20% recovery installments (Sch S L24f, direct-entry)", "data_type": "decimal", "required": False, "sort_order": 25,
      "notes": "Dec B. 20% of the 2020-2024 add-backs; needs historical records."},
-    {"fact_key": "other_deductions", "label": "Other Schedule S Part B deductions (direct-entry, L17/L25-37/L38…)", "data_type": "decimal", "required": False, "sort_order": 26},
+    # ─── ADDED 2026-09-05 (Ken ruling, delvio s333 — 1040 BATCH-296 #69): Sch S Part B line 17 is a PULL,
+    # not a direct entry. NC D-401 (2025) line 17: the state or local income tax refund that is INCLUDED on
+    # federal Schedule 1 line 1 (the §111 taxable recovery the federal engine computes). Witness: client
+    # 4153's filed Sch S printed the federal 905 on line 17; the engine (spec-conformant at the time) had it
+    # only as a keyed other-deduction. A federal fact reaches a state line automatically — never keyed.
+    {"fact_key": "state_refund_l17", "label": "Sch S L17 — state/local income tax refund (AUTO: federal Schedule 1 line 1, the §111 taxable recovery)",
+     "data_type": "decimal", "required": False, "sort_order": 26,
+     "notes": ("PULLED from the federal return's computed Schedule 1 line 1 (STATE_REFUND / R-SR-*). Never keyed on "
+               "the NC side — a keyed value could disagree with the federal figure the same return files. "
+               "0 when the federal return has no taxable refund.")},
+    {"fact_key": "other_deductions", "label": "Other Schedule S Part B deductions (direct-entry, L25-37/L38…; L17 is state_refund_l17 since 2026-09-05)", "data_type": "decimal", "required": False, "sort_order": 27},
     # Child deduction
     {"fact_key": "num_qualifying_children", "label": "Number of qualifying children (D-400 line 10a)", "data_type": "integer", "required": False, "sort_order": 30},
     # Deduction election / itemized (Schedule A)
@@ -475,11 +485,16 @@ NCD400_RULES: list[dict] = [
      "formula": "L7 = L3 + L4 + other_additions  [Sch S Part A L16] ; L8 = federal_agi + L7",
      "inputs": ["other_additions", "federal_agi"], "outputs": ["L7", "L8"], "sort_order": 11},
     {"rule_id": "R-NC-DEDUCTIONS", "title": "Deductions from federal AGI (L9) — Sch S Part B total", "rule_type": "calculation",
-     "formula": ("L9 = us_obligation_interest + ss_rr_benefits + bailey_retirement + military_retirement "
-                 "+ depr_recovery_bonus + depr_recovery_179 + other_deductions  [Sch S Part B L41]"),
-     "inputs": ["us_obligation_interest", "ss_rr_benefits", "bailey_retirement", "military_retirement",
+     "formula": ("L9 = state_refund_l17 + us_obligation_interest + ss_rr_benefits + bailey_retirement + military_retirement "
+                 "+ depr_recovery_bonus + depr_recovery_179 + other_deductions  [Sch S Part B L41]. "
+                 "state_refund_l17 = the federal return's computed Schedule 1 line 1 (the §111 taxable state/local "
+                 "refund) — an AUTOMATIC pull, never keyed (AMENDED 2026-09-05, Ken ruling, delvio s333)."),
+     "inputs": ["state_refund_l17", "us_obligation_interest", "ss_rr_benefits", "bailey_retirement", "military_retirement",
                 "depr_recovery_bonus", "depr_recovery_179", "other_deductions"], "outputs": ["L9"], "sort_order": 12,
-     "description": "Dec C. Structured Part B subtractions (L18-21 retirement/US-obligation) + the direct-entry 20% depreciation recovery (L23f/L24f) + other Part B items."},
+     "description": ("Dec C. Structured Part B subtractions (L17 refund pull; L18-21 retirement/US-obligation) + the direct-entry "
+                     "20% depreciation recovery (L23f/L24f) + other Part B items. AMENDED 2026-09-05 (1040 BATCH-296 #69): "
+                     "NC D-401 line 17 — 'the amount of state or local income tax refund included on Line 1 of Schedule 1 "
+                     "(Form 1040)' — is deterministic from the federal return, so it pulls; other_deductions no longer carries it.")},
     {"rule_id": "R-NC-CHILD-DED", "title": "Child deduction (L10b) — AGI-banded per-child × count", "rule_type": "calculation",
      "formula": ("group = MFJ if status in {MFJ,QW} else (HOH if status==HOH else single[covers single,MFS]) ; "
                  "per_child = first per_child where federal_agi <= ceiling (breakpoint → lower/higher-deduction band) ; "
@@ -530,6 +545,7 @@ NCD400_RULE_LINKS: list[tuple[str, str, str, str]] = [
     ("R-NC-ADDITIONS", "NC_2025_SCHEDULE_S", "primary", "Part A additions → D-400 L7"),
     ("R-NC-DEDUCTIONS", "NC_2025_SCHEDULE_S", "primary", "Part B deductions → D-400 L9"),
     ("R-NC-DEDUCTIONS", "NC_2025_D401_INSTRUCTIONS", "secondary", "Bailey/military/SS/US-obligation deduction eligibility"),
+    ("R-NC-DEDUCTIONS", "NC_2025_D401_INSTRUCTIONS", "primary", "L17 = the state/local income tax refund included on federal Schedule 1 line 1 (the pull; 2026-09-05)"),
     ("R-NC-CHILD-DED", "NC_2025_FORM_D400", "primary", "child-deduction AGI-banded table, booklet p.13"),
     ("R-NC-SCHED-A", "NC_2025_D401_INSTRUCTIONS", "primary", "NC itemized deductions restricted subset, booklet p.20"),
     ("R-NC-DED-ELECTION", "NC_2025_FORM_D400", "primary", "standard deduction chart, booklet p.14"),

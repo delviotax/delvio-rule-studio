@@ -143,6 +143,7 @@ EXISTING_SOURCES_TO_REFERENCE: list[str] = [
     "IRS_2025_1040_INSTR",
     "IRC_465",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
     "IRC_469",  # ownership -> irc_sections.py (A3/D-42, 2026-08-25)
+    "IRS_2025_6251_INSTR",  # 2026-09-05 (s333): the AMT passive refigure cites i6251 line 2m (owned by load_1040_form_6251)
 ]
 
 AUTHORITY_SOURCES: list[dict] = [
@@ -712,6 +713,41 @@ F8582_FACTS: list[dict] = [
     {"fact_key": "f8582_at_risk_limited", "label": "A loss may be limited by the §465 at-risk rules (Form 6198)?",
      "data_type": "boolean", "default_value": "false", "sort_order": 28,
      "notes": "S-6 R4. §465 applies BEFORE §469 (Reg 1.469-2T(d)(6)). If set, compute Form 6198 first; only the at-risk-allowed loss reaches Form 8582. Drives D_8582_ATRISK."},
+    # ── AMT PASSIVE-LOSS REFIGURE (added 2026-09-05, Ken direct: "do your recommendations"; delvio s333,
+    #    1040 BATCH-296 #40). SOURCE, fetched fresh 2026-09-05: 2025 Instructions for Form 6251, Line 2m —
+    #    "Refigure your passive activity gains and losses for the AMT by taking into account all
+    #    adjustments and preferences and any AMT prior year unallowed losses that apply to that activity.
+    #    You may fill out an AMT Form 8582 ... to determine your passive activity loss allowed for the AMT,
+    #    but don't file the AMT versions ... Instead, keep them with your records." Witness (client 3230):
+    #    a rental with a 43,162 regular loss and 245,082 regular prior; the asset report prints 20,433 of
+    #    regular vs 20,181 of AMT current depreciation (a 252 adjustment) and the AMT carryover worksheet
+    #    prints 250,149 outgoing = 207,239 prior AMT + 42,910 AMT current loss. Until this amendment the
+    #    spec carried NO AMT content and the app preserved the transcribed pool under D_CFWD_001 (error).
+    {"fact_key": "f8582_amt_adjustment", "label": "Per activity — AMT adjustments and preferences allocable to the activity (signed; + shrinks a loss)",
+     "data_type": "decimal", "default_value": "0", "sort_order": 40,
+     "notes": ("PER ACTIVITY (rental / passive K-1 / passive Sch C-F). The sum of the activity's AMT adjustments and "
+               "preferences — for a rental, chiefly regular depreciation − AMT depreciation on post-1986 property "
+               "(the asset report's 'Current Depr.' − 'Current AMT'); the i6251 example: a 4,125 loss with a 500 "
+               "depreciation adjustment and a 225 disposition adjustment → a 3,400 AMT loss. Preparer-keyed or "
+               "derived from the asset register when every asset carries an AMT method; an activity with AMT-basis "
+               "assets and no adjustment keyed → D_8582_AMT_ADJ_MISSING.")},
+    {"fact_key": "f8582_amt_prior_unallowed", "label": "Per activity — prior-year unallowed loss for the AMT (the AMT carryover in)",
+     "data_type": "decimal", "default_value": "0", "sort_order": 41,
+     "notes": ("PER ACTIVITY. i6251: 'The amount of any AMT passive activity loss that isn't deductible and is carried "
+               "forward is likely to differ from the regular tax amount ... keep adequate records for both.' Transcribed "
+               "from the prior year's AMT Form 8582 / the vendor's AMT carryover worksheet; rolls from f8582_amt_suspended.")},
+    {"fact_key": "f8582_amt_net", "label": "Per activity — AMT current-year net = regular net + f8582_amt_adjustment",
+     "data_type": "decimal", "sort_order": 42, "notes": "OUTPUT (R-8582-AMT-NET). The Part IV/V column (a)/(b) figure of the AMT Form 8582."},
+    {"fact_key": "f8582_amt_allowed", "label": "Per activity — AMT Part VIII allowed loss",
+     "data_type": "decimal", "sort_order": 43, "notes": "OUTPUT (R-8582-AMT-REFIGURE). The activity's loss allowed for the AMT."},
+    {"fact_key": "f8582_amt_suspended", "label": "Per activity — AMT unallowed loss (next year's f8582_amt_prior_unallowed)",
+     "data_type": "decimal", "sort_order": 44, "notes": "OUTPUT (R-8582-AMT-REFIGURE / R-8582-AMT-CARRYFWD). Reconciled against a transcribed AMT pool (D_8582_AMT_RECON)."},
+    {"fact_key": "f8582_amt_source_carryover", "label": "Transcribed outgoing AMT passive-loss carryover (the vendor worksheet), if any",
+     "data_type": "decimal", "sort_order": 45,
+     "notes": "The delvio carryforward_attributes row of kind passive_amt (per activity). RECONCILED against f8582_amt_suspended — never a blind override (the NOL / D_CFWD_002 precedent)."},
+    {"fact_key": "f6251_line_2m", "label": "Form 6251 line 2m — passive activities adjustment (signed)",
+     "data_type": "decimal", "sort_order": 46,
+     "notes": "OUTPUT (R-8582-AMT-2M) → the 6251 spec's line 2m input (a_amt_passive). Σ over passive activities of (AMT amount reported − regular amount reported)."},
 ]
 
 F8582_RULES: list[dict] = [
@@ -863,6 +899,59 @@ F8582_RULES: list[dict] = [
                  "spec / tts."),
      "inputs": ["f8582_at_risk_limited"], "outputs": [],
      "description": "S-6 R4. The at-risk-before-passive ordering; diagnostic-only, routes to 6198."},
+    # ── AMT passive-loss refigure (2026-09-05, Ken direct; delvio s333 / BATCH-296 #40) ──
+    {"rule_id": "R-8582-AMT-NET", "title": "AMT current-year net per activity = regular net + AMT adjustments/preferences", "rule_type": "calculation",
+     "precedence": 15, "sort_order": 15,
+     "formula": ("For each passive activity: f8582_amt_net = (regular current-year net income/loss) + f8582_amt_adjustment. "
+                 "A positive adjustment (regular depreciation > AMT depreciation) SHRINKS a loss / grows income. The AMT "
+                 "prior-year unallowed loss is f8582_amt_prior_unallowed (its own carryover, never the regular one)."),
+     "inputs": ["f8582_amt_adjustment", "f8582_amt_prior_unallowed"], "outputs": ["f8582_amt_net"],
+     "description": ("i6251 (2025) line 2m: 'Refigure your passive activity gains and losses for the AMT by taking into account all "
+                     "adjustments and preferences and any AMT prior year unallowed losses that apply to that activity.' The "
+                     "example: a 4,125 loss − 500 depreciation adjustment − 225 disposition adjustment = a 3,400 AMT loss.")},
+    {"rule_id": "R-8582-AMT-REFIGURE", "title": "The AMT Form 8582 — Parts I-VIII refigured with the AMT nets and AMT priors", "rule_type": "calculation",
+     "precedence": 16, "sort_order": 16,
+     "formula": ("Run R-8582-PASSIVE → R-8582-WS-NET → R-8582-ALLOWANCE → R-8582-ALLOC-VI → R-8582-ALLOC-VII → "
+                 "R-8582-ALLOWED-VIII a SECOND time with, per activity, column (a)/(b) = f8582_amt_net and column (c) = "
+                 "f8582_amt_prior_unallowed. Line 6 (MAGI) and the §469(i) allowance parameters are UNCHANGED (i6251 "
+                 "prescribes no AMT modified AGI — requires_human_review: the spec keeps the regular MAGI). Outputs per "
+                 "activity: f8582_amt_allowed (Part VIII col (c)), f8582_amt_suspended (Part VII col (c)). The AMT form "
+                 "is NOT filed — kept with the records."),
+     "inputs": ["f8582_amt_net", "f8582_amt_prior_unallowed", "f8582_magi"], "outputs": ["f8582_amt_allowed", "f8582_amt_suspended"],
+     "description": ("i6251 line 2m: 'You may fill out an AMT Form 8582 ... to determine your passive activity loss allowed for the "
+                     "AMT, but don't file the AMT versions of these forms and schedules with your tax return. Instead, keep them "
+                     "with your records.' The same §469 arithmetic over AMT amounts — one engine, two runs (the delvio one-engine rule).")},
+    {"rule_id": "R-8582-AMT-2M", "title": "Form 6251 line 2m = Σ (AMT amount reported − regular amount reported), signed per i6251", "rule_type": "calculation",
+     "precedence": 17, "sort_order": 17,
+     "formula": ("For each passive activity reported on Schedule C, E, F or Form 4835: reported_regular = the regular allowed "
+                 "figure (a loss enters NEGATIVE: −f8582 Part VIII allowed; income enters positive); reported_amt = the AMT "
+                 "allowed figure likewise (−f8582_amt_allowed; income + adjustment). f6251_line_2m = Σ (reported_amt − "
+                 "reported_regular). Sign check, i6251: negative when (a) the AMT loss is MORE than the regular loss, (b) the "
+                 "AMT gain is LESS than the regular gain, or (c) an AMT loss stands against a regular gain — so a SMALLER AMT "
+                 "loss is a POSITIVE adjustment. Gains/losses reported on Form 8949, Schedule D, Form 4684 or Form 4797 for "
+                 "the activity go to line 2k, NOT 2m."),
+     "inputs": ["f8582_amt_allowed"], "outputs": ["f6251_line_2m"],
+     "description": ("i6251 line 2m, verbatim sign rule. When the §469(i) allowance BINDS both runs identically (witness shape 3) "
+                     "the reported amounts agree and 2m = 0 while the carryovers differ — the difference surfaces only in later "
+                     "years or on disposition.")},
+    {"rule_id": "R-8582-AMT-CARRYFWD", "title": "AMT unallowed loss carries forward per activity; a transcribed AMT pool is RECONCILED", "rule_type": "routing",
+     "precedence": 18, "sort_order": 18,
+     "formula": ("Each activity's f8582_amt_suspended is next year's f8582_amt_prior_unallowed — a SEPARATE ledger from the "
+                 "regular carryover (R-8582-CARRYFWD). A §469(g) complete disposition releases the AMT suspended loss on the "
+                 "same trio (R-8582-DISPOSITION applies to both runs). A transcribed outgoing AMT pool "
+                 "(f8582_amt_source_carryover) must EQUAL f8582_amt_suspended → else D_8582_AMT_RECON (error); the "
+                 "transcription never overrides the computation."),
+     "inputs": ["f8582_amt_suspended", "f8582_amt_source_carryover", "f8582_complete_disposition"], "outputs": ["f8582_amt_prior_unallowed"],
+     "description": ("i6251: 'keep adequate records for both the AMT and regular tax.' The delvio carryforward_attributes kind "
+                     "passive_amt joins ENGINE_COMPUTED_KINDS once the app builds this (retiring D_CFWD_001's red for it — the "
+                     "FORM_172 precedent, D_CFWD_002 reconciliation).")},
+    {"rule_id": "R-8582-AMT-PTP", "title": "A PTP's AMT loss is refigured per PTP (§469(k)), off the AMT Form 8582", "rule_type": "routing",
+     "precedence": 19, "sort_order": 19,
+     "formula": ("For a PTP (R-8582-PTP): AMT loss = regular PTP loss + the PTP's AMT adjustments/preferences + its AMT prior "
+                 "unallowed; allowed only against that PTP's own AMT passive income (§469(k)); the remainder carries as the "
+                 "PTP's AMT pool. Contributes to f6251_line_2m like any other activity."),
+     "inputs": ["f8582_ptp_present", "f8582_amt_adjustment", "f8582_amt_prior_unallowed"], "outputs": [],
+     "description": "i6251 line 2m, 'Publicly Traded Partnership (PTP)': 'refigure the loss using any AMT adjustments and preferences and any AMT prior year unallowed loss.'"},
 ]
 
 F8582_LINES: list[dict] = [
@@ -890,6 +979,9 @@ F8582_LINES: list[dict] = [
     {"line_number": "P6", "description": "Part VI - special-allowance allocation: (a) loss, (b) ratio, (c) ratio x line 9, (d) (a)-(c)", "line_type": "informational"},
     {"line_number": "P7", "description": "Part VII - unallowed-loss allocation: (a) loss [VI(d)+V(e)], (b) ratio, (c) ratio x line C", "line_type": "informational"},
     {"line_number": "P8", "description": "Part VIII - allowed loss per activity: (a) loss+prior, (b) unallowed [VII(c)], (c) allowed (a)-(b)", "line_type": "informational"},
+    # ── AMT refigure (2026-09-05) ──
+    {"line_number": "AMT-P8", "description": "AMT Form 8582 Part VIII - allowed / unallowed per activity refigured with the AMT nets and AMT priors (kept with the records, not filed)", "line_type": "informational"},
+    {"line_number": "6251-2m", "description": "Form 6251 line 2m - passive activities: sum of (AMT amount reported - regular amount reported), signed per i6251", "line_type": "total"},
 ]
 
 F8582_DIAGNOSTICS: list[dict] = [
@@ -965,6 +1057,27 @@ F8582_DIAGNOSTICS: list[dict] = [
                  "single-form activities (Parts IV-VIII). Figure the Part IX per-form allocation manually. The "
                  "section 1231 / 28%-rate K-1 items are already flagged upstream by the K-1 router."),
      "notes": "Per-activity amendment 2026-06-23 (Ken). Part IX RED-defer; no new silent gap."},
+    # ── AMT refigure (2026-09-05) ──
+    {"diagnostic_id": "D_8582_AMT_RECON", "title": "Transcribed AMT passive-loss carryover disagrees with the AMT refigure", "severity": "error",
+     "condition": "f8582_amt_source_carryover is keyed for an activity AND f8582_amt_source_carryover != f8582_amt_suspended",
+     "message": ("The AMT passive-loss carryover transcribed for this activity does not equal the amount the AMT Form 8582 "
+                 "refigure carries forward. One of them is wrong: check the activity's AMT adjustment (regular vs AMT "
+                 "depreciation) and its prior-year AMT unallowed loss against the prior year's AMT Form 8582. The "
+                 "computed figure is what rolls forward; the transcription is not applied."),
+     "notes": "The NOL / D_CFWD_002 reconciliation precedent: a source pool is checked, never used blind."},
+    {"diagnostic_id": "D_8582_AMT_ADJ_MISSING", "title": "Passive activity has AMT-basis assets but no AMT adjustment keyed", "severity": "warning",
+     "condition": "a passive activity's asset register carries an AMT method/basis on any post-1986 asset AND f8582_amt_adjustment is unkeyed (blank) for that activity",
+     "message": ("This passive activity depreciates post-1986 property with an AMT method, so its AMT net differs from its regular "
+                 "net, but no AMT adjustment is keyed for it — the AMT Form 8582 would refigure with the regular figures and "
+                 "understate or overstate Form 6251 line 2m. Key the activity's AMT adjustment (regular depreciation − AMT "
+                 "depreciation, plus any other AMT adjustments) or confirm it is zero."),
+     "notes": "The no-silent-gap guard for the refigure's one preparer input."},
+    {"diagnostic_id": "D_8582_AMT_INFO", "title": "AMT passive-loss refigure ran", "severity": "info",
+     "condition": "any passive activity has a non-zero f8582_amt_adjustment or f8582_amt_prior_unallowed",
+     "message": ("Passive activity losses were refigured for the AMT (an AMT Form 8582 kept with the records, not filed): the "
+                 "AMT allowed / unallowed amounts per activity and Form 6251 line 2m are computed; the AMT carryover rolls "
+                 "forward separately from the regular carryover."),
+     "notes": "Visibility only."},
 ]
 
 F8582_SCENARIOS: list[dict] = [
@@ -1076,6 +1189,50 @@ F8582_SCENARIOS: list[dict] = [
      "expected_outputs": {"D_8582_ATRISK": True},
      "notes": ("A loss flagged as possibly at-risk-limited → D_8582_ATRISK: figure Form 6198 FIRST (§465 before "
                "§469, Reg 1.469-2T(d)(6)); only the at-risk-allowed loss reaches Form 8582.")},
+    # ── AMT refigure (2026-09-05, Ken direct; delvio s333 / BATCH-296 #40). `amt_activities` carries the SAME
+    #    activities with their AMT nets (regular loss − adjustment) and AMT priors; the harness runs the per-
+    #    activity recompute twice and derives line 2m = Σ(regular allowed − AMT allowed) over loss activities. ──
+    {"scenario_name": "8582-AMT1 — allowance not binding: a smaller AMT loss is a positive line 2m", "scenario_type": "normal", "sort_order": 16,
+     "inputs": {"tax_year": 2025, "filing_status": "mfj", "magi": 80000,
+                "activities": [{"name": "Rental A", "bucket": "IV", "loss": 20000}],
+                "amt_activities": [{"name": "Rental A", "bucket": "IV", "loss": 18000}]},
+     "expected_outputs": {"f8582_total_allowed": 20000, "f8582_suspended": 0,
+                          "per_activity": [{"name": "Rental A", "allowed": 20000, "suspended": 0}],
+                          "amt_per_activity": [{"name": "Rental A", "allowed": 18000, "suspended": 0}],
+                          "f6251_line_2m": 2000},
+     "notes": ("Regular: loss 20,000; MAGI 80k → allowance 25,000 → all allowed. AMT: adjustment +2,000 (regular depreciation "
+               "exceeds AMT) → AMT loss 18,000, all allowed. Reported: regular −20,000, AMT −18,000 → line 2m = −18,000 − "
+               "(−20,000) = +2,000 (i6251: the AMT loss is SMALLER, so the adjustment is positive).")},
+    {"scenario_name": "8582-AMT2 — the witness: everything suspended both ways, the carryovers differ, 2m = 0", "scenario_type": "normal", "sort_order": 17,
+     "inputs": {"tax_year": 2025, "filing_status": "mfj", "magi": 432304,
+                "activities": [{"name": "Ocean Lane", "bucket": "IV", "loss": 43162, "prior": 245082}],
+                "amt_activities": [{"name": "Ocean Lane", "bucket": "IV", "loss": 42910, "prior": 207239}]},
+     "expected_outputs": {"f8582_special_allowance": 0, "f8582_total_allowed": 0, "f8582_suspended": 288244,
+                          "per_activity": [{"name": "Ocean Lane", "allowed": 0, "suspended": 288244}],
+                          "amt_per_activity": [{"name": "Ocean Lane", "allowed": 0, "suspended": 250149}],
+                          "f6251_line_2m": 0},
+     "notes": ("Client-3230 shape (delvio BATCH-296 #40): MAGI over 150k → no allowance; regular 43,162 + 245,082 = 288,244 "
+               "suspended; AMT 42,910 (43,162 − the 252 depreciation adjustment: asset report 20,433 regular vs 20,181 AMT) + "
+               "207,239 prior AMT = 250,149 suspended — the vendor's AMT carryover worksheet figure. Nothing reported either "
+               "way → line 2m = 0; the ledgers differ by 38,095 and roll separately.")},
+    {"scenario_name": "8582-AMT3 — allowance binds both runs: 2m = 0, carryovers differ", "scenario_type": "edge_case", "sort_order": 18,
+     "inputs": {"tax_year": 2025, "filing_status": "mfj", "magi": 120000,
+                "activities": [{"name": "Rental A", "bucket": "IV", "loss": 40000}],
+                "amt_activities": [{"name": "Rental A", "bucket": "IV", "loss": 37000}]},
+     "expected_outputs": {"f8582_special_allowance": 15000, "f8582_total_allowed": 15000, "f8582_suspended": 25000,
+                          "per_activity": [{"name": "Rental A", "allowed": 15000, "suspended": 25000}],
+                          "amt_per_activity": [{"name": "Rental A", "allowed": 15000, "suspended": 22000}],
+                          "f6251_line_2m": 0},
+     "notes": ("MAGI 120k → allowance 15,000 in both runs (min(loss, 15,000)); reported −15,000 both ways → 2m = 0; "
+               "regular carryover 25,000 vs AMT 22,000.")},
+    {"scenario_name": "8582-AMT4 — transcribed AMT carryover disagrees with the refigure", "scenario_type": "diagnostic", "sort_order": 19,
+     "inputs": {"tax_year": 2025, "filing_status": "mfj", "magi": 432304,
+                "activities": [{"name": "Ocean Lane", "bucket": "IV", "loss": 43162, "prior": 245082}],
+                "amt_activities": [{"name": "Ocean Lane", "bucket": "IV", "loss": 42910, "prior": 207239}],
+                "amt_source_carryover": {"Ocean Lane": 240000}},
+     "expected_outputs": {"amt_per_activity": [{"name": "Ocean Lane", "allowed": 0, "suspended": 250149}],
+                          "D_8582_AMT_RECON": True},
+     "notes": "The transcribed 240,000 ≠ the refigured 250,149 → D_8582_AMT_RECON (error); the computed figure rolls forward."},
 ]
 
 F8582_RULE_LINKS: list[tuple[str, str, str, str]] = [
@@ -1105,6 +1262,14 @@ F8582_RULE_LINKS: list[tuple[str, str, str, str]] = [
     ("R-8582-PTP", "IRC_469", "primary", "§469(k) separate application to each PTP; disposition rule"),
     ("R-8582-ATRISK-ORDER", "IRC_465", "primary", "§465(b) amounts at risk"),
     ("R-8582-ATRISK-ORDER", "TREAS_REG_469", "secondary", "§1.469-2T(d)(6) at-risk before passive"),
+    # ── AMT refigure (2026-09-05) ──
+    ("R-8582-AMT-NET", "IRS_2025_6251_INSTR", "primary", "Line 2m: refigure passive gains/losses for the AMT with all adjustments/preferences + the AMT prior-year unallowed"),
+    ("R-8582-AMT-REFIGURE", "IRS_2025_6251_INSTR", "primary", "Line 2m: an AMT Form 8582 — kept with the records, not filed"),
+    ("R-8582-AMT-REFIGURE", "IRC_469", "secondary", "§469 applied to the AMT amounts (one limitation, two computations)"),
+    ("R-8582-AMT-2M", "IRS_2025_6251_INSTR", "primary", "Line 2m sign rule (a)/(b)/(c); 8949 / D / 4684 / 4797 items go to line 2k"),
+    ("R-8582-AMT-CARRYFWD", "IRS_2025_6251_INSTR", "primary", "'keep adequate records for both the AMT and regular tax' — the separate AMT carryover"),
+    ("R-8582-AMT-CARRYFWD", "IRC_469", "secondary", "§469(b) carryforward; §469(g) release applies to the AMT pool alike"),
+    ("R-8582-AMT-PTP", "IRS_2025_6251_INSTR", "primary", "Line 2m, 'Publicly Traded Partnership (PTP)': refigure the loss with AMT adjustments and the AMT prior unallowed"),
 ]
 
 
@@ -1182,6 +1347,17 @@ FLOW_ASSERTIONS: list[dict] = [
      "definition": {"kind": "gating_check", "form": "FORM_8582", "expect": {"red_fires": False, "info_fires": True},
                     "blockers": ["ptp_present", "at_risk_limited"]},
      "sort_order": 11},
+    {"assertion_id": "FA-1040-8582-09", "assertion_type": "flow_assertion", "entity_types": ["1040"],
+     "title": "AMT refigure: Form 6251 line 2m = Σ(AMT reported − regular reported); the AMT carryover rolls separately",
+     "description": ("Validates R-8582-AMT-REFIGURE / R-8582-AMT-2M / R-8582-AMT-CARRYFWD (2026-09-05). Bug it catches: the AMT "
+                     "Form 8582 run with the regular carryover; line 2m entered with the wrong sign (a smaller AMT loss is "
+                     "POSITIVE); a transcribed AMT pool applied blind instead of reconciled; the AMT carryover overwriting the "
+                     "regular one."),
+     "definition": {"kind": "flow_assertion", "form": "FORM_8582",
+                    "checks": [{"source_line": "6251-2m", "must_write_to": ["6251.2m"]},
+                               {"source_line": "AMT-P8", "must_write_to": ["FORM_8582.amt_prior_unallowed_next_year"]}],
+                    "formula": "6251.2m == sum(regular_allowed - amt_allowed over loss activities) + sum(amt_income - regular_income over income activities)"},
+     "sort_order": 12},
 ]
 
 

@@ -182,15 +182,53 @@ if any("199A" in s for s in m.MAGI_ADDBACKS):
 
 # ── 2. FORM_8582 scenarios — independent recompute (aggregate + per-activity) ──
 DIAG_KEYS_8582 = {"D_8582_RE_PRO", "D_8582_MFS_TOGETHER", "D_8582_SUSPENDED",
-                  "D_8582_PHASEOUT", "D_8582_005", "D_8582_DISPOSITION", "D_8582_MULTIFORM"}
+                  "D_8582_PHASEOUT", "D_8582_005", "D_8582_DISPOSITION", "D_8582_MULTIFORM",
+                  "D_8582_AMT_RECON", "D_8582_AMT_ADJ_MISSING", "D_8582_AMT_INFO"}
+
+
+def recompute_amt(inp, got_regular):
+    """The AMT refigure (2026-09-05): the SAME independent per-activity math run over the
+    `amt_activities` (AMT nets + AMT priors), plus i6251 line 2m = Σ(AMT reported − regular
+    reported) — a loss reports as −allowed, so 2m = Σ(regular_allowed − amt_allowed) over loss
+    activities (+ Σ(amt_income − regular_income) over income activities)."""
+    amt = recompute_per_activity({**inp, "activities": inp["amt_activities"]})
+    reg_allowed = {p["name"]: p["allowed"] for p in got_regular.get("per_activity", [])}
+    amt_allowed = {p["name"]: p["allowed"] for p in amt.get("per_activity", [])}
+    reg_inc = {a["name"]: a.get("income", 0) for a in inp["activities"]}
+    amt_inc = {a["name"]: a.get("income", 0) for a in inp["amt_activities"]}
+    line_2m = 0
+    for name in {*reg_allowed, *amt_allowed}:
+        line_2m += reg_allowed.get(name, 0) - amt_allowed.get(name, 0)
+    for name in reg_inc:
+        line_2m += amt_inc.get(name, 0) - reg_inc.get(name, 0)
+    return {"amt_per_activity": amt.get("per_activity", []), "f6251_line_2m": line_2m}
+
+
 f8582_spec = next(s for s in m.FORMS if s["identity"]["form_number"] == "FORM_8582")
 for s in f8582_spec["scenarios"]:
     name = s["scenario_name"].split(" ")[0]
     inp, exp = s["inputs"], s["expected_outputs"]
     per_activity = "activities" in inp
     got = recompute_per_activity(inp) if per_activity else recompute_8582(inp)
+    if "amt_activities" in inp:
+        got.update(recompute_amt(inp, got))
+        if exp.get("D_8582_AMT_RECON"):
+            src = inp.get("amt_source_carryover") or {}
+            comp = {p["name"]: p["suspended"] for p in got["amt_per_activity"]}
+            if not any(src.get(n) is not None and src[n] != comp.get(n) for n in comp):
+                err(f"{name}: D_8582_AMT_RECON expected without a transcribed pool that disagrees")
     for k, want in exp.items():
         if k in DIAG_KEYS_8582:
+            continue
+        if k == "amt_per_activity":
+            got_pa = {p["name"]: p for p in got.get("amt_per_activity", [])}
+            for wp in want:
+                gp = got_pa.get(wp["name"])
+                if gp is None:
+                    err(f"{name}.amt_per_activity[{wp['name']}]: not recomputed")
+                    continue
+                check(f"{name}.{wp['name']}.amt_allowed", gp["allowed"], wp["allowed"])
+                check(f"{name}.{wp['name']}.amt_suspended", gp["suspended"], wp["suspended"])
             continue
         if k == "per_activity":
             got_pa = {p["name"]: p for p in got.get("per_activity", [])}

@@ -1,3 +1,29 @@
+## 2026-09-05 (delvio s333, later) - Ken's four rulings: 8615 parent lines nullable, NC L17 pull, the FORM_8582 AMT refigure AUTHORED + seeded
+- Ken, one message: "do your recommendations on all four" (delvio REVIEW_QUEUE s333).
+- 8615 (load_1040_form_8615.py): D_8615_005's condition now reads UNKEYED (blank) — a keyed 0 is the
+  parent's figure (Form 8615 line 6: "If zero or less, enter -0-"); k_parent_taxable_income /
+  k_parent_tax lose their "0" defaults. Witness: a parent with no taxable income. check_8615_integrity
+  ALL PASS; seeded; export cached.
+- NC_D400 (load_nc_d400.py): NEW fact state_refund_l17 (AUTO from the federal Schedule 1 line 1, the
+  §111 taxable recovery — NC D-401 line 17 "included on Line 1 of Schedule 1 (Form 1040)"); R-NC-DEDUCTIONS
+  formula + inputs + description amended; other_deductions no longer names L17; D-401 linked primary for
+  the pull. Seeded; export cached. (No NC harness exists — the delvio tests carry the arithmetic.)
+- FORM_8582 (load_1040_schedule_e.py): the AMT PASSIVE-LOSS REFIGURE authored from the 2025 i6251 line 2m
+  (fetched fresh, quoted in the loader): 7 facts (per-activity AMT adjustment / AMT prior unallowed /
+  AMT net / AMT allowed / AMT suspended / transcribed AMT pool; f6251_line_2m), 5 rules (R-8582-AMT-NET,
+  -REFIGURE = the same Parts I-VIII run over the AMT amounts with the regular MAGI [requires_human_review:
+  i6251 prescribes no AMT MAGI], -2M with the i6251 sign rule verbatim, -CARRYFWD with the reconciliation
+  of a transcribed pool, -PTP), 2 lines, 3 diagnostics (D_8582_AMT_RECON error / D_8582_AMT_ADJ_MISSING
+  warning / D_8582_AMT_INFO), 4 scenarios (AMT1 allowance-not-binding → 2m = +2,000; AMT2 = the client-3230
+  witness, 288,244 vs 250,149 both suspended, 2m = 0; AMT3 allowance binds both, 2m = 0; AMT4 the
+  transcribed-pool disagreement), FA-1040-8582-09, 7 rule links (IRS_2025_6251_INSTR joins
+  EXISTING_SOURCES_TO_REFERENCE). Harness extended (recompute_amt runs the per-activity math twice and
+  derives 2m); the AMT scenarios recompute clean — ⚠ the gate's SEVEN pre-existing "no independent
+  recompute mapped" lines (REP2 / PTP1 / AR1 / SCHE-T5 / SCHE-G1) were red before this amendment and
+  stay red (verified by stash: 7 before, 7 after). Seeded with --only FORM_8582; lookup/FORM_8582/export
+  = 19 rules / 33 facts; cached to delvio server/specs/form_8582_spec.json. THE APP BUILD is a separate
+  unit (per-activity AMT facts + the second engine run + D_CFWD_001 retirement for passive_amt).
+
 ## 2026-09-05 (delvio s333) - MINISTER + SCHEDULE_SE amended for 1040 BATCH-296 #70 (a 4361 minister's Schedule C), seeded + exported + cached
 - Witness (client 2821): a Form 4361-exempt minister whose ministerial income is a
   PREACHER Schedule C (net 3,211), filed with NO Schedule SE; the delvio engine
