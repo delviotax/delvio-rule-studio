@@ -409,6 +409,36 @@ AUTHORITY_SOURCES: list[dict] = [
                 "is_key_excerpt": True,
             },
             {
+                "excerpt_label": "Form IND-CR 212 Community Based Faculty Preceptor Tax Credit (IT-511 p64, Rev. 07/09/25)",
+                "excerpt_text": (
+                    "O.C.G.A. § 48-7-29.22 provides an income tax credit for a community based faculty "
+                    "preceptor that conducts a preceptorship rotation(s). This tax credit is applicable for "
+                    "taxable years beginning on or after January 1, 2019 and ending on or before December 31, "
+                    "2026. For a community based faculty preceptor who is a physician as defined in O.C.G.A. "
+                    "§ 43-34-21, the credit shall accrue on a per preceptorship rotation basis in the amount of "
+                    "$500 for the first, second, or third preceptorship rotation and $1,000 for the fourth, "
+                    "fifth, sixth, seventh, eighth, ninth, or tenth preceptorship rotation completed in one "
+                    "calendar year. For a community based faculty preceptor who is an advanced practice "
+                    "registered nurse as defined in O.C.G.A. § 43-26-3 or a physician assistant as defined in "
+                    "O.C.G.A. § 43-34-102, the credit shall accrue on a per preceptorship rotation basis in the "
+                    "amount of $375 for the first, second, or third preceptorship rotation and $750 for the "
+                    "fourth, fifth, sixth, seventh, eighth, ninth, or tenth preceptorship rotation completed "
+                    "in one calendar year. An individual shall not accrue credit for more than ten "
+                    "preceptorship rotations in one calendar year. The credit cannot be carried forward and "
+                    "cannot be carried back. Certification from the Area Health Education Centers Program "
+                    "Office at Augusta University must be enclosed with the return. By filing this form I "
+                    "certify that I did not receive payment during such tax year from any source for the "
+                    "training of a medical student, advanced practice registered nurse student, or physician "
+                    "assistant student. A1 rotations 1-3 (no more than 3) x $500 (not to exceed $1,500); A2 "
+                    "rotations 4-10 (no more than 7) x $1,000 (not to exceed $7,000); A3 = A1 + A2 (cannot "
+                    "exceed $8,500). B1 x $375 (not to exceed $1,125); B2 x $750 (not to exceed $5,250); B3 = "
+                    "B1 + B2 (cannot exceed $6,375). C1 credit used this year (enter no more than the total "
+                    "of Line A3 and Line B3) -> IND-CR Summary Worksheet Line 10 (p.67) -> Form 500 line 20."
+                ),
+                "summary_text": "IND-CR 212: per-rotation credit ($500/$1,000 physician; $375/$750 APRN/PA), 3 + 7 rotation caps, no carryforward, AHEC certification -> Summary L10 -> Form 500 L20.",
+                "is_key_excerpt": True,
+            },
+            {
                 "excerpt_label": "Low Income Credit table + worksheet (IT-511 p35, 2025)",
                 "excerpt_text": (
                     "Eligible if Federal AGI < $20,000 and not claimed/eligible as a dependent. "
@@ -706,7 +736,7 @@ GA500_FACTS: list[dict] = [
     {"fact_key": "g_tp_rie_interest", "label": "TP RIE worksheet L6 — interest income", "data_type": "decimal", "default_value": "0", "sort_order": 55, "notes": "RIE worksheet line 6 (unearned)."},
     {"fact_key": "g_tp_rie_dividends", "label": "TP RIE worksheet L7 — dividend income", "data_type": "decimal", "default_value": "0", "sort_order": 56, "notes": "RIE worksheet line 7 (unearned)."},
     {"fact_key": "g_tp_rie_alimony", "label": "TP RIE worksheet L8 — alimony", "data_type": "decimal", "default_value": "0", "sort_order": 57, "notes": "RIE worksheet line 8 (unearned)."},
-    {"fact_key": "g_tp_rie_capital_gains", "label": "TP RIE worksheet L9 — capital gains (losses)", "data_type": "decimal", "default_value": "0", "sort_order": 58, "notes": "RIE worksheet line 9 (unearned)."},
+    {"fact_key": "g_tp_rie_capital_gains", "label": "TP RIE worksheet L9 — capital gains (losses)", "data_type": "decimal", "default_value": "0", "sort_order": 58, "notes": "RIE worksheet line 9 (unearned). ITEM-LEVEL (IT-511 p.24; Ken 2026-09-05): the taxpayer’s own signed current-year capital results + the taxpayer’s own carryover component; joint items at 50%. Never a weight-prorated share of 1040 line 7."},
     {"fact_key": "g_tp_rie_other_income", "label": "TP RIE worksheet L10 — other income (losses)", "data_type": "decimal", "default_value": "0", "sort_order": 59, "notes": "RIE worksheet line 10 (unearned). COMPONENTS DEFINED 2026-08-30 (Ken, Gate-1 direct: “approve the GA RIE amendment, statute primary”): the §111 taxable state-tax refund AND unemployment compensation, each at its GEORGIA-TAXABLE amount. ⚠ The refund enters at the federal Schedule 1 line 1 figure — the §111 benefit-limited amount — NEVER gross 1099-G box 2. Unemployment enters at box 1 NET of any same-year repayment (the Schedule 1 line 7 quantity). ⚠ “line 10” here is the RIE WORKSHEET line 10, not Form 500 line 10 (Georgia AGI) and not Schedule 1 line 10 (U.S.-obligation interest) — three different line 10s live in this spec. Owner: unemployment follows the 1099-G row’s owner; the refund is JOINT on an MFJ return whose prior-year return was joint, so the 50/50 split below governs it, else it is the taxpayer’s."},
     {"fact_key": "g_tp_rie_taxable_ira", "label": "TP RIE worksheet L11 — taxable IRA distributions", "data_type": "decimal", "default_value": "0", "sort_order": 60, "notes": "RIE worksheet line 11 (← 1040 4b portion)."},
     {"fact_key": "g_tp_rie_taxable_pension", "label": "TP RIE worksheet L12 — taxable pensions", "data_type": "decimal", "default_value": "0", "sort_order": 61, "notes": "RIE worksheet line 12 (← 1040 5b portion)."},
@@ -721,7 +751,7 @@ GA500_FACTS: list[dict] = [
     {"fact_key": "g_sp_rie_interest", "label": "Spouse RIE L6 — interest income", "data_type": "decimal", "default_value": "0", "sort_order": 75, "notes": "Spouse RIE worksheet line 6."},
     {"fact_key": "g_sp_rie_dividends", "label": "Spouse RIE L7 — dividend income", "data_type": "decimal", "default_value": "0", "sort_order": 76, "notes": "Spouse RIE worksheet line 7."},
     {"fact_key": "g_sp_rie_alimony", "label": "Spouse RIE L8 — alimony", "data_type": "decimal", "default_value": "0", "sort_order": 77, "notes": "Spouse RIE worksheet line 8."},
-    {"fact_key": "g_sp_rie_capital_gains", "label": "Spouse RIE L9 — capital gains (losses)", "data_type": "decimal", "default_value": "0", "sort_order": 78, "notes": "Spouse RIE worksheet line 9."},
+    {"fact_key": "g_sp_rie_capital_gains", "label": "Spouse RIE L9 — capital gains (losses)", "data_type": "decimal", "default_value": "0", "sort_order": 78, "notes": "Spouse RIE worksheet line 9. ITEM-LEVEL (IT-511 p.24; Ken 2026-09-05): the spouse’s own signed current-year capital results + the spouse’s own carryover component; joint items at 50%."},
     {"fact_key": "g_sp_rie_other_income", "label": "Spouse RIE L10 — other income (losses)", "data_type": "decimal", "default_value": "0", "sort_order": 79, "notes": "Spouse RIE worksheet line 10. RIE worksheet line 10 (unearned). COMPONENTS DEFINED 2026-08-30 (Ken, Gate-1 direct: “approve the GA RIE amendment, statute primary”): the §111 taxable state-tax refund AND unemployment compensation, each at its GEORGIA-TAXABLE amount. ⚠ The refund enters at the federal Schedule 1 line 1 figure — the §111 benefit-limited amount — NEVER gross 1099-G box 2. Unemployment enters at box 1 NET of any same-year repayment (the Schedule 1 line 7 quantity). ⚠ “line 10” here is the RIE WORKSHEET line 10, not Form 500 line 10 (Georgia AGI) and not Schedule 1 line 10 (U.S.-obligation interest) — three different line 10s live in this spec."},
     {"fact_key": "g_sp_rie_taxable_ira", "label": "Spouse RIE L11 — taxable IRA distributions", "data_type": "decimal", "default_value": "0", "sort_order": 80, "notes": "Spouse RIE worksheet line 11."},
     {"fact_key": "g_sp_rie_taxable_pension", "label": "Spouse RIE L12 — taxable pensions", "data_type": "decimal", "default_value": "0", "sort_order": 81, "notes": "Spouse RIE worksheet line 12."},
@@ -760,7 +790,14 @@ GA500_FACTS: list[dict] = [
     {"fact_key": "g_other_state_income_for_credit", "label": "Income taxed by another state while a GA resident (other-state worksheet)", "data_type": "decimal", "default_value": "0", "sort_order": 141, "notes": "Other-state credit worksheet input."},
     {"fact_key": "g_other_state_tax_paid", "label": "Tax paid to the other state(s) on the doubly-taxed income", "data_type": "decimal", "default_value": "0", "sort_order": 142, "notes": "Other-state credit worksheet input (reduced by other-state credits)."},
     {"fact_key": "g_eligible_itemizer_credit", "label": "Georgia Eligible Itemizer Tax Credit (L19) — direct", "data_type": "decimal", "default_value": "0", "sort_order": 143, "notes": "Form 500 line 19. Direct-entry."},
-    {"fact_key": "g_indcr_other_credits", "label": "Other IND-CR credits (besides child-care) → line 20", "data_type": "decimal", "default_value": "0", "sort_order": 144, "notes": "Form 500 line 20 (IND-CR Summary), excluding the computed child-care credit. Direct-entry."},
+    {"fact_key": "g_indcr_other_credits", "label": "Other IND-CR credits (besides child-care) → line 20", "data_type": "decimal", "default_value": "0", "sort_order": 144, "notes": "Form 500 line 20 (IND-CR Summary) RESIDUAL: every IND-CR credit EXCEPT the computed child-care credit (IND-CR 202) and the computed preceptor credit (IND-CR 212, 2026-09-05). Direct-entry."},
+
+    # — Community based faculty preceptor credit (IND-CR 212) — Ken 2026-09-05, BATCH-014 #5 —
+    {"fact_key": "g_preceptor_role", "label": "IND-CR 212 preceptor role (none / physician / aprn_pa)", "data_type": "choice", "default_value": "none", "sort_order": 146, "notes": "Form IND-CR 212 (IT-511 p.64): Part A = physician (O.C.G.A. § 43-34-21); Part B = advanced practice registered nurse (§ 43-26-3) or physician assistant (§ 43-34-102). One role per filer; none = no credit."},
+    {"fact_key": "g_preceptor_rotations_1_3", "label": "IND-CR 212 line A1/B1 — preceptorship rotations 1-3 completed (max 3)", "data_type": "integer", "default_value": "0", "sort_order": 147, "notes": "Count of the first through third rotations completed in the calendar year (0-3). x $500 physician / x $375 APRN-PA."},
+    {"fact_key": "g_preceptor_rotations_4_10", "label": "IND-CR 212 line A2/B2 — preceptorship rotations 4-10 completed (max 7)", "data_type": "integer", "default_value": "0", "sort_order": 148, "notes": "Count of the fourth through tenth rotations (0-7); nonzero only when rotations 1-3 = 3. x $1,000 physician / x $750 APRN-PA. Ten rotations per calendar year is the statutory ceiling."},
+    {"fact_key": "g_preceptor_credit_used", "label": "IND-CR 212 line C1 — credit used this year (blank = the computed total)", "data_type": "decimal", "default_value": "", "sort_order": 149, "notes": "Form line C1: ‘enter no more than the total of Line A3 and Line B3’. Blank = A3 + B3; a keyed figure above the total is refused (D_GA500_018). No carryforward and no carryback — an unused remainder is lost."},
+    {"fact_key": "g_preceptor_certification_enclosed", "label": "IND-CR 212 — AHEC Program Office (Augusta University) certification enclosed", "data_type": "boolean", "default_value": "False", "sort_order": 150, "notes": "Required enclosure per the form; unasserted with a nonzero credit -> D_GA500_018 warning."},
     {"fact_key": "g_schedule2_credits", "label": "Schedule 2 series-100 Georgia tax credits (L21) — direct", "data_type": "decimal", "default_value": "0", "sort_order": 145, "notes": "Form 500 line 21 (e-file required). Direct-entry."},
 
     # — payments / withholding —
@@ -809,7 +846,10 @@ GA500_RULES: list[dict] = [
                  "(box 1 net of same-year repayment). Ken, Gate-1 direct 2026-08-30. "
                  "L17 = min(L15, max allowable [$35,000 age 62-64/disabled, $65,000 age 65+]). "
                  "Taxpayer L17 → Sch 1 L7a (or L7c disability); spouse L17 → L7d (or L7f). "
-                 "Each spouse qualifies separately; jointly-owned income split 50/50. "
+                 "Each spouse qualifies separately. EACH ITEM OF INCOME OR LOSS GOES TO ITS OWNER, SIGNED; only a "
+                 "jointly-held item splits 50/50 (IT-511 p.24 verbatim; Ken 2026-09-05 ‘worksheet approach’, "
+                 "BATCH-014 #2) — L9 capital gains = the spouse’s own current results + own carryover component, "
+                 "never a weight-prorated share of 1040 line 7. Cap-binding attribution UNSPECIFIED (see description). "
                  "THE 50/50 SPLIT IS VENDOR-AWARE (Ken, Gate-1 direct 2026-08-26 — \"Write it into R-GA500-RIE\"), "
                  "and BOTH conventions CONSERVE (the two per-spouse amounts always re-add to the joint amount, so "
                  "Sch 1 L7 and L13 tie under either): "
@@ -865,7 +905,8 @@ GA500_RULES: list[dict] = [
                      "⚠ NOT RULED, RECORDED AS AN OPEN SPEC/ENGINE GAP: the delvio-tax engine also routes "
                      "1099-PATR patronage and 1099-MISC box 3 (both federal Schedule 1 line 8z) to this same "
                      "worksheet line. That is engine behaviour this spec has never stated and it was NOT part of "
-                     "this ruling — flagged, not adopted.")},
+                     "this ruling — flagged, not adopted. "
+                     "─── ALLOCATION BETWEEN SPOUSES DEFINED 2026-09-05 (Ken, Gate-1 direct, 1040 BATCH-014 #2: “worksheet approach”). SOURCE, VERBATIM (2025 IT-511 p.24, Retirement Income Exclusion): “Income or losses should be allocated to the person who owns the item. If any item is held jointly, the income or loss should be allocated to each taxpayer at 50%.” THIS IS ITEM-LEVEL ALLOCATION: each item of income or loss goes to its OWNER, signed; only a JOINTLY-held item splits 50/50 (under the vendor-aware rounding convention above). It is NOT a proportional share of a return-level total by weight. CAPITAL GAINS (worksheet L9) in particular: each spouse’s L9 = that spouse’s own signed current-year results (Form 8949 rows, capital-gain distributions, K-1 capital items) PLUS that spouse’s own prior-year loss carryover component, joint items 50/50 — so a joint return whose owners net 431 − 939 = −508 and 475 − 2,145 = −1,670 prints exactly those two columns (the BATCH-014 fixture; the weight proration the engine used gave −894 / −1,284 and was WRONG by the worksheet). A carryover pool therefore carries a PER-OWNER component, not one owner tag. ⚠ THE §1211(b) $3,000 CAP: when the federal cap binds, the sum of the owners’ signed nets is MORE negative than 1040 line 7 and the booklet does NOT say how the disallowed portion is attributed — UNSPECIFIED. The engine applies item-level allocation only when the owners’ nets re-add to line 7 exactly (no cap binding, every source owner-attributed); otherwise it keeps its return-level allocation and D_GA500_017 names the columns as preparer-entered. NOT a rounding rule: the 50/50 vendor clause governs only genuinely joint items.")},
 
     {"rule_id": "R-GA500-MIL", "title": "Schedule 1 line 7 — Military Retirement Exclusion worksheet", "rule_type": "calculation", "precedence": 2, "sort_order": 6,
      "formula": "Under 62 only. L3 = min(military retirement, $17,500). STOP branches (military retirement < $17,501 OR GA earned income < $17,501): exclusion = L3, entered on Sch 1 L7b/7e. Proceed branch: L7 = $35,000 (the worksheet's PREPRINTED total cap) and L8 = min(military retirement, L7); exclusion = L8 ALONE — NEVER L3 + L8 (IT-511: the additional $17,500 is claimed 'against the total military retirement income they received', so the total exclusion can never exceed the retirement actually received). → Sch 1 L7b/7e, entered on Sch 1 L9 as a subtraction. Max $35,000.",
@@ -920,7 +961,18 @@ GA500_RULES: list[dict] = [
     {"rule_id": "R-GA500-CC", "title": "Line 20 — IND-CR 202 child & dependent care credit", "rule_type": "calculation", "precedence": 9, "sort_order": 16,
      "formula": "GA child-care credit = 50% × the federal §21 child & dependent care credit claimed on the 1040 (Form 2441 result). → IND-CR Summary → Form 500 line 20. Not carried forward.",
      "inputs": ["g_federal_dependent_care_credit", "g_indcr_other_credits"], "outputs": ["20", "CC-3"],
-     "description": "O.C.G.A. §48-7-29.10. Computed from the federal Form 2441 result."},
+     "description": "O.C.G.A. §48-7-29.10. Computed from the federal Form 2441 result. LINE 20 COMPOSITION (2026-09-05): line 20 = CC-3 (this rule) + 212-C1 (R-GA500-PRECEPTOR) + g_indcr_other_credits (the residual for every other IND-CR credit)."},
+
+    {"rule_id": "R-GA500-PRECEPTOR", "title": "Line 20 — IND-CR 212 community based faculty preceptor credit", "rule_type": "calculation", "precedence": 9, "sort_order": 16,
+     "formula": ("Physician (Part A): A1 = min(rotations_1_3, 3) x $500 (<= $1,500); A2 = min(rotations_4_10, 7) x $1,000 (<= $7,000); "
+                 "A3 = A1 + A2 (<= $8,500). APRN / PA (Part B): B1 = min(rotations_1_3, 3) x $375 (<= $1,125); B2 = min(rotations_4_10, 7) x $750 "
+                 "(<= $5,250); B3 = B1 + B2 (<= $6,375). Exactly one part applies (g_preceptor_role). C1 = g_preceptor_credit_used when keyed "
+                 "(refused if > A3 + B3), else A3 + B3. C1 -> IND-CR Summary Worksheet line 10 -> Form 500 line 20 (nonrefundable; "
+                 "the line-22 cap against line 16 applies). NO carryforward, NO carryback. Window: taxable years beginning on/after "
+                 "2019-01-01 and ending on/before 2026-12-31 — ZERO outside it, never a latest-year fallback (the HB 463 precedent)."),
+     "inputs": ["g_preceptor_role", "g_preceptor_rotations_1_3", "g_preceptor_rotations_4_10", "g_preceptor_credit_used", "g_preceptor_certification_enclosed"],
+     "outputs": ["212-A1", "212-A2", "212-A3", "212-B1", "212-B2", "212-B3", "212-C1", "20"],
+     "description": "O.C.G.A. § 48-7-29.22 via Form IND-CR 212 (Rev. 07/09/25) transcribed from the 2025 IT-511 p.64 — the per-rotation amounts, the 3 + 7 rotation caps and the ten-per-year ceiling, the no-carry rule and the AHEC certification are the form’s own words (see the excerpt). Authored 2026-09-05 on Ken’s Gate-1 direct (BATCH-014 #5: ‘go ahead with the spec’). ⚠ The statute text itself was NOT fetched — the form is the primary transcription; if § 48-7-29.22 is later read to differ from the form, the statute governs and this rule is stale."},
 
     {"rule_id": "R-GA500-L22-CR", "title": "Lines 22-23 — total credits and balance", "rule_type": "calculation", "precedence": 10, "sort_order": 17,
      "formula": "Line 22 = Σ(L17c + L18 + L19 + L20 + L21), capped at line 16. Line 23 = max(0, line 16 − line 22).",
@@ -1073,6 +1125,15 @@ GA500_LINES: list[dict] = [
 
     # — Child-care credit —
     {"line_number": "CC-3", "description": "IND-CR 202: GA child & dependent care credit = 50% of the federal §21 credit", "line_type": "calculated"},
+
+    # — Community based faculty preceptor credit (IND-CR 212) —
+    {"line_number": "212-A1", "description": "IND-CR 212 A1: physician rotations 1-3 x $500 (not to exceed $1,500)", "line_type": "calculated"},
+    {"line_number": "212-A2", "description": "IND-CR 212 A2: physician rotations 4-10 x $1,000 (not to exceed $7,000)", "line_type": "calculated"},
+    {"line_number": "212-A3", "description": "IND-CR 212 A3: physician current-year credit = A1 + A2 (cannot exceed $8,500)", "line_type": "calculated"},
+    {"line_number": "212-B1", "description": "IND-CR 212 B1: APRN/PA rotations 1-3 x $375 (not to exceed $1,125)", "line_type": "calculated"},
+    {"line_number": "212-B2", "description": "IND-CR 212 B2: APRN/PA rotations 4-10 x $750 (not to exceed $5,250)", "line_type": "calculated"},
+    {"line_number": "212-B3", "description": "IND-CR 212 B3: APRN/PA current-year credit = B1 + B2 (cannot exceed $6,375)", "line_type": "calculated"},
+    {"line_number": "212-C1", "description": "IND-CR 212 C1: credit used this year (<= A3 + B3) -> IND-CR Summary Worksheet line 10 -> Form 500 line 20", "line_type": "calculated"},
 ]
 
 
@@ -1145,6 +1206,10 @@ GA500_DIAGNOSTICS: list[dict] = [
      "condition": "g_tp_rie_applies or g_sp_rie_applies is True AND that person's RIE worksheet line 17 = 0",
      "message": "The retirement income exclusion applies (age/disability gate set) but the computed exclusion is $0 — no income reached that person's worksheet base. Verify the age basis and that the person's retirement income is entered and attributed to the correct spouse.",
      "notes": "Warning — re-homed from the app's pre-pull D_GA500_002 (which this spec defines as the DOB-required error; the app diverged and is realigned tts s113). Post-pull this fires mainly for a qualified person with no attributed income at all."},
+    {"diagnostic_id": "D_GA500_018", "title": "IND-CR 212 preceptor credit — caps, window, certification", "severity": "error",
+     "condition": "g_preceptor_role != none AND (g_preceptor_rotations_1_3 > 3 OR g_preceptor_rotations_4_10 > 7 OR (g_preceptor_rotations_4_10 > 0 AND g_preceptor_rotations_1_3 < 3) OR g_preceptor_credit_used > 212-A3 + 212-B3 OR tax_year outside 2019-2026); WARNING when 212-C1 > 0 AND NOT g_preceptor_certification_enclosed",
+     "message": "IND-CR 212: no more than three first-through-third rotations and seven fourth-through-tenth rotations (ten per calendar year); rotations 4-10 presuppose three completed; the credit used cannot exceed A3 + B3 and cannot be carried forward or back; the credit exists only for taxable years 2019-2026; the AHEC Program Office certification must be enclosed.",
+     "notes": "Error on a cap, window or overclaim; warning on the missing certification. Authored 2026-09-05 (BATCH-014 #5) from IT-511 p.64."},
     {"diagnostic_id": "D_GA500_017", "title": "RIE base may be incomplete — categories not auto-pulled", "severity": "warning",
      "condition": "g_tp_rie_applies or g_sp_rie_applies is True AND the federal return carries alimony received (Sch 1 line 2a), capital gain/(loss) (1040 line 7), Schedule 1 other income (line 9), or Schedule E page-1 rental/royalty activity AND the corresponding RIE worksheet lines (8/9/10/13) are blank for both spouses",
      "message": "This return has federal income in categories the software cannot attribute per spouse (alimony, capital gains, other income, and/or Schedule E rental/royalty). If any of it is income of a retirement-exclusion-qualified person, enter the per-spouse amounts on RIE worksheet lines 8/9/10/13 — these categories are not pulled automatically.",
@@ -1250,6 +1315,14 @@ GA500_SCENARIOS: list[dict] = [
                 "g_tp_military_under62": True, "g_tp_military_retirement": 20000, "g_tp_military_ga_earned": 20000},
      "expected_outputs": {"MIL-3": 17500, "MIL-7": 35000, "MIL-8": 20000, "S1-7": 20000, "9": -20000, "10": 40000, "11": 12000, "13": 28000, "15c": 28000, "16": 1453},
      "notes": "HAND-COMPUTED (the 2026-07-05 over-exclusion fix's proof case). Military retirement 20,000, GA earned 20,000 ≥ 17,501 → proceed: L7 = 35,000, L8 = min(20,000, 35,000) = 20,000 excluded — the exclusion equals the retirement RECEIVED, never L3 + L8 = 37,500→35,000 as the buggy formula gave. 60,000 − 20,000 = 40,000 − 12,000 = 28,000 × 5.19% = 1,453.20 → 1,453 (the pre-fix formula gave tax 675)."},
+    {"scenario_name": "GA500-T21 — IND-CR 212 physician preceptor, 3 + 5 rotations (2025)", "scenario_type": "normal", "sort_order": 21,
+     "inputs": {"tax_year": 2025, "g_residency_status": "full_year", "g_filing_status": "A", "g_num_dependents": 0, "g_federal_agi": 200000, "g_preceptor_role": "physician", "g_preceptor_rotations_1_3": 3, "g_preceptor_rotations_4_10": 5, "g_preceptor_certification_enclosed": True},
+     "expected_outputs": {"13": 188000, "15c": 188000, "16": 9757, "212-A1": 1500, "212-A2": 5000, "212-A3": 6500, "212-C1": 6500, "20": 6500, "22": 6500, "23": 3257},
+     "notes": "A1 = 3 x 500 = 1,500; A2 = 5 x 1,000 = 5,000; A3 = 6,500; C1 blank -> 6,500 -> line 20. Tax 188,000 x 5.19% = 9,757.20 -> 9,757; balance 3,257. IT-511 p.64."},
+    {"scenario_name": "GA500-T22 — IND-CR 212 APRN preceptor, 2 rotations, credit keyed below the total (2025)", "scenario_type": "edge_case", "sort_order": 22,
+     "inputs": {"tax_year": 2025, "g_residency_status": "full_year", "g_filing_status": "A", "g_num_dependents": 0, "g_federal_agi": 60000, "g_preceptor_role": "aprn_pa", "g_preceptor_rotations_1_3": 2, "g_preceptor_rotations_4_10": 0, "g_preceptor_credit_used": 500, "g_preceptor_certification_enclosed": True},
+     "expected_outputs": {"13": 48000, "16": 2491, "212-B1": 750, "212-B3": 750, "212-C1": 500, "20": 500, "22": 500, "23": 1991},
+     "notes": "B1 = 2 x 375 = 750; the filer keys C1 = 500 (<= 750) -> line 20 = 500; the unused 250 is LOST (no carryforward). Tax 48,000 x 5.19% = 2,491.20 -> 2,491."},
     {"scenario_name": "GA500-T20 — LIC counts children only: HOH with an ODC brother dependent (2025)", "scenario_type": "edge_case", "sort_order": 20,
      "inputs": {"tax_year": 2025, "g_residency_status": "full_year", "g_filing_status": "D", "g_num_dependents": 1, "g_lic_children": 0,
                 "g_federal_agi": 18000, "g_lic_not_dependent": True, "g_lic_age65_count": 0},
@@ -1283,6 +1356,8 @@ GA500_RULE_LINKS: list[tuple[str, str, str, str]] = [
     ("R-GA500-OSC", "GA_2025_IT511", "primary", "Other-state tax credit worksheet"),
     ("R-GA500-CC", "GA_2025_FORM_500", "primary", "IND-CR 202 child & dependent care credit"),
     ("R-GA500-CC", "GA_OCGA_48_7", "primary", "§48-7-29.10 child & dependent care credit (50%)"),
+    ("R-GA500-PRECEPTOR", "GA_2025_IT511", "primary", "Form IND-CR 212 (IT-511 p.64) — per-rotation amounts, caps, window, no-carry, certification"),
+    ("R-GA500-PRECEPTOR", "GA_OCGA_48_7", "primary", "§48-7-29.22 community based faculty preceptor credit"),
     ("R-GA500-DEPR", "GA_2025_IT511", "primary", "GA conformity (IRC 1/1/2025, no OBBBA, §168(k) disallowance)"),
     ("R-GA500-TIPS", "GA_HB463_2026", "primary", "§48-7-27(a)(17) cash tips exclusion — verbatim /AP text"),
     ("R-GA500-TIPS", "GA_OCGA_48_7", "supporting", "Codified home: §48-7-27(a) subtraction list"),
@@ -1335,6 +1410,9 @@ FLOW_ASSERTIONS: list[dict] = [
     {"assertion_id": "FA-GA500-13", "assertion_type": "flow_assertion", "entity_types": ["1040"], "sort_order": 13,
      "title": "Tips/overtime exclusions → Schedule 1 subtractions → line 9", "description": "Validates R-GA500-TIPS / R-GA500-OT. The computed HB 463 exclusions (S1-12a cash tips, S1-12b qualified overtime) flow into the Schedule 1 subtraction subtotal (S1-13) and thus Form 500 line 9.",
      "definition": {"kind": "flow_assertion", "form": "500", "source_line": "S1-12a", "must_write_to": ["500.S1-13"], "companion_source_line": "S1-12b"}},
+    {"assertion_id": "FA-GA500-15", "assertion_type": "flow_assertion", "entity_types": ["1040"], "sort_order": 15,
+     "title": "IND-CR 212 preceptor credit used -> Form 500 line 20", "description": "Validates R-GA500-PRECEPTOR. The credit used (212-C1, <= A3 + B3) reaches Form 500 line 20 through the IND-CR Summary Worksheet line 10, once.",
+     "definition": {"kind": "flow_assertion", "form": "500", "source_line": "212-C1", "must_write_to": ["500.20"]}},
     {"assertion_id": "FA-GA500-14", "assertion_type": "reconciliation", "entity_types": ["1040"], "sort_order": 14,
      "title": "HB 463 tips/OT constants + gates pinned", "description": "Pins the §48-7-27(a)(16)/(17) mechanics: $1,750 cap per category PER TAXPAYER (W7), window TY2026-TY2028 with ZERO outside (self-repeal 12/31/2028 — never a latest-year fallback), the overtime full-time-hourly preparer-assertion gate (unasserted → 0), and the W-2-employee-only overtime source.",
      "definition": {"kind": "reconciliation", "form": "500", "constants": {"tips_ot_cap": 1750, "tips_ot_first_year": 2026, "tips_ot_last_year": 2028, "cap_grain": "per_taxpayer", "ot_gate": "ft_hourly_assertion", "ot_source": "w2_only"}}},
@@ -1374,7 +1452,11 @@ FORMS: list[dict] = [
                 "from the app's divergent D_GA500_002 semantics) + D_GA500_017 (RIE base categories "
                 "not auto-pulled — alimony/cap-gains/other/Sch-E rental; the no-silent-gap companion "
                 "to the tts s108 federal→RIE pull). Mechanism additions only — no tax-law element "
-                "changes; not a CHANGE_REGISTER item."
+                "changes; not a CHANGE_REGISTER item. AMENDED 2026-09-05 (s332, 1040 BATCH-014 #2 + #5, Ken Gate-1 "
+                "direct): R-GA500-RIE allocation between spouses is ITEM-LEVEL per IT-511 p.24 verbatim (cap-binding "
+                "attribution unspecified); NEW R-GA500-PRECEPTOR — IND-CR 212 community based faculty preceptor "
+                "credit (5 facts, 7 lines 212-A1..C1, D_GA500_018, T21/T22, FA-GA500-15; line 20 = CC-3 + 212-C1 + "
+                "the g_indcr_other_credits residual)."
             ),
         },
         "facts": GA500_FACTS,

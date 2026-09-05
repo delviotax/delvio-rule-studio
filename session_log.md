@@ -1,3 +1,35 @@
+## 2026-09-05 (delvio s332) - GA-500 AMENDED for 1040 BATCH-014 #2 + #5, Gate 1 APPROVED (Ken direct), seeded + exported + cached
+- Ken, one message: item 2 "worksheet approach"; item 5 "go ahead with the spec".
+- SOURCE fetched fresh: the 2025 IT-511 booklet PDF (dor.georgia.gov). p.24 RIE:
+  "Income or losses should be allocated to the person who owns the item. If any
+  item is held jointly, the income or loss should be allocated to each taxpayer
+  at 50%." p.64 Form IND-CR 212 (Rev. 07/09/25) transcribed verbatim into an
+  excerpt; p.67 Summary Worksheet line 10 -> Form 500 line 20.
+- R-GA500-RIE: allocation between spouses is ITEM-LEVEL (each item to its owner,
+  signed; joint 50/50 under the existing vendor-aware rounding). L9 capital gains
+  = own current results + own carryover COMPONENT (a pool carries per-owner
+  components). The engine's weight proration was WRONG by the worksheet on the
+  fixture (-894/-1,284 vs the printed -508/-1,670). CAP-BINDING attribution
+  recorded as UNSPECIFIED (the booklet is silent) - the delvio engine applies
+  item-level only when the owners' nets re-add to 1040 line 7 exactly.
+- NEW R-GA500-PRECEPTOR (IND-CR 212): 5 facts (role choice, rotations 1-3 /
+  4-10, credit used, AHEC certification), lines 212-A1..C1, D_GA500_018 (caps /
+  window 2019-2026 / overclaim = error; missing certification = warning),
+  T21 (physician 3+5 -> 6,500) + T22 (APRN 2 rotations, C1 keyed 500 < 750, the
+  unused 250 LOST - no carryforward), FA-GA500-15. Line 20 = CC-3 + 212-C1 +
+  the g_indcr_other_credits residual (its notes now exclude 212).
+  ⚠ The statute text (§48-7-29.22) was NOT fetched; the form is the primary
+  transcription and the rule says so.
+- check_ga500_integrity.py extended with the 212 recompute: ALL CHECKS PASS
+  (23 scenarios). Pre-flight cap scan + prod snapshot run (85/23/91/17/21 before).
+- Seeded to RS prod: 90 facts / 24 rules / 98 lines / 18 diagnostics / 23 tests /
+  15 FA. Deployed lookup/500/export/ = 200, every element verified present;
+  cached verbatim to delvio-tax server/specs/500_spec.json.
+- Mechanism: scratchpad/apply_ga500_b014.py (exact-anchor edits, 13 of 13).
+- NEXT (delvio lane): the engine item-level L9 + the carryover tp_share pair
+  (migration 0389), movement dry run over the 88 filed MFJ returns, deploy.
+  The IND-CR 212 APP build (form model / compute / print / lane) is a later unit.
+
 ## 2026-08-12/13 (s253) - FORM_172 (NOLs) authored, Gate 1 APPROVED, seeded + exported + cached
 - Ken came online ("I'm ready to answer NOL questions") and answered the s246
   brief's four questions live: BOTH SIDES in v1 (he overrode deduction-only);

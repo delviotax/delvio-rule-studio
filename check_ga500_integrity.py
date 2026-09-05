@@ -259,7 +259,25 @@ def recompute(inp):
 
     # — IND-CR 202 child & dependent care (50% of federal §21) —
     cc = r0(D(inp.get("g_federal_dependent_care_credit")) * Decimal("0.50"))
-    l20 = cc + D(inp.get("g_indcr_other_credits"))
+    # — IND-CR 212 preceptor credit (IT-511 p.64; authored 2026-09-05) —
+    role = inp.get("g_preceptor_role") or "none"
+    r13 = min(int(D(inp.get("g_preceptor_rotations_1_3"))), 3)
+    r410 = min(int(D(inp.get("g_preceptor_rotations_4_10"))), 7)
+    c1 = Decimal(0)
+    if role == "physician" and 2019 <= year <= 2026:
+        a1, a2 = Decimal(r13 * 500), Decimal(r410 * 1000)
+        out["212-A1"], out["212-A2"], out["212-A3"] = a1, a2, a1 + a2
+        c1 = a1 + a2
+    elif role == "aprn_pa" and 2019 <= year <= 2026:
+        b1, b2 = Decimal(r13 * 375), Decimal(r410 * 750)
+        out["212-B1"], out["212-B2"], out["212-B3"] = b1, b2, b1 + b2
+        c1 = b1 + b2
+    keyed = inp.get("g_preceptor_credit_used")
+    if c1 and keyed not in (None, ""):
+        c1 = min(c1, D(keyed))
+    if c1:
+        out["212-C1"] = c1
+    l20 = cc + c1 + D(inp.get("g_indcr_other_credits"))
     if cc > 0:
         out["CC-3"] = cc
     if l20 > 0:
