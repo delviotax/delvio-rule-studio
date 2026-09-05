@@ -26,6 +26,15 @@
   15 FA. Deployed lookup/500/export/ = 200, every element verified present;
   cached verbatim to delvio-tax server/specs/500_spec.json.
 - Mechanism: scratchpad/apply_ga500_b014.py (exact-anchor edits, 13 of 13).
+- SAME DAY, LATER (delvio BATCH-015 #3): R-5329-12 (form 5329, loader
+  load_1040_retirement.py) gained a MECHANISM note — the source-controlled
+  Schedule 2 line 8 override (the filed 'Form 5329 not required' figure carried
+  as sch2_l8_source_amount/label/note, adding to the rule's total, refused beside
+  a 5329 row, D_5329_SRC). Not a tax-law change. ⚠ OPEN SPEC QUESTION recorded
+  in the note, NOT decided: should code L (a §72(p) deemed distribution) be in
+  EARLY_CODES ({1, S} today)? The witness packet's vendor computed the 10% on it.
+  check_retirement_integrity ALL PASS; seeded; lookup/5329/export verified and
+  cached to delvio server/specs/5329_spec.json.
 - NEXT (delvio lane): the engine item-level L9 + the carryover tp_share pair
   (migration 0389), movement dry run over the 88 filed MFJ returns, deploy.
   The IND-CR 212 APP build (form model / compute / print / lane) is a later unit.
