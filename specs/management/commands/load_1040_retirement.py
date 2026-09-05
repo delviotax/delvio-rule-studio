@@ -1532,7 +1532,15 @@ F5329_RULES: list[dict] = [
      "inputs": [], "outputs": ["SCH_2.L8"],
      "description": ("ONCE PER RETURN. Each part's additional tax includes on Schedule 2 (Form 1040) line 8. "
                      "Computed feeder (Topic-2 direct-entry → computed; preparer override = the escape hatch). "
-                     "DUAL: the tts side sums BOTH the taxpayer's and the spouse's Form 5329 totals into one Sch 2 L8.")},
+                     "DUAL: the tts side sums BOTH the taxpayer's and the spouse's Form 5329 totals into one Sch 2 L8. "
+                     "SOURCE-CONTROLLED OVERRIDE (2026-09-05, delvio s332 / 1040 BATCH-015 #3 — a mechanism, not a tax-law "
+                     "change): when the FILED Schedule 2 reports line 8 DIRECTLY with the 'Form 5329 not required' box and no "
+                     "form — the SCH_2 spec types line 8 `input` and names that box — the delvio lane records the filed figure "
+                     "as `sch2_l8_source_amount` + `_label` + `_note` (the line-14 trio shape). It ADDS to this rule's total, is "
+                     "refused at staging beside any Form 5329 row, and D_5329_SRC names it (error when the engine also derives "
+                     "a Part I tax). Witness: a code-L deemed distribution — the engine's EARLY_CODES is {1, S}, so it derives "
+                     "no 10% for code L; whether code L SHOULD be early under §72(t)/(p) is an open spec question, NOT decided "
+                     "here.")},
 ]
 
 _SCH2L8 = "Schedule 2 (Form 1040) line 8"
