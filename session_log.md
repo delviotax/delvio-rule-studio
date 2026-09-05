@@ -1,3 +1,25 @@
+## 2026-09-05 (delvio s333) - MINISTER + SCHEDULE_SE amended for 1040 BATCH-296 #70 (a 4361 minister's Schedule C), seeded + exported + cached
+- Witness (client 2821): a Form 4361-exempt minister whose ministerial income is a
+  PREACHER Schedule C (net 3,211), filed with NO Schedule SE; the delvio engine
+  zeroed only W-2 ministerial earnings and manufactured 454 of SE tax.
+- SOURCE fetched fresh: Pub 517 (2025). "If you have an approved exemption ...
+  don't include the income or deductions from ministerial services in figuring
+  your net earnings from self-employment"; the self-employed minister "Deduct[s]
+  these expenses on Schedule C ... and carr[ies] the net amount to line 2 of
+  Schedule SE"; the exemption "doesn't apply to any other self-employment income".
+- R-MIN-4361: NEW per-business fact min_schc_ministerial (sort 8); formula + description
+  amended (a marked Schedule C leaves that proprietor's Schedule SE line 2; its line 31
+  still reaches Schedule 1 line 3 and QBI; an unmarked Schedule C stays). D_MIN_4361
+  message names the Schedule C branch. Pub 517 linked PRIMARY on R-MIN-4361.
+- R-SE-L2 (load_1040_schedule_c.py): description amended to say the same from the SE
+  side. No formula change (the exclusion is R-MIN-4361's).
+- check_minister_integrity + check_topic8_integrity: ALL CHECKS PASS. Seeded to RS prod
+  (load_1040_minister; load_1040_schedule_c THEN load_1040_schedule_f, the production
+  writer order). lookup/MINISTER + lookup/SCHEDULE_SE exports verified to carry the
+  amendment; cached to delvio-tax server/specs/{minister,schedule_se}_spec.json.
+- Not a tax-law change to the worksheet arithmetic (no new scenario; the Schedule C
+  branch is exercised by delvio's own test file test_b296_item70_ministerial_schc.py).
+
 ## 2026-09-05 (delvio s332) - GA-500 AMENDED for 1040 BATCH-014 #2 + #5, Gate 1 APPROVED (Ken direct), seeded + exported + cached
 - Ken, one message: item 2 "worksheet approach"; item 5 "go ahead with the spec".
 - SOURCE fetched fresh: the 2025 IT-511 booklet PDF (dor.georgia.gov). p.24 RIE:
